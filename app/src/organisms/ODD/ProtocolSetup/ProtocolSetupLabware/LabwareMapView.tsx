@@ -19,7 +19,7 @@ import {
 
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { LabwareOnDeck } from '@opentrons/components'
 import type {
   CompletedProtocolAnalysis,
@@ -35,7 +35,7 @@ interface LabwareMapViewProps {
   labwareByLiquidId: LabwareByLiquidId
 }
 
-export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
+export function LabwareMapView(props: LabwareMapViewProps): ReactNode {
   const {
     handleLabwareClick,
     mostRecentAnalysis,

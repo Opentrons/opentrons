@@ -9,13 +9,14 @@ import {
 import { LPCLabwareDetails } from './LPCLabwareDetails'
 import { LPCLabwareList } from './LPCLabwareList'
 
+import type { ReactNode } from 'react'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
-export function HandleLabware(props: LPCWizardContentProps): JSX.Element {
+export function HandleLabware(props: LPCWizardContentProps): ReactNode {
   return <HandleLabwareContent {...props} />
 }
 
-function HandleLabwareContent(props: LPCWizardContentProps): JSX.Element {
+function HandleLabwareContent(props: LPCWizardContentProps): ReactNode {
   const currentSubStep = useSelector(selectCurrentSubstep(props.runId))
 
   // These views are one step, since the progress bar remains static during the core LPC flow. Therefore, we use substeps to navigate.

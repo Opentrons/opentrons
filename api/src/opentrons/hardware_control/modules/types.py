@@ -26,7 +26,7 @@ from opentrons.drivers.flex_stacker.types import (
     PlatformStatus,
     StackerAxis,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 
 
 @dataclass(frozen=True)

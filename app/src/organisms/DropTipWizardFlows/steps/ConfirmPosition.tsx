@@ -23,6 +23,7 @@ import {
 } from '../constants'
 import { DropTipFooterButtons } from '../shared'
 
+import type { ReactNode } from 'react'
 import type { DropTipWizardContainerProps } from '../types'
 
 export interface UseConfirmPositionResult {
@@ -75,7 +76,7 @@ export function ConfirmPosition({
   dropTipCommands,
   proceed,
   modalStyle,
-}: ConfirmPositionProps): JSX.Element {
+}: ConfirmPositionProps): ReactNode {
   const { blowoutOrDropTip } = dropTipCommands
   const { t } = useTranslation('drop_tip_wizard')
 

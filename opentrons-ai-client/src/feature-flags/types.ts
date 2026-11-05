@@ -5,11 +5,12 @@
 export const DEPRECATED_FLAGS = [
   // Feature flags modal removed - settings page now handles all feature flags
   'displayFeatureFlagsModal',
+  // PD protocol generation removed (AUTH-2850) - PD format is no longer supported
+  'enablePDProtocolGeneration',
 ]
 
 // union of feature flag string constant IDs
-export type FlagTypes =
-  'enablePrereleaseMode' | 'enablePDProtocolGeneration' | 'enableAnalytics'
+export type FlagTypes = 'enablePrereleaseMode' | 'enableAnalytics'
 
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: FlagTypes[] = ['enableAnalytics']
@@ -17,7 +18,6 @@ export const userFacingFlags: FlagTypes[] = ['enableAnalytics']
 export const allFlags: FlagTypes[] = [
   ...userFacingFlags,
   'enablePrereleaseMode',
-  'enablePDProtocolGeneration',
 ]
 
 export type Flags = Partial<Record<FlagTypes, boolean | null | undefined>>

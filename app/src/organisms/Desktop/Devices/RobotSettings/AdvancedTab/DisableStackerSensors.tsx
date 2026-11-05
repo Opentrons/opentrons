@@ -13,13 +13,15 @@ import {
 import { ToggleButton } from '/app/atoms/buttons'
 import { useDisableStackerSensors } from '/app/resources/robot-settings'
 
+import type { ReactNode } from 'react'
+
 interface DisableStackerSensorsProps {
   isRobotBusy: boolean
 }
 
 export function DisableStackerSensors({
   isRobotBusy,
-}: DisableStackerSensorsProps): JSX.Element {
+}: DisableStackerSensorsProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const { sensorsDisabled, toggleSensors } = useDisableStackerSensors()
 

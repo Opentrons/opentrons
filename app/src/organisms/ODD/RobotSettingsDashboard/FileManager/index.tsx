@@ -22,7 +22,7 @@ import { DownloadLogPeriodsWizard } from './FileManagerWizardFlows/DownloadLogPe
 import { DownloadProtocolRunRecordsWizard } from './FileManagerWizardFlows/DownloadProtocolRunRecordsWizard'
 import { ProtocolRunRecords } from './ProtocolRunRecords'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
 import type { SetSettingOption } from '../types'
 
@@ -32,9 +32,7 @@ interface FileManagerProps {
   setCurrentOption: SetSettingOption
 }
 
-export function FileManager({
-  setCurrentOption,
-}: FileManagerProps): JSX.Element {
+export function FileManager({ setCurrentOption }: FileManagerProps): ReactNode {
   const { t } = useTranslation('device_details')
   const [showDownloadModal, setShowDownloadModal] = useState(false)
   const [showDownloadRecordsWizard, setShowDownloadRecordsWizard] =

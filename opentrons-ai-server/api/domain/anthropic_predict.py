@@ -11,7 +11,16 @@ import requests
 import structlog
 import weave
 from anthropic import Anthropic, AsyncAnthropic
-from anthropic.types import ContentBlockParam, DocumentBlockParam, Message, MessageParam, TextBlockParam, ToolParam
+from anthropic.types import (
+    ContentBlockParam,
+    DocumentBlockParam,
+    Message,
+    MessageParam,
+    TextBlockParam,
+    ThinkingConfigDisabledParam,
+    ThinkingConfigParam,
+    ToolParam,
+)
 from weave.trace.context.call_context import set_tracing_enabled
 
 from api.domain.config_anthropic import DOCUMENTS, PROMPT, PROMPT_FIND_RELEVANT_DOCS, SYSTEM_PROMPT
@@ -57,8 +66,34 @@ API_DOCS_ROOT: Path = ROOT_PATH / "api" / "storage" / "api_docs"
 API_DOCS_CONTENT_ROOT: Path = API_DOCS_ROOT / "docs" / "v2"
 API_DOCS_STRUCT_PATH: Path = API_DOCS_ROOT / "api_docs_struct.md"
 
+# Shown when _handle_response hits MAX_TOOL_ROUNDS (AUTH-3348); avoids generic "No response was generated".
+TOOL_ROUNDS_EXCEEDED_USER_MESSAGE = (
+    "This request needed more automated steps than Opentrons AI can run in one reply "
+    "(for example, chained documentation lookup, protocol generation, and simulation). "
+    "Please try again: generate the protocol in one message, then ask to simulate in a follow-up, "
+    "or simplify what you need in a single request."
+)
+
+
+def anthropic_thinking_for_model(model: str) -> ThinkingConfigParam:
+    """Pick thinking config for the target model (AUTH-3480 Sonnet 5.5 migration).
+
+    Sonnet 5.5 requires ``between_tools`` instead of ``disabled`` when upfront thinking is off.
+    Earlier models (e.g. ``claude-sonnet-5``) reject ``between_tools``.
+    """
+    if "5-5" in model:
+        # Sonnet 5.5 API accepts between_tools; anthropic SDK stubs may not list it yet.
+        return cast(ThinkingConfigParam, {"type": "between_tools"})
+    disabled: ThinkingConfigDisabledParam = {"type": "disabled"}
+    return disabled
+
 
 class AnthropicPredict:
+    # Safety cap on tool-call round trips per turn. Sonnet 5+ is materially more agentic than
+    # earlier models and will readily chain tool calls (e.g. call get_relevant_api_docs more than
+    # once, or call it and then simulate_protocol). See AUTH-3347.
+    MAX_TOOL_ROUNDS: int = 8
+
     def __init__(self, settings: Settings) -> None:
         self.settings: Settings = settings
         self.max_tokens: int = int(settings.anthropic_max_tokens)
@@ -66,8 +101,23 @@ class AnthropicPredict:
         self._sync_client: Anthropic = Anthropic(api_key=settings.anthropic_api_key.get_secret_value())
         self.model_name: str = settings.anthropic_model_name
         self.model_helper: str = settings.model_helper
+        if self.model_name == "claude-sonnet-5" or self.model_helper == "claude-sonnet-5":
+            logger.warning(
+                "Configured Anthropic model is claude-sonnet-5; use claude-sonnet-5-5 (Sonnet 5.5) for better capability and pricing",
+                extra={"model_name": self.model_name, "model_helper": self.model_helper},
+            )
+        self.thinking: ThinkingConfigParam = anthropic_thinking_for_model(self.model_name)
+        self.thinking_helper: ThinkingConfigParam = anthropic_thinking_for_model(self.model_helper)
         default_api_level = get_default_api_level()
-        self.system_prompt: str = SYSTEM_PROMPT.replace("__DEFAULT_API_LEVEL__", default_api_level)
+        # System prompt is sent as a cacheable content block (not a plain string) so Anthropic's
+        # prompt caching can reuse it across requests instead of re-billing the full text every turn.
+        self.system_prompt: List[TextBlockParam] = [
+            TextBlockParam(
+                type="text",
+                text=SYSTEM_PROMPT.replace("__DEFAULT_API_LEVEL__", default_api_level),
+                cache_control={"type": "ephemeral"},
+            )
+        ]
         self.prompt: str = PROMPT.replace("__DEFAULT_API_LEVEL__", default_api_level)
         self.PROMPT_PD = PROMPT_PD
         self.path_docs: Path = ROOT_PATH / "api" / "storage" / "docs"
@@ -275,7 +325,7 @@ class AnthropicPredict:
             max_tokens=1024,
             system="You are a helpful assistant that analyzes documentation structure to find relevant files.",
             metadata={"user_id": user_id},
-            thinking={"type": "disabled"},
+            thinking=self.thinking_helper,
         )
 
         files_content = response.content[0].text.strip()
@@ -298,7 +348,7 @@ class AnthropicPredict:
             system=self.system_prompt,
             tools=self.tools,
             metadata={"user_id": user_id},
-            thinking={"type": "disabled"},
+            thinking=self.thinking,
         ) as stream:
             response: Message = await stream.get_final_message()
 
@@ -309,6 +359,12 @@ class AnthropicPredict:
                 "output_tokens": response.usage.output_tokens,
                 "cache_read": getattr(response.usage, "cache_read_input_tokens", "---"),
                 "cache_create": getattr(response.usage, "cache_creation_input_tokens", "---"),
+                # stop_reason and content block types are the fastest way to diagnose "no
+                # response was generated" / "something went wrong" reports (AUTH-3347): e.g.
+                # stop_reason == "max_tokens" means the model was truncated mid-answer, and the
+                # block type sequence shows whether it ended on tool_use, text, or something else.
+                "stop_reason": response.stop_reason,
+                "content_block_types": [block.type for block in response.content],
             },
         )
         return response
@@ -502,34 +558,54 @@ class AnthropicPredict:
     async def _handle_response(
         self, response: Message, messages: List[MessageParam], user_id: str, message_type: MessageType
     ) -> str | None:
-        """Handle the response from the AI model, including tool use."""
-        # Handle tool use if present
-        if response.content[-1].type == "tool_use":
-            tool_use = response.content[-1]
+        """
+        Handle the response from the AI model, executing tool calls in a loop until the model
+        returns a final text response (or MAX_TOOL_ROUNDS is exhausted).
+
+        Sonnet 5+ is materially more agentic than earlier models: it readily chains tool calls
+        (e.g. calling get_relevant_api_docs more than once, or calling it and then
+        simulate_protocol) and may issue more than one tool_use block in a single turn. A prior
+        version of this method assumed exactly one tool-call round and only ever inspected a
+        single content block. That silently dropped the final answer whenever the model needed a
+        second hop (returning a "let me look that up" preamble instead of the protocol, since the
+        follow-up's first block happened to be text), or returned None -- surfaced to users as
+        "No response was generated, please try again." It also only sent a tool_result for the
+        *last* tool_use block, which violates the Anthropic API's requirement that every tool_use
+        in a turn gets a matching tool_result whenever the model requests more than one tool at
+        once, causing a hard API error ("Something went wrong. Please try again.").
+        """
+        for _ in range(self.MAX_TOOL_ROUNDS):
+            tool_uses = [block for block in response.content if block.type == "tool_use"]
+            if not tool_uses:
+                break
+
             messages.append({"role": "assistant", "content": response.content})
-            result = await self.handle_tool_use(tool_use.name, cast(Dict[str, Any], tool_use.input), user_id)
-            messages.append(
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "tool_result",
-                            "tool_use_id": tool_use.id,
-                            "content": result,
-                        }
-                    ],
-                }
+
+            tool_results: List[ContentBlockParam] = []
+            for tool_use in tool_uses:
+                result = await self.handle_tool_use(tool_use.name, cast(Dict[str, Any], tool_use.input), user_id)
+                tool_results.append(
+                    {
+                        "type": "tool_result",
+                        "tool_use_id": tool_use.id,
+                        "content": result,
+                    }
+                )
+            messages.append({"role": "user", "content": tool_results})
+
+            response = await self._process_message(user_id=user_id, messages=messages, message_type=message_type)
+        else:
+            logger.error(
+                "Exceeded max tool rounds without a final response",
+                extra={"user_id": user_id, "max_rounds": self.MAX_TOOL_ROUNDS},
             )
-            follow_up = await self._process_message(user_id=user_id, messages=messages, message_type=message_type)
-            if follow_up.content and follow_up.content[0].type == "text":
-                return follow_up.content[0].text
-            logger.error("Unexpected follow-up response type")
-            return None
+            return TOOL_ROUNDS_EXCEEDED_USER_MESSAGE
 
-        elif response.content and response.content[0].type == "text":
-            return response.content[0].text
+        text = "".join(block.text for block in response.content if block.type == "text").strip()
+        if text:
+            return text
 
-        logger.error("Unexpected response type")
+        logger.error("Model returned no text content after tool use", extra={"user_id": user_id})
         return None
 
     def _determine_media_type(self, file_type: str) -> str:
@@ -579,36 +655,7 @@ class AnthropicPredict:
                 )
             messages.append(user_message)
             response = await self._process_message(user_id=user_id, messages=messages, message_type=message_type)
-
-            if response.content[-1].type == "tool_use":
-                tool_use = response.content[-1]
-                messages.append({"role": "assistant", "content": response.content})
-                result = await self.handle_tool_use(tool_use.name, cast(Dict[str, Any], tool_use.input), user_id)
-                messages.append(
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "tool_result",
-                                "tool_use_id": tool_use.id,
-                                "content": result,
-                            }
-                        ],
-                    }
-                )
-                follow_up = await self._process_message(user_id=user_id, messages=messages, message_type=message_type)
-                if follow_up.content and follow_up.content[0].type == "text":
-                    # Simply return the text directly
-                    return follow_up.content[0].text
-                logger.error("Unexpected follow-up response type")
-                return None
-
-            elif response.content and response.content[0].type == "text":
-                # Simply return the text directly
-                return response.content[0].text
-
-            logger.error("Unexpected response type")
-            return None
+            return await self._handle_response(response, messages, user_id, message_type)
         except anthropic.APIError:
             raise
         except Exception as e:
@@ -634,7 +681,7 @@ class AnthropicPredict:
                 model=self.model_name,
                 system=self.system_prompt_pd,
                 metadata={"user_id": user_id},
-                thinking={"type": "disabled"},
+                thinking=self.thinking,
             ) as stream:
                 response: Message = await stream.get_final_message()
             if response.content and response.content[0].type == "text":

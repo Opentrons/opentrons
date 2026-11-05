@@ -21,6 +21,7 @@ import { useRecordSelection } from '../hooks/useRecordSelection'
 import fileManagerStyles from '../robotsettingsfilemanager.module.css'
 import styles from './diagnosticfiles.module.css'
 
+import type { ReactNode } from 'react'
 import type { IconProps } from '@opentrons/components'
 
 const DIAGNOSTIC_ROWS = [
@@ -34,7 +35,7 @@ interface DiagnosticsFilesProps {
 
 export function DiagnosticsFiles({
   robotName,
-}: DiagnosticsFilesProps): JSX.Element {
+}: DiagnosticsFilesProps): ReactNode {
   const { t } = useTranslation('device_details')
   const { makeToast, eatToast } = useToaster()
 

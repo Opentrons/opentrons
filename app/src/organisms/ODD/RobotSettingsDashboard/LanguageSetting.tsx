@@ -21,7 +21,7 @@ import { ANALYTICS_LANGUAGE_UPDATED_ODD_SETTINGS } from '/app/redux/analytics'
 import { getAppLanguage, updateConfigValue } from '/app/redux/config'
 import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 import type { SetSettingOption } from './types'
 
@@ -50,7 +50,7 @@ const uuid: () => string = uuidv4
 
 export function LanguageSetting({
   setCurrentOption,
-}: LanguageSettingProps): JSX.Element {
+}: LanguageSettingProps): ReactNode {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()

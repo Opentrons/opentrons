@@ -10,10 +10,7 @@ from opentrons.types import Mount
 
 if TYPE_CHECKING:
     from ..dev_types import PipetteDict
-
-    # TODO (lc 12-05-2022) This protocol has deviated from the OT3 api. We
-    # need to figure out how to combine them again in follow-up refactors.
-    from opentrons.hardware_control.instruments.ot2.pipette import Pipette
+    from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 
 
 class InstrumentConfigurer(Protocol[MountArgType]):

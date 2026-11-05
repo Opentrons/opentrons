@@ -53,7 +53,7 @@ const ONBOARDING_ANIMATIONS: Record<number, string> = {
   6: six,
 }
 
-export function WizardBody(props: WizardBodyProps): JSX.Element {
+export function WizardBody(props: WizardBodyProps): ReactNode {
   const {
     stepNumber,
     header,

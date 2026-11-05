@@ -19,6 +19,7 @@ import { SavedVacuumCycle } from './SavedVacuumCycle'
 import { SavedVacuumStep } from './SavedVacuumStep'
 import styles from './vacuumprofile.module.css'
 
+import type { ReactNode } from 'react'
 import type {
   VACUUM_MODE_POWER,
   VACUUM_MODE_PRESSURE,
@@ -34,9 +35,7 @@ export interface VacuumProfileModalProps {
   onClose: () => void
 }
 
-export function VacuumProfileModal(
-  props: VacuumProfileModalProps
-): JSX.Element {
+export function VacuumProfileModal(props: VacuumProfileModalProps): ReactNode {
   const { formData, propsForFields, mode, onClose } = props
   const { vacuumOrderedProfileIds, vacuumProfileItemsById } = formData
   const { t } = useTranslation('protocol_steps')

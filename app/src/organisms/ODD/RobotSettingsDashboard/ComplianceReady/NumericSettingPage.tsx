@@ -81,10 +81,12 @@ export function NumericSettingPage({
     })
     if (parseResult.result === 'success') {
       setCurrentValue(parseResult.data)
-    } else if (parseResult.result === 'empty') {
+    } else if (
+      parseResult.result === 'empty' ||
+      parseResult.result === 'syntaxError'
+    ) {
       setCurrentValue(undefined)
     }
-    console.log('parseResult', parseResult)
   }
 
   return (

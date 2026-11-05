@@ -14,12 +14,14 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 interface TitleHeaderProps {
   title: string
 }
 
 // Note (kj:05/12/2023) This might be a component later
-export function TitleHeader({ title }: TitleHeaderProps): JSX.Element {
+export function TitleHeader({ title }: TitleHeaderProps): ReactNode {
   const navigate = useNavigate()
   return (
     <Flex

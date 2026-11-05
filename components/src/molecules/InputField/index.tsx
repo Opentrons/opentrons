@@ -96,7 +96,7 @@ export interface InputFieldProps {
  * Please do not use this for the touchscreen application
  */
 export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
-  (props, ref): JSX.Element => {
+  (props, ref): ReactNode => {
     const {
       disabled,
       id,

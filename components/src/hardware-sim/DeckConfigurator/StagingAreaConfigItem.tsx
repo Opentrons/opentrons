@@ -18,6 +18,7 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
+import type { ReactNode } from 'react'
 import type {
   AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
@@ -40,7 +41,7 @@ interface StagingAreaConfigItemProps {
 
 export function StagingAreaConfigItem(
   props: StagingAreaConfigItemProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation('deck_configuration')
 
   const {

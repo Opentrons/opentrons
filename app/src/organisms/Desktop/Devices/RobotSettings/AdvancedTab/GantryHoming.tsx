@@ -14,7 +14,7 @@ import { useUpdateRobotSettingMutation } from '@opentrons/react-api-client'
 import { ToggleButton } from '/app/atoms/buttons'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { RobotSettingsField } from '@opentrons/api-client'
 
 interface GantryHomingProps {
@@ -25,7 +25,7 @@ interface GantryHomingProps {
 export function GantryHoming({
   settings,
   isRobotBusy,
-}: GantryHomingProps): JSX.Element {
+}: GantryHomingProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const documentationState = useDocumentationState()
   const { updateRobotSetting } =

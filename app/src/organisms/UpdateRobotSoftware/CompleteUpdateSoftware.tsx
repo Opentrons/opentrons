@@ -15,12 +15,14 @@ import {
 
 import { ProgressBar } from '/app/atoms/ProgressBar'
 
+import type { ReactNode } from 'react'
+
 interface CompleteUpdateSoftwareProps {
   robotName: string
 }
 export function CompleteUpdateSoftware({
   robotName,
-}: CompleteUpdateSoftwareProps): JSX.Element {
+}: CompleteUpdateSoftwareProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'robot_controls'])
 
   return (

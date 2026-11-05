@@ -17,16 +17,16 @@ from opentrons.protocol_engine import ModuleDefinition
 
 
 @pytest.fixture(scope="session")
-def tempdeck_v1_def() -> ModuleDefinition:
+def tempdeck_v2_def() -> ModuleDefinition:
     """Get the definition of a V1 tempdeck."""
-    definition = load_shared_data("module/definitions/3/temperatureModuleV1.json")
+    definition = load_shared_data("module/definitions/3/temperatureModuleV2.json")
     return ModuleDefinition.model_validate_json(definition)
 
 
 @pytest.fixture()
 def json_protocol_file(tmp_path: Path) -> Path:
     """Get minimal JSON protocol input "file"."""
-    tip_rack_def = load_definition("opentrons_96_tiprack_300ul", version=1)
+    tip_rack_def = load_definition("opentrons_flex_96_tiprack_1000ul", version=1)
     path = tmp_path / "protocol-name.json"
 
     path.write_text(
@@ -35,18 +35,18 @@ def json_protocol_file(tmp_path: Path) -> Path:
                 "$otSharedSchema": "#/protocol/schemas/6",
                 "schemaVersion": 6,
                 "metadata": {},
-                "robot": {"model": "OT-2 Standard", "deckId": "ot2_standard"},
+                "robot": {"model": "OT-3 Standard", "deckId": "ot3_standard"},
                 "pipettes": {
-                    "pipette-id": {"name": "p300_single"},
+                    "pipette-id": {"name": "p1000_single_flex"},
                 },
                 "labware": {
                     "labware-id": {
-                        "displayName": "Opentrons 96 Tip Rack 300 µL",
-                        "definitionId": "opentrons/opentrons_96_tiprack_300ul/1",
+                        "displayName": "Opentrons Flex 96 Tip Rack 1000 µL",
+                        "definitionId": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
                     },
                 },
                 "labwareDefinitions": {
-                    "opentrons/opentrons_96_tiprack_300ul/1": tip_rack_def,
+                    "opentrons/opentrons_flex_96_tiprack_1000ul/1": tip_rack_def,
                 },
                 "commands": [
                     {
@@ -54,10 +54,10 @@ def json_protocol_file(tmp_path: Path) -> Path:
                         "commandType": "loadLabware",
                         "params": {
                             "labwareId": "labware-id",
-                            "loadName": "opentrons_96_tiprack_300ul",
+                            "loadName": "opentrons_flex_96_tiprack_1000ul",
                             "namespace": "opentrons",
                             "version": 1,
-                            "location": {"slotName": "1"},
+                            "location": {"slotName": "A1"},
                         },
                     },
                     {
@@ -65,7 +65,7 @@ def json_protocol_file(tmp_path: Path) -> Path:
                         "commandType": "loadPipette",
                         "params": {
                             "pipetteId": "pipette-id",
-                            "pipetteName": "p300_single",
+                            "pipetteName": "p1000_single_flex",
                             "mount": "left",
                         },
                     },
@@ -95,20 +95,23 @@ def python_protocol_file(tmp_path: Path) -> Path:
             """
             # my protocol
             metadata = {
-                "apiLevel": "2.14",
+                "apiLevel": "2.17",
+            }
+            requirements = {
+                "robotType": "Flex"
             }
             def run(ctx):
                 pipette = ctx.load_instrument(
-                    instrument_name="p300_single",
+                    instrument_name="flex_1channel_1000",
                     mount="left",
                 )
                 tip_rack = ctx.load_labware(
-                    load_name="opentrons_96_tiprack_300ul",
-                    location="1",
+                    load_name="opentrons_flex_96_tiprack_1000ul",
+                    location="A1",
                 )
                 temp_module = ctx.load_module(
-                    module_name="temperature module",
-                    location="3"
+                    module_name="temperatureModuleV2",
+                    location="C1"
                 )
                 pipette.pick_up_tip(
                     location=tip_rack.wells_by_name()["A1"],
@@ -131,6 +134,9 @@ def python_protocol_file_with_run_time_params(tmp_path: Path) -> Path:
             metadata = {
                 "apiLevel": "2.18",
             }
+            requirements = {
+                "robotType": "Flex"
+            }
             def add_parameters(params):
                 params.add_float(
                     display_name="Aspirate volume",
@@ -150,95 +156,22 @@ def python_protocol_file_with_run_time_params(tmp_path: Path) -> Path:
                 )
             def run(ctx):
                 pipette = ctx.load_instrument(
-                    instrument_name="p300_single",
+                    instrument_name="flex_1channel_1000",
                     mount=ctx.params.mount,
                 )
                 tip_rack = ctx.load_labware(
-                    load_name="opentrons_96_tiprack_300ul",
-                    location="1",
+                    load_name="opentrons_flex_96_tiprack_1000ul",
+                    location="A1",
                 )
                 reservoir = ctx.load_labware(
                     load_name="nest_1_reservoir_195ml",
-                    location=2,
+                    location="A2",
                 )
                 pipette.pick_up_tip(
                     location=tip_rack.wells_by_name()["A1"],
                 )
                 pipette.aspirate(ctx.params.aspirate_volume, reservoir.wells()[0])
             """
-        )
-    )
-
-    return path
-
-
-@pytest.fixture()
-def legacy_python_protocol_file(tmp_path: Path) -> Path:
-    """Get an on-disk, minimal Python protocol fixture."""
-    path = tmp_path / "protocol-name.py"
-    path.write_text(
-        textwrap.dedent(
-            """
-            # my protocol
-            metadata = {
-                "apiLevel": "2.11",
-            }
-            def run(ctx):
-                pipette = ctx.load_instrument(
-                    instrument_name="p300_single",
-                    mount="left",
-                )
-                tip_rack = ctx.load_labware(
-                    load_name="opentrons_96_tiprack_300ul",
-                    location="1",
-                )
-                pipette.pick_up_tip(
-                    location=tip_rack.wells_by_name()["A1"],
-                )
-            """
-        )
-    )
-
-    return path
-
-
-@pytest.fixture()
-def legacy_json_protocol_file(tmp_path: Path) -> Path:
-    """Get an on-disk, minimal JSON protocol fixture."""
-    tip_rack_def = load_definition("opentrons_96_tiprack_300ul", version=1)
-    path = tmp_path / "protocol-name.json"
-    path.write_text(
-        json.dumps(
-            {
-                "$otSharedSchema": "#/protocol/schemas/5",
-                "schemaVersion": 5,
-                "metadata": {},
-                "robot": {"model": "OT-2 Standard"},
-                "pipettes": {
-                    "pipette-id": {"mount": "left", "name": "p300_single"},
-                },
-                "labware": {
-                    "labware-id": {
-                        "slot": "1",
-                        "displayName": "Opentrons 96 Tip Rack 300 µL",
-                        "definitionId": "opentrons/opentrons_96_tiprack_300ul/1",
-                    },
-                },
-                "modules": {},
-                "labwareDefinitions": {
-                    "opentrons/opentrons_96_tiprack_300ul/1": tip_rack_def,
-                },
-                "commands": [
-                    {
-                        "command": "pickUpTip",
-                        "params": {
-                            "pipette": "pipette-id",
-                            "labware": "labware-id",
-                            "well": "A1",
-                        },
-                    },
-                ],
-            }
         )
     )
 

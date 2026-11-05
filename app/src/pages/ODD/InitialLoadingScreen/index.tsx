@@ -8,7 +8,9 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-export function InitialLoadingScreen(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function InitialLoadingScreen(): ReactNode {
   return (
     <Flex
       backgroundColor={COLORS.grey35}

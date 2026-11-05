@@ -68,7 +68,7 @@
 
 .overflow_menu_container {
   position: absolute;
-  z-index: 10;
+  z-index: var(--z-index-menus);
   top: 2.3rem;
   right: 0;
   display: flex;

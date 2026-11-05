@@ -63,4 +63,52 @@ describe('vacuumStopPump', () => {
     )
     expect(getErrorResult(result)).toEqual(missingModuleError)
   })
+
+  it('resolves moduleId when it is a string runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: vacuumModuleId,
+      },
+    }
+    const result = vacuumStopPump(
+      { moduleId: 'selected_module' },
+      invariantContext,
+      robotState
+    )
+    expect(getSuccessResult(result)).toEqual({
+      commands: [
+        {
+          commandType: 'vacuumModule/stopVacuum',
+          key: expect.any(String),
+          params: { moduleId: vacuumModuleId },
+        },
+      ],
+      python: 'mock_vacuum_module.stop_vacuum_pump()',
+    })
+  })
+
+  it('returns error if moduleId is not a string runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      mock_rtp: {
+        variableName: 'mock_rtp',
+        displayName: 'mock rtp',
+        type: 'boolean',
+        default: false,
+      },
+    }
+    const result = vacuumStopPump(
+      { moduleId: 'mock_rtp' },
+      invariantContext,
+      robotState
+    )
+    expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+    ])
+  })
 })

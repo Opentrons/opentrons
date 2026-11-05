@@ -8,6 +8,8 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 import {
+  useLogLevelQuery,
+  usePostLogLevelMutation,
   useRobotSettingsQuery,
   useUpdateRobotSettingMutation,
 } from '@opentrons/react-api-client'
@@ -41,11 +43,13 @@ import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 import { useNetworkConnection } from '/app/resources/networking'
 import {
   useDisableStackerSensors,
+  useDisableVacuumModuleWasteDetection,
   useLEDLights,
 } from '/app/resources/robot-settings'
 
 import styles from './robotsettingslist.module.css'
 
+import type { ReactNode } from 'react'
 import type { SetSettingOption } from '/app/organisms/ODD/RobotSettingsDashboard'
 import type { Dispatch, State } from '/app/redux/types'
 
@@ -54,7 +58,7 @@ interface RobotSettingsListProps {
   setCurrentOption: SetSettingOption
 }
 
-export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
+export function RobotSettingsList(props: RobotSettingsListProps): ReactNode {
   const { setCurrentOption } = props
   const { t, i18n } = useTranslation([
     'device_settings',
@@ -65,6 +69,8 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const documentationState = useDocumentationState()
   const { updateRobotSetting } =
     useUpdateRobotSettingMutation(documentationState)
+  const robotLogLevel = useLogLevelQuery()
+  const { postLogLevel } = usePostLogLevelMutation(documentationState)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const networkConnection = useNetworkConnection(robotName)
@@ -88,6 +94,8 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const devToolsOn = useSelector(getDevtoolsEnabled)
   const { lightsEnabled, toggleLights } = useLEDLights()
   const { sensorsDisabled, toggleSensors } = useDisableStackerSensors()
+  const { wasteDetectionDisabled, toggleWasteDetection } =
+    useDisableVacuumModuleWasteDetection()
   const { toggleERSettings, isEREnabled } = useErrorRecoverySettingsToggle()
   const automaticSoftwareUpdateDownloadsEnabled =
     useSelector(getConfig)?.update?.automaticallyDownloadUpdates
@@ -107,6 +115,14 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
       message: `User toggled devtools to ${newDevToolsOn ? 'on' : 'off'}`,
     })
   )
+  const DEBUG_LEVELS = ['info', 'debug']
+  const debugLogsEnabled = DEBUG_LEVELS.includes(
+    robotLogLevel?.data?.log_level ?? 'unknown'
+  )
+
+  const handleToggleDebugLogs = (newValue: boolean): void => {
+    postLogLevel(newValue ? 'debug' : 'warning')
+  }
 
   return (
     <div className={styles.main_content}>
@@ -307,12 +323,30 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           onClick={toggleSensors}
         />
         <RobotSettingButton
+          settingName={t('disable_vacuum_module_waste_detection')}
+          dataTestId="RobotSettingButton_disable_vacuum_module_waste_detection"
+          settingInfo={t('disable_vacuum_module_waste_detection_description')}
+          iconName="ot-vacuum"
+          rightElement={<OnOffToggle isOn={wasteDetectionDisabled} />}
+          onClick={toggleWasteDetection}
+        />
+        <RobotSettingButton
           settingName={t('app_settings:update_channel')}
           dataTestId="RobotSettingButton_update_channel"
           onClick={() => {
             setCurrentOption('UpdateChannel')
           }}
           iconName="update-channel"
+        />
+        <RobotSettingButton
+          settingName={t('debug_logging')}
+          dataTestId="RobotSettingButton_enable_debug_logging"
+          settingInfo={t('debug_logging_description')}
+          rightElement={<OnOffToggle isOn={debugLogsEnabled} />}
+          onClick={() => {
+            handleToggleDebugLogs(!debugLogsEnabled)
+          }}
+          iconName="compliance"
         />
         <RobotSettingButton
           settingName={t('app_settings:enable_dev_tools')}
@@ -324,13 +358,14 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
             handleToggleDevtools(!devToolsOn)
           }}
         />
+
         {devToolsOn ? <FeatureFlags /> : null}
       </div>
     </div>
   )
 }
 
-function FeatureFlags(): JSX.Element {
+function FeatureFlags(): ReactNode {
   const { t } = useTranslation('app_settings')
   const devInternalFlags = useSelector(getFeatureFlags)
   const dispatch = useDispatch<Dispatch>()

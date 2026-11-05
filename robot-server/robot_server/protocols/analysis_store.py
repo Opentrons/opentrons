@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from logging import getLogger
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import sqlalchemy
 from typing_extensions import Final
@@ -18,6 +18,9 @@ from opentrons.protocol_engine import (
     LoadedPipette,
 )
 from opentrons.protocol_engine.protocol_engine import code_in_error_tree
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_engine.types import (
     CommandAnnotation,
     CommandPreconditions,
@@ -120,6 +123,27 @@ class AnalysisStore:
             current_analyzer_version=_CURRENT_ANALYZER_VERSION,
         )
         self._access_control_status = access_control_status
+        self._commands_dict_list: List[dict[str, Any]] = []
+        self._analysis_store_provider = CommandStoreProvider(
+            run_id=None,
+            store_insert_batch_commands=self.insert_batch_analysis_command,
+        )
+
+    async def insert_batch_analysis_command(
+        self, run_id: str, batch_commands: list[tuple[int, Command]]
+    ) -> None:
+        """Store analysis commands as JSON dicts locally."""
+        for _index, command in batch_commands:
+            command_json = command.model_dump(by_alias=True, exclude_none=True)
+            self._commands_dict_list.append(command_json)
+
+    def set_analysis_provider_id(self, analysis_id: str) -> None:
+        """Set the ID used by the analysis provider."""
+        self._analysis_store_provider.set_run_id(analysis_id)
+
+    def get_analysis_store_provider(self) -> CommandStoreProvider:
+        """Get the AnalysisStoreProvider."""
+        return self._analysis_store_provider
 
     def add_pending(
         self,
@@ -151,7 +175,7 @@ class AnalysisStore:
         analysis_id: str,
         robot_type: RobotType,
         run_time_parameters: List[RunTimeParameter],
-        commands: List[Command],
+        commands: Optional[List[dict[str, Any]]],
         labware: List[LoadedLabware],
         modules: List[LoadedModule],
         pipettes: List[LoadedPipette],
@@ -183,6 +207,9 @@ class AnalysisStore:
             labware_offsets: See `CompletedAnalysis.labware_offsets`.
         """
         protocol_id = self._pending_store.get_protocol_id(analysis_id=analysis_id)
+        if commands is None:
+            # Use the locally stored commands list
+            commands = self._commands_dict_list
 
         # No protocol ID means there was no pending analysis with the given analysis ID.
         assert protocol_id is not None, (
@@ -229,13 +256,16 @@ class AnalysisStore:
             completed_analysis
         )
         csv_rtp_resources = self._extract_csv_run_time_params(completed_analysis)
-        await self._completed_store.make_room_and_add(
-            completed_analysis_resource=completed_analysis_resource,
-            primitive_rtp_resources=primitive_rtp_resources,
-            csv_rtp_resources=csv_rtp_resources,
-        )
+        try:
+            await self._completed_store.make_room_and_add(
+                completed_analysis_resource=completed_analysis_resource,
+                primitive_rtp_resources=primitive_rtp_resources,
+                csv_rtp_resources=csv_rtp_resources,
+            )
 
-        self._pending_store.remove(analysis_id=analysis_id)
+            self._pending_store.remove(analysis_id=analysis_id)
+        finally:
+            self._commands_dict_list.clear()
 
     async def save_initialization_failed_analysis(
         self,

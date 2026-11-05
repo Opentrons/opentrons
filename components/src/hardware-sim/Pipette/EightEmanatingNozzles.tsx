@@ -2,10 +2,12 @@ import { Fragment } from 'react'
 
 import { EmanatingNozzle } from './EmanatingNozzle'
 
+import type { ReactNode } from 'react'
+
 export const EightEmanatingNozzles = (props: {
   cx: number
   initialCy: number
-}): JSX.Element => {
+}): ReactNode => {
   const { cx, initialCy } = props
   const MULTI_CHANNEL_NOZZLE_SPACING = 9
   return (

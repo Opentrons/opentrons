@@ -18,10 +18,12 @@ import { getTopPortalEl } from '/app/App/portal'
 import { OddModal } from '/app/molecules/OddModal'
 import { NOT_CONFIGURED } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 
+import type { ReactNode } from 'react'
+
 export interface OpenDoorModalProps {
   moduleDoorLocation: string | null
 }
-export function OpenDoorAlertModal(props: OpenDoorModalProps): JSX.Element {
+export function OpenDoorAlertModal(props: OpenDoorModalProps): ReactNode {
   const { t } = useTranslation('run_details')
   let doorHeader = t('door_is_open')
   let doorText = t('close_door_to_resume_run')

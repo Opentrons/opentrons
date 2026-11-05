@@ -97,16 +97,6 @@ def _robot_log_config(log_level: int) -> Dict[str, Any]:
                 "level": log_level,
                 "propagate": False,
             },
-            "sqlalchemy": {
-                "handlers": ["syslog_plus_unit_above_warn", "unit_only_below_warn"],
-                # SQLAlchemy's logging is slightly unusual:
-                # they set up their logger with a default level of WARN by itself,
-                # so even if we enabled propagation, we'd have to override the level
-                # to see things below WARN.
-                # docs.sqlalchemy.org/en/14/core/engines.html#configuring-logging
-                "level": log_level,
-                "propagate": False,
-            },
         },
     }
 

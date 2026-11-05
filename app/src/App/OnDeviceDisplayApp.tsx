@@ -85,6 +85,7 @@ import { ODDTopLevelRedirects } from './ODDTopLevelRedirects'
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
 import { ModalPortalRoot } from './portal'
 
+import type { ReactNode } from 'react'
 import type { HostConfig } from '@opentrons/api-client'
 import type { Dispatch } from '/app/redux/types'
 
@@ -179,7 +180,7 @@ const TURN_OFF_BACKLIGHT = '7'
 
 const RETRY_DELAY_MS = 1000
 
-export const OnDeviceDisplayApp = (): JSX.Element => {
+export const OnDeviceDisplayApp = (): ReactNode => {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
 

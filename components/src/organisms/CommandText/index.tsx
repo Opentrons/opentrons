@@ -7,7 +7,7 @@ import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
 import { useCommandTextString } from './useCommandTextString'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type {
   LabwareDefinition,
   RobotType,
@@ -101,7 +101,7 @@ function CommandStyledText(
   props: STProps & {
     children: JSX.Element[] | JSX.Element | string
   } & StyleProps
-): JSX.Element {
+): ReactNode {
   if (isModernSTProps(props)) {
     return (
       <StyledText
@@ -134,9 +134,7 @@ type ThermocyclerRunProfileProps = BaseProps &
   STProps &
   Omit<GetTCRunProfileCommandTextResult, 'kind'>
 
-function ThermocyclerRunProfile(
-  props: ThermocyclerRunProfileProps
-): JSX.Element {
+function ThermocyclerRunProfile(props: ThermocyclerRunProfileProps): ReactNode {
   const {
     isOnDevice,
     propagateCenter = false,
@@ -203,7 +201,7 @@ type ThermocyclerRunExtendedProfileProps = BaseProps &
 
 function ThermocyclerRunExtendedProfile(
   props: ThermocyclerRunExtendedProfileProps
-): JSX.Element {
+): ReactNode {
   const {
     isOnDevice,
     propagateCenter = false,
@@ -293,7 +291,7 @@ type ThermocyclerStartRunExtendedProfileProps = BaseProps &
 
 function ThermocyclerStartRunExtendedProfile(
   props: ThermocyclerStartRunExtendedProfileProps
-): JSX.Element {
+): ReactNode {
   const {
     isOnDevice,
     propagateCenter = false,

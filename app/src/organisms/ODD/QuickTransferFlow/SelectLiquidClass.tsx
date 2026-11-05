@@ -16,7 +16,7 @@ import { useToaster } from '/app/organisms/ToasterOven'
 import { ACTIONS } from './constants'
 import { checkLiquidClassCompatibility } from './utils'
 
-import type { ComponentProps, Dispatch } from 'react'
+import type { ComponentProps, Dispatch, ReactNode } from 'react'
 import type { LiquidClass, LiquidClassType } from '@opentrons/shared-data'
 import type { SmallButton } from '/app/atoms/buttons'
 import type {
@@ -37,7 +37,7 @@ export function SelectLiquidClass({
   exitButtonProps,
   state,
   dispatch,
-}: SelectLiquidClassProps): JSX.Element {
+}: SelectLiquidClassProps): ReactNode {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const [selectedLiquidClass, setSelectedLiquidClass] = useState<LiquidClass>()
   const { makeSnackbar } = useToaster()

@@ -5,6 +5,7 @@ import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import styles from './robotinfolabel.module.css'
 
+import type { ReactNode } from 'react'
 import type { HelixStyles } from '../../atoms/StyledText'
 import type { IconName } from '../../icons'
 
@@ -28,7 +29,7 @@ export function RobotInfoLabel({
   width,
   transform,
   svgSize,
-}: RobotInfoLabelProps): JSX.Element {
+}: RobotInfoLabelProps): ReactNode {
   const labelClass = clsx(
     styles.label,
     highlight

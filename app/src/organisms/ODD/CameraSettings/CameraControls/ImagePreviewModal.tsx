@@ -8,6 +8,7 @@ import { OddModal } from '/app/molecules/OddModal'
 
 import styles from './cameracontrols.module.css'
 
+import type { ReactNode } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 export interface ImagePreviewModalProps {
@@ -18,7 +19,7 @@ export interface ImagePreviewModalProps {
 export function ImagePreviewModal({
   imgPath,
   toggleModal,
-}: ImagePreviewModalProps): JSX.Element {
+}: ImagePreviewModalProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   const displayTimestamp = useMemo(() => {

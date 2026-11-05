@@ -39,6 +39,7 @@ import { getModuleTooHot } from '/app/transformations/modules'
 import { getDoesModuleRequireCalibration } from './utils'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type {
   CutoutConfig,
@@ -112,7 +113,7 @@ export function ModuleTableItem({
   robotName,
   runId,
   comboFixtureId,
-}: ModuleTableItemProps): JSX.Element {
+}: ModuleTableItemProps): ReactNode {
   const { i18n, t } = useTranslation([
     'protocol_setup',
     'module_wizard_flows',

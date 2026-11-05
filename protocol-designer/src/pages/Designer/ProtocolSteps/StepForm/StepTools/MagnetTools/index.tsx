@@ -20,9 +20,10 @@ import {
   getMagnetLabwareEngageHeight,
 } from '/protocol-designer/ui/modules/selectors'
 
+import type { ReactNode } from 'react'
 import type { StepFormProps } from '../../types'
 
-export function MagnetTools(props: StepFormProps): JSX.Element {
+export function MagnetTools(props: StepFormProps): ReactNode {
   const { propsForFields, formData } = props
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const moduleLabwareOptions = useSelector(getMagneticLabwareOptions)

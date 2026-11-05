@@ -1,6 +1,6 @@
 .overlay {
   position: fixed;
-  z-index: 1000000;
+  z-index: var(--z-index-logged-out-overlay);
   top: calc(var(--handle-height) + var(--spacing-16));
   left: 0;
   width: 100%;

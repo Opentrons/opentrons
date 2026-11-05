@@ -15,6 +15,7 @@ import {
 
 import { OddModal } from '/app/molecules/OddModal'
 
+import type { ReactNode } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface NetworkDetailsModalProps {
@@ -33,7 +34,7 @@ export function NetworkDetailsModal({
   securityType,
   subnetMask,
   macAddress,
-}: NetworkDetailsModalProps): JSX.Element {
+}: NetworkDetailsModalProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared'])
   const networkName = ssid != null ? ssid : t('shared:no_data')
   const modalHeader: OddModalHeaderBaseProps = {
@@ -71,7 +72,7 @@ interface ListItemProps {
   itemName: string
   itemValue: string
 }
-function ListItem({ itemName, itemValue }: ListItemProps): JSX.Element {
+function ListItem({ itemName, itemValue }: ListItemProps): ReactNode {
   return (
     <Flex
       flexDirection={DIRECTION_ROW}

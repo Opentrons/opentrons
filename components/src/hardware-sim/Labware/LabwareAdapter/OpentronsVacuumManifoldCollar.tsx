@@ -1,5 +1,7 @@
 import { COLORS } from '../../../helix-design-system'
 
+import type { ReactNode } from 'react'
+
 const SVG_VIEWPORT_WIDTH = 111
 const SVG_VIEWPORT_HEIGHT = 80
 
@@ -13,7 +15,7 @@ interface OpentronsVacuumManifoldCollarProps {
 
 export function OpentronsVacuumManifoldCollar({
   lidDimensions,
-}: OpentronsVacuumManifoldCollarProps): JSX.Element {
+}: OpentronsVacuumManifoldCollarProps): ReactNode {
   const width = lidDimensions?.xDimension ?? 150.5
   const height = lidDimensions?.yDimension ?? 108.6
   const sx = width / SVG_VIEWPORT_WIDTH

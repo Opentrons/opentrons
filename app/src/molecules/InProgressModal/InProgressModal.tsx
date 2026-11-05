@@ -12,7 +12,7 @@ interface Props {
   children?: JSX.Element
 }
 
-export function InProgressModal(props: Props): JSX.Element {
+export function InProgressModal(props: Props): ReactNode {
   const { alternativeSpinner, children, description, body } = props
 
   return (

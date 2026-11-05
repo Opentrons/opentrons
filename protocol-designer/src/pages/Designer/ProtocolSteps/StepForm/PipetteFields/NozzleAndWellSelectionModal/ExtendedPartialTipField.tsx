@@ -18,6 +18,7 @@ import { NozzleAndWellSelectionModal } from './NozzleAndWellSelectionModal'
 import styles from './nozzleandwellwizard.module.css'
 import { getNozzleText, getWellGroupLength } from './utils'
 
+import type { ReactNode } from 'react'
 import type {
   ActiveNozzleNumber,
   LabwareDefinition,
@@ -35,7 +36,7 @@ interface ExtendedPartialTipFieldProps extends FieldProps {
 }
 export function ExtendedPartialTipField(
   props: ExtendedPartialTipFieldProps
-): JSX.Element {
+): ReactNode {
   const { pipetteSpecs, propsForFields, stepType } = props
   const { t } = useTranslation('protocol_steps')
   const deckSetup = useSelector(getInitialDeckSetup)

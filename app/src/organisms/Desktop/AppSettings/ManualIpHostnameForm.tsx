@@ -18,6 +18,7 @@ import { TertiaryButton } from '/app/atoms/buttons'
 import { addManualIp } from '/app/redux/config'
 import { startDiscovery } from '/app/redux/discovery'
 
+import type { ReactNode } from 'react'
 import type { FieldError, Resolver } from 'react-hook-form'
 import type { Dispatch } from '/app/redux/types'
 
@@ -65,7 +66,7 @@ interface ManualIpHostnameFormProps {
 
 export function ManualIpHostnameForm({
   setMostRecentAddition,
-}: ManualIpHostnameFormProps): JSX.Element {
+}: ManualIpHostnameFormProps): ReactNode {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
   const addManualIpAndHostname = (ip: string): void => {

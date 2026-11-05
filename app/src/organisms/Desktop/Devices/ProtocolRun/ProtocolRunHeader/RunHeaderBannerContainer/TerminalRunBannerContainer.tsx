@@ -14,6 +14,7 @@ import {
 
 import { useIsRunCurrent, useMostRecentRunId } from '/app/resources/runs'
 
+import type { ReactNode } from 'react'
 import type { RunHeaderBannerContainerProps } from '.'
 
 type TerminalBannerType = 'success' | 'error' | null
@@ -71,7 +72,7 @@ interface TerminalRunBannerContainerProps extends RunHeaderBannerContainerProps 
 // Contains all possible banners that render after the run reaches a terminal run status.
 export function TerminalRunBannerContainer(
   props: TerminalRunBannerContainerProps
-): JSX.Element {
+): ReactNode {
   const { bannerType } = props
 
   switch (bannerType) {
@@ -88,7 +89,7 @@ export function TerminalRunBannerContainer(
 function ProtocolRunSuccessBanner({
   closeCurrentRun,
   isClosingCurrentRun,
-}: RunHeaderBannerContainerProps): JSX.Element {
+}: RunHeaderBannerContainerProps): ReactNode {
   const { t } = useTranslation('run_details')
 
   const handleRunSuccessClick = (): void => {
@@ -114,7 +115,7 @@ function ProtocolRunErrorBanner({
   runStatus,
   runHeaderModalContainerUtils,
   closeCurrentRun,
-}: RunHeaderBannerContainerProps): JSX.Element {
+}: RunHeaderBannerContainerProps): ReactNode {
   const { t } = useTranslation('run_details')
 
   const { highestPriorityError } = runErrors

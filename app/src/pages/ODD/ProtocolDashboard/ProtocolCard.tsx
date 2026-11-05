@@ -36,21 +36,21 @@ import { formatTimeWithUtcLabel } from '/app/resources/runs'
 
 import { LongPressModal } from './LongPressModal'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface ProtocolCardProps {
   protocol: ProtocolResource
-  longPress: Dispatch<SetStateAction<boolean>>
+  longPress?: Dispatch<SetStateAction<boolean>>
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
   setTargetProtocolId: (targetProtocolId: string) => void
   lastRun?: string
   setIsRequiredCSV: (isRequiredCSV: boolean) => void
 }
 
-export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
+export function ProtocolCard(props: ProtocolCardProps): ReactNode {
   const {
     protocol,
     lastRun,
@@ -113,7 +113,7 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
 
   useEffect(() => {
     if (longpress.isLongPressed) {
-      longPress(true)
+      longPress?.(true)
       setTargetProtocolId(protocol.id)
       setIsRequiredCSV(isRequiredCSV)
     }

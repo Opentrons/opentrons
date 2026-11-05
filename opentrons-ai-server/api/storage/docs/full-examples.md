@@ -32,7 +32,7 @@ metadata = {
     'protocolName': 'Reagent Transfer',
     'author': 'chatGPT',
     'description': 'Transfer reagent',
-    'apiLevel': '2.15'
+    'apiLevel': '2.28'
 }
 
 def run(protocol): # labware
@@ -89,7 +89,7 @@ metadata = {
 "protocolName": "Reagent Transfer protocol",
 "author": "Opentrons Generative AI",
 "description": "Transfer reagents from multile source labware to multiple destination labware",
-"apiLevel": "2.15"
+"apiLevel": "2.28"
 }
 
 def run(protocol: protocol_api.ProtocolContext): # labware
@@ -145,7 +145,7 @@ metadata = {
     'protocolName': 'Reagent Transfer',
     'author': 'chatGPT',
     'description': 'P1000 Single-Channel GEN2 transfer 195.0 ul',
-    'apiLevel': '2.15'
+    'apiLevel': '2.28'
 }
 
 def run(protocol):
@@ -212,7 +212,7 @@ metadata = {
 'protocolName': 'Reagent Transfer',
 'author': 'Opentrons Generative AI',
 }
-requirements = {"robotType": "Flex", "apiLevel": "2.15"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 # protocol run function
 
@@ -286,7 +286,7 @@ metadata = {
 'author': 'Opentrons Generative AI',
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.15"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 def run(protocol: protocol_api.ProtocolContext):
 
@@ -320,7 +320,7 @@ Metadata:
 
 Requirements:
 
-- `requirements = {"robotType": "OT-2", "apiLevel": "2.15"}`
+- `requirements = {"robotType": "OT-2", "apiLevel": "2.28"}`
 
 Modules:
 
@@ -377,7 +377,7 @@ metadata = {
 'protocol_name': 'QIAGEN OneStep RT-PCR Kit PCR Amplification',
 'author': 'chatGPT',
 'description': 'Amplification using QIAGEN OneStep RT-PCR Kit with 13 cycles',
-'apiLevel': '2.15'
+'apiLevel': '2.28'
 }
 
 def run(protocol: protocol_api.ProtocolContext): # Sample preparation parameters
@@ -493,7 +493,7 @@ Metadata:
 
 Requirements:
 
-- requirements = {"robotType": "Flex", "apiLevel": "2.15"}
+- requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 Modules:
 
@@ -563,7 +563,7 @@ metadata = {
     'description': 'PCR Amplification protocol with 25 cycles',
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.15"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 def run(protocol: protocol_api.ProtocolContext): # Sample parameters
 sample_volume_ul = 20
@@ -773,7 +773,7 @@ metadata = {
     'author': 'Your Name',
     'description': 'Transfer 1 µL of reagent from source tube A1 to all wells in the destination plate using the same tip.',
 }
-requirements = {"robotType": "OT-2", "apiLevel": "2.19"}
+requirements = {"robotType": "OT-2", "apiLevel": "2.28"}
 
 def run(protocol: protocol_api.ProtocolContext):
     # Load labware
@@ -831,7 +831,7 @@ metadata = {
     'author': 'Your Name',
     'description': 'Transfer 150 µL from specific source wells to specific destination wells using the same tip.',
 }
-requirements = {"robotType": "OT-2", "apiLevel": "2.19"}
+requirements = {"robotType": "OT-2", "apiLevel": "2.28"}
 
 def run(protocol: protocol_api.ProtocolContext):
     # Load labware
@@ -951,7 +951,7 @@ metadata = {
     'author': 'Opentrons Generative AI',
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.19"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -993,7 +993,7 @@ metadata = {
     'author': 'Opentrons Generative AI',
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.19"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -1044,7 +1044,7 @@ metadata = {
     'protocol_name': 'QIAGEN OneStep RT-PCR Kit PCR Amplification',
     'author': 'chatGPT',
     'description': 'Amplification using QIAGEN OneStep RT-PCR Kit with 13 cycles',
-    'apiLevel': '2.16'
+    'apiLevel': '2.28'
 }
 
 
@@ -1156,7 +1156,7 @@ def run(protocol: protocol_api.ProtocolContext):
 ### Liquid transfer with Heater Shaker module
 
 <description>
-Write a protocol using the Opentrons Python Protocol API v2.19 for Opentrons Flex robot for the following description:
+Write a protocol using the Opentrons Python Protocol API v2.28 for Opentrons Flex robot for the following description:
 
 Metadata:
 
@@ -1166,7 +1166,7 @@ Metadata:
 
 Requirements:
 
-- requirements = {"robotType": "Flex", "apiLevel": "2.19"}
+- requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 Labware:
 
@@ -1213,7 +1213,7 @@ metadata = {
 
 requirements = {
     'robotType': 'Flex',
-    'apiLevel': '2.19'
+    'apiLevel': '2.28'
 }
 
 def run(protocol: protocol_api.ProtocolContext):

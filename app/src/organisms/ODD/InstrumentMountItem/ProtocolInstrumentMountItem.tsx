@@ -28,7 +28,7 @@ import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { InstrumentData, Mount } from '@opentrons/api-client'
 import type {
   GripperModel,
@@ -59,7 +59,7 @@ interface ProtocolInstrumentMountItemProps {
 }
 export function ProtocolInstrumentMountItem(
   props: ProtocolInstrumentMountItemProps
-): JSX.Element {
+): ReactNode {
   const { i18n, t } = useTranslation('protocol_setup')
   const { mount, attachedInstrument, speccedName } = props
   const [showPipetteWizardFlow, setShowPipetteWizardFlow] =

@@ -14,7 +14,7 @@ import * as highlightSelectors from '../../../top-selectors/substep-highlight'
 import * as tipContentsSelectors from '../../../top-selectors/tip-contents'
 import { getAllWellContentsForActiveItem } from '../../../top-selectors/well-contents'
 
-import type { CSSProperties } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import type {
   TipType,
   WellGroup,
@@ -42,7 +42,7 @@ interface LabwareOnDeckProps {
   centerInSlot?: boolean
 }
 
-export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
+export function LabwareOnDeck(props: LabwareOnDeckProps): ReactNode {
   const {
     labwareOnDeck,
     x,

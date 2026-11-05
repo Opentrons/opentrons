@@ -24,6 +24,7 @@ import {
   SelectRecoveryOption,
 } from './SelectRecoveryOption'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps, RecoveryRoute } from '../types'
 
 type StackerErrorFlow =
@@ -32,9 +33,7 @@ type StackerErrorFlow =
 
 const { STACKER_HOPPER_OR_SHUTTLE_EMPTY } = RECOVERY_MAP
 
-export function StackerSelectErrorFlow(
-  props: RecoveryContentProps
-): JSX.Element {
+export function StackerSelectErrorFlow(props: RecoveryContentProps): ReactNode {
   const { recoveryMap } = props
   const { step, route } = recoveryMap
 
@@ -51,7 +50,7 @@ export function StackerSelectErrorFlow(
 
 export function StackerHopperOrShuttleEmptyOptions(
   props: RecoveryContentProps
-): JSX.Element {
+): ReactNode {
   const {
     routeUpdateActions,
     getRecoveryOptionCopy,

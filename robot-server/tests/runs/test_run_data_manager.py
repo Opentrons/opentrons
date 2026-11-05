@@ -869,7 +869,7 @@ async def test_uncurrent(
         mock_run_store.update_run_state(
             run_id=run_id,
             summary=engine_state_summary,
-            commands=[run_command],
+            commands=None,
             command_annotations=command_annotations,
             run_time_parameters=run_time_parameters,
         )
@@ -993,7 +993,7 @@ async def test_uncurrent_signoff_enforcement(
             mock_run_store.update_run_state(
                 run_id=run_id,
                 summary=engine_state_summary,
-                commands=[run_command],
+                commands=None,
                 command_annotations=command_annotations,
                 run_time_parameters=run_time_parameters,
             )
@@ -1105,7 +1105,7 @@ async def test_create_archives_existing(
         mock_run_store.update_run_state(
             run_id=run_id_old,
             summary=engine_state_summary,
-            commands=[run_command],
+            commands=None,
             command_annotations=command_annotations,
             run_time_parameters=run_time_parameters,
         )
@@ -1253,7 +1253,7 @@ async def test_create_replacement_signoff_enforcement(
             mock_run_store.update_run_state(
                 run_id=run_id_old,
                 summary=engine_state_summary,
-                commands=[run_command],
+                commands=None,
                 command_annotations=command_annotations,
                 run_time_parameters=run_time_parameters,
             )

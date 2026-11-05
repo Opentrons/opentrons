@@ -20,6 +20,9 @@ from opentrons.protocol_engine import DeckType
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
 )
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_engine.resources.file_provider import FileProvider
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
@@ -202,12 +205,14 @@ async def test_run_process_create(
         ot3_hardware_api, mock_app_state
     )
 
+    command_store_provider = CommandStoreProvider()
     run_store = RunOrchestratorStore(
         hardware_api=ot3_async,
         robot_type="OT-3 Standard",
         deck_type=DeckType("ot3_standard"),
         run_process_pyro_provider=mock_run_process_pyro_provider,
         access_control_status=False,
+        command_store_provider=command_store_provider,
     )
     resource_utilities.register_run_orchestrator_store_to_pyro_resource(
         mock_app_state, run_store
@@ -228,6 +233,12 @@ async def test_run_process_create(
     resource_utilities.register_notify_publishers_to_pyro_resource(
         mock_app_state,
         lambda: [],  # type: ignore
+    )
+    resource_utilities.register_run_store_provider_to_pyro_resource(
+        mock_app_state, command_store_provider
+    )
+    resource_utilities.register_analysis_store_provider_to_pyro_resource(
+        mock_app_state, command_store_provider
     )
 
     # Proceed with Pyro process testing

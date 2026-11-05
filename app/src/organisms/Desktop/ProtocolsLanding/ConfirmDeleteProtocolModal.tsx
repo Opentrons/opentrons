@@ -13,7 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 
 interface ConfirmDeleteProtocolModalProps {
   cancelDeleteProtocol: MouseEventHandler<HTMLAnchorElement> | undefined
@@ -22,7 +22,7 @@ interface ConfirmDeleteProtocolModalProps {
 
 export function ConfirmDeleteProtocolModal(
   props: ConfirmDeleteProtocolModalProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation(['protocol_list', 'shared'])
   return (
     <Modal

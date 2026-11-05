@@ -10,6 +10,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 type DispenseSettingOption =
   | {
       option: string
@@ -32,7 +34,7 @@ interface DispenseSettingItemProps {
 
 export function DispenseSettingItem({
   displayItem,
-}: DispenseSettingItemProps): JSX.Element {
+}: DispenseSettingItemProps): ReactNode {
   return (
     <ListItem
       type="default"

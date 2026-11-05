@@ -14,6 +14,20 @@ export default function CowButton(props) {
 }
 ```
 
+### localization (Node-safe)
+
+Shared i18n resource objects (`shared_en_resources`, `shared_zh_resources`,
+`resources`) are available from a DOM-free subpath. Use this in Node scripts,
+tests, or SSR instead of importing from the package root (which loads React/DOM):
+
+```javascript
+import {
+  shared_en_resources,
+  shared_zh_resources,
+  resources,
+} from '@opentrons/components/localization'
+```
+
 ## setup
 
 Usage requirements for dependent projects:

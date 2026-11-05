@@ -4,15 +4,14 @@ import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
 
 import styles from './shared.module.css'
 
+import type { ReactNode } from 'react'
+
 interface ErrorScreenProps {
   subText: string
   onExit: () => void
 }
 
-export function ErrorScreen({
-  subText,
-  onExit,
-}: ErrorScreenProps): JSX.Element {
+export function ErrorScreen({ subText, onExit }: ErrorScreenProps): ReactNode {
   const { t, i18n } = useTranslation('shared')
 
   return (

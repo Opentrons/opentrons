@@ -21,6 +21,7 @@ import secureTCLatchImage from '/app/assets/images/secure_tc_latch.png'
 
 import { getModuleName } from '../utils/getModuleName'
 
+import type { ReactNode } from 'react'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'
 
 interface SecureLabwareModalProps {
@@ -30,7 +31,7 @@ interface SecureLabwareModalProps {
 
 export const SecureLabwareModal = (
   props: SecureLabwareModalProps
-): JSX.Element => {
+): ReactNode => {
   const { t } = useTranslation(['protocol_setup', 'shared', 'branded'])
   const moduleName = getModuleName(props.type)
   return createPortal(

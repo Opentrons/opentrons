@@ -21,7 +21,7 @@ interface ExpandingTitleProps {
   diagram?: ReactNode
 }
 
-export function ExpandingTitle(props: ExpandingTitleProps): JSX.Element {
+export function ExpandingTitle(props: ExpandingTitleProps): ReactNode {
   const [diagramVisible, setDiagramVisible] = useState<boolean>(false)
   const toggleDiagramVisible = (): void => {
     setDiagramVisible(currentDiagramVisible => !currentDiagramVisible)

@@ -26,10 +26,10 @@ import {
   openPythonInterpreterDirectory,
 } from '/app/redux/protocol-analysis'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
-export function OverridePathToPython(): JSX.Element {
+export function OverridePathToPython(): ReactNode {
   const { t } = useTranslation(['app_settings', 'branded'])
   const pathToPythonInterpreter = useSelector(getPathToPythonOverride)
   const dispatch = useDispatch<Dispatch>()

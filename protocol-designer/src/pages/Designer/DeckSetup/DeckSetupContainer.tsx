@@ -56,7 +56,7 @@ import {
   zoomInOnCoordinate,
 } from './utils'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type {
   AddressableAreaName,
@@ -92,9 +92,7 @@ interface DeckSetupContainerProps {
   initialViewBox: string
   currentStep: FormData | null
 }
-export function DeckSetupContainer(
-  props: DeckSetupContainerProps
-): JSX.Element {
+export function DeckSetupContainer(props: DeckSetupContainerProps): ReactNode {
   const {
     robotType,
     hoverSlot,

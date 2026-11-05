@@ -14,6 +14,7 @@ import {
 import { DT_ROUTES } from '../constants'
 import { DropTipFooterButtons } from '../shared'
 
+import type { ReactNode } from 'react'
 import type { DropTipWizardContainerProps } from '../types'
 
 import SuccessIcon from '../../../assets/images/icon_success.png'
@@ -24,7 +25,7 @@ export const Success = ({
   fixitCommandTypeUtils,
   proceedWithConditionalClose,
   modalStyle,
-}: DropTipWizardContainerProps): JSX.Element => {
+}: DropTipWizardContainerProps): ReactNode => {
   const { tipDropComplete } = fixitCommandTypeUtils?.buttonOverrides ?? {}
   const { t } = useTranslation('drop_tip_wizard')
 

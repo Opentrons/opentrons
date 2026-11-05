@@ -30,9 +30,10 @@ class Settings(BaseSettings):
     log_level: str = "info"
     service_name: str = "local-ai-api"
     openai_model_name: str = "gpt-4-1106-preview"
-    anthropic_model_name: str = "claude-sonnet-5"
+    # Production default: Sonnet 5.5 (`claude-sonnet-5-5`). Prefer over `claude-sonnet-5` for capability and cost.
+    anthropic_model_name: str = "claude-sonnet-5-5"
     anthropic_max_tokens: str = "64000"
-    model_helper: str = "claude-sonnet-5"
+    model_helper: str = "claude-sonnet-5-5"
     model: str = "claude"
     auth0_domain: str = "opentrons-dev.us.auth0.com"
     auth0_api_audience: str = "sandbox-ai-api"
@@ -41,7 +42,7 @@ class Settings(BaseSettings):
     service_version: str = "hardcoded_default_from_settings"
     # Comma-separated origins for CORS. With allow_credentials=True, "*" is invalid; use explicit origins.
     # Default allows local Vite dev server so the UI at http://localhost:5173 can call the API.
-    allowed_origins: str = "http://localhost:5173,http://localhost:3000"
+    allowed_origins: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000"
     cpu: str = "1028"
     memory: str = "2048"
     google_sheet_id: str = "harcoded_default_from_settings"

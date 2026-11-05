@@ -144,7 +144,7 @@ from opentrons.config.types import (
     OT3Config,
     RobotConfig,
 )
-from opentrons.drivers.rpi_drivers.types import PortGroup, USBPort
+from opentrons.drivers.usb.types import PortGroup, USBPort
 from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
 )
@@ -1459,11 +1459,11 @@ class OT3API(
         for axis in [Axis.Z_L, Axis.Z_R, Axis.Z_G]:
             if axis in position:
                 have_z = True
-                if Axis.Z_L:
+                if axis == Axis.Z_L:
                     carriage_effectors_offset = (
                         self._robot_calibration.left_mount_offset
                     )
-                elif Axis.Z_R:
+                elif axis == Axis.Z_R:
                     carriage_effectors_offset = (
                         self._robot_calibration.right_mount_offset
                     )
@@ -1478,7 +1478,6 @@ class OT3API(
         for axis, position_value in position.items():
             if axis not in absolute_positions:
                 absolute_positions[axis] = position_value
-
         await self._move(
             target_position=absolute_positions,
             speed=speed,
@@ -2623,7 +2622,7 @@ class OT3API(
         mount: Union[top_types.Mount, OT3Mount],
         cp_override: Optional[CriticalPoint] = None,
     ) -> top_types.Point:
-        if mount == OT3Mount.GRIPPER:
+        if mount == OT3Mount.GRIPPER or mount == top_types.Mount.EXTENSION:
             return self._gripper_handler.get_critical_point(cp_override)
         else:
             return self._pipette_handler.critical_point_for(
@@ -2642,6 +2641,7 @@ class OT3API(
         }
 
     @property
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def hardware_gripper(self) -> Optional[Gripper]:
         if not self.has_gripper():
             return None
@@ -2649,7 +2649,7 @@ class OT3API(
 
     @property
     @pyro_behavior(specialty_func=convert_result_to_dict_of_proxies, apply_local=False)
-    def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:  # type: ignore
+    def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:
         # see comment in `protocols.instrument_configurer`
         # override required for type matching
         # Warning: don't use this in new code, used `hardware_pipettes` instead
@@ -3477,6 +3477,13 @@ class OT3API(
         cp = self.critical_point_for(realmount, None)
         return end_point + offset + cp
 
+    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
+    async def get_motor_usage_data(
+        self,
+        expected_nodes: Optional[List[Axis]] = None,
+    ) -> Dict[Axis, Dict[str, int]]:
+        return await self._backend.get_motor_usage_data(expected_nodes)
+
     async def update_module(self, module_serial: str) -> None:
         module = await self.get_attached_module_by_serial(module_serial)
         bundled_fw = module.bundled_fw
@@ -3485,13 +3492,6 @@ class OT3API(
                 message=f"No stored firmware for {module.name} {module.serial_number}"
             )
         return await modules.update_firmware(module, bundled_fw.path)
-
-    @pyro_behavior(specialty_func=convert_result_to_wrapped_dict, apply_local=False)
-    async def get_motor_usage_data(
-        self,
-        expected_nodes: Optional[List[Axis]] = None,
-    ) -> Dict[Axis, Dict[str, int]]:
-        return await self._backend.get_motor_usage_data(expected_nodes)
 
     async def debug_set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
         """This is a debug utility function- the protocol engine or anything user-facing shouldn't touch this!"""

@@ -35,6 +35,7 @@ import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
 import { getMainPagePortalEl } from '../Portal'
 
+import type { ReactNode } from 'react'
 import type {
   AdditionalEquipmentEntity,
   LiquidEntities,
@@ -58,7 +59,7 @@ export function MaterialsListModal({
   labware,
   liquids,
   setShowMaterialsListModal,
-}: MaterialsListModalProps): JSX.Element {
+}: MaterialsListModalProps): ReactNode {
   const { t } = useTranslation(['protocol_overview', 'shared'])
   const robotType = useSelector(getRobotType)
   const allLabwareWellContents = useSelector(

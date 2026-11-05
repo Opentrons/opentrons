@@ -8,6 +8,7 @@ import { SPACING, TYPOGRAPHY } from '../../../ui-style-constants'
 import { StyledText } from '../../StyledText'
 import { Tag } from '../../Tag/index'
 
+import type { ReactNode } from 'react'
 import type { DropdownMenuProps } from '../../../molecules/DropdownMenu'
 import type { TagProps } from '../../Tag/index'
 
@@ -25,7 +26,7 @@ interface ListItemCustomizeProps {
   menuPlacement?: 'auto' | 'top' | 'bottom'
 }
 
-export function ListItemCustomize(props: ListItemCustomizeProps): JSX.Element {
+export function ListItemCustomize(props: ListItemCustomizeProps): ReactNode {
   const {
     header,
     leftHeaderItem,

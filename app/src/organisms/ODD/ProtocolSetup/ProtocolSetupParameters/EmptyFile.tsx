@@ -13,7 +13,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-export function EmptyFile(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function EmptyFile(): ReactNode {
   const { t } = useTranslation('protocol_setup')
 
   return (

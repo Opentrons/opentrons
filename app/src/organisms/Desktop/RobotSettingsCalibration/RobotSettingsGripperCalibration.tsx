@@ -19,6 +19,7 @@ import {
   TYPOGRAPHY,
   useMenuHandleClickOutside,
   useOnClickOutside,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
@@ -26,6 +27,7 @@ import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstop
 
 import { formatLastCalibrated } from './CalibrationDetails/utils'
 
+import type { ReactNode } from 'react'
 import type { GripperData } from '@opentrons/api-client'
 
 const StyledTable = styled.table`
@@ -58,7 +60,7 @@ interface RobotSettingsGripperCalibrationProps {
 
 export function RobotSettingsGripperCalibration(
   props: RobotSettingsGripperCalibrationProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation('device_settings')
   const { gripper, robotName } = props
   const {
@@ -156,7 +158,7 @@ export function RobotSettingsGripperCalibration(
                     <Flex
                       ref={calsOverflowWrapperRef}
                       whiteSpace={NO_WRAP}
-                      zIndex={10}
+                      zIndex={Z_INDEX.MENUS}
                       borderRadius="4px 4px 0px 0px"
                       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
                       position={POSITION_ABSOLUTE}

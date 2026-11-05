@@ -7,6 +7,7 @@ import {
   RESPONSIVENESS,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
 
 const WIZARD_CONTAINER_STYLE = css`
@@ -26,7 +27,7 @@ export interface SimpleWizardBodyContainerProps extends StyleProps {
 export function SimpleWizardBodyContainer({
   children,
   ...styleProps
-}: SimpleWizardBodyContainerProps): JSX.Element {
+}: SimpleWizardBodyContainerProps): ReactNode {
   return (
     <Flex css={WIZARD_CONTAINER_STYLE} {...styleProps}>
       {children}

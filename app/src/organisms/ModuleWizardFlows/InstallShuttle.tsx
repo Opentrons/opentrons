@@ -20,6 +20,7 @@ import { SmallButton } from '/app/atoms/buttons'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
@@ -50,7 +51,7 @@ const BUTTON_STYLE = css`
     }
   `
 
-export function InstallShuttle(props: InstallShuttleProps): JSX.Element {
+export function InstallShuttle(props: InstallShuttleProps): ReactNode {
   const { proceed, isOnDevice, attachedModules } = props
   const { t, i18n } = useTranslation(['module_wizard_flows'])
 

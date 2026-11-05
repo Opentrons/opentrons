@@ -124,7 +124,7 @@ export function InterventionModal({
   run,
   analysis,
   alternateFooterContent,
-}: InterventionModalProps): JSX.Element {
+}: InterventionModalProps): ReactNode {
   const { t } = useTranslation(['protocol_command_text', 'protocol_info'])
   const isOnDevice = useSelector(getIsOnDevice)
 

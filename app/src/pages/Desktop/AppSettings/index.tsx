@@ -22,9 +22,10 @@ import { AdvancedSettings } from './AdvancedSettings'
 import { GeneralSettings } from './GeneralSettings'
 import { PrivacySettings } from './PrivacySettings'
 
+import type { ReactNode } from 'react'
 import type { AppSettingsTab, DesktopRouteParams } from '/app/App/types'
 
-export function AppSettings(): JSX.Element {
+export function AppSettings(): ReactNode {
   const { t } = useTranslation('app_settings')
   const devToolsOn = useSelector(Config.getDevtoolsEnabled)
   const { appSettingsTab } = useParams<

@@ -20,6 +20,7 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
+import type { ReactNode } from 'react'
 import type {
   AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
@@ -40,9 +41,7 @@ interface TrashBinConfigItemProps {
   selected?: boolean
 }
 
-export function TrashBinConfigItem(
-  props: TrashBinConfigItemProps
-): JSX.Element {
+export function TrashBinConfigItem(props: TrashBinConfigItemProps): ReactNode {
   const { t } = useTranslation('deck_configuration')
 
   const {

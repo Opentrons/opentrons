@@ -13,6 +13,7 @@ import {
 } from '@opentrons/components'
 import { getDisplayVolume } from '@opentrons/shared-data'
 
+import type { ReactNode } from 'react'
 import type {
   LabwareDefinition,
   LabwareVolumeUnits,
@@ -36,7 +37,7 @@ const BOTTOM_SHAPE_TO_ICON = {
   flat: 'ot-flat-bottom',
 } as const
 
-export function WellProperties(props: WellPropertiesProps): JSX.Element {
+export function WellProperties(props: WellPropertiesProps): ReactNode {
   const { t } = useTranslation('labware_details')
   const { wellProperties, wellLabel, displayVolumeUnits: units } = props
 

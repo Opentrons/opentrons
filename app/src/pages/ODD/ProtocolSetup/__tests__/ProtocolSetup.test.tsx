@@ -6,7 +6,6 @@ import { when } from 'vitest-when'
 import { mockHeaterShaker, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   useAddCameraSettingsToRunMutation,
-  useAllPipetteOffsetCalibrationsQuery,
   useCamera,
   useCreateProtocolAnalysisMutation,
   useInstrumentsQuery,
@@ -330,9 +329,6 @@ describe('ProtocolSetup', () => {
           data: [mockLeftPipetteData, mockRightPipetteData, mockGripperData],
         },
       } as any)
-    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
-      .calledWith()
-      .thenReturn({ data: { data: [] } } as any)
     vi.mocked(useIsHeaterShakerInProtocol).mockReturnValue(false)
     when(vi.mocked(useIsDoorOpen))
       .calledWith(ROBOT_NAME)

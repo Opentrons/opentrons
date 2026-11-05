@@ -565,4 +565,189 @@ describe('moveToWell', () => {
       type: 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL',
     })
   })
+  it('resolves every arg when they are runtime parameters', () => {
+    invariantContext.runtimeParameters = {
+      selected_pipette: {
+        variableName: 'selected_pipette',
+        displayName: 'Selected pipette',
+        type: 'string',
+        default: DEFAULT_PIPETTE,
+      },
+      selected_labware: {
+        variableName: 'selected_labware',
+        displayName: 'Selected labware',
+        type: 'string',
+        default: SOURCE_LABWARE,
+      },
+      well_name: {
+        variableName: 'well_name',
+        displayName: 'Well name',
+        type: 'string',
+        default: 'A1',
+      },
+      well_origin: {
+        variableName: 'well_origin',
+        displayName: 'Well origin',
+        type: 'string',
+        default: 'bottom',
+      },
+      offset_x: {
+        variableName: 'offset_x',
+        displayName: 'Offset x',
+        type: 'int',
+        default: 1,
+      },
+      offset_y: {
+        variableName: 'offset_y',
+        displayName: 'Offset y',
+        type: 'float',
+        default: 2,
+      },
+      offset_z: {
+        variableName: 'offset_z',
+        displayName: 'Offset z',
+        type: 'float',
+        default: 3,
+      },
+      force_direct: {
+        variableName: 'force_direct',
+        displayName: 'Force direct',
+        type: 'boolean',
+        default: false,
+      },
+      min_z: {
+        variableName: 'min_z',
+        displayName: 'Min z',
+        type: 'float',
+        default: 5,
+      },
+      move_speed: {
+        variableName: 'move_speed',
+        displayName: 'Move speed',
+        type: 'int',
+        default: 10,
+      },
+    }
+    const result = moveToWell(
+      {
+        pipetteId: 'selected_pipette',
+        labwareId: 'selected_labware',
+        wellName: 'well_name',
+        wellLocation: {
+          origin: 'well_origin',
+          offset: { x: 'offset_x', y: 'offset_y', z: 'offset_z' },
+        },
+        forceDirect: 'force_direct',
+        minimumZHeight: 'min_z',
+        speed: 'move_speed',
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getSuccessResult(result).commands).toEqual([
+      {
+        commandType: 'moveToWell',
+        key: expect.any(String),
+        params: {
+          pipetteId: DEFAULT_PIPETTE,
+          labwareId: SOURCE_LABWARE,
+          wellName: 'A1',
+          wellLocation: {
+            origin: 'bottom',
+            offset: { x: 1, y: 2, z: 3 },
+          },
+          forceDirect: false,
+          minimumZHeight: 5,
+          speed: 10,
+        },
+      },
+    ])
+    expect(getSuccessResult(result).python).toBe(
+      'mock_pipette.move_to(mock_source_plate[well_name].bottom(z=offset_z).move(types.Point(x=offset_x, y=offset_y)), force_direct=force_direct, minimum_z_height=min_z, speed=move_speed)'
+    )
+  })
+  it('returns errors if args are not valid runtime parameters', () => {
+    invariantContext.runtimeParameters = {
+      mock_bool_rtp: {
+        variableName: 'mock_bool_rtp',
+        displayName: 'mock bool rtp',
+        type: 'boolean',
+        default: false,
+      },
+      mock_int_rtp: {
+        variableName: 'mock_int_rtp',
+        displayName: 'mock int rtp',
+        type: 'int',
+        default: 1,
+      },
+      mock_string_rtp: {
+        variableName: 'mock_string_rtp',
+        displayName: 'mock string rtp',
+        type: 'string',
+        default: 'mock',
+      },
+    }
+    const result = moveToWell(
+      {
+        pipetteId: 'mock_bool_rtp',
+        labwareId: 'mock_int_rtp',
+        wellName: 'mock_bool_rtp',
+        wellLocation: {
+          origin: 'mock_int_rtp',
+          offset: {
+            x: 'mock_string_rtp',
+            y: 'missing_offset',
+            z: 'mock_bool_rtp',
+          },
+        },
+        minimumZHeight: 'mock_string_rtp',
+        forceDirect: 'mock_int_rtp',
+        speed: 'mock_bool_rtp',
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_bool_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_int_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_bool_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_int_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_string_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "missing_offset" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_bool_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_string_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_int_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_bool_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+    ])
+  })
 })

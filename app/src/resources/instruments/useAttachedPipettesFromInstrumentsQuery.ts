@@ -12,7 +12,6 @@ export type AttachedPipettesFromInstrumentsQuery = {
 }
 export function useAttachedPipettesFromInstrumentsQuery(): AttachedPipettesFromInstrumentsQuery {
   const attachedInstruments = useInstrumentsQuery()?.data?.data ?? []
-
   const okPipettes = attachedInstruments.filter(
     (instrument): instrument is PipetteData =>
       instrument.instrumentType === 'pipette' && instrument.ok

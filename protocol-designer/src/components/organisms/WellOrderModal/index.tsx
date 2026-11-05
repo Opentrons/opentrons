@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -84,13 +84,6 @@ export function WellOrderModal(props: WellOrderModalProps): JSX.Element | null {
     firstValue: initialFirstValue,
     secondValue: initialSecondValue,
   })
-
-  useEffect(() => {
-    setWellOrder({
-      firstValue: initialFirstValue,
-      secondValue: initialSecondValue,
-    })
-  }, [initialFirstValue, initialSecondValue])
 
   const applyChanges = (): void => {
     updateValues(wellOrder.firstValue, wellOrder.secondValue)

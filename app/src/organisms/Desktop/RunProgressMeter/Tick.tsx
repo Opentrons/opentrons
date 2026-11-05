@@ -16,6 +16,7 @@ import {
 
 import { getModalPortalEl } from '/app/App/portal'
 
+import type { ReactNode } from 'react'
 import type { IconName } from '@opentrons/components'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 
@@ -40,7 +41,7 @@ const ICON_NAME_BY_COMMAND_TYPE: {
   waitForResume: 'pause-circle',
   moveLabware: 'move-xy',
 }
-export function Tick(props: TickProps): JSX.Element {
+export function Tick(props: TickProps): ReactNode {
   const { index, count, range, firstCommandType, makeHandleJumpToStep, total } =
     props
   const { t } = useTranslation('run_details')

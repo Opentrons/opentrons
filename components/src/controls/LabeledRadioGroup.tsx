@@ -10,7 +10,7 @@ export interface LabeledRadioGroupProps extends RadioGroupProps {
   'data-test'?: string
 }
 
-export function LabeledRadioGroup(props: LabeledRadioGroupProps): JSX.Element {
+export function LabeledRadioGroup(props: LabeledRadioGroupProps): ReactNode {
   const { label, value, options, onChange } = props
 
   return (

@@ -979,7 +979,7 @@
       {
         "id": "vacuumModuleV1A3",
         "areaType": "vacuumModule",
-        "offsetFromCutoutFixture": [0, 0, 19.0],
+        "offsetFromCutoutFixture": [0.4, 0, 18.75],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,

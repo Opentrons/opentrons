@@ -14,12 +14,14 @@ import { OddModal } from '/app/molecules/OddModal'
 
 import { NameQuickTransfer } from './NameQuickTransfer'
 
+import type { ReactNode } from 'react'
+
 interface SaveOrRunModalProps {
   onSave: (protocolName: string) => void
   onRun: () => void
 }
 
-export const SaveOrRunModal = (props: SaveOrRunModalProps): JSX.Element => {
+export const SaveOrRunModal = (props: SaveOrRunModalProps): ReactNode => {
   const { t } = useTranslation('quick_transfer')
   const [showNameTransfer, setShowNameTransfer] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)

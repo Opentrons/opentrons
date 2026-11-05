@@ -53,7 +53,7 @@ class Slack:
         message: str,
         file_paths: list[str] | None = None,
         user_id: Optional[str] = None,
-    ) -> None:
+    ) -> Optional[str]:
         """Send Slack message with optional multiple files in a single-threaded group."""
         try:
             parent = self.client.chat_postMessage(
@@ -66,10 +66,10 @@ class Slack:
             thread_ts = parent["ts"]
         except Exception as e:
             print(f"Failed to send primary Slack message: {e}")
-            return
+            return None
 
         if not file_paths:
-            return
+            return thread_ts
 
         for file_path in file_paths:
             cleaned = file_path.strip()
@@ -91,6 +91,8 @@ class Slack:
             except Exception as e:
                 print(f"Failed to upload {cleaned} to Slack: {e}")
                 continue
+
+        return thread_ts
 
     def send_run_completed_message(
         self, protocol_name: str, file_paths: list[str] | None = None
@@ -117,7 +119,7 @@ class Slack:
         ip: str,
         file_paths: list[str] | None = None,
     ) -> None:
-        """Send error message to Slack, optionally tagging a user."""
+        """Send error message to Slack with the logs and error video attached."""
         message = f"Protocol {protocol_name} on IP: {ip} ended in error: {error_str}"
         self.icon_emoji = ":alert:"
         self.send_slack_message(message, file_paths)

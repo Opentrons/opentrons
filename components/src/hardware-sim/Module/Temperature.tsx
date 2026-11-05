@@ -1,12 +1,14 @@
 import { COLORS } from '../../helix-design-system'
 
+import type { ReactNode } from 'react'
+
 export interface TemperatureVizProps {
   targetTemperature: number | null
 }
 
 const ROOM_TEMPERATURE_C = 23
 
-export function Temperature(props: TemperatureVizProps): JSX.Element {
+export function Temperature(props: TemperatureVizProps): ReactNode {
   const { targetTemperature } = props
   let ledLightColor = COLORS.transparent
   if (targetTemperature != null) {

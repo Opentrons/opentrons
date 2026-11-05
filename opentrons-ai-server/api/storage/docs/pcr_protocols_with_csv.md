@@ -7,7 +7,7 @@ Write a protocol using the Opentrons Python Protocol API v2 for the OT-2 robot a
 
 Requirements:
 
-- requirements = {"robotType": "OT-2", "apiLevel": "2.19"}
+- requirements = {"robotType": "OT-2", "apiLevel": "2.28"}
 
 Modules:
 
@@ -49,7 +49,7 @@ Protocol Steps:
 ```python
 from opentrons import protocol_api
 
-requirements = {"robotType": "OT-2", "apiLevel": "2.19"}
+requirements = {"robotType": "OT-2", "apiLevel": "2.28"}
 
 def run(protocol: protocol_api.ProtocolContext):
     # Module loading
@@ -125,7 +125,7 @@ Write a protocol using the Opentrons Python Protocol API v2 for OT-2 robot accor
 
 Requirements:
 
-- requirements = {"robotType": "OT-2", "apiLevel": "2.19"}
+- requirements = {"robotType": "OT-2", "apiLevel": "2.28"}
 
 Module:
 
@@ -163,7 +163,7 @@ from opentrons import protocol_api
 
 requirements = {
     'robotType': 'OT-2',
-    'apiLevel': '2.19'
+    'apiLevel': '2.28'
 }
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -228,7 +228,7 @@ Write a protocol using the Opentrons Python Protocol API v2 for Flex robot accor
 
 Requirements:
 
-- requirements = {"robotType": "Flex", "apiLevel": "2.19"}
+- requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 Temperature Modules:
 
@@ -287,7 +287,7 @@ Protocol Steps:
 ```python
 from opentrons import protocol_api
 
-requirements = {"robotType": "Flex", "apiLevel": "2.19"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 def run(protocol: protocol_api.ProtocolContext):
     # Trash
@@ -367,7 +367,7 @@ Write a protocol using the Opentrons Python Protocol API v2 for the Flex robot a
 
 Requirements:
 
-- `requirements = {"robotType": "Flex", "apiLevel": "2.19"}`
+- `requirements = {"robotType": "Flex", "apiLevel": "2.28"}`
 
 Modules:
 
@@ -405,7 +405,7 @@ from opentrons import protocol_api
 
 requirements = {
     'robotType': 'Flex',
-    'apiLevel': '2.19'
+    'apiLevel': '2.28'
 }
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -481,7 +481,7 @@ Write a protocol using the Opentrons Python Protocol API v2 for the Flex robot a
 
 Requirements:
 
-- `requirements = {"robotType": "Flex", "apiLevel": "2.19"}`
+- `requirements = {"robotType": "Flex", "apiLevel": "2.28"}`
 
 Modules:
 
@@ -533,7 +533,7 @@ from opentrons import protocol_api
 
 requirements = {
     'robotType': 'Flex',
-    'apiLevel': '2.19'
+    'apiLevel': '2.28'
 }
 
 
@@ -656,7 +656,7 @@ Write a protocol using the Opentrons Python Protocol API v2 for the Flex robot a
 
 Requirements:
 
-- `requirements = {"robotType": "Flex", "apiLevel": "2.15"}`
+- `requirements = {"robotType": "Flex", "apiLevel": "2.28"}`
 
 Modules:
 
@@ -711,7 +711,7 @@ from opentrons import protocol_api
 
 requirements = {
     'robotType': 'Flex',
-    'apiLevel': '2.15'
+    'apiLevel': '2.28'
 }
 
 
@@ -827,7 +827,7 @@ Write a protocol using the Opentrons Python Protocol API v2 for the Flex robot a
 
 Requirements:
 
-- `requirements = {"robotType": "Flex", "apiLevel": "2.15"}`
+- `requirements = {"robotType": "Flex", "apiLevel": "2.28"}`
 
 Modules:
 
@@ -865,7 +865,7 @@ from opentrons import protocol_api
 
 requirements = {
     'robotType': 'Flex',
-    'apiLevel': '2.15'
+    'apiLevel': '2.28'
 }
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -946,7 +946,7 @@ Write a protocol using the Opentrons Python Protocol API v2 for the Flex robot a
 
 Requirements:
 
-- `requirements = {"robotType": "Flex", "apiLevel": "2.15"}`
+- `requirements = {"robotType": "Flex", "apiLevel": "2.28"}`
 
 Modules:
 
@@ -985,7 +985,7 @@ from opentrons import protocol_api
 
 requirements = {
     'robotType': 'Flex',
-    'apiLevel': '2.15'
+    'apiLevel': '2.28'
 }
 
 

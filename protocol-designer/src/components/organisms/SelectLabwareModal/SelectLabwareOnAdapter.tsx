@@ -28,7 +28,7 @@ import { ADAPTER_96_CHANNEL } from '../../../utils/labwareModuleCompatibility'
 import { SelectLidOnLabware } from './SelectLidOnLabware'
 import { getIsNestedDefinitionALid } from './utils'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { StackingProps } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ThunkDispatch } from '../../../types'
@@ -44,7 +44,7 @@ interface SelectLabwareOnAdapterProps {
 }
 export function SelectLabwareOnAdapter(
   props: SelectLabwareOnAdapterProps
-): JSX.Element | null {
+): ReactNode {
   const {
     slot,
     lidLoadNames,

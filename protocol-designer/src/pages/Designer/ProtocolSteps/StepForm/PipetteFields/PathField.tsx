@@ -71,7 +71,7 @@ interface PathButtonProps {
   children?: ReactNode
 }
 
-function PathButton(props: PathButtonProps): JSX.Element {
+function PathButton(props: PathButtonProps): ReactNode {
   const { disabled, onClick, path, selected, subtitle } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP_START,
@@ -118,7 +118,7 @@ const getSubtitle = (
   return reasonForDisabled || ''
 }
 
-export function PathField(props: PathFieldProps): JSX.Element {
+export function PathField(props: PathFieldProps): ReactNode {
   const {
     aspirate_wells,
     changeTip,

@@ -1,5 +1,7 @@
+import type { ReactNode } from 'react'
+
 // x .32, y .31
-export function OpentronsAutoclavableDeckRiser(): JSX.Element {
+export function OpentronsAutoclavableDeckRiser(): ReactNode {
   return (
     <svg id="DekRiser" xmlns="http://www.w3.org/2000/svg" version="1.1">
       <g id="BgFill">

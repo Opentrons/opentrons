@@ -11,6 +11,7 @@ import {
   TC_MODULE_LOCATION_OT3,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_LOCATION,
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
@@ -29,13 +30,17 @@ describe('getModuleDisplayLocation', () => {
     const result = getModuleDisplayLocation(moduleOnDeck, FLEX_ROBOT_TYPE)
     expect(result).toEqual(TC_MODULE_LOCATION_OT3)
   })
+  it('returns the correct display location for a vacuum module on Flex', () => {
+    const moduleOnDeck = { type: VACUUM_MODULE_TYPE } as ModuleOnDeck
+    const result = getModuleDisplayLocation(moduleOnDeck, FLEX_ROBOT_TYPE)
+    expect(result).toEqual(VACUUM_MODULE_LOCATION)
+  })
   ;[
     MAGNETIC_MODULE_TYPE,
     TEMPERATURE_MODULE_TYPE,
     HEATERSHAKER_MODULE_TYPE,
     ABSORBANCE_READER_TYPE,
     FLEX_STACKER_MODULE_TYPE,
-    VACUUM_MODULE_TYPE,
   ].forEach(type => {
     it(`returns the slot for ${type}`, () => {
       const moduleOnDeck = {

@@ -1,20 +1,21 @@
 import { useTranslation } from 'react-i18next'
 
-import { LegacyStyledText } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
-import { BODY_STYLE, SECTIONS } from './constants'
+import { SECTIONS } from './constants'
 import { getPipetteAnimations } from './utils'
 
+import type { ReactNode } from 'react'
 import type { PipetteWizardStepProps } from './types'
 
 interface DetachProbeProps extends PipetteWizardStepProps {
   proceed: () => void
 }
 
-export const DetachProbe = (props: DetachProbeProps): JSX.Element => {
+export const DetachProbe = (props: DetachProbeProps): ReactNode => {
   const {
     isRobotMoving,
     goBack,
@@ -33,16 +34,26 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element => {
   }
   return (
     <GenericWizardTile
-      header={i18n.format(t('remove_cal_probe'), 'capitalize')}
+      header={
+        <StyledText
+          desktopStyle="headingSmallBold"
+          oddStyle="level4HeaderSemiBold"
+        >
+          {i18n.format(t('remove_cal_probe'), 'capitalize')}
+        </StyledText>
+      }
       //  todo(jr, 5/30/23): update animations! these are not final for 1, 8 and 96
       rightHandBody={getPipetteAnimations({
         pipetteWizardStep,
         channel,
       })}
       bodyText={
-        <LegacyStyledText css={BODY_STYLE}>
+        <StyledText
+          desktopStyle="bodyDefaultRegular"
+          oddStyle="bodyTextRegular"
+        >
           {i18n.format(t('remove_probe'), 'capitalize')}
-        </LegacyStyledText>
+        </StyledText>
       }
       proceedButtonText={
         errorMessage != null ? t('exit_cal') : t('complete_cal')

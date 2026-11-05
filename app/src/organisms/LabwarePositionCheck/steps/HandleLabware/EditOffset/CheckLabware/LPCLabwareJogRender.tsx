@@ -26,6 +26,7 @@ import {
   selectSelectedLwDef,
 } from '/app/redux/protocol-runs'
 
+import type { ReactNode } from 'react'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 
 // TODO(jh, 03-12-25): Standardize viewboxes.
@@ -33,7 +34,7 @@ const DECK_MAP_VIEWBOX = '-10 -10 150 105'
 
 export function LPCLabwareJogRender({
   runId,
-}: EditOffsetContentProps): JSX.Element {
+}: EditOffsetContentProps): ReactNode {
   const pipetteName =
     useSelector(selectActivePipette(runId))?.pipetteName ?? 'p1000_single'
   const itemLwDef = useSelector(selectSelectedLwDef(runId))!
@@ -70,7 +71,7 @@ const RENDER_CONTAINER_STYLE = css`
   align-items: ${ALIGN_CENTER};
 `
 
-function LevelWithLabware({ runId }: { runId: string }): JSX.Element {
+function LevelWithLabware({ runId }: { runId: string }): ReactNode {
   const { t } = useTranslation('labware_position_check')
   const isLwTiprack = useSelector(selectIsSelectedLwTipRack(runId))
 

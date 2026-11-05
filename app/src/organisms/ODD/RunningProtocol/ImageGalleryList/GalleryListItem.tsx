@@ -6,6 +6,7 @@ import { ODDMediaContainerContent } from '/app/molecules/ODDMediaContainerConten
 import { handleCameraPhotoModal } from '/app/organisms/ODD/RunningProtocol/ImageGalleryList/CameraPhotoModal'
 import { useImage } from '/app/resources/dataFiles/useImage'
 
+import type { ReactNode } from 'react'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition,
@@ -21,7 +22,7 @@ export interface GalleryListItemProps {
   item: UseImagesInfoItem
 }
 
-export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
+export function GalleryListItem(props: GalleryListItemProps): ReactNode {
   const { t } = useTranslation('run_details')
   const { item, runId, protocolAnalysis, robotType, allRunDefs } = props
 

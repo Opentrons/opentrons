@@ -39,7 +39,7 @@ import {
 } from './utils'
 
 import type { ThunkDispatch } from 'redux-thunk'
-import type { Dispatch, MouseEvent, SetStateAction } from 'react'
+import type { Dispatch, MouseEvent, ReactNode, SetStateAction } from 'react'
 import type { DeleteModalType } from '/protocol-designer/components/organisms'
 import type { StepIdType } from '/protocol-designer/form-types'
 import type { BaseState, ThunkAction } from '/protocol-designer/types'
@@ -59,7 +59,7 @@ const DEBOUNCE_DURATION_MS = 500
 
 // todo(mm, 2025-11-14): I've made a mess of ConnectedStepInfo and ConnectedStepContainer.
 // We should try to either merge them, or clarify each one's responsibilities.
-export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
+export function ConnectedStepInfo(props: ConnectedStepInfoProps): ReactNode {
   const {
     stepId,
     openedOverflowMenuId,

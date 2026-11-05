@@ -1,6 +1,5 @@
 import type { Language } from '/app/i18n'
 import type { ProtocolSort } from '/app/redux/protocol-storage'
-import type { LogLevel } from '../../logger'
 
 export type UrlProtocol = 'file:' | 'http:'
 
@@ -15,7 +14,6 @@ export type DevInternalFlag =
   | 'protocolTimeline'
   | 'enableLabwareCreator'
   | 'reactQueryDevtools'
-  | 'reactScan'
   | 'quickTransferProtocolContentsLog'
   | 'robotSearchBar'
   | 'showGitDetails'
@@ -39,6 +37,9 @@ export interface OnDeviceDisplaySettings {
   textSize: number
   unfinishedUnboxingFlowRoute: string | null
 }
+
+export type LogLevel =
+  'error' | 'warn' | 'info' | 'http' | 'verbose' | 'debug' | 'silly'
 
 export interface ConfigV0 {
   version: 0

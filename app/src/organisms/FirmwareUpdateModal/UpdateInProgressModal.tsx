@@ -16,6 +16,7 @@ import {
 
 import { OddModal } from '/app/molecules/OddModal'
 
+import type { ReactNode } from 'react'
 import type { Subsystem } from '@opentrons/api-client'
 
 interface UpdateInProgressModalProps {
@@ -33,7 +34,7 @@ const SPINNER_STYLE = css`
 
 export function UpdateInProgressModal(
   props: UpdateInProgressModalProps
-): JSX.Element {
+): ReactNode {
   const { subsystem } = props
   const { t } = useTranslation('firmware_update')
 

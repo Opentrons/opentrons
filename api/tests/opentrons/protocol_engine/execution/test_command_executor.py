@@ -10,7 +10,7 @@ from pydantic import BaseModel, PrivateAttr
 
 from opentrons_shared_data.errors.exceptions import EStopActivatedError, PythonException
 
-from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI, OT3HardwareControlAPI
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
@@ -62,7 +62,7 @@ from opentrons.protocol_engine.state.state import StateStore
 @pytest.fixture
 def hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Get a mocked out StateStore."""
-    return decoy.mock(cls=OT2HardwareControlAPI)
+    return decoy.mock(cls=OT3HardwareControlAPI)
 
 
 @pytest.fixture

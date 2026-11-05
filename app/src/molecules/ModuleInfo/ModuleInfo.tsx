@@ -23,6 +23,7 @@ import {
 
 import { useRunHasStarted } from '/app/resources/runs'
 
+import type { ReactNode } from 'react'
 import type { ModuleModel } from '@opentrons/shared-data'
 
 export interface ModuleInfoProps {
@@ -32,7 +33,7 @@ export interface ModuleInfoProps {
   runId?: string
 }
 
-export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
+export const ModuleInfo = (props: ModuleInfoProps): ReactNode => {
   const { moduleModel, physicalPort, isAttached, runId = null } = props
   const moduleDef = getModuleDef(moduleModel)
   const {

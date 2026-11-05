@@ -30,7 +30,7 @@ import { DeckSetupToolbox } from '../DeckSetup/DeckSetupToolbox'
 import { LabwareLabel } from '../LabwareLabel'
 import { OffDeckDetails } from './OffDeckDetails'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { ThunkDispatch } from '../../../types'
 
 const STANDARD_X_WIDTH = 127.76
@@ -40,7 +40,7 @@ const SCALER_TO_ACCOUNT_FOR_LABWARE_LABEL = 0.8
 interface OffDeckProps {
   setOverflowMenu: Dispatch<SetStateAction<boolean>>
 }
-export function OffDeck(props: OffDeckProps): JSX.Element {
+export function OffDeck(props: OffDeckProps): ReactNode {
   const { setOverflowMenu } = props
   const { t, i18n } = useTranslation('starting_deck_state')
   const terminalItemId = useSelector(getSelectedTerminalItemId)

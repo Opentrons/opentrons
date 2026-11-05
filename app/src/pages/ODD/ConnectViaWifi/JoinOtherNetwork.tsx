@@ -6,7 +6,7 @@ import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 import { WifiSsidInput } from '/app/organisms/ODD/NetworkSettings'
 import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { WifiScreenOption } from './'
 
 interface JoinOtherNetworkProps {
@@ -17,7 +17,7 @@ interface JoinOtherNetworkProps {
 export function JoinOtherNetwork({
   setCurrentOption,
   setSelectedSsid,
-}: JoinOtherNetworkProps): JSX.Element {
+}: JoinOtherNetworkProps): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
 
   const [inputSsid, setInputSsid] = useState<string>('')

@@ -1,16 +1,14 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import {
   ALIGN_FLEX_END,
   Btn,
   COLORS,
-  LegacyStyledText,
   PrimaryButton,
-  RESPONSIVENESS,
   SecondaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
@@ -25,7 +23,7 @@ import {
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { LoadedPipette, MotorAxes } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
@@ -40,7 +38,7 @@ interface ResultsProps extends PipetteWizardStepProps {
   nextMount?: string
 }
 
-export const Results = (props: ResultsProps): JSX.Element => {
+export const Results = (props: ResultsProps): ReactNode => {
   const {
     goBack,
     proceed,
@@ -249,32 +247,19 @@ export const Results = (props: ResultsProps): JSX.Element => {
     requiredPipDisplayName == null &&
     (flowType === FLOWS.ATTACH || flowType === FLOWS.DETACH)
   ) {
-    const GO_BACK_BUTTON_STYLE = css`
-      ${TYPOGRAPHY.pSemiBold};
-      color: ${COLORS.grey50};
-
-      &:hover {
-        opacity: 70%;
-      }
-
-      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-        font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-        font-size: ${TYPOGRAPHY.fontSize22};
-
-        &:hover {
-          opacity: 100%;
-        }
-      }
-    `
     subHeader =
       numberOfTryAgains > 2 ? t('branded:something_seems_wrong') : undefined
     button = (
       <>
         {Boolean(isOnDevice) ? (
           <Btn onClick={goBack} aria-label="back">
-            <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
+            <StyledText
+              desktopStyle="bodyDefaultSemiBold"
+              oddStyle="bodyTextSemiBold"
+              color={COLORS.grey50}
+            >
               {t('shared:go_back')}
-            </LegacyStyledText>
+            </StyledText>
           </Btn>
         ) : (
           <SecondaryButton

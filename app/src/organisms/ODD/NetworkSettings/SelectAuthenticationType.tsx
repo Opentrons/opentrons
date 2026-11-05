@@ -22,7 +22,7 @@ import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 
 import { AlternativeSecurityTypeModal } from './AlternativeSecurityTypeModal'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { WifiSecurityType } from '@opentrons/api-client'
 
 interface SelectAuthenticationTypeProps {
@@ -33,7 +33,7 @@ interface SelectAuthenticationTypeProps {
 export function SelectAuthenticationType({
   selectedAuthType,
   setSelectedAuthType,
-}: SelectAuthenticationTypeProps): JSX.Element {
+}: SelectAuthenticationTypeProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared'])
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'

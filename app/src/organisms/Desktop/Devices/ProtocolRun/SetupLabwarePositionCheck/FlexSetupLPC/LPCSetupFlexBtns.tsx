@@ -20,6 +20,7 @@ import {
 } from '/app/redux/protocol-runs'
 import { useLPCDisabledReason } from '/app/resources/runs'
 
+import type { ReactNode } from 'react'
 import type { SetupLabwarePositionCheckProps } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupLabwarePositionCheck'
 
 export interface LPCSetupFlexBtnsProps extends SetupLabwarePositionCheckProps {
@@ -34,7 +35,7 @@ export function LPCSetupFlexBtns({
   robotName,
   hasMissingModulesForFlex,
   hasMissingCalForFlex,
-}: LPCSetupFlexBtnsProps): JSX.Element {
+}: LPCSetupFlexBtnsProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
   const lpcDisabledReason = useLPCDisabledReason({
     robotName,

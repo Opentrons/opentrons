@@ -404,6 +404,37 @@ class AddressableAreaView:
         addressable_area = self.get_addressable_area(addressable_area_name)
         return addressable_area.base_slot
 
+    def get_potential_addressable_area_base_slot(
+        self, addressable_area_name: str
+    ) -> Optional[DeckSlotName]:
+        """Get the cutout deck slot that can provide this addressable area.
+
+        Uses the loaded area when it is on the deck. When a module fixture has
+        replaced the plain name, reads the cutout from the deck definition, so
+        a later module that mounts on column 4 is found on whatever cutout
+        provides that area. Analysis uses a simulated deck, which rejects the
+        plain name as incompatible with the module fixture instead of missing.
+        """
+        try:
+            return self.get_addressable_area_base_slot(addressable_area_name)
+        except (
+            AreaNotInDeckConfigurationError,
+            AddressableAreaDoesNotExistError,
+            CutoutDoesNotExistError,
+            IncompatibleAddressableAreaError,
+        ):
+            try:
+                cutout_id, _ = (
+                    deck_configuration_provider.get_potential_cutout_fixtures(
+                        addressable_area_name, self._state.deck_definition
+                    )
+                )
+                return deck_configuration_provider.get_deck_slot_for_cutout_id(
+                    cutout_id
+                )
+            except (AddressableAreaDoesNotExistError, CutoutDoesNotExistError):
+                return None
+
     def get_addressable_area_position(
         self,
         addressable_area_name: str,
