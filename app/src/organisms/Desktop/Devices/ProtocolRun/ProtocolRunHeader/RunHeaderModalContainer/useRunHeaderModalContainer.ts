@@ -31,7 +31,7 @@ import {
   useQuickProtocolDetailsForRun,
 } from '/app/resources/runs'
 
-import { useRunHeaderRunControls } from '../hooks'
+import { useCloseTerminalRun, useRunHeaderRunControls } from '../hooks'
 import { getFallbackRobotSerialNumber } from '../utils'
 import {
   useHeaterShakerConfirmationModal,
@@ -99,6 +99,7 @@ export function useRunHeaderModalContainer({
   attachedModules,
   runErrors,
   closeCurrentRun,
+  isCloning = false,
 }: UseRunHeaderModalContainerProps): UseRunHeaderModalContainerResult {
   const navigate = useNavigate()
 
@@ -223,12 +224,17 @@ export function useRunHeaderModalContainer({
     isRunStarting: isApplyingOffsets,
   })
 
+  useCloseTerminalRun({
+    runId,
+    runStatus,
+    closeCurrentRun,
+  })
+
   const dropTipUtils = useRunHeaderDropTip({
     runId,
     runStatus,
-    runRecord,
     robotType,
-    closeCurrentRun,
+    isCloning,
   })
 
   const recoveryModalUtils = useErrorRecoveryFlows(runId, runStatus)

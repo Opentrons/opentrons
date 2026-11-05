@@ -27,12 +27,14 @@ export interface ProtocolDropTipModalProps {
   onBeginRemoval: () => void
   isPressed: boolean
   mount?: PipetteData['mount']
+  is96Channel?: boolean
 }
 
 export function ProtocolDropTipModal({
   onSkip,
   onBeginRemoval,
   mount,
+  is96Channel = false,
   isPressed,
 }: ProtocolDropTipModalProps): ReactNode {
   const { t } = useTranslation('drop_tip_wizard')
@@ -70,7 +72,11 @@ export function ProtocolDropTipModal({
         <StyledText desktopStyle="bodyDefaultRegular">
           <Trans
             t={t}
-            i18nKey="liquid_damages_this_pipette"
+            i18nKey={
+              is96Channel
+                ? 'liquid_damages_pipette'
+                : 'liquid_damages_this_pipette'
+            }
             values={{
               mount,
             }}

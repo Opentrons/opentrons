@@ -88,7 +88,7 @@ export function PrepareDeckForHome(props: RecoveryContentProps): ReactNode {
   const primaryBtnOnClick = (): Promise<void> =>
     proceedToRouteAndStep(
       RECOVERY_MAP.HOME_AND_RETRY.ROUTE,
-      tipStatusUtils.areTipsAttached
+      tipStatusUtils.aPipetteWithTip != null
         ? RECOVERY_MAP.HOME_AND_RETRY.STEPS.REMOVE_TIPS_FROM_PIPETTE
         : RECOVERY_MAP.HOME_AND_RETRY.STEPS.HOME_BEFORE_RETRY
     )
@@ -125,7 +125,7 @@ export function HomeGantryBeforeRetry(props: RecoveryContentProps): ReactNode {
   const secondaryBtnOnClick = (): Promise<void> =>
     proceedToRouteAndStep(
       RECOVERY_MAP.HOME_AND_RETRY.ROUTE,
-      tipStatusUtils.areTipsAttached
+      tipStatusUtils.aPipetteWithTip != null
         ? RECOVERY_MAP.HOME_AND_RETRY.STEPS.REMOVE_TIPS_FROM_PIPETTE
         : RECOVERY_MAP.HOME_AND_RETRY.STEPS.PREPARE_DECK_FOR_HOME
     )

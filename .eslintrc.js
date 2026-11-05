@@ -38,7 +38,7 @@ module.exports = {
     'react-hooks/exhaustive-deps': [
       'error',
       {
-        additionalHooks: '(useDrag|useDrop)',
+        additionalHooks: '^(useDrag|useDrop)$',
       },
     ],
     'no-extra-boolean-cast': 'off',
