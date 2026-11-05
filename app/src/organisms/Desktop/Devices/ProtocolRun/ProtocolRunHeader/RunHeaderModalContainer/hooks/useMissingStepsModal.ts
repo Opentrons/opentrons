@@ -9,16 +9,15 @@ import {
   MODULE_SETUP_STEP_KEY,
   ROBOT_CALIBRATION_STEP_KEY,
 } from '/app/redux/protocol-runs'
+import { selectTotalCountLocationSpecificOffsets } from '/app/redux/protocol-runs/selectors/lpc/labware/offsets'
 
 import { isAnyHeaterShakerShaking } from '../modals'
-import { selectTotalCountLocationSpecificOffsets } from '/app/redux/protocol-runs/selectors/lpc/labware/offsets'
 
 import type { AttachedModule, RunStatus } from '@opentrons/api-client'
 import type { UseConditionalConfirmResult } from '@opentrons/components'
 import type { StepKey } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
 import type { ConfirmMissingStepsModalProps } from '../modals'
-
 
 const UNCONFIRMABLE_MISSING_STEPS = new Set<StepKey>([
   ROBOT_CALIBRATION_STEP_KEY,
@@ -53,7 +52,9 @@ export function useMissingStepsModal({
   handleProceedToRunClick,
   isRunStarting,
 }: UseMissingStepsModalProps): UseMissingStepsModalResult {
-  const totalOffsetstoApply = useSelector(selectTotalCountLocationSpecificOffsets(runId))
+  const totalOffsetstoApply = useSelector(
+    selectTotalCountLocationSpecificOffsets(runId)
+  )
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const isHeaterShakerShaking = isAnyHeaterShakerShaking(attachedModules)
   const missingSetupSteps = useSelector<State, StepKey[]>((state: State) =>

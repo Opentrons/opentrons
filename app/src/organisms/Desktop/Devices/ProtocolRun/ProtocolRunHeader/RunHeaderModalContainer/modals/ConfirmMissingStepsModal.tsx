@@ -33,7 +33,13 @@ export interface ConfirmMissingStepsModalProps {
 export const ConfirmMissingStepsModal = (
   props: ConfirmMissingStepsModalProps
 ): JSX.Element | null => {
-  const { missingSteps, onCloseClick, onConfirmClick, isRunStarting, offsetCount } = props
+  const {
+    missingSteps,
+    onCloseClick,
+    onConfirmClick,
+    isRunStarting,
+    offsetCount,
+  } = props
   const { t, i18n } = useTranslation(['protocol_setup', 'shared'])
 
   const confirmAttached = (): void => {
