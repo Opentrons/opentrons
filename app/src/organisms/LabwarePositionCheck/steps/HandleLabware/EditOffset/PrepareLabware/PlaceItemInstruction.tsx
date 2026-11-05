@@ -6,14 +6,14 @@ import {
   DIRECTION_COLUMN,
   Flex,
   InlineNotification,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { DescriptionContent } from '/app/molecules/InterventionModal'
-import { UnorderedList } from '/app/molecules/UnorderedList'
+import { UnorderedList } from '/app/components/adhoc/shared/UnorderedList'
+import { DescriptionContent } from '/app/components/ODD/modals/InterventionModal'
 import {
   getFlexSlotNameOnly,
   OFFSET_KIND_DEFAULT,
@@ -189,7 +189,7 @@ function PlaceItemInstructionContent({
         }}
         components={{
           bold: (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="span"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             />
@@ -212,7 +212,7 @@ function PlaceItemInstructionContent({
         }}
         components={{
           bold: (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="span"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             />

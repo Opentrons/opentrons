@@ -118,6 +118,7 @@ def _get_sample_analysis_resource(
             liquids=[],
             liquidClasses=[],
         ),
+        result=AnalysisResult.OK.value,
     )
 
 

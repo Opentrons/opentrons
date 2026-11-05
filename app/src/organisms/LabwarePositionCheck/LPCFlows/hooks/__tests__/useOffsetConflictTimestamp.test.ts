@@ -79,16 +79,6 @@ describe('useOffsetConflictTimestamp', () => {
     })
   })
 
-  it('should do nothing when isFlex is false', () => {
-    renderHook(() => {
-      useOffsetConflictTimestamp(false, RUN_ID, {
-        data: { protocolId: PROTOCOL_ID },
-      } as Run)
-    })
-
-    expect(mockDispatch).not.toHaveBeenCalled()
-  })
-
   it('should do nothing when conflict info is already initialized', () => {
     vi.mocked(selectConflictTimestampInfo).mockImplementation(
       (runId: string) => (state: any) => ({
@@ -98,7 +88,7 @@ describe('useOffsetConflictTimestamp', () => {
     )
 
     renderHook(() => {
-      useOffsetConflictTimestamp(true, RUN_ID, {
+      useOffsetConflictTimestamp(RUN_ID, {
         data: { protocolId: PROTOCOL_ID },
       } as Run)
     })
@@ -108,7 +98,7 @@ describe('useOffsetConflictTimestamp', () => {
 
   it('should do nothing when in initializing state', () => {
     renderHook(() => {
-      useOffsetConflictTimestamp(true, null, undefined)
+      useOffsetConflictTimestamp(null, undefined)
     })
 
     expect(mockDispatch).not.toHaveBeenCalled()
@@ -120,7 +110,7 @@ describe('useOffsetConflictTimestamp', () => {
     )
 
     renderHook(() => {
-      useOffsetConflictTimestamp(true, RUN_ID, {
+      useOffsetConflictTimestamp(RUN_ID, {
         data: { protocolId: PROTOCOL_ID },
       } as Run)
     })
@@ -164,7 +154,7 @@ describe('useOffsetConflictTimestamp', () => {
     )
 
     renderHook(() => {
-      useOffsetConflictTimestamp(true, RUN_ID, {
+      useOffsetConflictTimestamp(RUN_ID, {
         data: { protocolId: PROTOCOL_ID },
       } as Run)
     })
@@ -213,7 +203,7 @@ describe('useOffsetConflictTimestamp', () => {
     )
 
     renderHook(() => {
-      useOffsetConflictTimestamp(true, RUN_ID, {
+      useOffsetConflictTimestamp(RUN_ID, {
         data: { protocolId: PROTOCOL_ID },
       } as Run)
     })
@@ -260,7 +250,7 @@ describe('useOffsetConflictTimestamp', () => {
     )
 
     renderHook(() => {
-      useOffsetConflictTimestamp(true, RUN_ID, {
+      useOffsetConflictTimestamp(RUN_ID, {
         data: { protocolId: PROTOCOL_ID },
       } as Run)
     })
@@ -307,7 +297,7 @@ describe('useOffsetConflictTimestamp', () => {
     )
 
     renderHook(() =>
-      useOffsetConflictTimestamp(true, RUN_ID, {
+      useOffsetConflictTimestamp(RUN_ID, {
         data: { protocolId: PROTOCOL_ID },
       } as Run)
     )
@@ -357,7 +347,7 @@ describe('useOffsetConflictTimestamp', () => {
     )
 
     renderHook(() =>
-      useOffsetConflictTimestamp(true, RUN_ID, {
+      useOffsetConflictTimestamp(RUN_ID, {
         data: { protocolId: PROTOCOL_ID },
       } as Run)
     )

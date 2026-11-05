@@ -225,21 +225,17 @@ class CommandHistory:
 
     def get_slice(
         self, start: int, stop: int, command_ids: Optional[list[str]] = None
-    ) -> List[Command]:
-        """Get a list of commands between start and stop."""
+    ) -> List[str]:
+        """Get a list of commands in JSON format between start and stop."""
         commands = self._all_command_ids[start:stop]
         selected_command_ids = (
             command_ids if command_ids is not None else self._all_command_ids
         )
         commands = selected_command_ids[start:stop]
-        raw_command_slice = [self._commands_by_id[command] for command in commands]
-        command_slice = [
-            raw_command_entry.command_type.model_validate_json(
-                raw_command_entry.command
-            )
-            for raw_command_entry in raw_command_slice
+        raw_command_slice = [
+            self._commands_by_id[command].command for command in commands
         ]
-        return command_slice
+        return raw_command_slice
 
     def del_end_slice(self, length: int) -> None:
         """Delete the end of the command history up to a given length."""

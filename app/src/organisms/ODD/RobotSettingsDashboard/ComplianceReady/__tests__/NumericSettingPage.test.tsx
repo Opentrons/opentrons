@@ -10,7 +10,7 @@ import { NumericSettingPage } from '../NumericSettingPage'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('/app/atoms/SoftwareKeyboard/NumericalKeyboard', () => ({
+vi.mock('/app/components/ODD/keyboard/NumericalKeyboard', () => ({
   NumericalKeyboard: () => <div>mock numerical keyboard</div>,
 }))
 

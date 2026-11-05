@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
 import { render, screen } from '@testing-library/react'
-import { when } from 'vitest-when'
 
 import { getDefaultFormState, getInitialStatus } from '../../../fields'
 import { FORM_LEVEL_ERRORS } from '../../../formLevelValidation'
@@ -30,7 +29,7 @@ describe('Preview', () => {
       onSubmit: vi.fn(),
     }
 
-    when(vi.mocked(getLabwareName))
+    vi.when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, true)
       .thenReturn('FAKE LABWARE NAME PLURAL')
   })

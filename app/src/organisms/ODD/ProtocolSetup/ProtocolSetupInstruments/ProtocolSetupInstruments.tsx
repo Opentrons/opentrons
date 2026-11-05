@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
-import { ODDBackButton } from '/app/molecules/ODDBackButton'
+import { ODDBackButton } from '/app/components/adhoc/ODD/ODDBackButton'
 import { ProtocolInstrumentMountItem } from '/app/organisms/ODD/InstrumentMountItem'
 import { PipetteRecalibrationODDWarning } from '/app/organisms/ODD/PipetteRecalibrationODDWarning'
 import { isGripperInCommands } from '/app/resources/protocols/utils'

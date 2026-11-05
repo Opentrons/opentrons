@@ -4,8 +4,8 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -22,13 +22,14 @@ export function EmptySetupStep(props: EmptySetupStepProps): ReactNode {
   return (
     <Flex flexDirection={DIRECTION_ROW} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Flex flexDirection={DIRECTION_COLUMN} color={COLORS.grey40}>
-        <LegacyStyledText
-          css={TYPOGRAPHY.h3SemiBold}
+        <StyledText
+          forwardedAs="h3"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing4}
         >
           {title}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">{description}</LegacyStyledText>
+        </StyledText>
+        <StyledText forwardedAs="p">{description}</StyledText>
       </Flex>
       {rightElement}
     </Flex>

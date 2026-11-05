@@ -6,12 +6,12 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
 import { useLEDLights } from '/app/resources/robot-settings'
 
 import type { ReactNode } from 'react'
@@ -33,15 +33,15 @@ export function EnableStatusLight({
     >
       <Box width="70%">
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('enable_status_light')}
-          </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
+          </StyledText>
+          <StyledText forwardedAs="p">
             {t('enable_status_light_description')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       </Box>
       <ToggleButton

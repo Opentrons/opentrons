@@ -1,6 +1,5 @@
 import { renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import {
   useCreateProtocolAnalysisMutation,
@@ -44,10 +43,10 @@ describe('useEnsureProtocolAnalysis', () => {
     vi.mocked(useCreateProtocolAnalysisMutation).mockReturnValue({
       createProtocolAnalysis,
     } as any)
-    when(vi.mocked(useProtocolQuery))
+    vi.when(vi.mocked(useProtocolQuery))
       .calledWith(null, { staleTime: Infinity }, undefined)
       .thenReturn({ data: undefined } as UseQueryResult<Protocol>)
-    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+    vi.when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(null, null, {
         enabled: false,
         refetchInterval: ANALYSIS_POLL_MS,
@@ -63,7 +62,7 @@ describe('useEnsureProtocolAnalysis', () => {
 
   it('POSTs a new analysis once when analysis summaries are empty', () => {
     stubProtocolQuery(EMPTY_SUMMARIES_PROTOCOL, true)
-    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+    vi.when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, null, {
         enabled: false,
         refetchInterval: ANALYSIS_POLL_MS,
@@ -90,7 +89,7 @@ describe('useEnsureProtocolAnalysis', () => {
 
   it('does not POST when a pending analysis id already exists', () => {
     stubProtocolQuery(PENDING_SUMMARIES_PROTOCOL, true)
-    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+    vi.when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, PENDING_ANALYSIS_ID, {
         enabled: true,
         refetchInterval: ANALYSIS_POLL_MS,
@@ -108,7 +107,7 @@ describe('useEnsureProtocolAnalysis', () => {
 
   it('does not enable asDocument without an analysis id', () => {
     stubProtocolQuery(EMPTY_SUMMARIES_PROTOCOL, true)
-    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+    vi.when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, null, {
         enabled: false,
         refetchInterval: ANALYSIS_POLL_MS,
@@ -129,7 +128,7 @@ describe('useEnsureProtocolAnalysis', () => {
   it('returns the completed analysis document without starting a new analysis', () => {
     stubProtocolQuery(COMPLETED_SUMMARIES_PROTOCOL, true)
     stubProtocolQuery(COMPLETED_SUMMARIES_PROTOCOL, undefined)
-    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+    vi.when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, PROTOCOL_ANALYSIS.id, {
         enabled: true,
         refetchInterval: ANALYSIS_POLL_MS,
@@ -137,7 +136,7 @@ describe('useEnsureProtocolAnalysis', () => {
       .thenReturn({
         data: PROTOCOL_ANALYSIS,
       } as UseQueryResult<CompletedProtocolAnalysis>)
-    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+    vi.when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, PROTOCOL_ANALYSIS.id, {
         enabled: true,
         refetchInterval: false,
@@ -162,7 +161,7 @@ describe('useEnsureProtocolAnalysis', () => {
   it('keeps polling asDocument after the summary is completed until the document loads', () => {
     stubProtocolQuery(COMPLETED_SUMMARIES_PROTOCOL, true)
     stubProtocolQuery(COMPLETED_SUMMARIES_PROTOCOL, undefined)
-    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+    vi.when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, PROTOCOL_ANALYSIS.id, {
         enabled: true,
         refetchInterval: ANALYSIS_POLL_MS,
@@ -187,7 +186,7 @@ describe('useEnsureProtocolAnalysis', () => {
 
   it('treats LastAnalysisPending 503 as in-progress and does not retry', () => {
     stubProtocolQuery(EMPTY_SUMMARIES_PROTOCOL, true)
-    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+    vi.when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, null, {
         enabled: false,
         refetchInterval: ANALYSIS_POLL_MS,
@@ -222,7 +221,7 @@ function stubProtocolQuery(
   protocol: Protocol,
   enablePolling: boolean | undefined
 ): void {
-  when(vi.mocked(useProtocolQuery))
+  vi.when(vi.mocked(useProtocolQuery))
     .calledWith(PROTOCOL_ID, { staleTime: Infinity }, enablePolling)
     .thenReturn({ data: protocol } as UseQueryResult<Protocol>)
 }

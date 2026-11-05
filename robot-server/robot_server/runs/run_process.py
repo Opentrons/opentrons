@@ -26,6 +26,7 @@ from opentrons.protocol_engine import (
     CommandSlice,
     DeckType,
     ErrorOccurrence,
+    JsonCommandSlice,
     StateSummary,
 )
 from opentrons.protocol_engine import (
@@ -145,6 +146,9 @@ def register_process_types() -> None:
         OpentronsPyroSerializer.register_pydantic_model(command)
     for command_create in get_args(get_args(CommandCreate)[0]):
         OpentronsPyroSerializer.register_pydantic_model(command_create)
+
+    for class_type in [JsonCommandSlice]:
+        OpentronsPyroSerializer.register_class(class_type)
 
 
 def register_all_needed_types() -> None:
@@ -410,7 +414,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
 
     async def get_command_slice(
         self, cursor: Optional[int], length: int, include_fixit_commands: bool
-    ) -> CommandSlice:
+    ) -> JsonCommandSlice:
         """Get a slice of run commands.
 
         Args:

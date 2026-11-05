@@ -2,18 +2,17 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import clsx from 'clsx'
 
-import { TouchInputField } from '@opentrons/components'
-
-import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
-import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { PasswordVisibilityToggle } from '/app/components/adhoc/shared/PasswordVisibilityToggle'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
+import { FullKeyboard } from '/app/components/ODD/keyboard'
+import { AccordionKeyboard } from '/app/components/ODD/keyboard/AccordionKeyboard'
 import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
-import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import {
   getPasswordComplexityError,
   mapSetNewPasswordError,
 } from '/app/resources/auth'
 
-import { ChildNavigation } from '../../../ChildNavigation'
 import styles from './user_management_settings.module.css'
 
 import type { TFunction } from 'i18next'

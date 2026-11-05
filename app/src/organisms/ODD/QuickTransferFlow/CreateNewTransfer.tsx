@@ -8,11 +8,11 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import type { ComponentProps, ReactNode } from 'react'
-import type { SmallButton } from '/app/atoms/buttons'
+import type { SmallButton } from '/app/components/ODD/buttons'
 
 interface CreateNewTransferProps {
   onNext: () => void

@@ -3,9 +3,9 @@ import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import clsx from 'clsx'
 
-import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
-import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+import { FullKeyboard } from '/app/components/ODD/keyboard'
+import { AccordionKeyboard } from '/app/components/ODD/keyboard/AccordionKeyboard'
 import { getPasswordComplexityError } from '/app/resources/auth'
 
 import { LoginFieldController } from './LoginFieldController'

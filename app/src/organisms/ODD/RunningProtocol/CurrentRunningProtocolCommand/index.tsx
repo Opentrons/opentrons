@@ -7,7 +7,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { RunTimer } from '/app/molecules/RunTimer'
+import { RunTimer } from '/app/components/adhoc/shared/RunTimer'
 import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 import { useNotifyAllCommandsQuery } from '/app/resources/runs'
 
@@ -101,7 +101,7 @@ export function CurrentRunningProtocolCommand({
           <StyledText className={styles.title_text}>{protocolName}</StyledText>
         </div>
         <div className={styles.timer_info}>
-          <RunTimer {...runTimerInfo} style={styles.run_timer} />
+          <RunTimer {...runTimerInfo} className={styles.run_timer} />
           <StyledText
             style={{
               fontSize: TYPOGRAPHY.fontSize28,

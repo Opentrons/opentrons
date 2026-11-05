@@ -13,9 +13,9 @@ from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import (
     CommandErrorSlice,
     CommandPointer,
-    CommandSlice,
     EngineStatus,
     ErrorOccurrence,
+    JsonCommandSlice,
     LabwareOffset,
     Liquid,
     LoadedLabware,
@@ -857,7 +857,7 @@ async def test_uncurrent(
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
     decoy.when(await mock_run_orchestrator_store.clear()).then_return(
         RunResult(
-            commands=[run_command],
+            commands=[],
             state_summary=engine_state_summary,
             parameters=run_time_parameters,
             command_annotations=command_annotations,
@@ -982,7 +982,7 @@ async def test_uncurrent_signoff_enforcement(
     else:
         decoy.when(await mock_run_orchestrator_store.clear()).then_return(
             RunResult(
-                commands=[run_command],
+                commands=[],
                 state_summary=engine_state_summary,
                 parameters=run_time_parameters,
                 command_annotations=command_annotations,
@@ -1042,7 +1042,7 @@ async def test_create_archives_existing(
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id_old)
     decoy.when(await mock_run_orchestrator_store.clear()).then_return(
         RunResult(
-            commands=[run_command],
+            commands=[],
             state_summary=engine_state_summary,
             parameters=run_time_parameters,
             command_annotations=command_annotations,
@@ -1190,7 +1190,7 @@ async def test_create_replacement_signoff_enforcement(
     else:
         decoy.when(await mock_run_orchestrator_store.clear()).then_return(
             RunResult(
-                commands=[run_command],
+                commands=[],
                 state_summary=engine_state_summary,
                 parameters=run_time_parameters,
                 command_annotations=command_annotations,
@@ -1278,8 +1278,13 @@ async def test_get_commands_slice_from_db(
         run_command,
     ]
 
-    expected_command_slice = CommandSlice(
-        commands=expected_commands_result, cursor=1, total_length=3
+    expected_command_slice = JsonCommandSlice(
+        commands=[
+            command.model_dump_json(by_alias=True, exclude_none=True)
+            for command in expected_commands_result
+        ],
+        cursor=1,
+        total_length=3,
     )
 
     decoy.when(
@@ -1312,8 +1317,13 @@ async def test_get_commands_slice_current_run(
         run_command,
     ]
 
-    expected_command_slice = CommandSlice(
-        commands=expected_commands_result, cursor=1, total_length=3
+    expected_command_slice = JsonCommandSlice(
+        commands=[
+            command.model_dump_json(by_alias=True, exclude_none=True)
+            for command in expected_commands_result
+        ],
+        cursor=1,
+        total_length=3,
     )
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("run-id")
     decoy.when(
@@ -1437,8 +1447,10 @@ def test_get_current_command_not_current_run(
         index=0,
     )
 
-    command_slice = CommandSlice(
-        commands=[last_command_slice], cursor=0, total_length=1
+    command_slice = JsonCommandSlice(
+        commands=[last_command_slice.model_dump_json(by_alias=True, exclude_none=True)],
+        cursor=0,
+        total_length=1,
     )
 
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("not-run-id")
@@ -1506,8 +1518,10 @@ def test_get_last_completed_command_not_current_run(
         "different-run-id"
     )
 
-    command_slice = CommandSlice(
-        commands=[last_command_slice], cursor=1, total_length=1
+    command_slice = JsonCommandSlice(
+        commands=[last_command_slice.model_dump_json(by_alias=True, exclude_none=True)],
+        cursor=1,
+        total_length=1,
     )
     decoy.when(
         mock_run_store.get_commands_slice(

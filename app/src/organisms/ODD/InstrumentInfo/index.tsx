@@ -18,7 +18,7 @@ import {
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 
-import { MediumButton } from '/app/atoms/buttons'
+import { MediumButton } from '/app/components/ODD/buttons'
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import { GRIPPER_FLOW_TYPES } from '/app/organisms/GripperWizardFlows/constants'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'

@@ -9,12 +9,12 @@ import {
   COLORS,
   DIRECTION_ROW,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { RoundTab } from '/app/molecules/RoundTab'
+import { RoundTab } from '/app/components/adhoc/desktop/RoundTab'
 import { FeatureFlags } from '/app/organisms/Desktop/AppSettings/FeatureFlags'
 import * as Config from '/app/redux/config'
 
@@ -50,12 +50,13 @@ export function AppSettings(): ReactNode {
     <Flex paddingX={SPACING.spacing16} paddingY={SPACING.spacing16}>
       <Box width="100%" borderRadius={BORDERS.borderRadius8}>
         <Box padding={SPACING.spacing16} paddingBottom={SPACING.spacing16}>
-          <LegacyStyledText
-            css={TYPOGRAPHY.h1Default}
+          <StyledText
+            forwardedAs="h1"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             paddingBottom={SPACING.spacing24}
           >
             {t('app_settings')}
-          </LegacyStyledText>
+          </StyledText>
           <Flex
             alignItems={ALIGN_START}
             flexDirection={DIRECTION_ROW}

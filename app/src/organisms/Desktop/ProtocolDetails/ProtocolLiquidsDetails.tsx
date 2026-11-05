@@ -11,7 +11,6 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   LiquidIcon,
   SPACING,
   StyledText,
@@ -19,7 +18,7 @@ import {
 } from '@opentrons/components'
 import { parseLiquidsInLoadOrder } from '@opentrons/shared-data'
 
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 
 import type { ReactNode } from 'react'
 import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
@@ -98,12 +97,12 @@ export const ProtocolLiquidsDetails = (
             name="ot-alert"
             aria-label="ProtocolLIquidsDetails_noLiquidsIcon"
           />
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {i18n.format(t('liquids_not_in_protocol'), 'capitalize')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       )}
     </Flex>

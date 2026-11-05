@@ -14,7 +14,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { getLocalRobot } from '/app/redux/discovery'
 import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 

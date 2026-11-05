@@ -1,8 +1,8 @@
 import {
   BORDERS,
   Box,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { getUniqueWellProperties } from '@opentrons/shared-data'
@@ -36,12 +36,13 @@ export function InsertDetails(props: InsertDetailsProps): ReactNode {
             marginY={SPACING.spacing16}
           >
             <Box padding={SPACING.spacing16}>
-              <LegacyStyledText
-                css={TYPOGRAPHY.h2SemiBold}
+              <StyledText
+                forwardedAs="h2"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 paddingBottom={SPACING.spacing8}
               >
                 {wellProps.metadata.displayName}
-              </LegacyStyledText>
+              </StyledText>
               <WellProperties
                 wellProperties={wellProps}
                 wellLabel={wellLabel}

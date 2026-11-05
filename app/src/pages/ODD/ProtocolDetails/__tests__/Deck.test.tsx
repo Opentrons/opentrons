@@ -1,6 +1,5 @@
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import {
   useProtocolAnalysisAsDocumentQuery,
@@ -154,14 +153,14 @@ describe('Deck', () => {
     props = {
       protocolId: MOCK_PROTOCOL_ID,
     }
-    when(vi.mocked(useProtocolQuery))
+    vi.when(vi.mocked(useProtocolQuery))
       .calledWith(MOCK_PROTOCOL_ID)
       .thenReturn({
         data: {
           data: { analysisSummaries: [{ id: MOCK_PROTOCOL_ANALYSIS.id }] },
         } as any,
       } as UseQueryResult<Protocol>)
-    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+    vi.when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(MOCK_PROTOCOL_ID, MOCK_PROTOCOL_ANALYSIS.id, {
         enabled: true,
       })

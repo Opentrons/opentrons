@@ -4,12 +4,13 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
+import { PipetteRecalibrationWarning } from '/app/components/desktop/cards/PipetteCard/PipetteRecalibrationWarning'
 import { i18n } from '/app/i18n'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { PIPETTE_MOUNTS } from '/app/resources/instruments/constants'
@@ -17,7 +18,6 @@ import { isGripperInCommands } from '/app/resources/protocols/utils'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 
-import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
 import { SetupFlexPipetteCalibrationItem } from './SetupFlexPipetteCalibrationItem'
 import { SetupGripperCalibrationItem } from './SetupGripperCalibrationItem'
 
@@ -54,9 +54,13 @@ export function SetupInstrumentCalibration({
       {getShowPipetteCalibrationWarning(instrumentsQueryData) && (
         <PipetteRecalibrationWarning />
       )}
-      <LegacyStyledText color={COLORS.black90} css={TYPOGRAPHY.pSemiBold}>
+      <StyledText
+        forwardedAs="p"
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        color={COLORS.black90}
+      >
         {i18n.format(t('required_instrument_calibrations'), 'titleCase')}
-      </LegacyStyledText>
+      </StyledText>
       {PIPETTE_MOUNTS.map((mount, index) => {
         return (
           <SetupFlexPipetteCalibrationItem

@@ -1,5 +1,4 @@
 export * from './CommandText'
-export * from './DeckLabelSet'
 export * from './FixtureOption'
 export * from './LabwareDetailsWithCount'
 export * from './LabwareInfoOverlay'

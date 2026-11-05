@@ -22,10 +22,10 @@ import {
 import { useHost } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { PasswordVisibilityToggle } from '/app/components/adhoc/shared/PasswordVisibilityToggle'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
-import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import { logOut } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
 import {

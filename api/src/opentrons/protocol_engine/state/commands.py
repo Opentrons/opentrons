@@ -138,6 +138,34 @@ class CommandSlice(BaseModel):
     total_length: int
 
 
+@dataclass(frozen=True)
+class JsonCommandSlice:
+    """A subset of all commands in state in JSON format."""
+
+    commands: List[str]
+    cursor: int
+    total_length: int
+
+    @staticmethod
+    def to_pyro_dict(obj: "JsonCommandSlice") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "commands": obj.commands,
+            "cursor": obj.cursor,
+            "total_length": obj.total_length,
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "JsonCommandSlice":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return JsonCommandSlice(
+            commands=data["commands"],
+            cursor=data["cursor"],
+            total_length=data["total_length"],
+        )
+
+
 class CommandErrorSlice(BaseModel):
     """A subset of all commands errors in state."""
 
@@ -843,8 +871,8 @@ class CommandView:
 
     def get_slice(
         self, cursor: Optional[int], length: int, include_fixit_commands: bool
-    ) -> CommandSlice:
-        """Get a subset of commands around a given cursor.
+    ) -> JsonCommandSlice:
+        """Get a subset of commands around a given cursor in JSON string format.
 
         If the cursor is omitted, a cursor will be selected automatically
         based on the currently running or most recently executed command,
@@ -873,7 +901,7 @@ class CommandView:
             start=start, stop=stop, command_ids=command_ids
         )
 
-        return CommandSlice(
+        return JsonCommandSlice(
             commands=commands,
             cursor=start,
             total_length=total_length,

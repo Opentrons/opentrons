@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { getPipetteSpecsV2, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
@@ -474,7 +473,7 @@ describe('moveToWell', () => {
     })
   })
   it('should return an error when moving to a well east/west of a heater shaker with its latch open', () => {
-    when(getIsHeaterShakerEastWestWithLatchOpen)
+    vi.when(getIsHeaterShakerEastWestWithLatchOpen)
       .calledWith(
         robotStateWithTip.modules,
         getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack)
@@ -496,7 +495,7 @@ describe('moveToWell', () => {
     })
   })
   it('should return an error when moving to a well east/west of a heater shaker with a multi channel pipette', () => {
-    when(getIsHeaterShakerEastWestMultiChannelPipette)
+    vi.when(getIsHeaterShakerEastWestMultiChannelPipette)
       .calledWith(
         robotStateWithTip.modules,
         getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
@@ -519,7 +518,7 @@ describe('moveToWell', () => {
     })
   })
   it('should return an error when moving to a well north/south/east/west of a heater shaker while it is shaking', () => {
-    when(pipetteAdjacentHeaterShakerWhileShaking)
+    vi.when(pipetteAdjacentHeaterShakerWhileShaking)
       .calledWith(
         robotStateWithTip.modules,
         getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),
@@ -542,7 +541,7 @@ describe('moveToWell', () => {
     })
   })
   it('should return an error when moving to labware north/south of a heater shaker into a non tiprack using a multi channel pipette', () => {
-    when(getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
+    vi.when(getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette)
       .calledWith(
         robotStateWithTip.modules,
         getSlotInLocationStack(robotStateWithTip.labware[SOURCE_LABWARE].stack),

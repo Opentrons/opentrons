@@ -1,12 +1,10 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/hooks'
-import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
 import {
   getConnectableRobots,
@@ -90,7 +88,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     })
     provideNullCurrentRunIdFor(mockConnectableRobot.ip)
     vi.mocked(useCurrentRunStatus).mockReturnValue(null)
-    when(vi.mocked(useCreateRunFromProtocol))
+    vi.when(vi.mocked(useCreateRunFromProtocol))
       .calledWith(
         expect.any(Object),
         { hostname: expect.any(String) },
@@ -101,7 +99,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
         createRunFromProtocolSource: mockCreateRunFromProtocolSource,
         reset: mockResetCreateRun,
       } as any)
-    when(vi.mocked(useCreateRunFromProtocol))
+    vi.when(vi.mocked(useCreateRunFromProtocol))
       .calledWith(
         expect.any(Object),
         null,
@@ -115,28 +113,6 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     vi.mocked(useTrackCreateProtocolRunEvent).mockReturnValue({
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,
     })
-    when(vi.mocked(useOffsetCandidatesForAnalysis))
-      .calledWith(storedProtocolDataFixture.mostRecentAnalysis, false, null)
-      .thenReturn([])
-    when(vi.mocked(useOffsetCandidatesForAnalysis))
-      .calledWith(
-        storedProtocolDataFixture.mostRecentAnalysis,
-        expect.any(String)
-      )
-      .thenReturn([])
-    when(vi.mocked(useOffsetCandidatesForAnalysis))
-      .calledWith(
-        storedProtocolDataWithCsvRunTimeParameter.mostRecentAnalysis,
-        false,
-        null
-      )
-      .thenReturn([])
-    when(vi.mocked(useOffsetCandidatesForAnalysis))
-      .calledWith(
-        storedProtocolDataWithCsvRunTimeParameter.mostRecentAnalysis,
-        expect.any(String)
-      )
-      .thenReturn([])
     vi.mocked(useNetworkInterfaces).mockReturnValue({
       wifi: null,
       ethernet: null,
@@ -144,6 +120,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     vi.mocked(useNotifyDataReady).mockReturnValue({} as any)
   })
   afterEach(() => {
+    nullCurrentRunIdOnceByHostname.clear()
     vi.resetAllMocks()
   })
 
@@ -326,22 +303,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     expect(proceedButton).toBeDisabled()
   })
 
-  it('renders labware offset data selection and learn more button launches help modal', () => {
-    render({
-      storedProtocolData: storedProtocolDataFixture,
-      onCloseClick: vi.fn(),
-      showSlideout: true,
-    })
-    screen.getByText('No offset data available')
-    const learnMoreLink = screen.getByText('Learn more')
-    fireEvent.click(learnMoreLink)
-    screen.getByText(
-      'Labware offset data references previous protocol run labware locations to save you time. If all the labware in this protocol have been checked in previous runs, that data will be applied to this run.'
-    )
-  })
-
   it('Disables confirm values button if file parameter missing', async () => {
-    vi.mocked(useOffsetCandidatesForAnalysis).mockReturnValue([])
     render({
       storedProtocolData: storedProtocolDataWithCsvRunTimeParameter,
       onCloseClick: vi.fn(),
@@ -357,20 +319,28 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
   })
 })
 
+const nullCurrentRunIdOnceByHostname = new Map<string, boolean>()
+
 const provideNullCurrentRunIdFor = (hostname: string): void => {
-  let once = true
-  when(vi.mocked(useCurrentRunId))
-    .calledWith(expect.any(Object), {
-      hostname,
-      requestor: undefined,
-    })
-    .thenDo(options => {
+  nullCurrentRunIdOnceByHostname.set(hostname, true)
+  vi.when(vi.mocked(useCurrentRunId), {
+    onUnmatched: (options, hostConfig): string | null => {
+      const matchedHostname = hostConfig?.hostname
+      if (
+        matchedHostname == null ||
+        !nullCurrentRunIdOnceByHostname.has(matchedHostname) ||
+        hostConfig?.requestor !== undefined
+      ) {
+        return null
+      }
+      const once = nullCurrentRunIdOnceByHostname.get(matchedHostname)
       void (options?.onSuccess != null && once
         ? options.onSuccess({
             links: { current: null },
           } as any)
         : {})
-      once = false
+      nullCurrentRunIdOnceByHostname.set(matchedHostname, false)
       return null
-    })
+    },
+  })
 }

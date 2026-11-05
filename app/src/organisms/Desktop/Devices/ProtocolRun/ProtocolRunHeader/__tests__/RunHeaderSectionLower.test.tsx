@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 
@@ -84,7 +83,7 @@ describe('RunHeaderSectionLower', () => {
     })
     vi.mocked(useNavigate).mockReturnValue(mockNavigate)
     mockTrackEvent = vi.fn()
-    when(vi.mocked(useTrackEvent)).calledWith().thenReturn(mockTrackEvent)
+    vi.when(vi.mocked(useTrackEvent)).calledWith().thenReturn(mockTrackEvent)
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -117,7 +116,7 @@ describe('RunHeaderSectionLower', () => {
         apiVersion: [2, 13],
       },
     }
-    when(vi.mocked(useStoredProtocolAnalysis))
+    vi.when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith(mockRunId)
       .thenReturn(nonSupportedProtocolAnalysis as any)
     props = {
@@ -139,7 +138,7 @@ describe('RunHeaderSectionLower', () => {
         schemaVersion: 5,
       },
     }
-    when(vi.mocked(useStoredProtocolAnalysis))
+    vi.when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith(mockRunId)
       .thenReturn(nonSupportedProtocolAnalysis as any)
     props = {
@@ -154,7 +153,7 @@ describe('RunHeaderSectionLower', () => {
   })
 
   it('should call mock function when clicking visualize button', () => {
-    when(vi.mocked(useStoredProtocolAnalysis))
+    vi.when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith(mockRunId)
       .thenReturn(STORED_PROTOCOL_ANALYSIS as any)
     props = {

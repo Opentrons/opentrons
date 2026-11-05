@@ -10,13 +10,13 @@ import {
   POSITION_FIXED,
   SPACING,
   StyledText,
-  TouchInputField,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
+import { FullKeyboard } from '/app/components/ODD/keyboard'
 
 import type { ReactNode } from 'react'
 

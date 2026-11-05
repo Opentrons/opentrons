@@ -3,34 +3,27 @@ import { css } from 'styled-components'
 
 import {
   AnimationVideo,
-  Banner,
   Flex,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import pipetteProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
 import pipetteProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
 import probing96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
+import { SimpleWizardInProgressBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { WizardBodyText } from '/app/components/adhoc/shared/wizards/WizardBodyText'
 
-import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
-import {
-  getPipetteAnimations,
-  isWasteChuteOnDeck,
-  startCalibrationOnClick,
-} from './utils'
+import { FLOWS, SECTIONS } from './constants'
+import { getPipetteAnimations, startCalibrationOnClick } from './utils'
 
-import type { UseQueryResult } from 'react-query'
-import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
 interface AttachProbeProps extends PipetteWizardStepProps {
   isExiting: boolean
-  deckConfig: UseQueryResult<DeckConfiguration>
 }
 
 const IN_PROGRESS_STYLE = css`
@@ -50,16 +43,10 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     mount,
     isRobotMoving,
     goBack,
-    proceed,
     isExiting,
     isOnDevice,
     flowType,
-    deckConfig,
   } = props
-
-  const handleOnClick = (): void => {
-    proceed()
-  }
 
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const pipetteWizardStep = { mount, flowType, section: SECTIONS.ATTACH_PROBE }
@@ -70,7 +57,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const is96Channel = attachedPipettes[mount]?.data.channels === 96
   const startCalibration = startCalibrationOnClick(props, pipetteId)
 
-  const calSlotNum = 'C2'
+  const calSlotNum = 'B2'
   let src = pipetteProbe1
   if (is8Channel) {
     src = pipetteProbe8
@@ -111,10 +98,13 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         }
       >
         {isExiting ? undefined : (
-          <Flex marginX={Boolean(isOnDevice) ? '4.5rem' : '8.5625rem'}>
-            <LegacyStyledText css={IN_PROGRESS_STYLE}>
+          <Flex
+            marginX={Boolean(isOnDevice) ? '4.5rem' : '8.5625rem'}
+            css={IN_PROGRESS_STYLE}
+          >
+            <StyledText forwardedAs="p">
               {t('calibration_probe_touching', { slotNumber: calSlotNum })}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         )}
       </SimpleWizardInProgressBody>
@@ -130,7 +120,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       })}
       bodyText={
         <>
-          <LegacyStyledText css={BODY_STYLE}>
+          <WizardBodyText>
             <Trans
               t={t}
               i18nKey={'install_probe'}
@@ -139,28 +129,11 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
                 bold: <strong />,
               }}
             />
-          </LegacyStyledText>
-          {is96Channel && !isWasteChuteOnDeck(deckConfig) && (
-            <Banner
-              type="warning"
-              size={isOnDevice ? '1.5rem' : '1rem'}
-              marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
-            >
-              {t('waste_chute_warning_probe')}
-            </Banner>
-          )}
+          </WizardBodyText>
         </>
       }
-      proceedButtonText={
-        is96Channel && isWasteChuteOnDeck(deckConfig)
-          ? i18n.format(t('shared:continue'), 'capitalize')
-          : t('begin_calibration')
-      }
-      proceed={
-        is96Channel && isWasteChuteOnDeck(deckConfig)
-          ? handleOnClick
-          : startCalibration
-      }
+      proceedButtonText={t('begin_calibration')}
+      proceed={startCalibration}
       back={flowType === FLOWS.ATTACH ? undefined : goBack}
     />
   )

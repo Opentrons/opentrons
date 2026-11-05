@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 
 import {
   RUN_ACTION_TYPE_PLAY,
@@ -19,9 +19,9 @@ import {
   Flex,
   Icon,
   InfoScreen,
-  LegacyStyledText,
   OVERFLOW_AUTO,
   SPACING,
+  StyledText,
   Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
@@ -31,12 +31,14 @@ import {
   sortRuntimeParameters,
 } from '@opentrons/shared-data'
 
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 import {
   DEFAULT_STATUS_REFETCH_INTERVAL,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
 } from '/app/resources/runs'
+
+import styles from './protocolrunruntimeparameters.module.css'
 
 import type { ReactNode } from 'react'
 import type { RunStatus } from '@opentrons/api-client'
@@ -108,19 +110,19 @@ export function ProtocolRunRuntimeParameters({
           alignItems={ALIGN_CENTER}
         >
           {hasRunTimeParameters ? (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h3"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {t('parameters')}
-            </LegacyStyledText>
+            </StyledText>
           ) : null}
           {hasRunTimeParameters ? (
-            <LegacyStyledText forwardedAs="label" color={COLORS.grey60}>
+            <StyledText forwardedAs="label" color={COLORS.grey60}>
               {hasCustomRunTimeParameterValues
                 ? t('custom_values')
                 : t('default_values')}
-            </LegacyStyledText>
+            </StyledText>
           ) : null}
         </Flex>
         {hasRunTimeParameters ? (
@@ -184,17 +186,14 @@ function RunTimeParametersBanner({
   return (
     <Banner type="informing" width="100%" iconMarginLeft={SPACING.spacing4}>
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {isRunTerminal ? t('download_files') : t('values_are_view_only')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        </StyledText>
+        <StyledText forwardedAs="p">
           {isRunTerminal
             ? t('all_files_associated')
             : t('cancel_and_restart_to_edit')}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
     </Banner>
   )
@@ -215,17 +214,11 @@ const StyledTableRowComponent = (
   return (
     <StyledTableRow isLast={isLast} key={`runTimeParameter-${index}`}>
       <StyledTableCell display="span">
-        <LegacyStyledText
-          forwardedAs="p"
-          css={css`
-            display: inline;
-            padding-right: 8px;
-          `}
-        >
+        <StyledText forwardedAs="p" className={styles.parameter_name}>
           {parameter.type === 'csv_file'
             ? t('csv_file')
             : parameter.displayName}
-        </LegacyStyledText>
+        </StyledText>
         {parameter.description != null ? (
           <>
             <Flex
@@ -252,11 +245,11 @@ const StyledTableRowComponent = (
           gridGap={SPACING.spacing16}
           alignItems={ALIGN_CENTER}
         >
-          <LegacyStyledText forwardedAs="p" css={PARAMETER_VALUE_TEXT_STYLE}>
+          <StyledText forwardedAs="p" className={styles.parameter_value}>
             {parameter.type === 'csv_file'
               ? (parameter.file?.name ?? '')
               : formatRunTimeParameterValue(parameter, t)}
-          </LegacyStyledText>
+          </StyledText>
           {parameter.type === 'csv_file' ||
           parameter.default !== parameter.value ? (
             <Chip
@@ -311,13 +304,4 @@ const StyledTableCell = styled.td<StyledTableCellProps>`
   padding: ${SPACING.spacing8} 0;
   padding-right: ${props =>
     props.paddingRight != null ? props.paddingRight : SPACING.spacing16};
-`
-
-const PARAMETER_VALUE_TEXT_STYLE = css`
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  overflow-wrap: anywhere;
 `

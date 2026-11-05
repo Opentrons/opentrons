@@ -1,11 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
-import { OddModal } from '/app/molecules/OddModal'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import styles from '/app/organisms/ODD/RunningProtocol/ImageGalleryList/gallery.module.css'
 
 import type { ReactNode } from 'react'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 export interface CameraPhotoModalProps {
   imagePath: string

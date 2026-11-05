@@ -1,6 +1,6 @@
 import { COLORS } from '@opentrons/components'
 
-import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
+import { SimpleWizardBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
 
 import type { TFunction } from 'i18next'
 import type { ReactNode } from 'react'

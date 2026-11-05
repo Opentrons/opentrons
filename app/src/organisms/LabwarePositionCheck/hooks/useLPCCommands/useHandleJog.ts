@@ -17,7 +17,7 @@ import type {
   Jog,
   Sign,
   StepSize,
-} from '/app/molecules/JogControls/types'
+} from '/app/components/adhoc/shared/JogControls/types'
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
 import type { UseLPCCommandWithChainRunChildProps } from './types'
 

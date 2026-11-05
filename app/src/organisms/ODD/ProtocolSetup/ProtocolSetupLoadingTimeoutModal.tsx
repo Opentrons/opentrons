@@ -4,13 +4,13 @@ import { useTranslation } from 'react-i18next'
 import { COLORS, StyledText } from '@opentrons/components'
 import { useRestartMutation } from '@opentrons/react-api-client'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { OddModal } from '/app/molecules/OddModal'
 
 import styles from './protocolsetuploadingtimeoutmodal.module.css'
 
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 export const RUN_ERROR_TIMEOUT_DURATION_MS = 3 * 60 * 1000
 

@@ -26,3 +26,8 @@
   justify-content: center;
   gap: var(--spacing-8);
 }
+
+.version_mismatch_label > a {
+  color: var(--red-60);
+  text-decoration: underline;
+}

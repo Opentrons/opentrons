@@ -45,8 +45,8 @@
 .legacy_p,
 .legacy_p_semi_bold,
 .legacy_p_bold {
-  font-size: var(--font-size-22);
-  line-height: var(--line-height-28);
+  font-size: var(--font-size-13);
+  line-height: var(--line-height-20);
 }
 
 .legacy_p {
@@ -147,6 +147,13 @@
 
   .legacy_h3_semi_bold {
     font-weight: var(--font-weight-semi-bold);
+  }
+
+  .legacy_p,
+  .legacy_p_semi_bold,
+  .legacy_p_bold {
+    font-size: var(--font-size-22);
+    line-height: var(--line-height-28);
   }
 
   .legacy_label,

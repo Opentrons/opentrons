@@ -1006,7 +1006,7 @@ export function ProtocolSetup(): ReactNode {
         robotName={robotName}
         runRecord={runRecord ?? null}
         labwareConfirmed={labwareConfirmed}
-        isLPCInitializing={lpcLaunchProps.isFlexLPCInitializing}
+        isLPCInitializing={lpcLaunchProps.isLPCInitializing}
         offsetsConfirmed={offsetsConfirmed}
         cameraSettingsConfirmed={cameraSettingsConfirmed}
         isCameraRequired={isCameraRequired}

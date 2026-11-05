@@ -4,8 +4,8 @@ import { useSelector } from 'react-redux'
 
 import { INFO_TOAST, RadioButton, StyledText } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddInfoScreen } from '/app/components/ODD/ODDInfoScreen'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getShellUsbMassStorageMountPaths } from '/app/redux/shell'
 

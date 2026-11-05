@@ -12,7 +12,6 @@ import { SkipStepNewTips } from '../SkipStepNewTips'
 import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
 
-vi.mock('/app/molecules/Command')
 vi.mock('../SelectRecoveryOption')
 vi.mock('../../shared', async () => {
   const actual = await vi.importActual('../../shared')

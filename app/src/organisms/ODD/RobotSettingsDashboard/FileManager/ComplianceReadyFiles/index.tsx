@@ -7,8 +7,8 @@ import {
   useLogPeriodSummariesQuery,
 } from '@opentrons/react-api-client'
 
-import { Skeleton } from '/app/atoms/Skeleton'
-import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
+import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
+import { OddInfoScreen } from '/app/components/ODD/ODDInfoScreen'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import { ConfirmLogPeriodModal } from '../FileManagerWizardFlows/ConfirmLogPeriodModal'

@@ -1,6 +1,6 @@
 import { SPACING } from '@opentrons/components'
 
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 import {
   AdditionalCustomLabwareSourceFolder,
   ClearUnavailableRobots,

@@ -15,7 +15,6 @@ import {
   InfoScreen,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   SIZE_4,
   SPACING,
@@ -276,12 +275,10 @@ export function DeviceDetailsDeckConfiguration({
                   gridGap={SPACING.spacing8}
                   css={TYPOGRAPHY.labelSemiBold}
                 >
-                  <LegacyStyledText flex="1 0 30px">
-                    {t('location')}
-                  </LegacyStyledText>
-                  <LegacyStyledText flex="9 1 0">
+                  <StyledText flex="1 0 30px">{t('location')}</StyledText>
+                  <StyledText flex="9 1 0">
                     {i18n.format(t('deck_hardware'), 'capitalize')}
-                  </LegacyStyledText>
+                  </StyledText>
                 </Flex>
                 {fixtureDisplayList.length > 0 ? (
                   fixtureDisplayList.map(({ displayLocation, displayName }) => (
@@ -294,12 +291,8 @@ export function DeviceDetailsDeckConfiguration({
                       width="100%"
                       css={TYPOGRAPHY.labelRegular}
                     >
-                      <LegacyStyledText flex="1 0 30px">
-                        {displayLocation}
-                      </LegacyStyledText>
-                      <LegacyStyledText flex="9 1 0">
-                        {displayName}
-                      </LegacyStyledText>
+                      <StyledText flex="1 0 30px">{displayLocation}</StyledText>
+                      <StyledText flex="9 1 0">{displayName}</StyledText>
                     </Flex>
                   ))
                 ) : (
@@ -310,7 +303,7 @@ export function DeviceDetailsDeckConfiguration({
                     width="100%"
                     css={TYPOGRAPHY.labelRegular}
                   >
-                    <LegacyStyledText>{t('no_deck_fixtures')}</LegacyStyledText>
+                    <StyledText>{t('no_deck_fixtures')}</StyledText>
                   </Flex>
                 )}
               </Flex>

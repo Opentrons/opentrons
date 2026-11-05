@@ -1,7 +1,7 @@
 import { PrimaryButton } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
 

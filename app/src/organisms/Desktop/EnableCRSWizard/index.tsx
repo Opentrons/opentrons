@@ -23,9 +23,9 @@ import {
 import { useHost } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { PasswordVisibilityToggle } from '/app/components/adhoc/shared/PasswordVisibilityToggle'
 import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
-import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 import { useRobot } from '/app/redux-resources/robots'
 import { getRobotSerialNumber } from '/app/redux/discovery'
 import { getPasswordComplexityError } from '/app/resources/auth/getPasswordComplexityError'

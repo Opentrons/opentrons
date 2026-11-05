@@ -8,20 +8,20 @@ import {
   COLORS,
   Flex,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   PrimaryButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import { useGetModulesNeedingSetupThatCanCurrentlyBeSetUp } from '/app/App/hooks/useGetModulesNeedingSetup'
-import { SmallButton } from '/app/atoms/buttons'
-import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
+} from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 
 import { EQUIPMENT_POLL_MS } from '../DoorOpenControl/constants'
 import { useIsDoorOpen } from '../DoorOpenControl/useIsDoorOpen'
@@ -226,7 +226,7 @@ export function ModuleWizardFlows(
               i18nKey="branded:module_setup_failed"
               values={{ error: wizardFlowBaseProps.errorMessage }}
               components={{
-                block: <LegacyStyledText forwardedAs="p" />,
+                block: <StyledText forwardedAs="p" />,
               }}
             />
           }

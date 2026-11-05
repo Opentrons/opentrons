@@ -7,13 +7,13 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   RadioButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { IconButton } from '/app/atoms/buttons/IconButton'
+import { SimpleIconButton } from '/app/components/ODD/buttons/SimpleIconButton'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
@@ -191,12 +191,9 @@ function SelectBy({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-      <LegacyStyledText
-        forwardedAs="p"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {i18n.format(t('select_by'), 'capitalize')}
-      </LegacyStyledText>
+      </StyledText>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
         <RadioButton
           buttonLabel={i18n.format(t('columns'), 'capitalize')}
@@ -273,12 +270,9 @@ function StartingWell({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-      <LegacyStyledText
-        forwardedAs="p"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {i18n.format(t('starting_well'), 'capitalize')}
-      </LegacyStyledText>
+      </StyledText>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
         {checkboxWellOptions.map(well => (
           <Checkbox
@@ -313,7 +307,7 @@ interface ButtonControlsProps {
   minusDisabled: boolean
   plusDisabled: boolean
 }
-
+// TODO (jj, 2026-10-29): SimpleIconButton is an ODD component. We should replace this on desktop.
 function ButtonControls(props: ButtonControlsProps): ReactNode {
   const { channels, handleMinus, handlePlus, minusDisabled, plusDisabled } =
     props
@@ -322,24 +316,21 @@ function ButtonControls(props: ButtonControlsProps): ReactNode {
   const addOrRemoveButtons =
     channels !== 96 ? (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {i18n.format(
             t(channels === 8 ? 'add_or_remove_columns' : 'add_or_remove'),
             'capitalize'
           )}
-        </LegacyStyledText>
+        </StyledText>
         <Flex gridGap={SPACING.spacing16} height="6.5rem">
-          <IconButton
+          <SimpleIconButton
             disabled={minusDisabled}
             onClick={handleMinus}
             iconName="minus"
             hasBackground
             flex="1"
           />
-          <IconButton
+          <SimpleIconButton
             disabled={plusDisabled}
             onClick={handlePlus}
             iconName="plus"

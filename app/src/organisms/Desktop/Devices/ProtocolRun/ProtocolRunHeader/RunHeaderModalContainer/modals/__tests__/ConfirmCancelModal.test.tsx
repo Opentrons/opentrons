@@ -1,6 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -61,9 +60,11 @@ describe('ConfirmCancelModal', () => {
       stopRun: mockStopRun,
     } as any)
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
-    when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
-      trackProtocolRunEvent: mockTrackProtocolRunEvent,
-    })
+    vi.when(useTrackProtocolRunEvent)
+      .calledWith(RUN_ID, ROBOT_NAME)
+      .thenReturn({
+        trackProtocolRunEvent: mockTrackProtocolRunEvent,
+      })
     vi.mocked(useIsFlex).mockReturnValue(true)
 
     props = {

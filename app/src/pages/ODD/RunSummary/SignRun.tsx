@@ -5,9 +5,9 @@ import clsx from 'clsx'
 
 import { StyledText, Z_INDEX } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useInsufficientPermissionsToast } from '/app/local-resources/access-control/useInsufficientPermissionsToast'
-import { OddModal } from '/app/molecules/OddModal'
 import { showLoginModal } from '/app/organisms/ODD/OnDeviceLogin/LoginModal'
 import { useLocalRobotName } from '/app/redux-resources/robots/hooks/useLocalRobotName'
 import { useSignRunFlow } from '/app/resources/access-control/useSignRunFlow'

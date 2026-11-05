@@ -2,14 +2,14 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { i18n } from '/app/i18n'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import { ZoomSettingsView } from '../ZoomSettingsView'
 
 import type { ZoomSettingsViewProps } from '../ZoomSettingsView'
 
-vi.mock('/app/organisms/ODD/ChildNavigation')
+vi.mock('/app/components/ODD/headers/ChildNavigation')
 
 const render = (props: ZoomSettingsViewProps) => {
   return renderWithProviders(<ZoomSettingsView {...props} />, {

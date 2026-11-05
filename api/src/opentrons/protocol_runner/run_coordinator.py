@@ -20,9 +20,9 @@ from opentrons.protocol_engine import (
     CommandCreate,
     CommandErrorSlice,
     CommandPointer,
-    CommandSlice,
     DeckType,
     ErrorOccurrence,
+    JsonCommandSlice,
     StateSummary,
 )
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
@@ -178,7 +178,7 @@ class AbstractRunCoordinator(ABC):
     @abstractmethod
     async def get_command_slice(
         self, cursor: Optional[int], length: int, include_fixit_commands: bool
-    ) -> CommandSlice:
+    ) -> JsonCommandSlice:
         """Get a slice of run commands.
 
         Args:
