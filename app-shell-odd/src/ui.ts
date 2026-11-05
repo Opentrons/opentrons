@@ -138,7 +138,6 @@ async function waitForBackendSendReady(dispatch: Dispatch): Promise<void> {
   systemd
     .getIsBackendReady()
     .then((isReady: boolean) => {
-      console.log('waitForBackendSendReady', isReady)
       dispatch(sendReadyStatus(isReady))
       if (!isReady) {
         setTimeout(() => {
