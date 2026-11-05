@@ -151,6 +151,34 @@ Running Thermocycler profiles is time-consuming, so you can choose to run other 
 
 ## Vacuum Module steps
 
-Adding a Vacuum Module step to your protocol displays any labware, collars, and spacers currently on the module, which uses a deck adapter that occupies 2 slots, A3 (the vacuum base) and A4 (the dock). See the [Vacuum Module section](../starting-deck.md#vacuum-module) in Protocol starting deck page for more information.
+Adding a Vacuum Module step to your protocol lets you configure the module with any required labware, collars, and spacers. When working with an imported Protocol Designer file, this tool will also show you any installed Vacuum Module components and other deck mounted modules and fixtures.
 
-Automating a Vacuum Module workflow also requires a Flex Gripper. The gripper moves manifold collars, filter plates, and collection plates on and off the module during a protocol run. However, the gripper cannot pick up or manipulate spacers; spacers must be placed in the vacuum base manually during starting deck setup.
+Click **Edit protocol** to setup the Vacuum module and add or modify protocol steps and module components. When creating or modifying Vacuum Module steps you can:
+
+* **Configure labware:** Click on the module's adapter icon to add or modify well plates, filter plates, collars, and spacers on the vacuum base or the dock. Protocol Designer will also show you the stacking order of these components in a top to bottom list.
+
+* **Control step options:** Click **Add Step** and select **Vacuum** from the popup menu. This opens the step editor that lets you operate the module by vacuum state or with vacuum profile.
+
+### Configuring vacuum state
+
+*State* refers to the condition or configuration of the Vacuum Module. A state step is single set of operations contained in one step. It cannot loop or perform multiple operations within a step. Available state settings let you control the pump by:
+
+* Turning the vacuum pump on or off.
+* Opening or closing the vent.
+* Setting vacuum by gauge pressure (mbar) or by running the pump continuously at a percentage of its total power.
+* Adding an optional vacuum duration (in mm:ss).
+
+If you need to run the pump multiple times sequentially with different vacuum or power settings, you could configure multiple state steps, but try using a vacuum profile instead.
+
+### Configuring a vacuum profile
+
+Vacuum profiles consist of multiple sub-steps. They're ideal when you need to run the pump with different settings in an uninterrupted sequence without configuring an entire step multiple times.
+
+### Understanding last module state
+
+When configuring vacuum steps, you may notice the "Last module state" section in a step profile is grayed out. This is a read-only status indicator that does not change until the end state of a vacuum step changes. For example, the first step in a vacuum procedure the module state is **pump: off** and **vent: open**. If the steps ends with the pump on and the vent closed, the next sequential vacuum state step will show **pump: on** and **vent: closed**.
+
+<figure class="screenshot" markdown>
+![Last module state status indicator](../images/last-vacuum-state.png){ width="60%" }
+<figcaption>Module status from a vacuum step.</figcaption>
+</figure>
