@@ -99,6 +99,7 @@ export function useRunHeaderModalContainer({
   attachedModules,
   runErrors,
   closeCurrentRun,
+  isCloning = false,
 }: UseRunHeaderModalContainerProps): UseRunHeaderModalContainerResult {
   const navigate = useNavigate()
 
@@ -233,6 +234,7 @@ export function useRunHeaderModalContainer({
     runId,
     runStatus,
     robotType,
+    isCloning,
   })
 
   const recoveryModalUtils = useErrorRecoveryFlows(runId, runStatus)

@@ -32,6 +32,7 @@ export interface UseRunHeaderDropTipParams {
   runId: string
   robotType: RobotType
   runStatus: RunStatus | null
+  isCloning?: boolean
 }
 
 export interface UseRunHeaderDropTipResult {
@@ -45,6 +46,7 @@ export function useRunHeaderDropTip({
   runId,
   robotType,
   runStatus,
+  isCloning = false,
 }: UseRunHeaderDropTipParams): UseRunHeaderDropTipResult {
   const dispatch = useDispatch()
   const isPromptDismissed = useSelector(selectDropTipPromptDismissed(runId))
@@ -85,12 +87,16 @@ export function useRunHeaderDropTip({
     enableDTWiz()
   }
 
+  const isRunTerminatingOrTerminal = isTerminatingOrTerminal(runStatus)
+
   const dropTipModalUtils = useProtocolDropTipModal({
     hasPipetteWithTip:
       aPipetteWithTip != null &&
       isMostRecentRun &&
       !isPromptDismissed &&
-      !isCheckingTips,
+      !isCheckingTips &&
+      !isCloning &&
+      isRunTerminatingOrTerminal,
     isPromptDismissed,
     isWizardActive: showDTWiz || wizardPipette != null,
     enableDTWiz: openWizard,
@@ -124,10 +130,8 @@ export function useRunHeaderDropTip({
       : { showDTWiz: false, dtWizProps: null }
   }
 
-  const isRunTerminatingOrTerminal = isTerminatingOrTerminal(runStatus)
-
   useEffect(() => {
-    if (runStatus === RUN_STATUS_IDLE) {
+    if (isCloning || runStatus === RUN_STATUS_IDLE) {
       resetTipStatus()
     } else if (
       isMostRecentRun &&
@@ -138,6 +142,7 @@ export function useRunHeaderDropTip({
       checkTipStatus()
     }
   }, [
+    isCloning,
     runStatus,
     isMostRecentRun,
     isPromptDismissed,
