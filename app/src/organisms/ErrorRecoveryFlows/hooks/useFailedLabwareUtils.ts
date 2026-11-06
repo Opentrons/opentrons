@@ -8,7 +8,6 @@ import {
   getLoadedLabware,
 } from '@opentrons/components'
 import {
-  FLEX_ROBOT_TYPE,
   getAllDefinitions,
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
@@ -506,7 +505,6 @@ function getSlotNameFromLocation(
       location,
       loadedModules,
       loadedLabwares,
-      robotType: FLEX_ROBOT_TYPE,
       detailLevel: 'slot-only',
     })?.slotName ?? ''
   )
@@ -525,7 +523,6 @@ export function useRelevantFailedLwLocations({
   const BASE_DISPLAY_PARAMS: Omit<DisplayLocationSlotOnlyParams, 'location'> = {
     loadedLabwares,
     loadedModules,
-    robotType: FLEX_ROBOT_TYPE,
     t,
     detailLevel: 'slot-only',
     isOnDevice: false, // Always return the "slot XYZ" copy, which is the desktop copy.

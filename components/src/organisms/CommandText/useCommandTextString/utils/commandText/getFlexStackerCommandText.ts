@@ -56,7 +56,6 @@ export const getFlexStackerCommandText = ({
   allRunDefs,
   commandTextData,
   t,
-  robotType,
 }: // stackerCommand,
 GetFlexStackerCommandText): string => {
   const primaryDefinitionDisplayName =
@@ -70,7 +69,6 @@ GetFlexStackerCommandText): string => {
     const slotName = getLabwareDisplayLocation({
       loadedLabwares: commandTextData?.labware ?? [],
       location: command.result?.primaryLocationSequence,
-      robotType,
       allRunDefs,
       loadedModules: commandTextData?.modules ?? [],
       t,
@@ -85,7 +83,6 @@ GetFlexStackerCommandText): string => {
     const slotName = getLabwareDisplayLocation({
       loadedLabwares: commandTextData?.labware ?? [],
       location: command.result?.primaryOriginLocationSequence ?? null,
-      robotType,
       allRunDefs,
       loadedModules: commandTextData?.modules ?? [],
       t,
@@ -100,7 +97,6 @@ GetFlexStackerCommandText): string => {
     const slotName = getLabwareDisplayLocation({
       loadedLabwares: commandTextData?.labware ?? [],
       location: { moduleId: command.params?.moduleId },
-      robotType,
       allRunDefs,
       loadedModules: commandTextData?.modules ?? [],
       t,
@@ -133,7 +129,6 @@ GetFlexStackerCommandText): string => {
     const slotName = getLabwareDisplayLocation({
       loadedLabwares,
       location: { moduleId: command.params.moduleId },
-      robotType,
       allRunDefs,
       loadedModules: commandTextData?.modules ?? [],
       t,
@@ -178,7 +173,6 @@ GetFlexStackerCommandText): string => {
     const slotName = getLabwareDisplayLocation({
       loadedLabwares: commandTextData?.labware ?? [],
       location: { moduleId: command.params?.moduleId },
-      robotType,
       allRunDefs,
       loadedModules: commandTextData?.modules ?? [],
       t,
@@ -204,7 +198,6 @@ GetFlexStackerCommandText): string => {
     const slotName = getLabwareDisplayLocation({
       loadedLabwares: commandTextData?.labware ?? [],
       location: { moduleId: command.params?.moduleId },
-      robotType,
       allRunDefs,
       loadedModules: commandTextData?.modules ?? [],
       t,
@@ -219,7 +212,6 @@ GetFlexStackerCommandText): string => {
     const slotName = getLabwareDisplayLocation({
       loadedLabwares,
       location: { moduleId: command.params.moduleId },
-      robotType,
       allRunDefs,
       loadedModules: commandTextData?.modules ?? [],
       t,

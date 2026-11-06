@@ -10,7 +10,6 @@ export function getMoveToWellCommandText({
   allRunDefs,
   t,
   commandTextData,
-  robotType,
 }: HandlesCommands<MoveToWellRunTimeCommand>): string {
   const { wellName, labwareId, wellLocation } = command.params
   const {
@@ -30,7 +29,6 @@ export function getMoveToWellCommandText({
   const displayLocation = getLabwareDisplayLocation({
     loadedLabwares: commandTextData?.labware ?? [],
     location: labwareLocation?.locationSequence ?? labwareLocation?.location,
-    robotType,
     allRunDefs,
     loadedModules: commandTextData?.modules ?? [],
     t,

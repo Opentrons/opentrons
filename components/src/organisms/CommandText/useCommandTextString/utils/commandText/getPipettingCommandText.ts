@@ -20,7 +20,6 @@ export const getPipettingCommandText = ({
   command,
   allRunDefs,
   commandTextData,
-  robotType,
   t,
 }: HandlesCommands<PipettingRunTimeCommand>): string => {
   const labwareId =
@@ -59,7 +58,6 @@ export const getPipettingCommandText = ({
       labwareLocationFromCommands?.location ??
       loadedLabware?.location ??
       null,
-    robotType,
     allRunDefs,
     loadedModules: commandTextData?.modules ?? [],
     t,
