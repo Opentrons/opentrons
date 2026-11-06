@@ -3,9 +3,7 @@ from opentrons.protocol_api import ProtocolContext, ParameterContext
 from opentrons.types import Point
 from opentrons.config import IS_ROBOT
 from typing import List, Dict, Optional
-import csv
 import time
-import os
 
 from opentrons.protocol_api.core.engine import (
     pipette_movement_conflict,
