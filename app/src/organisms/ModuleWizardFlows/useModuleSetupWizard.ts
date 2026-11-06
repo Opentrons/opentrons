@@ -1,5 +1,4 @@
 import { useEffect, useReducer, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
@@ -39,6 +38,7 @@ export interface UseModuleSetupWizardResult {
   totalStepCount: number
   createMaintenanceRun: CreateMaintenanceRunType
   handleCleanUpAndClose: () => void
+  handleCloseWithoutHome: () => void
   wizardFlowBaseProps: {
     attachedPipette: PipetteInformation | null
     chainRunCommands?: (
@@ -80,7 +80,6 @@ export function useModuleSetupWizard(
 ): UseModuleSetupWizardResult {
   const { closeFlow, attachedModuleOnLaunch, onComplete } = params
   const isOnDevice = useSelector(getIsOnDevice)
-  const { t } = useTranslation('module_wizard_flows')
 
   const [state, dispatch] = useReducer(moduleSetupWizardReducer, {
     currentStepIndex: 0,
@@ -187,6 +186,22 @@ export function useModuleSetupWizard(
     }
   )
 
+  const handleCloseWithoutHome = (): void => {
+    if (attachedModule != null) sendIdentifyModule(attachedModule, false)
+    if (maintenanceRunId == null) {
+      handleClose()
+    } else {
+      deleteMaintenanceRun(maintenanceRunId, {
+        onSuccess: () => {
+          handleClose()
+        },
+        onError: () => {
+          handleClose()
+        },
+      })
+    }
+  }
+
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
     if (attachedModule != null) sendIdentifyModule(attachedModule, false)
@@ -216,9 +231,7 @@ export function useModuleSetupWizard(
         })
         .catch(error => {
           if (isMaintenanceDoorOpenError(error)) {
-            setIsExiting(false)
-            setIsDoorOpenError(true)
-            setErrorMessage(t('door_is_open') as string)
+            handleCloseWithoutHome()
           } else {
             console.error(error.message)
             handleClose()
@@ -308,6 +321,7 @@ export function useModuleSetupWizard(
     totalStepCount,
     createMaintenanceRun: createTargetedMaintenanceRun,
     handleCleanUpAndClose,
+    handleCloseWithoutHome,
     wizardFlowBaseProps: calibrateBaseProps,
     deckConfig,
     buildFlowForSelectedModule,
