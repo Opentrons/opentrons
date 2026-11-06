@@ -14,13 +14,11 @@ const mockDeckLabels = [
   {
     text: 'Label',
     isSelected: false,
-    labelBorderRadius: BORDERS.borderRadius4,
     isZoomed: true,
   },
   {
     text: 'Label',
     isSelected: false,
-    labelBorderRadius: BORDERS.borderRadius4,
     isZoomed: true,
   },
 ]
