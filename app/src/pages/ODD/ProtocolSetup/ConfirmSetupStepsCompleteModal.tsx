@@ -20,6 +20,7 @@ interface ConfirmSetupStepsCompleteModalProps {
   onConfirmClick: () => void
   missingSteps: StepKey[]
   isRunStarting: boolean
+  offsetCount: number
 }
 
 export function ConfirmSetupStepsCompleteModal({
@@ -27,6 +28,7 @@ export function ConfirmSetupStepsCompleteModal({
   missingSteps,
   onConfirmClick,
   isRunStarting,
+  offsetCount,
 }: ConfirmSetupStepsCompleteModalProps): ReactNode {
   const { i18n, t } = useTranslation(['protocol_setup', 'shared'])
   const modalHeader: OddModalHeaderBaseProps = {
@@ -50,7 +52,7 @@ export function ConfirmSetupStepsCompleteModal({
     const i18nKey = isMissingLPCStep
       ? 'you_havent_confirmed_lpc_missing'
       : 'you_havent_confirmed'
-    return t(i18nKey, { missingSteps: formattedSteps })
+    return t(i18nKey, { missingSteps: formattedSteps, count: offsetCount })
   }
 
   return (
