@@ -3,7 +3,6 @@ import { screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import {
-  FLEX_ROBOT_TYPE,
   getLabwareDefURI,
   getLabwareDisplayName,
   getModuleDisplayName,
@@ -59,7 +58,6 @@ describe('getLabwareDisplayLocation with translations', () => {
   const defaultParams = {
     loadedLabwares: [],
     loadedModules: [],
-    robotType: FLEX_ROBOT_TYPE,
     allRunDefs: [],
   }
   const detailLevels = ['full', 'slot-only']

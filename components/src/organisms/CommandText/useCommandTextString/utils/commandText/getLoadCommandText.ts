@@ -62,7 +62,6 @@ export const getLoadCommandText = ({
     case 'loadLabware': {
       const location = getLabwareDisplayLocation({
         location: command.result?.locationSequence ?? command.params.location,
-        robotType,
         allRunDefs,
         loadedLabwares: commandTextData?.labware ?? [],
         loadedModules: commandTextData?.modules ?? [],
@@ -95,7 +94,6 @@ export const getLoadCommandText = ({
         command.result?.stackLocationSequence != null
           ? getLabwareDisplayLocation({
               location: command.result.stackLocationSequence,
-              robotType,
               allRunDefs,
               loadedLabwares: commandTextData?.labware ?? [],
               loadedModules: commandTextData?.modules ?? [],
