@@ -268,13 +268,13 @@ def run(ctx: ProtocolContext) -> None:
         # NOTE: The optimal tip overlap is calculated with the following formula:
         # Where (T) is tip overlap, (d) is the default overlap, (bN) is a bare nozzle delta to a given position, (tN) is a trial result delta and (A) is the number of active nozzles:
         # T = d - (b1 + ... + bA) / A + (t1 + ... + tN) / (A * tN)
-        active_nozzles = len(LAYOUT_TO_NOZZLES[ctx.params.layout])
+        active_nozzles = len(LAYOUT_TO_NOZZLES[ctx.params.layout])  # type: ignore [attr-defined]
         trial_deltas: List[float] = []
         for val in results.values():
             trial_deltas.extend(val)
 
         tip_overlap = (
-            ctx.params.default_overlap
+            ctx.params.default_overlap  # type: ignore [attr-defined]
             - sum(nozzle_results[:active_nozzles]) / active_nozzles
             + sum(trial_deltas) / (active_nozzles * len(results))
         )
