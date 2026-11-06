@@ -470,7 +470,7 @@ describe('ComplianceReadySoftwareSettings', () => {
     fireEvent.blur(idleLogoutField)
 
     await waitFor(() => {
-      screen.getByText('Must be greater than 0 minutes')
+      screen.getByText('Minimum of 1 mins')
     })
 
     expect(mockPatchAuthSettings).not.toHaveBeenCalled()
@@ -497,7 +497,7 @@ describe('ComplianceReadySoftwareSettings', () => {
     fireEvent.blur(passwordResetTimeField)
 
     await waitFor(() => {
-      screen.getByText('Must be at least 1 day')
+      screen.getByText('Minimum of 1 days')
     })
 
     expect(mockPatchAuthSettings).not.toHaveBeenCalled()
