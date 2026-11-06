@@ -22,6 +22,7 @@ import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import { START_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
 import { getSelectedTerminalItemId } from '/protocol-designer/ui/steps'
 
+import { LabwareLabel } from '../../LabwareLabel'
 import { FixtureRender } from '../FixtureRender'
 import { SelectedItems } from '../SelectedItems'
 
@@ -30,6 +31,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('../FixtureRender')
+vi.mock('../../LabwareLabel')
 vi.mock('/protocol-designer/labware-ingred/selectors')
 vi.mock('/protocol-designer/labware-defs/selectors')
 vi.mock('/protocol-designer/components/organisms')
@@ -90,6 +92,16 @@ describe('SelectedItems', () => {
       },
     })
     vi.mocked(LabwareOnDeck).mockReturnValue(<div>mock LabwareOnDeck</div>)
+    vi.mocked(LabwareLabel).mockImplementation(
+      ({ labwareDef, nestedLabwareInfo = [], labelText }) => (
+        <>
+          <div>{labelText ?? labwareDef.metadata.displayName}</div>
+          {nestedLabwareInfo.map(({ text }, index) => (
+            <div key={`${text}_${index}`}>{text}</div>
+          ))}
+        </>
+      )
+    )
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
       selectedAdapterDefURI: null,
       selectedTopLabware: { labwareDefURI: null, amount: 1 },

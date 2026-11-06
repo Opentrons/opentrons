@@ -1,5 +1,4 @@
 import { DeckLabelSet as DeckLabelSetComponent } from '.'
-import { BORDERS } from '../../helix-design-system'
 import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
 
@@ -10,13 +9,11 @@ const mockDeckLabels = [
     isZoomed: false,
     text: 'Label',
     isSelected: false,
-    labelBorderRadius: BORDERS.borderRadius4,
   },
   {
     isZoomed: false,
     text: 'Label',
     isSelected: false,
-    labelBorderRadius: BORDERS.borderRadius4,
     isLast: true,
   },
 ]

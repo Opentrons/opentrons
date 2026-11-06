@@ -6,7 +6,6 @@ import {
   LabwareRender,
   SELECTED_ERROR,
 } from '@opentrons/components'
-import { getIsLid } from '@opentrons/shared-data'
 import * as wellContentsSelectors from '@opentrons/step-generation'
 
 import { selectors } from '../../../labware-ingred/selectors'
@@ -58,7 +57,9 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): ReactNode {
     borderStroke,
     ignoreMissingTips = false,
     wellLabelOptions,
-    centerInSlot = false,
+    // Default true so deck/module labware is centered; pass false when a parent
+    // already applies CenterLabwareInModuleChildSlot
+    centerInSlot = true,
   } = props
   const missingAndUsedTipsByLabwareId = useSelector(
     tipContentsSelectors.getMissingAndUsedTipsByLabwareId
@@ -87,8 +88,7 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): ReactNode {
       ? missingAndUsedTipsByLabwareId[labwareOnDeck.id]
       : null
   const { missingTips } = labwareTipInfo ?? {}
-  const isLid = getIsLid(labwareOnDeck.def)
-  const shouldCenter = isLid || centerInSlot
+  const positioningMode = centerInSlot ? 'passThrough' : 'offsetInSlot'
   const wellFill = wellContentsSelectors.wellFillFromWellContents(
     wellContents,
     liquidDisplayColors
@@ -107,7 +107,7 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): ReactNode {
   const labwareRenderComponent = (
     <LabwareRender
       definition={labwareOnDeck.def}
-      positioningMode={shouldCenter ? 'passThrough' : 'offsetInSlot'}
+      positioningMode={positioningMode}
       wellFill={newWellFill}
       handleClickWell={handleClickWell}
       {...(showHighlightedWells ? { highlightedWells } : {})}
@@ -124,8 +124,7 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): ReactNode {
   )
   return (
     <g transform={`translate(${x}, ${y})`}>
-      {/* TODO (ND, 01/06/2026): Center all labware including non-lids in the slot. Requires a larger audit of LabwareOnDeck implementation. */}
-      {shouldCenter ? (
+      {centerInSlot ? (
         <CenterLabwareInSlot definition={labwareOnDeck.def}>
           {labwareRenderComponent}
         </CenterLabwareInSlot>

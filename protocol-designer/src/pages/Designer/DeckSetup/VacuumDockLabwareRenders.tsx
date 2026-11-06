@@ -82,13 +82,7 @@ export function VacuumDockLabwareRenders(
       {[...dockLabwareStack].reverse().map(labwareId => {
         const labware = labwaresOnDeck[labwareId]
         return labware ? (
-          <LabwareOnDeck
-            key={labwareId}
-            x={x}
-            y={y}
-            labwareOnDeck={labware}
-            centerInSlot
-          />
+          <LabwareOnDeck key={labwareId} x={x} y={y} labwareOnDeck={labware} />
         ) : null
       })}
       <HighlightLabware

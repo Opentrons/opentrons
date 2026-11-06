@@ -243,7 +243,11 @@ export function AddStepButton({
         disabled={isStepCreationDisabled}
       >
         <Icon name="plus" size="1rem" />
-        {hasText ? <StyledText>{t('button:add_step')}</StyledText> : null}
+        {hasText ? (
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {t('button:add_step')}
+          </StyledText>
+        ) : null}
       </SecondaryButton>
     </>
   )

@@ -87,13 +87,20 @@ export function OffDeck(props: OffDeckProps): ReactNode {
       >
         {() => (
           <>
-            <LabwareOnDeck labwareOnDeck={zoomedInLabwareOnDeck} x={0} y={0} />
+            <LabwareOnDeck
+              labwareOnDeck={zoomedInLabwareOnDeck}
+              x={0}
+              y={0}
+              // Zoomed off-deck view is labware-sized, not a deck slot.
+              centerInSlot={false}
+            />
             <LabwareLabel
               isLast={true}
               isSelected={true}
               labwareDef={zoomedInLabwareOnDeck.def}
               position={[0, 0, 0]}
               showModuleIcon={false}
+              centerInSlot={false}
             />
           </>
         )}

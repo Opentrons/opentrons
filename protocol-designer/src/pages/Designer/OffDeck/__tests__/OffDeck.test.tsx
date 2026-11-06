@@ -17,6 +17,7 @@ import { getSelectedTerminalItemId } from '/protocol-designer/ui/steps'
 
 import { OffDeck } from '..'
 import { DeckSetupToolbox } from '../../DeckSetup/DeckSetupToolbox'
+import { LabwareLabel } from '../../LabwareLabel'
 import { OffDeckDetails } from '../OffDeckDetails'
 
 import type { ComponentProps } from 'react'
@@ -24,6 +25,7 @@ import type * as Components from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('../OffDeckDetails')
+vi.mock('../../LabwareLabel')
 vi.mock('/protocol-designer/ui/steps')
 vi.mock('/protocol-designer/labware-ingred/selectors')
 vi.mock('/protocol-designer/labware-defs/selectors')
@@ -70,6 +72,9 @@ describe('OffDeck', () => {
       <div>mock DeckSetupToolbox</div>
     )
     vi.mocked(LabwareOnDeck).mockReturnValue(<div>mock LabwareOnDeck</div>)
+    vi.mocked(LabwareLabel).mockImplementation(({ labwareDef }) => (
+      <div>{labwareDef.metadata.displayName}</div>
+    ))
   })
   it('renders off deck details', () => {
     vi.mocked(OffDeckDetails).mockReturnValue(<div>mock off deck details</div>)

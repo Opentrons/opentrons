@@ -378,14 +378,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): ReactNode {
         const labwareRightBelowTopMostLabware =
           rightBelowTopId != null ? activeLabware[rightBelowTopId] : null
         const isAdapter = labwareOnModule?.def.allowedRoles?.includes('adapter')
-        const isLabwareOnModuleVacuumCollar =
-          labwareOnModule?.def.parameters.quirks?.includes(
-            'vacuumModuleDock'
-          ) ?? false
-        const isLabwareBelowTopVacuumCollar =
-          labwareRightBelowTopMostLabware?.def.parameters.quirks?.includes(
-            'vacuumModuleDock'
-          ) ?? false
         const vacuumMainModuleStack =
           moduleOnDeck.type === VACUUM_MODULE_TYPE
             ? allLabwareValues
@@ -446,7 +438,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): ReactNode {
                         x={0}
                         y={0}
                         labwareOnDeck={lw}
-                        centerInSlot
                       />
                     ))
                   ) : (
@@ -456,14 +447,12 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): ReactNode {
                           x={0}
                           y={0}
                           labwareOnDeck={labwareRightBelowTopMostLabware}
-                          centerInSlot={isLabwareBelowTopVacuumCollar}
                         />
                       ) : null}
                       <LabwareOnDeck
                         x={0}
                         y={0}
                         labwareOnDeck={labwareOnModule}
-                        centerInSlot={isLabwareOnModuleVacuumCollar}
                       />
                     </>
                   )}

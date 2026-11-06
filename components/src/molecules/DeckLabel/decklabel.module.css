@@ -1,0 +1,35 @@
+.deck_label {
+  display: flex;
+  width: max-content;
+  align-items: center;
+  padding: var(--spacing-2);
+  gap: var(--spacing-2);
+}
+
+.deck_label_zoomed {
+  font-size: 14px;
+}
+
+.deck_label_unzoomed {
+  font-size: 18px;
+}
+
+.deck_label_selected {
+  border: 1.5px solid var(--blue-50);
+  background-color: var(--blue-50);
+  color: var(--white);
+}
+
+.deck_label_unselected {
+  border-right: 1.5px solid var(--blue-50);
+  border-bottom: 1.5px solid var(--blue-50);
+  border-left: 1.5px solid var(--blue-50);
+  background-color: var(--white);
+  color: var(--blue-50);
+}
+
+.deck_label_text {
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
