@@ -15,7 +15,6 @@ import {
   RESPONSIVENESS,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
@@ -31,24 +30,6 @@ import { getIsOnDevice } from '/app/redux/config'
 import type { BadGripper, GripperData } from '@opentrons/api-client'
 import type { GripperWizardStepProps } from './types'
 
-const GO_BACK_BUTTON_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.grey50};
-  padding-left: ${SPACING.spacing32};
-
-  &:hover {
-    opacity: 70%;
-  }
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-    font-size: ${TYPOGRAPHY.fontSize22};
-    padding-left: 0rem;
-    &:hover {
-      opacity: 100%;
-    }
-  }
-`
 const QUICK_GRIPPER_POLL_MS = 3000
 
 const ALIGN_BUTTONS = css`
@@ -109,11 +90,12 @@ export const MountGripper = (
           onClick={() => {
             setShowUnableToDetect(false)
           }}
-          css={GO_BACK_BUTTON_STYLE}
         >
           <StyledText
-            forwardedAs="p"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            desktopStyle="bodyDefaultSemiBold"
+            oddStyle="bodyTextSemiBold"
+            color={COLORS.grey50}
+            paddingLeft={SPACING.spacing32}
           >
             {t('shared:go_back')}
           </StyledText>
@@ -133,7 +115,14 @@ export const MountGripper = (
     </SimpleWizardBody>
   ) : (
     <GenericWizardTile
-      header={t('branded:connect_and_screw_in_gripper')}
+      header={
+        <StyledText
+          desktopStyle="headingSmallBold"
+          oddStyle="level4HeaderSemiBold"
+        >
+          {t('branded:connect_and_screw_in_gripper')}
+        </StyledText>
+      }
       rightHandBody={
         <AnimationVideo
           css={css`
@@ -146,7 +135,10 @@ export const MountGripper = (
         </AnimationVideo>
       }
       bodyText={
-        <StyledText forwardedAs="p">
+        <StyledText
+          desktopStyle="bodyDefaultRegular"
+          oddStyle="bodyTextRegular"
+        >
           {t('attached_gripper_and_screw_in')}
         </StyledText>
       }

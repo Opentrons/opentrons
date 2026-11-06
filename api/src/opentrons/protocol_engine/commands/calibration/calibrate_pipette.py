@@ -21,6 +21,10 @@ class CalibratePipetteParams(BaseModel):
     """Payload required to calibrate-pipette."""
 
     mount: MountType = Field(..., description="Instrument mount to calibrate.")
+    slot: DeckSlotName = Field(
+        default=DeckSlotName.SLOT_B2,
+        description="Deck slot whose calibration square to probe.",
+    )
 
 
 class CalibratePipetteResult(BaseModel):
@@ -57,7 +61,7 @@ class CalibratePipetteImplementation(
         )
 
         pipette_offset = await calibration.find_pipette_offset(
-            hcapi=ot3_api, mount=ot3_mount, slot=DeckSlotName.SLOT_B2.as_int()
+            hcapi=ot3_api, mount=ot3_mount, slot=params.slot.as_int()
         )
 
         await ot3_api.save_instrument_offset(mount=ot3_mount, delta=pipette_offset)

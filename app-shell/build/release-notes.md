@@ -8,7 +8,12 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ## Opentrons App Changes in 10.2.0
 
-Welcome to the v10.2.0 release of the Opentrons App! This release introduces the Opentrons Vacuum Module, an on-deck vacuum filtration and purification module for the Opentrons Flex.
+Welcome to the v10.2.0 release of the Opentrons App! This release adds support for the Opentrons Flex Automated Vacuum Module and includes other bug fixes.
+
+### Bug Fixes
+
+- The Flex door should stay closed after a labware position check and while the gantry homes. If you open the door, this no longer results in an invalid labware offset.
+- Choose between Flex deck slot B2 and C2 when calibrating the 96-channel pipette, and avoid needing to remove an attached waste chute.
 
 ---
 
