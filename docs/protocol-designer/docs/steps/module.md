@@ -168,14 +168,22 @@ Click **Edit protocol** to add or edit a vacuum step and and module components.
 * Setting vacuum by gauge pressure (mbar) or by running the pump continuously at a percentage of its total power.
 * Adding an optional vacuum duration (in mm:ss).
 
-If you need to run the pump sequentially with different vacuum or power settings, you can create multiple state steps. However, it may be more efficient to create a vacuum profile or cycle, which run multiple sub-steps sequentially once or in a loop.
+If you need to run the pump sequentially with different vacuum or power settings, you can create multiple state steps. However, it may be more efficient to create a vacuum profile or cycle, which run multiple operations sequentially once or in a loop within a single step.
 
 ### Vacuum profiles
 
-Vacuum profiles consist of multiple sub-steps that run the pump by either one of two mode types: gauge pressure (mbar) or as a percentage (%) of the pump's rated power. Each substep in a vacuum profile runs only once but you can create multiple, sequential profiles.
+A vacuum profile is a multi-step sequence of module pump actions that run in order within a single protocol step. A vacuum profile is useful when used with a step that requires sequential changes, like incrementally increasing vacuum pressure in a series or alternating between holding vacuum and venting.
+
+Unlike a standalone vacuum staat step, which performs a single acton, a profile lets you run individual sub-steps within a single vacuum step. Each profile sub-step executes only once, in sequence.
+
+When designing a profile, choose one mode type for the entire set of sub-steps:
+
+* **Pressure mode:** Closed loop lorem ipsum foo add text here
+
+* **Power mode:** Open loop lorem ipsum foo add text here. Echo or tie in back to these modes from the API
 
 !!! note
-    When creating a vacuum profile, mode types (pressure and power) must be identical. You cannot mix modes in a single profile.
+    Profile types cannot use combined modes in the same profile. A vacuum profile must use either pressure mode or power mode.
 
 <figure class="screenshot side-by-side" markdown>
 ![Pressure profile in a Vacuum Module step](../images/vacuum-pressure-profile.png)
@@ -185,9 +193,15 @@ Vacuum profiles consist of multiple sub-steps that run the pump by either one of
 
 ### Vacuum cycles
 
-Cycles are loops of pressure or power substeps. Unlike each opertion in a vacuum profile, which runs once, cycles are like `for` loops that repeat a specified number of times.
+Cycles are loops of pressure or power substeps. Unlike each operation in a vacuum profile, which runs once, cycles are like `for` loops that repeat a specified number of times.
 
-more text here
+<figure class="screenshot" markdown>
+![Vacuum operation cycle in a Vacuum Module step](../images/vacuum-profile-cycle.png){ width="80%" }
+<figcaption>Vacuum profile with cyclical operations</figcaption>
+</figure>
+
+!!! tip
+    You can combine steps and cycles into a single vacuum profile, but the types (pressure or power) must be the same. Mixed pressure and power cycles and steps are not supported.
 
 ### Last module state
 
