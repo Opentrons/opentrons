@@ -151,30 +151,45 @@ Running Thermocycler profiles is time-consuming, so you can choose to run other 
 
 ## Vacuum Module steps
 
-Adding a Vacuum Module step to your protocol lets you configure the module with any required labware, collars, and spacers. When working with an imported Protocol Designer file, this tool will also show you any installed Vacuum Module components and other deck mounted modules and fixtures.
+Adding a Vacuum Module step to your protocol lets you:
 
-Click **Edit protocol** to setup the Vacuum module and add or modify protocol steps and module components. When creating or modifying Vacuum Module steps you can:
+- **Manage labware and components:** Configure the module with any required labware, collars, and spacers. When working with an imported Protocol Designer file, this tool will also show you any installed spacers, collars, and other staged components.
 
-* **Configure labware:** Click on the module's adapter icon to add or modify well plates, filter plates, collars, and spacers on the vacuum base or the dock. Protocol Designer will also show you the stacking order of these components in a top to bottom list.
+- **Control vacuum operation:** Set the _state_ of the module through features that control a an individual step in a vacuum protocol, or create a _profile_ that lets you specify multiple operations within a single step.
 
-* **Control step options:** Click **Add Step** and select **Vacuum** from the popup menu. This opens the step editor that lets you operate the module by vacuum state or with vacuum profile.
+Click **Edit protocol** to add or edit a vacuum step and and module components.
 
-### Configuring vacuum state
+### Vacuum state
 
-*State* refers to the condition or configuration of the Vacuum Module. A state step is single set of operations contained in one step. It cannot loop or perform multiple operations within a step. Available state settings let you control the pump by:
+*State* refers to the condition or configuration of the Vacuum Module in single step. A state step cannot perform multiple operations within a single step. Available state settings let you control the pump by:
 
 * Turning the vacuum pump on or off.
 * Opening or closing the vent.
 * Setting vacuum by gauge pressure (mbar) or by running the pump continuously at a percentage of its total power.
 * Adding an optional vacuum duration (in mm:ss).
 
-If you need to run the pump multiple times sequentially with different vacuum or power settings, you could configure multiple state steps, but try using a vacuum profile instead.
+If you need to run the pump sequentially with different vacuum or power settings, you can create multiple state steps. However, it may be more efficient to create a vacuum profile or cycle, which run multiple sub-steps sequentially once or in a loop.
 
-### Configuring a vacuum profile
+### Vacuum profiles
 
-Vacuum profiles consist of multiple sub-steps. They're ideal when you need to run the pump with different settings in an uninterrupted sequence without configuring an entire step multiple times.
+Vacuum profiles consist of multiple sub-steps that run the pump by either one of two mode types: gauge pressure (mbar) or as a percentage (%) of the pump's rated power. Each substep in a vacuum profile runs only once but you can create multiple, sequential profiles.
 
-### Understanding last module state
+!!! note
+    When creating a vacuum profile, mode types (pressure and power) must be identical. You cannot mix modes in a single profile.
+
+<figure class="screenshot side-by-side" markdown>
+![Pressure profile in a Vacuum Module step](../images/vacuum-pressure-profile.png)
+![Power profile in a Vacuum Module step](../images/vacuum-power-profile.png)
+<figcaption>Pressure and power profiles showing multiple sub-steps.</figcaption>
+</figure>
+
+### Vacuum cycles
+
+Cycles are loops of pressure or power substeps. Unlike each opertion in a vacuum profile, which runs once, cycles are like `for` loops that repeat a specified number of times.
+
+more text here
+
+### Last module state
 
 The "Last module state" is a read-only status indicator. It changes when a previous vacuum step changes the state of the module. For example, in the first vacuum step of a protocol, the module's state is **pump: off** and **vent: open**. If the step ends with the pump on and the vent closed, the next sequential vacuum step will show the state as **pump: on** and **vent: closed**.
 
