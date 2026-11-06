@@ -254,7 +254,7 @@ async def robot_model(
 @pytest.fixture
 def deck_definition_name(robot_model: RobotModel) -> str:
     if robot_model == "OT-3 Standard":
-        return deck_type.STANDARD_OT3_DECK
+        return DeckType.OT3_STANDARD
     elif robot_model == "OT-2 Standard":
         # There are two OT-2 deck definitions (standard and short-trash),
         # but RobotModel does not draw such a distinction. We assume here that it's

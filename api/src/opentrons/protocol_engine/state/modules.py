@@ -18,9 +18,6 @@ from typing import (
     overload,
 )
 
-from numpy import array, dot
-from numpy import double as npdouble
-from numpy.typing import NDArray
 from pydantic import BaseModel
 
 from opentrons_shared_data.deck.types import DeckDefinitionV6
@@ -38,7 +35,6 @@ from ..commands import (
     thermocycler,
 )
 from ..errors import (
-    AreaNotInDeckConfigurationError,
     FixtureDoesNotExistError,
     ModuleNotConnectedError,
 )
@@ -963,8 +959,6 @@ class ModuleView:
             raise ValueError(
                 "Module location invalid for nominal module offset calculation."
             )
-        if not self.get_deck_supports_module_fixtures():
-            return location.value
         return self.ensure_and_convert_module_fixture_location(location, module.model)
 
     def get_requested_model(self, module_id: str) -> Optional[ModuleModel]:
@@ -1035,65 +1029,13 @@ class ModuleView:
         Includes the slot-specific transform. Does not include the child's
         Labware Position Check offset.
         """
-        base = self.get_nominal_offset_to_child_from_addressable_area(module_id)
-        if self.get_deck_supports_module_fixtures():
-            module_addressable_area = self.get_provided_addressable_area(module_id)
-            module_addressable_area_position = (
-                addressable_areas.get_addressable_area_offsets_from_cutout(
-                    module_addressable_area
-                )
+        module_addressable_area = self.get_provided_addressable_area(module_id)
+        module_addressable_area_position = (
+            addressable_areas.get_addressable_area_offsets_from_cutout(
+                module_addressable_area
             )
-            return base + module_addressable_area_position
-        else:
-            return base
-
-    def get_nominal_offset_to_child_from_addressable_area(
-        self, module_id: str
-    ) -> Point:
-        """Get the position offset for a child of this module from the nearest AA.
-
-        On the Flex, this is always (0, 0, 0); on the OT-2, since modules load on top
-        of addressable areas rather than providing addressable areas, the offset is
-        the labwareOffset from the module definition, rotated by the module's
-        slotTransform if appropriate.
-        """
-        if self.get_deck_supports_module_fixtures():
-            return Point(0, 0, 0)
-        else:
-            definition = self.get_definition(module_id)
-            slot = self.get_location(module_id).slotName.id
-
-            pre_transform: NDArray[npdouble] = array(
-                (
-                    definition.labwareOffset.x,
-                    definition.labwareOffset.y,
-                    definition.labwareOffset.z,
-                    1,
-                )
-            )
-            xforms_ser = definition.slotTransforms.get(
-                str(self._state.deck_type.value), {}
-            ).get(
-                slot,
-                {
-                    "labwareOffset": [
-                        [1, 0, 0, 0],
-                        [0, 1, 0, 0],
-                        [0, 0, 1, 0],
-                        [0, 0, 0, 1],
-                    ]
-                },
-            )
-            xforms_ser_offset = xforms_ser["labwareOffset"]
-
-            # Apply the slot transform, if any
-            xform: NDArray[npdouble] = array(xforms_ser_offset)
-            xformed = dot(xform, pre_transform)
-            return Point(
-                x=xformed[0],
-                y=xformed[1],
-                z=xformed[2],
-            )
+        )
+        return module_addressable_area_position
 
     def get_module_calibration_offset(
         self, module_id: str
@@ -1487,13 +1429,8 @@ class ModuleView:
                 "Only readings of 96 Well labware are supported for conversion to map of values by well."
             )
 
-    def get_deck_supports_module_fixtures(self) -> bool:
-        """Check if the loaded deck supports modules as fixtures."""
-        deck_type = self._state.deck_type
-        return deck_type not in [DeckType.OT2_STANDARD, DeckType.OT2_SHORT_TRASH]
-
+    @staticmethod
     def ensure_and_convert_module_fixture_location(
-        self,
         deck_slot: DeckSlotName,
         model: ModuleModel,
     ) -> str:
@@ -1501,13 +1438,6 @@ class ModuleView:
 
         Also, convert the deck slot to a valid module fixture addressable area.
         """
-        deck_type = self._state.deck_type
-
-        if not self.get_deck_supports_module_fixtures():
-            raise AreaNotInDeckConfigurationError(
-                f"Invalid Deck Type: {deck_type.name} - Does not support modules as fixtures."
-            )
-
         assert deck_slot in DeckSlotName.ot3_slots()
         if model == ModuleModel.MAGNETIC_BLOCK_V1:
             return f"magneticBlockV1{deck_slot.value}"

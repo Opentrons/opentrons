@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 import pytest
 from decoy import Decoy
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.types import DeckDefinitionV5, DeckDefinitionV6
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
@@ -22,15 +20,11 @@ from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.protocols.types import FlexRobotType
 from opentrons.protocol_engine.notes import CommandNoteAdder
 from opentrons.protocol_engine.resources import CameraProvider, FileProvider
-from opentrons.protocol_engine.types import ModuleDefinition, PeripheralDefinition
-from opentrons.protocols.api_support.deck_type import (
-    SHORT_TRASH_DECK,
-    STANDARD_OT2_DECK,
-    STANDARD_OT3_DECK,
+from opentrons.protocol_engine.types import (
+    DeckType,
+    ModuleDefinition,
+    PeripheralDefinition,
 )
-
-if TYPE_CHECKING:
-    from opentrons.hardware_control.ot3api import OT3API
 
 
 @pytest.fixture
@@ -50,37 +44,9 @@ def ot3_hardware_api(decoy: Decoy) -> OT3API:
 
 
 @pytest.fixture(scope="session")
-def ot2_standard_deck_def() -> DeckDefinitionV5:
-    """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT2_DECK, 5)
-
-
-@pytest.fixture(scope="session")
-def ot2_short_trash_deck_def() -> DeckDefinitionV5:
-    """Get the OT-2 short-trash deck definition."""
-    return load_deck(SHORT_TRASH_DECK, 5)
-
-
-@pytest.fixture(scope="session")
 def ot3_standard_deck_def() -> DeckDefinitionV6:
     """Get the OT-3 standard deck definition."""
-    return load_deck(STANDARD_OT3_DECK, 6)
-
-
-@pytest.fixture(scope="session")
-def ot2_fixed_trash_def() -> LabwareDefinition:
-    """Get the definition of the OT-2 standard fixed trash."""
-    return labware_definition_type_adapter.validate_python(
-        load_definition("opentrons_1_trash_1100ml_fixed", 1)
-    )
-
-
-@pytest.fixture(scope="session")
-def ot2_short_fixed_trash_def() -> LabwareDefinition:
-    """Get the definition of the OT-2 short fixed trash."""
-    return labware_definition_type_adapter.validate_python(
-        load_definition("opentrons_1_trash_850ml_fixed", 1)
-    )
+    return load_deck(DeckType.OT3_STANDARD, 6)
 
 
 @pytest.fixture(scope="session")

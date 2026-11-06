@@ -5,7 +5,7 @@ Try to add new tests to test_module_state.py, where they can be tested together,
 treating ModuleState as a private implementation detail.
 """
 
-from typing import Dict, List, Optional, Set, cast
+from typing import Dict, Optional, Set, cast
 
 import pytest
 from pytest_lazy_fixtures import lf as lazy_fixture
@@ -61,10 +61,10 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.types import DeckSlotName
 
-_OT2_STANDARD_CONFIG = Config(
+_OT3_STANDARD_CONFIG = Config(
     use_simulated_deck_config=False,
-    robot_type="OT-2 Standard",
-    deck_type=DeckType.OT2_STANDARD,
+    robot_type="OT-3 Standard",
+    deck_type=DeckType.OT3_STANDARD,
 )
 
 
@@ -112,12 +112,12 @@ def get_addressable_area_view(
 def test_initial_state() -> None:
     """It should initialize the module state."""
     subject = ModuleStore(
-        config=_OT2_STANDARD_CONFIG,
+        config=_OT3_STANDARD_CONFIG,
         deck_fixed_labware=[],
     )
 
     assert subject.state == ModuleState(
-        deck_type=DeckType.OT2_STANDARD,
+        deck_type=DeckType.OT3_STANDARD,
         requested_model_by_id={},
         load_location_by_module_id={},
         hardware_by_module_id={},
@@ -211,7 +211,7 @@ def test_load_module(
         command=commands.LoadModule.model_construct(  # type: ignore[call-arg]
             params=commands.LoadModuleParams(
                 model=params_model,
-                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D1),
             ),
             result=commands.LoadModuleResult(
                 moduleId="module-id",
@@ -224,21 +224,21 @@ def test_load_module(
             definition=module_definition,
             requested_model=params_model,
             serial_number="serial-number",
-            slot_name=DeckSlotName.SLOT_1,
+            slot_name=DeckSlotName.SLOT_D1,
         ),
     )
 
     subject = ModuleStore(
-        config=_OT2_STANDARD_CONFIG,
+        config=_OT3_STANDARD_CONFIG,
         deck_fixed_labware=[],
     )
     subject.handle_action(action)
 
     assert subject.state == ModuleState(
-        deck_type=DeckType.OT2_STANDARD,
+        deck_type=DeckType.OT3_STANDARD,
         load_location_by_module_id={
             "module-id": deck_configuration_provider.get_cutout_id_by_deck_slot_name(
-                DeckSlotName.SLOT_1
+                DeckSlotName.SLOT_D1
             )
         },
         requested_model_by_id={"module-id": params_model},
@@ -255,28 +255,7 @@ def test_load_module(
     )
 
 
-@pytest.mark.parametrize(
-    argnames=["tc_slot", "deck_type", "robot_type", "expected_additional_slots"],
-    argvalues=[
-        (
-            DeckSlotName.SLOT_7,
-            DeckType.OT2_STANDARD,
-            "OT-2 Standard",
-            [DeckSlotName.SLOT_8, DeckSlotName.SLOT_10, DeckSlotName.SLOT_11],
-        ),
-        (
-            DeckSlotName.SLOT_B1,
-            DeckType.OT3_STANDARD,
-            "OT-3 Standard",
-            [DeckSlotName.SLOT_A1],
-        ),
-    ],
-)
 def test_load_thermocycler_in_thermocycler_slot(
-    tc_slot: DeckSlotName,
-    deck_type: DeckType,
-    robot_type: RobotType,
-    expected_additional_slots: List[DeckSlotName],
     thermocycler_v2_def: ModuleDefinition,
 ) -> None:
     """It should update additional slots for thermocycler module."""
@@ -284,7 +263,7 @@ def test_load_thermocycler_in_thermocycler_slot(
         command=commands.LoadModule.model_construct(  # type: ignore[call-arg]
             params=commands.LoadModuleParams(
                 model=ModuleModel.THERMOCYCLER_MODULE_V2,
-                location=DeckSlotLocation(slotName=tc_slot),
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_B1),
             ),
             result=commands.LoadModuleResult(
                 moduleId="module-id",
@@ -297,26 +276,23 @@ def test_load_thermocycler_in_thermocycler_slot(
             definition=thermocycler_v2_def,
             requested_model=ModuleModel.THERMOCYCLER_MODULE_V2,
             serial_number="serial-number",
-            slot_name=tc_slot,
+            slot_name=DeckSlotName.SLOT_B1,
         ),
     )
-    load_position_for_module = f"cutout{tc_slot.value}"
 
     subject = ModuleStore(
         Config(
             use_simulated_deck_config=False,
-            robot_type=robot_type,
-            deck_type=deck_type,
+            robot_type="OT-3 Standard",
+            deck_type=DeckType.OT3_STANDARD,
         ),
         deck_fixed_labware=[],
     )
     subject.handle_action(action)
 
-    assert subject.state.load_location_by_module_id == {
-        "module-id": load_position_for_module
-    }
+    assert subject.state.load_location_by_module_id == {"module-id": "cutoutB1"}
     assert subject.state.additional_slots_occupied_by_module_id == {
-        "module-id": expected_additional_slots
+        "module-id": [DeckSlotName.SLOT_A1]
     }
 
 
@@ -390,13 +366,13 @@ def test_add_module_action(
     )
 
     subject = ModuleStore(
-        config=_OT2_STANDARD_CONFIG,
+        config=_OT3_STANDARD_CONFIG,
         deck_fixed_labware=[],
     )
     subject.handle_action(action)
 
     assert subject.state == ModuleState(
-        deck_type=DeckType.OT2_STANDARD,
+        deck_type=DeckType.OT3_STANDARD,
         load_location_by_module_id={"module-id": None},
         requested_model_by_id={"module-id": None},
         hardware_by_module_id={
@@ -417,7 +393,7 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
     load_module_cmd = commands.LoadModule.model_construct(  # type: ignore[call-arg]
         params=commands.LoadModuleParams(
             model=ModuleModel.HEATER_SHAKER_MODULE_V1,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D1),
         ),
         result=commands.LoadModuleResult(
             moduleId="module-id",
@@ -434,7 +410,7 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
         result=hs_commands.DeactivateHeaterResult(),
     )
     subject = ModuleStore(
-        config=_OT2_STANDARD_CONFIG,
+        config=_OT3_STANDARD_CONFIG,
         deck_fixed_labware=[],
     )
 
@@ -446,7 +422,7 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
                 definition=heater_shaker_v1_def,
                 requested_model=ModuleModel.HEATER_SHAKER_MODULE_V1,
                 serial_number="serial-number",
-                slot_name=DeckSlotName.SLOT_1,
+                slot_name=DeckSlotName.SLOT_D1,
             ),
         )
     )
@@ -475,7 +451,7 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
     load_module_cmd = commands.LoadModule.model_construct(  # type: ignore[call-arg]
         params=commands.LoadModuleParams(
             model=ModuleModel.HEATER_SHAKER_MODULE_V1,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D1),
         ),
         result=commands.LoadModuleResult(
             moduleId="module-id",
@@ -497,7 +473,7 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
     )
 
     subject = ModuleStore(
-        config=_OT2_STANDARD_CONFIG,
+        config=_OT3_STANDARD_CONFIG,
         deck_fixed_labware=[],
     )
 
@@ -509,7 +485,7 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
                 definition=heater_shaker_v1_def,
                 requested_model=ModuleModel.HEATER_SHAKER_MODULE_V1,
                 serial_number="serial-number",
-                slot_name=DeckSlotName.SLOT_1,
+                slot_name=DeckSlotName.SLOT_D1,
             ),
         )
     )
@@ -549,7 +525,7 @@ def test_handle_hs_labware_latch_commands(
     load_module_cmd = commands.LoadModule.model_construct(  # type: ignore[call-arg]
         params=commands.LoadModuleParams(
             model=ModuleModel.HEATER_SHAKER_MODULE_V1,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D1),
         ),
         result=commands.LoadModuleResult(
             moduleId="module-id",
@@ -566,7 +542,7 @@ def test_handle_hs_labware_latch_commands(
         result=hs_commands.OpenLabwareLatchResult(pipetteRetracted=False),
     )
     subject = ModuleStore(
-        config=_OT2_STANDARD_CONFIG,
+        config=_OT3_STANDARD_CONFIG,
         deck_fixed_labware=[],
     )
 
@@ -578,7 +554,7 @@ def test_handle_hs_labware_latch_commands(
                 definition=heater_shaker_v1_def,
                 requested_model=ModuleModel.HEATER_SHAKER_MODULE_V1,
                 serial_number="serial-number",
-                slot_name=DeckSlotName.SLOT_1,
+                slot_name=DeckSlotName.SLOT_D1,
             ),
         )
     )
@@ -618,7 +594,7 @@ def test_handle_tempdeck_temperature_commands(
     load_module_cmd = commands.LoadModule.model_construct(  # type: ignore[call-arg]
         params=commands.LoadModuleParams(
             model=ModuleModel.TEMPERATURE_MODULE_V2,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D1),
         ),
         result=commands.LoadModuleResult(
             moduleId="module-id",
@@ -639,7 +615,7 @@ def test_handle_tempdeck_temperature_commands(
         result=temp_commands.DeactivateTemperatureResult(),
     )
     subject = ModuleStore(
-        config=_OT2_STANDARD_CONFIG,
+        config=_OT3_STANDARD_CONFIG,
         deck_fixed_labware=[],
     )
 
@@ -651,7 +627,7 @@ def test_handle_tempdeck_temperature_commands(
                 definition=tempdeck_v2_def,
                 requested_model=ModuleModel.HEATER_SHAKER_MODULE_V1,
                 serial_number="serial-number",
-                slot_name=DeckSlotName.SLOT_1,
+                slot_name=DeckSlotName.SLOT_D1,
             ),
         )
     )
@@ -676,7 +652,7 @@ def test_handle_thermocycler_temperature_commands(
     load_module_cmd = commands.LoadModule.model_construct(  # type: ignore[call-arg]
         params=commands.LoadModuleParams(
             model=ModuleModel.THERMOCYCLER_MODULE_V1,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D1),
         ),
         result=commands.LoadModuleResult(
             moduleId="module-id",
@@ -705,7 +681,7 @@ def test_handle_thermocycler_temperature_commands(
         result=tc_commands.DeactivateLidResult(),
     )
     subject = ModuleStore(
-        config=_OT2_STANDARD_CONFIG,
+        config=_OT3_STANDARD_CONFIG,
         deck_fixed_labware=[],
     )
 
@@ -717,7 +693,7 @@ def test_handle_thermocycler_temperature_commands(
                 definition=thermocycler_v1_def,
                 requested_model=ModuleModel.THERMOCYCLER_MODULE_V1,
                 serial_number="serial-number",
-                slot_name=DeckSlotName.SLOT_1,
+                slot_name=DeckSlotName.SLOT_D1,
             ),
         )
     )
@@ -766,7 +742,7 @@ def test_handle_thermocycler_lid_commands(
     load_module_cmd = commands.LoadModule.model_construct(  # type: ignore[call-arg]
         params=commands.LoadModuleParams(
             model=ModuleModel.THERMOCYCLER_MODULE_V1,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D1),
         ),
         result=commands.LoadModuleResult(
             moduleId="module-id",
@@ -801,7 +777,7 @@ def test_handle_thermocycler_lid_commands(
                 definition=thermocycler_v1_def,
                 requested_model=ModuleModel.THERMOCYCLER_MODULE_V1,
                 serial_number="serial-number",
-                slot_name=DeckSlotName.SLOT_1,
+                slot_name=DeckSlotName.SLOT_D1,
             ),
         )
     )
@@ -833,7 +809,7 @@ def test_handle_absorbance_reader_commands(
     load_module_cmd = commands.LoadModule.model_construct(  # type: ignore[call-arg]
         params=commands.LoadModuleParams(
             model=ModuleModel.ABSORBANCE_READER_V1,
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D1),
         ),
         result=commands.LoadModuleResult(
             moduleId="module-id",
@@ -878,7 +854,7 @@ def test_handle_absorbance_reader_commands(
                 definition=abs_reader_v1_def,
                 requested_model=ModuleModel.ABSORBANCE_READER_V1,
                 serial_number="serial-number",
-                slot_name=DeckSlotName.SLOT_1,
+                slot_name=DeckSlotName.SLOT_D1,
             ),
         )
     )

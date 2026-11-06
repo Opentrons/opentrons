@@ -9,7 +9,6 @@ from decoy import Decoy
 from opentrons_shared_data import liquid_classes
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.types import (
-    DeckDefinitionV5,
     DeckDefinitionV6,
     SlotDefV3,
 )
@@ -89,30 +88,19 @@ from opentrons.protocol_engine.state.labware import (
 )
 from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
+    DeckType,
     FlowRates,
     HexColor,
 )
-from opentrons.protocol_engine.types import (
-    Liquid as PE_Liquid,
-)
-from opentrons.protocols.api_support.deck_type import (
-    STANDARD_OT2_DECK,
-    STANDARD_OT3_DECK,
-)
+from opentrons.protocol_engine.types import Liquid as PE_Liquid
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import DeckSlotName, Mount, MountType, Point, StagingSlotName
 
 
 @pytest.fixture(scope="session")
-def ot2_standard_deck_def() -> DeckDefinitionV5:
-    """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT2_DECK, 5)
-
-
-@pytest.fixture(scope="session")
 def ot3_standard_deck_def() -> DeckDefinitionV6:
     """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT3_DECK, 6)
+    return load_deck(DeckType.OT3_STANDARD, 6)
 
 
 @pytest.fixture(autouse=True)
@@ -225,7 +213,7 @@ def test_api_version(
 
 
 def test_get_slot_definition(
-    ot2_standard_deck_def: DeckDefinitionV6, subject: ProtocolCore, decoy: Decoy
+    ot3_standard_deck_def: DeckDefinitionV6, subject: ProtocolCore, decoy: Decoy
 ) -> None:
     """It should return a deck slot's definition."""
     expected_slot_def = cast(
