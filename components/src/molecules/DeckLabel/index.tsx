@@ -38,10 +38,7 @@ export function DeckLabel({
       className={clsx(
         styles.deck_label,
         isZoomed ? styles.deck_label_zoomed : styles.deck_label_unzoomed,
-        {
-          [styles.deck_label_selected]: isSelected,
-          [styles.deck_label_unselected]: !isSelected,
-        }
+        isSelected ? styles.deck_label_selected : styles.deck_label_unselected
       )}
       style={{ maxWidth }}
     >

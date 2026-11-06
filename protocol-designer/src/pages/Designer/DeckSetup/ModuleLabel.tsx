@@ -69,7 +69,7 @@ export const ModuleLabel = (props: ModuleLabelProps): ReactNode => {
   const slotTransformKey =
     robotType === FLEX_ROBOT_TYPE ? FLEX_STANDARD_DECKID : OT2_STANDARD_DECKID
   const cornerOffsetsFromSlotFromTransform =
-    slot != null && !isZoomed
+    slot != null
       ? def?.slotTransforms?.[slotTransformKey]?.[slot]?.cornerOffsetFromSlot
       : null
   const tempAdjustmentX =
