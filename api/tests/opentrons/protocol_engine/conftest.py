@@ -9,7 +9,7 @@ from decoy import Decoy
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV5, DeckDefinitionV6
 from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
@@ -62,9 +62,9 @@ def ot2_short_trash_deck_def() -> DeckDefinitionV5:
 
 
 @pytest.fixture(scope="session")
-def ot3_standard_deck_def() -> DeckDefinitionV5:
-    """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT3_DECK, 5)
+def ot3_standard_deck_def() -> DeckDefinitionV6:
+    """Get the OT-3 standard deck definition."""
+    return load_deck(STANDARD_OT3_DECK, 6)
 
 
 @pytest.fixture(scope="session")

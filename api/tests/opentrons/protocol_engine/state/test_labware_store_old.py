@@ -10,7 +10,7 @@ from typing import Optional
 
 import pytest
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     LabwareDefinition2,
@@ -43,7 +43,7 @@ from opentrons.types import DeckSlotName
 
 @pytest.fixture
 def subject(
-    ot2_standard_deck_def: DeckDefinitionV5,
+    ot2_standard_deck_def: DeckDefinitionV6,
 ) -> LabwareStore:
     """Get a LabwareStore test subject."""
     return LabwareStore(
@@ -53,7 +53,7 @@ def subject(
 
 
 def test_initial_state(
-    ot2_standard_deck_def: DeckDefinitionV5,
+    ot2_standard_deck_def: DeckDefinitionV6,
     subject: LabwareStore,
 ) -> None:
     """It should create the labware store with preloaded fixed labware."""

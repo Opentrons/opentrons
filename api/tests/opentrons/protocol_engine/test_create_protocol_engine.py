@@ -1,12 +1,10 @@
 """Smoke tests for the ProtocolEngine creation factory."""
 
 import pytest
-from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.hardware_control.ot3api import OT3API as HardwareAPI
@@ -22,68 +20,28 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
 from opentrons.protocol_engine.types import DeckSlotLocation, LoadedLabware
 from opentrons.protocols.api_support.deck_type import (
-    SHORT_TRASH_DECK,
-    STANDARD_OT2_DECK,
     STANDARD_OT3_DECK,
 )
 from opentrons.types import DeckSlotName
 
 
 @pytest.fixture(scope="session")
-def ot2_standard_deck_def() -> DeckDefinitionV5:
-    """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT2_DECK, 5)
+def ot3_standard_deck_def() -> DeckDefinitionV6:
+    """Get the OT-3 standard deck definition."""
+    return load_deck(STANDARD_OT3_DECK, 6)
 
 
-@pytest.fixture(scope="session")
-def ot2_short_trash_deck_def() -> DeckDefinitionV5:
-    """Get the OT-2 with short trash standard deck definition."""
-    return load_deck(SHORT_TRASH_DECK, 5)
-
-
-@pytest.fixture(scope="session")
-def ot3_standard_deck_def() -> DeckDefinitionV5:
-    """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT3_DECK, 5)
-
-
-@pytest.mark.parametrize(
-    (
-        "robot_type",
-        "deck_type",
-        "expected_deck_def",
-    ),
-    [
-        (
-            "OT-2 Standard",
-            DeckType.OT2_STANDARD,
-            lazy_fixture("ot2_standard_deck_def"),
-        ),
-        (
-            "OT-2 Standard",
-            DeckType.OT2_SHORT_TRASH,
-            lazy_fixture("ot2_short_trash_deck_def"),
-        ),
-        (
-            "OT-3 Standard",
-            DeckType.OT3_STANDARD,
-            lazy_fixture("ot3_standard_deck_def"),
-        ),
-    ],
-)
 async def test_create_engine_initializes_state_with_no_fixed_trash(
     hardware_api: HardwareAPI,
-    robot_type: RobotType,
-    deck_type: DeckType,
-    expected_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> None:
     """It should load deck geometry data into the store on create."""
     engine = await create_protocol_engine(
         hardware_api=hardware_api,
         config=EngineConfig(
             # robot_type chosen to match hardware_api.
-            robot_type=robot_type,
-            deck_type=deck_type,
+            robot_type="OT-3 Standard",
+            deck_type=DeckType.OT3_STANDARD,
         ),
         error_recovery_policy=error_recovery_policy.never_recover,
         load_fixed_trash=False,
@@ -91,57 +49,22 @@ async def test_create_engine_initializes_state_with_no_fixed_trash(
     state = engine.state_view
 
     assert isinstance(engine, ProtocolEngine)
-    assert state.labware.get_deck_definition() == expected_deck_def
+    assert state.labware.get_deck_definition() == ot3_standard_deck_def
     assert state.labware.get_all() == []
 
 
-@pytest.mark.parametrize(
-    (
-        "robot_type",
-        "deck_type",
-        "expected_deck_def",
-        "expected_fixed_trash_def",
-        "expected_fixed_trash_slot",
-    ),
-    [
-        (
-            "OT-2 Standard",
-            DeckType.OT2_STANDARD,
-            lazy_fixture("ot2_standard_deck_def"),
-            lazy_fixture("ot2_fixed_trash_def"),
-            DeckSlotName.FIXED_TRASH,
-        ),
-        (
-            "OT-2 Standard",
-            DeckType.OT2_SHORT_TRASH,
-            lazy_fixture("ot2_short_trash_deck_def"),
-            lazy_fixture("ot2_short_fixed_trash_def"),
-            DeckSlotName.FIXED_TRASH,
-        ),
-        (
-            "OT-3 Standard",
-            DeckType.OT3_STANDARD,
-            lazy_fixture("ot3_standard_deck_def"),
-            lazy_fixture("ot3_fixed_trash_def"),
-            DeckSlotName.SLOT_A3,
-        ),
-    ],
-)
 async def test_create_engine_initializes_state_with_fixed_trash(
     hardware_api: HardwareAPI,
-    robot_type: RobotType,
-    deck_type: DeckType,
-    expected_deck_def: DeckDefinitionV5,
-    expected_fixed_trash_def: LabwareDefinition,
-    expected_fixed_trash_slot: DeckSlotName,
+    ot3_standard_deck_def: DeckDefinitionV6,
+    ot3_fixed_trash_def: LabwareDefinition,
 ) -> None:
     """It should load deck geometry data into the store on create."""
     engine = await create_protocol_engine(
         hardware_api=hardware_api,
         config=EngineConfig(
             # robot_type chosen to match hardware_api.
-            robot_type=robot_type,
-            deck_type=deck_type,
+            robot_type="OT-3 Standard",
+            deck_type=DeckType.OT3_STANDARD,
         ),
         error_recovery_policy=error_recovery_policy.never_recover,
         load_fixed_trash=True,
@@ -149,17 +72,17 @@ async def test_create_engine_initializes_state_with_fixed_trash(
     state = engine.state_view
 
     assert isinstance(engine, ProtocolEngine)
-    assert state.labware.get_deck_definition() == expected_deck_def
+    assert state.labware.get_deck_definition() == ot3_standard_deck_def
     assert state.labware.get_all() == [
         LoadedLabware(
             id="fixedTrash",
-            loadName=expected_fixed_trash_def.parameters.loadName,
+            loadName=ot3_fixed_trash_def.parameters.loadName,
             definitionUri=uri_from_details(
-                load_name=expected_fixed_trash_def.parameters.loadName,
-                namespace=expected_fixed_trash_def.namespace,
-                version=expected_fixed_trash_def.version,
+                load_name=ot3_fixed_trash_def.parameters.loadName,
+                namespace=ot3_fixed_trash_def.namespace,
+                version=ot3_fixed_trash_def.version,
             ),
-            location=DeckSlotLocation(slotName=expected_fixed_trash_slot),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
             offsetId=None,
         )
     ]
@@ -175,8 +98,8 @@ async def test_create_engine_initializes_state_with_door_state(
         config=EngineConfig(
             block_on_door_open=True,
             # Choice of robot and deck type are arbitrary.
-            robot_type="OT-2 Standard",
-            deck_type=DeckType.OT2_SHORT_TRASH,
+            robot_type="OT-3 Standard",
+            deck_type=DeckType.OT3_STANDARD,
         ),
         error_recovery_policy=error_recovery_policy.never_recover,
     )

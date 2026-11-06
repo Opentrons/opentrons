@@ -6,7 +6,7 @@ from typing import Annotated, Union
 import fastapi
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
@@ -73,7 +73,7 @@ async def put_deck_configuration(  # noqa: D103
         DeckConfigurationStore, fastapi.Depends(get_deck_configuration_store)
     ],
     now: Annotated[datetime, fastapi.Depends(get_current_time)],
-    deck_definition: Annotated[DeckDefinitionV5, fastapi.Depends(get_deck_definition)],
+    deck_definition: Annotated[DeckDefinitionV6, fastapi.Depends(get_deck_definition)],
 ) -> PydanticResponse[
     Union[
         SimpleBody[models.DeckConfigurationResponse],

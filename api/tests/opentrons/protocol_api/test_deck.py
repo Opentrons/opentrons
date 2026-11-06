@@ -6,7 +6,7 @@ from typing import Dict, cast
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
+from opentrons_shared_data.deck.types import DeckDefinitionV6, SlotDefV3
 
 from opentrons.motion_planning import adjacent_slots_getters as mock_adjacent_slots
 from opentrons.protocol_api import (
@@ -26,10 +26,10 @@ from opentrons.types import DeckSlotName, Point
 
 
 @pytest.fixture
-def deck_definition() -> DeckDefinitionV5:
+def deck_definition() -> DeckDefinitionV6:
     """Get a deck definition value object."""
     return cast(
-        DeckDefinitionV5,
+        DeckDefinitionV6,
         {
             "locations": {"addressableAreas": [], "calibrationPoints": []},
             "cutoutFixtures": {},
@@ -84,7 +84,7 @@ def staging_slot_definitions_by_name() -> Dict[str, SlotDefV3]:
 @pytest.fixture
 def subject(
     decoy: Decoy,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
     mock_protocol_core: ProtocolCore,
     mock_core_map: LoadedCoreMap,
     api_version: APIVersion,

@@ -6,7 +6,7 @@ from typing import Optional, Union, overload
 
 from typing_extensions import assert_type
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
+from opentrons_shared_data.deck.types import DeckDefinitionV6, SlotDefV3
 from opentrons_shared_data.labware.labware_definition import (
     AxisAlignedBoundingBox3D,
     Extents,
@@ -93,7 +93,7 @@ def get_stackup_origin_to_labware_origin(
     underlying_ancestor_definition: LabwareStackupAncestorDefinition,
     slot_name: DeckSlotName,
     module_parent_to_child_offset: Point | None,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
 ) -> Point:
     """Returns the offset from the stackup placement origin to child labware origin.
 
@@ -133,7 +133,7 @@ def _get_stackup_origin_to_lw_origin(
     stackup_lw_info_top_to_bottom: list[tuple[LabwareDefinition, LabwareLocation]],
     underlying_ancestor_definition: LabwareStackupAncestorDefinition,
     module_parent_to_child_offset: Point | None,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
     slot_name: DeckSlotName,
     is_topmost_labware: bool = True,
 ) -> Point:
@@ -218,7 +218,7 @@ def _get_parent_placement_origin_to_lw_origin_by_location(
     labware_location: LabwareLocation,
     labware_definition: LabwareDefinition,
     parent_definition: _LabwareStackupDefinition,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
     module_parent_to_child_offset: Point | None,
     underlying_ancestor_orientation: ModuleOrientation,
     is_topmost_labware: bool,
@@ -267,7 +267,7 @@ def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: ModuleDefinition,
     module_parent_to_child_offset: Point,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
     is_topmost_labware: bool,
     labware_location: ModuleLocation,
     underlying_ancestor_orientation: ModuleOrientation,
@@ -279,7 +279,7 @@ def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: DeckLocationDefinition,
     module_parent_to_child_offset: None,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
     is_topmost_labware: bool,
     labware_location: Union[DeckSlotLocation, AddressableAreaLocation],
     underlying_ancestor_orientation: ModuleOrientation,
@@ -291,7 +291,7 @@ def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: LabwareDefinition,
     module_parent_to_child_offset: None,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
     is_topmost_labware: bool,
     labware_location: OnLabwareLocation,
     underlying_ancestor_orientation: ModuleOrientation,
@@ -302,7 +302,7 @@ def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: _LabwareStackupDefinition,
     module_parent_to_child_offset: Point | None,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
     is_topmost_labware: bool,
     labware_location: LabwareLocation,
     underlying_ancestor_orientation: ModuleOrientation,
@@ -405,7 +405,7 @@ def _get_parent_deck_item_origin_to_child_labware_placement_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: _LabwareStackupDefinition,
     module_parent_to_child_offset: Point | None,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
     labware_location: LabwareLocation,
 ) -> Point:
     """Get the offset vector from parent entity origin to child labware placement origin."""
@@ -1047,7 +1047,7 @@ def _get_child_labware_overlap_with_parent_labware(
 def _get_child_labware_overlap_with_parent_module(
     child_labware: LabwareDefinition,
     parent_module_model: ModuleModel,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
 ) -> Point:
     """Get the child labware's overlap with the parent module model."""
     child_labware_overlap = child_labware.stackingOffsetWithModule.get(
@@ -1064,7 +1064,7 @@ def _get_child_labware_overlap_with_parent_module(
 
 def _feature_exception_offsets(
     parent_deck_item: _LabwareStackupDefinition,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
 ) -> Point:
     """These offsets are intended for legacy reasons only and should generally be avoided post labware schema 2.
 
@@ -1080,7 +1080,7 @@ def _feature_exception_offsets(
 
 def _is_thermocycler_on_ot2(
     parent_module_model: ModuleModel,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
 ) -> bool:
     """Whether the given parent module is a thermocycler with the current deck being an OT2 deck."""
     robot_model = deck_definition["robot"]["model"]
@@ -1108,7 +1108,7 @@ def _get_labware_footprint_as_child(
 def _total_nominal_gripper_offsets(
     stackup_lw_info_top_to_bottom: list[tuple[LabwareDefinition, LabwareLocation]],
     slot_name: DeckSlotName,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
     underlying_ancestor_definition: LabwareStackupAncestorDefinition,
 ) -> _GripperOffsets:
     """Get the total of the offsets to be used to pick up and drop labware."""
@@ -1175,7 +1175,7 @@ def _nominal_gripper_offsets_for_location(
     labware_location: LabwareLocation,
     labware_definition: LabwareDefinition,
     slot_name: DeckSlotName,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
     underlying_ancestor_definition: LabwareStackupAncestorDefinition,
 ) -> LabwareMovementOffsetData:
     """Provide the default gripper offset data for the given location type."""
@@ -1194,7 +1194,7 @@ def _nominal_gripper_offsets_for_location(
 
 
 def _get_deck_default_gripper_offsets(
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
 ) -> Optional[LabwareMovementOffsetData]:
     """Get the deck's default gripper offsets."""
     parsed_offsets = deck_definition.get("gripperOffsets", {}).get("default")

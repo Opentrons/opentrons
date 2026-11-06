@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, List, Optional, Sequence, Set, Tuple, Union, cast
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
+from opentrons_shared_data.deck.types import DeckDefinitionV6, SlotDefV3
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.robot.types import RobotType
@@ -572,7 +572,7 @@ class LegacyProtocolCore(
     ) -> Optional[LegacyLabwareCore]:
         assert False, "get_labware_on_labware only supported on engine core"
 
-    def get_deck_definition(self) -> DeckDefinitionV5:
+    def get_deck_definition(self) -> DeckDefinitionV6:
         """Get the geometry definition of the robot's deck."""
         assert False, "get_deck_definition only supported on engine core"
 

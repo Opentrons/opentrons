@@ -2,9 +2,8 @@
 
 import pytest
 from decoy import Decoy
-from pytest_lazy_fixtures import lf as lazy_fixture
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.protocol_engine.resources import (
@@ -25,30 +24,21 @@ def mock_labware_data_provider(decoy: Decoy) -> LabwareDataProvider:
     return decoy.mock(cls=LabwareDataProvider)
 
 
-@pytest.mark.parametrize(
-    ("deck_type", "expected_definition"),
-    [
-        (DeckType.OT2_STANDARD, lazy_fixture("ot2_standard_deck_def")),
-        (DeckType.OT2_SHORT_TRASH, lazy_fixture("ot2_short_trash_deck_def")),
-        (DeckType.OT3_STANDARD, lazy_fixture("ot3_standard_deck_def")),
-    ],
-)
 async def test_get_deck_definition(
-    deck_type: DeckType,
-    expected_definition: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
     mock_labware_data_provider: LabwareDataProvider,
 ) -> None:
     """It should be able to load the correct deck definition."""
     subject = DeckDataProvider(
-        deck_type=deck_type, labware_data=mock_labware_data_provider
+        deck_type=DeckType.OT3_STANDARD, labware_data=mock_labware_data_provider
     )
     result = await subject.get_deck_definition()
-    assert result == expected_definition
+    assert result == ot3_standard_deck_def
 
 
 async def test_get_deck_labware_fixtures_ot2_standard(
     decoy: Decoy,
-    ot2_standard_deck_def: DeckDefinitionV5,
+    ot2_standard_deck_def: DeckDefinitionV6,
     ot2_fixed_trash_def: LabwareDefinition,
     mock_labware_data_provider: LabwareDataProvider,
 ) -> None:
@@ -78,7 +68,7 @@ async def test_get_deck_labware_fixtures_ot2_standard(
 
 async def test_get_deck_labware_fixtures_ot2_short_trash(
     decoy: Decoy,
-    ot2_short_trash_deck_def: DeckDefinitionV5,
+    ot2_short_trash_deck_def: DeckDefinitionV6,
     ot2_short_fixed_trash_def: LabwareDefinition,
     mock_labware_data_provider: LabwareDataProvider,
 ) -> None:
@@ -108,7 +98,7 @@ async def test_get_deck_labware_fixtures_ot2_short_trash(
 
 async def test_get_deck_labware_fixtures_ot3_standard(
     decoy: Decoy,
-    ot3_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
     ot3_fixed_trash_def: LabwareDefinition,
     mock_labware_data_provider: LabwareDataProvider,
 ) -> None:

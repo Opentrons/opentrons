@@ -18,7 +18,7 @@ from typing import (
 
 from typing_extensions import assert_never
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
 from opentrons_shared_data.labware.labware_definition import (
     InnerWellGeometry,
@@ -121,7 +121,7 @@ class LabwareState:
     labware_offsets_by_id: Dict[str, LabwareOffset]
 
     definitions_by_uri: Dict[str, LabwareDefinition]
-    deck_definition: DeckDefinitionV5
+    deck_definition: DeckDefinitionV6
 
 
 class LabwareStore(HasState[LabwareState], HandlesActions):
@@ -131,7 +131,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
     def __init__(
         self,
-        deck_definition: DeckDefinitionV5,
+        deck_definition: DeckDefinitionV6,
         deck_fixed_labware: Sequence[DeckFixedLabware],
     ) -> None:
         """Initialize a labware store and its state."""
@@ -564,7 +564,7 @@ class LabwareView:
             or self.get_definition(labware_id).metadata.displayName
         )
 
-    def get_deck_definition(self) -> DeckDefinitionV5:
+    def get_deck_definition(self) -> DeckDefinitionV6:
         """Get the current deck definition."""
         return self._state.deck_definition
 

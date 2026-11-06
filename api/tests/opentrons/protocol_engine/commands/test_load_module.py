@@ -7,7 +7,7 @@ from decoy import Decoy
 
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.types import (
-    DeckDefinitionV5,
+    DeckDefinitionV6,
     SlotDefV3,
 )
 from opentrons_shared_data.robot.types import RobotType
@@ -94,7 +94,7 @@ async def test_load_module_implementation(
     decoy: Decoy,
     equipment: EquipmentHandler,
     state_view: StateView,
-    ot3_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
     module_model: ModuleModel,
     module_def_fixture_name: str,
     load_slot_name: DeckSlotName,
@@ -222,7 +222,7 @@ async def test_load_module_raises_if_location_occupied(
         )
     ).then_return(addressable_area_provided_by_module)
 
-    deck_def = load_deck(STANDARD_OT3_DECK, 5)
+    deck_def = load_deck(STANDARD_OT3_DECK, 6)
 
     decoy.when(state_view.labware.get_deck_definition()).then_return(deck_def)
     decoy.when(
@@ -294,7 +294,7 @@ async def test_load_module_raises_wrong_location(
     state_view: StateView,
     requested_model: HardwareModuleModel,
     engine_model: EngineModuleModel,
-    deck_def: DeckDefinitionV5,
+    deck_def: DeckDefinitionV6,
     slot_name: DeckSlotName,
     robot_type: RobotType,
 ) -> None:
@@ -350,7 +350,7 @@ async def test_load_module_raises_module_fixture_id_does_not_exist(
     state_view: StateView,
     requested_model: HardwareModuleModel,
     engine_model: EngineModuleModel,
-    deck_def: DeckDefinitionV5,
+    deck_def: DeckDefinitionV6,
     slot_name: DeckSlotName,
     robot_type: RobotType,
 ) -> None:

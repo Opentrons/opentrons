@@ -7,7 +7,7 @@ from robot_server.deck_configuration import validation as subject
 
 def test_valid() -> None:
     """It should return an empty error list if the input is valid."""
-    deck_definition = load_deck_definition("ot3_standard", version=5)
+    deck_definition = load_deck_definition("ot3_standard", version=6)
     cutout_fixtures = [
         subject.Placement(
             cutout_fixture_id=cutout_fixture_id,
@@ -34,7 +34,7 @@ def test_valid() -> None:
 
 def test_invalid_empty_cutouts() -> None:
     """It should enforce that every cutout is occupied."""
-    deck_definition = load_deck_definition("ot3_standard", version=5)
+    deck_definition = load_deck_definition("ot3_standard", version=6)
     cutout_fixtures = [
         subject.Placement(
             cutout_fixture_id=cutout_fixture_id,
@@ -65,7 +65,7 @@ def test_invalid_empty_cutouts() -> None:
 
 def test_invalid_overcrowded_cutouts() -> None:
     """It should prevent you from putting multiple things into a single cutout."""
-    deck_definition = load_deck_definition("ot3_standard", version=5)
+    deck_definition = load_deck_definition("ot3_standard", version=6)
     cutout_fixtures = [
         subject.Placement(
             cutout_fixture_id=cutout_fixture_id,
@@ -105,7 +105,7 @@ def test_invalid_overcrowded_cutouts() -> None:
 
 def test_invalid_cutout_for_fixture() -> None:
     """Each fixture must be placed in a location that's valid for that particular fixture."""
-    deck_definition = load_deck_definition("ot3_standard", version=5)
+    deck_definition = load_deck_definition("ot3_standard", version=6)
     cutout_fixtures = [
         subject.Placement(
             cutout_fixture_id=cutout_fixture_id,
@@ -147,7 +147,7 @@ def test_invalid_cutout_for_fixture() -> None:
 
 def test_unrecognized_cutout() -> None:
     """It should raise a sensible error if you pass a totally nonexistent cutout."""
-    deck_definition = load_deck_definition("ot3_standard", version=5)
+    deck_definition = load_deck_definition("ot3_standard", version=6)
     cutout_fixtures = [
         subject.Placement(
             cutout_fixture_id=cutout_fixture_id,
@@ -184,7 +184,7 @@ def test_unrecognized_cutout() -> None:
 
 def test_unrecognized_cutout_fixture() -> None:
     """It should raise a sensible error if you pass a totally nonexistent cutout fixture."""
-    deck_definition = load_deck_definition("ot3_standard", version=5)
+    deck_definition = load_deck_definition("ot3_standard", version=6)
     cutout_fixtures = [
         subject.Placement(
             cutout_fixture_id=cutout_fixture_id,
@@ -241,7 +241,7 @@ def test_unrecognized_cutout_fixture() -> None:
 
 def test_invalid_serial_number() -> None:
     """It should raise a sensible error if you fail to provide a serial number for a fixture that requires one."""
-    deck_definition = load_deck_definition("ot3_standard", version=5)
+    deck_definition = load_deck_definition("ot3_standard", version=6)
     cutout_fixtures = [
         subject.Placement(
             cutout_fixture_id=cutout_fixture_id,
@@ -274,7 +274,7 @@ def test_invalid_serial_number() -> None:
 
 def test_unexpected_serial_number() -> None:
     """It should raise a sensible error if you provide a serial number for a fixture that DOES NOT require one."""
-    deck_definition = load_deck_definition("ot3_standard", version=5)
+    deck_definition = load_deck_definition("ot3_standard", version=6)
     cutout_fixtures = [
         subject.Placement(
             cutout_fixture_id=cutout_fixture_id,
@@ -309,7 +309,7 @@ def test_unexpected_serial_number() -> None:
 # new test to raise error if not all members of a fixture group are loaded into the deck config
 def test_missing_group_fixture() -> None:
     """It should raise a sensible error if you fail to provide all members of a fixture group in a deck configuration."""
-    deck_definition = load_deck_definition("ot3_standard", version=5)
+    deck_definition = load_deck_definition("ot3_standard", version=6)
     cutout_fixtures = [
         subject.Placement(
             cutout_fixture_id=cutout_fixture_id,

@@ -4,7 +4,7 @@ The trifecta is tested here as a single unit, treating AddressableAreaState as a
 implementation detail.
 """
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 
 from opentrons.protocol_engine.actions.actions import (
     AddAddressableAreaAction,
@@ -20,7 +20,7 @@ from opentrons.types import DeckSlotName
 
 
 def test_deck_configuration_setting(
-    ot3_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> None:
     """You should be able to set the deck configuration with a SetDeckConfigurationAction."""
     subject = AddressableAreaStore(
@@ -81,7 +81,7 @@ def test_deck_configuration_setting(
 
 
 def _ot3_store(
-    ot3_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
     deck_configuration: DeckConfigurationType,
     use_simulated_deck_config: bool,
 ) -> AddressableAreaStore:
@@ -115,7 +115,7 @@ def _ot3_store(
 
 
 def _ot3_view(
-    ot3_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
     deck_configuration: DeckConfigurationType,
     use_simulated_deck_config: bool,
 ) -> AddressableAreaView:
@@ -129,7 +129,7 @@ def _ot3_view(
 
 
 def test_potential_base_slot_for_loaded_staging_area(
-    ot3_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> None:
     """A loaded staging area resolves to the cutout that provides it."""
     subject_view = _ot3_view(
@@ -144,7 +144,7 @@ def test_potential_base_slot_for_loaded_staging_area(
 
 
 def test_potential_base_slot_when_module_replaces_staging_area(
-    ot3_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> None:
     """The plain staging name still resolves after a module fixture replaces it."""
     subject_view = _ot3_view(
@@ -162,7 +162,7 @@ def test_potential_base_slot_when_module_replaces_staging_area(
 
 
 def test_potential_base_slot_when_simulated_deck_rejects_plain_slot(
-    ot3_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> None:
     """Analysis rejects plain A4 once the vacuum dock areas are loaded."""
     subject = _ot3_store(
@@ -180,7 +180,7 @@ def test_potential_base_slot_when_simulated_deck_rejects_plain_slot(
 
 
 def test_potential_base_slot_missing_area_returns_none(
-    ot3_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> None:
     """An unknown area name has no cutout."""
     subject_view = _ot3_view(
