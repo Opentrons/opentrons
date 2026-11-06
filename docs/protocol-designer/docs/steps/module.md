@@ -157,33 +157,33 @@ Adding a Vacuum Module step to your protocol lets you:
 
 - **Control vacuum operation:** Set the _state_ of the module through features that control a an individual step in a vacuum protocol, or create a _profile_ that lets you specify multiple operations within a single step.
 
-Click **Edit protocol** to add or edit a vacuum step and and module components.
+To set up your Vacuum Module and add vacuum steps to a protocol, click **Edit protocol** from the module overview screen and:
+
+* **Add hardware:** Click on the module's deck icon (slot A3 or A4). From the popup menu, select **Edit labware** to choose the filter plates, well plates, spacers, and collars that you want to use on the module.
+
+* **Add steps:** Click **Add step** to open the step menu. From the popup menu, select **Vacuum** to change the module's state or profile and save those settings in a vacuum step.
 
 ### Vacuum state
 
-*State* refers to the condition or configuration of the Vacuum Module in single step. A state step cannot perform multiple operations within a single step. Available state settings let you control the pump by:
+A *state* step sets an single configuration on the Vacuum Module rather than running a multi-step sequence.
 
-* Turning the vacuum pump on or off.
-* Opening or closing the vent.
-* Setting vacuum by gauge pressure (mbar) or by running the pump continuously at a percentage of its total power.
-* Adding an optional vacuum duration (in mm:ss).
+In the step menu, click **Change Vacuum state** to configure module actions:
+
+* **Turn on the pump:** Run the pump using closed-loop gauge pressure (between 0 and -800 mbar) or open-loop pump power (between 1% and 100%).
+* **Open the vent:** Open the release valve to vent the chamber and return the system to atmospheric pressure (0 mbar).
+* **Set a duration:** _(Optional)_ Specify how long to run the pump (in mm:ss). When unselected, the pump runs continuously until a subsequent vacuum step changes the module's state.
 
 If you need to run the pump sequentially with different vacuum or power settings, you can create multiple state steps. However, it may be more efficient to create a vacuum profile or cycle, which run multiple operations sequentially once or in a loop, both within a single step.
 
 ### Vacuum profiles
 
-A vacuum profile is a multi-step sequence of module pump actions that run in order within a single protocol step. A vacuum profile is useful when used with a step that requires sequential changes, like incrementally increasing vacuum pressure in a series or alternating between holding vacuum and venting.
+A vacuum profile is a multi-step sequence of module operations that run in order within a single protocol step. A vacuum profile is useful when used with a step that requires sequential changes, like incrementally increasing vacuum pressure, alternating between holding vacuum and venting, and running the pump at different rates.
 
-Unlike a standalone vacuum staat step, which performs a single acton, a profile lets you run individual sub-steps within a single vacuum step. Each profile executes its steps only once, in sequence.
+When building a profile, choose one mode type only for the entire sequence of sub-steps:
 
-When designing a profile, choose one mode type for the entire set of sub-steps:
+* **Pressure mode:** This is a closed loop operation where you set target gauge pressures between 0 and -800 mbar. The module continuously monitors internal sensors to reach and maintain the desired vacuum pressure.
 
-* **Pressure mode:** Closed loop lorem ipsum foo add text here
-
-* **Power mode:** Open loop lorem ipsum foo add text here. Echo or tie in back to these modes from the API
-
-!!! note
-    Profile types cannot use combined modes in the same profile. A vacuum profile must use either pressure mode or power mode.
+* **Power mode:** This is an open loop operation where you set the pump motor to run at a fixed percentage of its rated power.
 
 <figure class="screenshot side-by-side" markdown>
 ![Pressure profile in a Vacuum Module step](../images/vacuum-pressure-profile.png)
@@ -191,9 +191,12 @@ When designing a profile, choose one mode type for the entire set of sub-steps:
 <figcaption>Pressure and power profiles showing multiple sub-steps.</figcaption>
 </figure>
 
+!!! tip
+    See [Controlling vacuum operations](../../python-api/modules/vacuum.md#controlling-vacuum-operations) for more information about open and closed loop pressure controls.
+
 ### Vacuum cycles
 
-Cycles are loops of pressure or power substeps. Unlike each operation in a vacuum profile, which runs once, cycles are like `for` loops that repeat a specified number of times.
+Cycles are repeating loops of pressure or power operations nested within a vacuum step. While a standard vacuum profile step runs only once, a vacuum cycle repeats its sequence of operations for a set number of times before the robot moves on to the next protocol step.
 
 <figure class="screenshot" markdown>
 ![Vacuum operation cycle in a Vacuum Module step](../images/vacuum-profile-cycle.png){ width="80%" }
@@ -201,13 +204,60 @@ Cycles are loops of pressure or power substeps. Unlike each operation in a vacuu
 </figure>
 
 !!! tip
-    You can combine steps and cycles into a single vacuum profile, but the types (pressure or power) must be the same. Mixed pressure and power cycles and steps are not supported.
+    You can combine profiles and cycles into a single vacuum profile, but the types (pressure or power) must be the same. Mixed pressure and power cycles and steps are not supported.
 
 ### Last module state
 
-The "Last module state" is a read-only status indicator. It updates when a previous vacuum step changes the state of the module. For example, in the first vacuum step of a protocol, the module's state is **pump: off** and **vent: open**. If the step ends with the pump on and the vent closed, the next vacuum step will show the state as **pump: on** and **vent: closed**.
+When working with pressure controls, the step menu includes a "Last module state" section. This is a read-only status indicator. It updates when a previous vacuum step changes the state of the module. For example, in the first vacuum step of a protocol, the module's state is **pump: off** and **vent: open**. If the step ends with the pump on and the vent closed, the next vacuum step will show the state as **pump: on** and **vent: closed**.
 
 <figure class="screenshot" markdown>
 ![Last module state status indicator](../images/last-vacuum-state.png){ width="60%" }
 <figcaption>Shows module status from the previous vacuum step.</figcaption>
 </figure>
+
+## Unused test section
+
+Testing with images from the step menu. Too complicated, I think.
+
+<font color="red"><strong>REMOVE UNUSED IMAGES REMINDER</strong></font>
+
+### Vacuum state image test 3
+
+A *state* step sets a single pressure or power condition on the Vacuum Module rather than running a multi-step sequence.
+
+Under **Select the state to change**, choose a primary action: change stat or program a profile. Here we only want to change state.
+
+<figure class="screenshot" markdown>
+![Options to change state or program a profile](../images/vacuum-change-state.png){ width="60%" }
+</figure>
+
+Next, you can turn on the vacuum pump or open the vent (and save the step). Selecting the pump option opens the settings that let you specify vacuum pressure, duration, and vent open/closed slider (not shown).
+
+<figure class="screenshot side-by-side" markdown>
+![blah blah test](../images/vacuum-state-pump.png)
+![test](../images/vacuum-state-pressure.png)
+</figure>
+
+### Vacuum state image test 2
+
+<div style="display: flex; gap: 2rem; align-items: flex-start;" markdown>
+<div style="flex: 1;" markdown>
+
+A *state* step sets a single pressure or power condition on the Vacuum Module rather than running a multi-step sequence.
+
+In the step menu, configure:
+
+* **Module action:** Choose whether to turn the pump on or open the vent valve.
+* **Control mode:** Select closed-loop **Gauge pressure** (0 to -800 mbar) or open-loop **Pump power** (1–100%).
+* **Duration:** Run continuously until the next command or set an optional hold time (`mm:ss`).
+
+</div>
+<div style="flex: 0 0 320px;" markdown>
+
+<figure class="screenshot" markdown>
+  ![Vacuum state step menu](../images/vacuum-state-profile.png)
+  <figcaption>Vacuum step menu configured for a state change.</figcaption>
+</figure>
+
+</div>
+</div>
