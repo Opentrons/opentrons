@@ -2,10 +2,8 @@ import { useSelector } from 'react-redux'
 
 import { Module } from '@opentrons/components'
 import {
-  FLEX_STACKER_MODULE_TYPE,
   getAllDefinitions,
   getModuleDef,
-  getModuleType,
   inferModuleOrientationFromXCoordinate,
   VACUUM_MODULE_V1,
 } from '@opentrons/shared-data'
@@ -133,11 +131,6 @@ export const SelectedItems = (props: SelectedItemsProps): ReactNode => {
       orientation != null ? (
         <>
           {/*
-          todo(mm, 2025-07-10): This <Module> and <ModuleLabel> positioning is not
-          quite right, most obviously for the Thermocycler on a Flex. We aren't
-          passing a targetSlotId and targetDeckId down to <Module>, which means
-          it isn't applying slot-specific adjustments.
-
           note: we need to special-case labware on the hopper since it is the 2nd slot
           available for labware on the stacker. so we don't want to re-render the stacker
           in the hopper slot
@@ -149,20 +142,17 @@ export const SelectedItems = (props: SelectedItemsProps): ReactNode => {
               y={slotPosition[1]}
               def={getModuleDef(transformedModuleModel)}
               orientation={orientation}
-              targetDeckId={null}
-              targetSlotId={null}
-              childrenPositioningMode={
-                getModuleType(transformedModuleModel) ===
-                FLEX_STACKER_MODULE_TYPE
-                  ? 'passThrough'
-                  : 'offsetToSlot'
-              }
+              targetDeckId={deckDef.otId}
+              targetSlotId={selectedSlot.slot}
+              childrenPositioningMode="passThrough"
             >
               <SelectedModuleLabwareRender
                 topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}
                 adapterDef={selectedAdapterDef}
                 moduleModel={transformedModuleModel}
                 lidOnDeck={matchingSelectedLidOnDeck}
+                deckDef={deckDef}
+                slotId={selectedSlot.slot}
               />
             </Module>
           )}

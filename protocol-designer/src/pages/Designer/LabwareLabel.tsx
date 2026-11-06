@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 
-import { DeckLabelSet } from '@opentrons/components'
+import { CenterLabwareInSlot, DeckLabelSet } from '@opentrons/components'
+import { getLabwareViewBox } from '@opentrons/shared-data'
 
 import {
   VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_X,
@@ -36,6 +37,8 @@ interface LabwareLabelProps {
   showModuleIcon: boolean
   nestedLabwareInfo?: DeckLabelProps[]
   labelText?: string
+  /** Match LabwareOnDeck: default true; false for off-deck zoom (no slot). */
+  centerInSlot?: boolean
 }
 export const LabwareLabel = (props: LabwareLabelProps): ReactNode => {
   const {
@@ -46,6 +49,7 @@ export const LabwareLabel = (props: LabwareLabelProps): ReactNode => {
     showModuleIcon,
     nestedLabwareInfo = [],
     labelText = labwareDef.metadata.displayName,
+    centerInSlot = true,
   } = props
   const labelContainerRef = useRef<HTMLDivElement>(null)
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
@@ -53,6 +57,7 @@ export const LabwareLabel = (props: LabwareLabelProps): ReactNode => {
   const terminalItemId = useSelector(getSelectedTerminalItemId)
   const [labelContainerHeight, setLabelContainerHeight] = useState(0)
   const greaterThan1 = selectedTopLabware.amount > 1
+  const isZoomed = terminalItemId === START_TERMINAL_ITEM_ID
   const deckLabels = [
     {
       text: greaterThan1
@@ -60,16 +65,32 @@ export const LabwareLabel = (props: LabwareLabelProps): ReactNode => {
         : labelText,
       isSelected,
       isLast,
-      isZoomed: terminalItemId === START_TERMINAL_ITEM_ID,
+      isZoomed,
     },
     ...nestedLabwareInfo,
   ]
 
-  useEffect(() => {
-    if (labelContainerRef.current) {
-      setLabelContainerHeight(labelContainerRef.current.offsetHeight)
+  useLayoutEffect(() => {
+    const currentRef = labelContainerRef.current
+    if (currentRef == null) {
+      return
     }
-  }, [nestedLabwareInfo])
+    const updateHeight = (): void => {
+      // In RobotCoordsForeignDiv, 1 CSS px ≈ 1 SVG user unit, so the
+      // stack's offsetHeight is the y-shift needed to keep the outline on the
+      // labware and the label in sync.
+      const measuredHeight = currentRef.offsetHeight
+      if (measuredHeight > 0) {
+        setLabelContainerHeight(measuredHeight)
+      }
+    }
+    updateHeight()
+    const resizeObserver = new ResizeObserver(updateHeight)
+    resizeObserver.observe(currentRef)
+    return () => {
+      resizeObserver.disconnect()
+    }
+  }, [deckLabels.length, labelText, isZoomed, greaterThan1])
 
   const showDeckRiserAdjustments =
     labwareDef.parameters.loadName === 'opentrons_flex_deck_riser' &&
@@ -82,28 +103,46 @@ export const LabwareLabel = (props: LabwareLabelProps): ReactNode => {
         VACUUM_COLLAR_OFFSET_MM_FROM_CORNER_Y,
       ]
     : [0, 0]
-  return (
+  const { xDimension, yDimension } = getLabwareViewBox(labwareDef)
+  const width = xDimension
+  const height =
+    yDimension -
+    (showDeckRiserAdjustments ? DECK_RISER_ADJUSTED_Z_DIMENSION : 0)
+  const xAdjust =
+    -(showDeckRiserAdjustments ? DECK_RISER_ADJUSTED_X : 0) +
+    vacuumCollarAdjustmentX
+  const yAdjust = -labelContainerHeight + vacuumCollarAdjustmentY
+
+  // When centered, CenterLabwareInSlot owns the slot→labware origin shift;
+  // DeckLabelSet coords are relative to that labware origin.
+  const labelX = centerInSlot
+    ? xAdjust
+    : position[0] + labwareDef.cornerOffsetFromSlot.x + xAdjust
+  const labelY = centerInSlot
+    ? yAdjust
+    : position[1] + labwareDef.cornerOffsetFromSlot.y + yAdjust
+
+  const deckLabelSet = (
     <DeckLabelSet
       ref={labelContainerRef}
       deckLabels={deckLabels}
-      x={
-        position[0] +
-        labwareDef.cornerOffsetFromSlot.x -
-        (showDeckRiserAdjustments ? DECK_RISER_ADJUSTED_X : 0) +
-        vacuumCollarAdjustmentX
-      }
-      y={
-        position[1] +
-        labwareDef.cornerOffsetFromSlot.y -
-        labelContainerHeight +
-        vacuumCollarAdjustmentY
-      }
-      width={labwareDef.dimensions.xDimension}
-      height={
-        labwareDef.dimensions.yDimension -
-        (showDeckRiserAdjustments ? DECK_RISER_ADJUSTED_Z_DIMENSION : 0)
-      }
+      x={labelX}
+      y={labelY}
+      width={width}
+      height={height}
       showModuleIcon={showModuleIcon}
     />
+  )
+
+  if (!centerInSlot) {
+    return deckLabelSet
+  }
+
+  return (
+    <g transform={`translate(${position[0]}, ${position[1]})`}>
+      <CenterLabwareInSlot definition={labwareDef}>
+        {deckLabelSet}
+      </CenterLabwareInSlot>
+    </g>
   )
 }
