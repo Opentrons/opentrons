@@ -1,6 +1,10 @@
 import { useEffect, useId, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { COLORS, InputField, StyledText } from '@opentrons/components'
+
+// eslint-disable-next-line opentrons/no-imports-across-applications
+import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 
 import styles from './inputsetting.module.css'
 
@@ -11,10 +15,9 @@ export interface InputSettingProps {
   value: string
   units?: string
   placeholder?: string
-  min?: number
-  max?: number
-  validate?: (value: string) => string | null
-  onBlur: (value: string) => void | Promise<void>
+  min: number
+  max: number
+  onBlur: (value: number) => void | Promise<void>
 }
 
 export function InputSetting({
@@ -25,12 +28,40 @@ export function InputSetting({
   placeholder,
   min,
   max,
-  validate,
 }: InputSettingProps): JSX.Element {
   const inputId = useId()
   const savedValueRef = useRef(value)
   const [inputValue, setInputValue] = useState(value)
   const [error, setError] = useState<string | null>(null)
+  const { t } = useTranslation('device_settings')
+
+  const validate = (
+    value: string
+  ):
+    | { result: 'success'; data: number }
+    | { result: 'error'; error: string }
+    | { result: 'empty' } => {
+    const result = parseNumericalInput(value, {
+      allowNegative: false,
+      allowDecimal: false,
+      min,
+      max,
+    })
+    switch (result.result) {
+      case 'success':
+        return { result: 'success', data: result.data }
+      case 'rangeError':
+        return {
+          result: 'error',
+          error:
+            result.type === 'min'
+              ? t('desktop_minimum_settings_error', { min, units })
+              : t('desktop_maximum_settings_error', { max, units }),
+        }
+      default:
+        return { result: 'error', error: t('desktop_syntax_settings_error') }
+    }
+  }
 
   savedValueRef.current = value
 
@@ -66,20 +97,25 @@ export function InputSetting({
           }
           onChange={event => {
             setInputValue(event.target.value)
-            if (error != null) {
-              setError(null)
-            }
+            setError(null)
           }}
           onBlur={event => {
             const blurredValue = event.target.value
-            const validationError = validate?.(blurredValue) ?? null
-            setError(validationError)
-            if (validationError == null) {
-              void Promise.resolve(onBlur(blurredValue)).catch(() => {
-                setInputValue(savedValueRef.current)
-              })
+            const validation = validate(blurredValue)
+            switch (validation.result) {
+              case 'success':
+                setInputValue(String(validation.data))
+                void Promise.resolve(onBlur(validation.data)).catch(() => {
+                  setInputValue(savedValueRef.current)
+                })
+                break
+              case 'error':
+                setError(validation.error)
             }
           }}
+          width="4.9375rem"
+          inputWidth="default"
+          alignItems="flex-end"
         />
       </div>
     </div>

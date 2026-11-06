@@ -1,5 +1,3 @@
-import { isValidPasswordComplexityMinimumLength } from '/app/resources/auth/helpers'
-
 import {
   AUDIT_SERVER_SETTING_FIELD_IDS,
   AUTH_SERVER_SETTING_FIELD_IDS,
@@ -20,55 +18,29 @@ import type {
   RobotServerSettingFieldId,
 } from './complianceReadySettingsTypes'
 
-const SECONDS_PER_MINUTE = 60
-const SECONDS_PER_DAY = 24 * 60 * 60
+export const SECONDS_PER_MINUTE = 60
+export const SECONDS_PER_DAY = 24 * 60 * 60
 export const MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH = 256
 export const MAX_NUMBER_OF_LOGIN_ATTEMPTS = 5
 export const MIN_PASSWORD_RESET_TIME_DAYS = 1
-
-export function isValidLogoutIdleTime(value: string): boolean {
-  const parsedValue = Number(value)
-  return Number.isFinite(parsedValue) && parsedValue > 0
-}
-
-export function isValidMaxNumberOfLoginAttempts(value: string): boolean {
-  if (value === '') {
-    return true
-  }
-  const parsedValue = Number(value)
-  return (
-    Number.isInteger(parsedValue) &&
-    parsedValue > 0 &&
-    parsedValue <= MAX_NUMBER_OF_LOGIN_ATTEMPTS
-  )
-}
-
-export function isValidPasswordResetTime(value: string): boolean {
-  const parsedValue = Number(value)
-  return (
-    Number.isFinite(parsedValue) && parsedValue >= MIN_PASSWORD_RESET_TIME_DAYS
-  )
-}
+export const MAX_C_INT = 2147483647
 
 function getAuthSettingFieldValue(
   key: AuthSettingFieldId,
   authSettings: AuthSettingsData
-): string | boolean {
+): number | boolean | null {
   switch (key) {
     case 'idleLogout':
       return authSettings.idleLogout != null
-        ? String(authSettings.idleLogout / SECONDS_PER_MINUTE)
-        : ''
+        ? Math.round(authSettings.idleLogout / SECONDS_PER_MINUTE)
+        : null
     case 'passwordResetTime':
       return authSettings.passwordResetTime != null
-        ? String(Math.round(authSettings.passwordResetTime / SECONDS_PER_DAY))
-        : ''
+        ? Math.round(authSettings.passwordResetTime / SECONDS_PER_DAY)
+        : null
     default: {
       const value = authSettings[key]
-      if (typeof value === 'boolean') {
-        return value
-      }
-      return value != null ? String(value) : ''
+      return value ?? null
     }
   }
 }
@@ -76,14 +48,11 @@ function getAuthSettingFieldValue(
 function getAuditSettingFieldValue(
   key: AuditServerSettingFieldId,
   auditSettings: AuditSettingsData
-): string | boolean {
+): number | boolean | null {
   switch (key) {
     default: {
       const value = auditSettings[key]
-      if (typeof value === 'boolean') {
-        return value
-      }
-      return value != null ? String(value) : ''
+      return value ?? null
     }
   }
 }
@@ -141,35 +110,21 @@ export function getFieldValuesFromSettings(
 }
 
 /** Auth-server patch for an input value, if it should be persisted. */
-export function getAuthInputPatch(
+export function getInputPatch(
   id: AuthSettingFieldId,
-  value: string,
-  fieldValues: FieldValues
+  value: number
 ): PatchAuthSettingsRequest | null {
   switch (id) {
     case 'maxNumberOfLoginAttempts':
-      if (!isValidMaxNumberOfLoginAttempts(value)) {
-        return null
-      }
       return {
-        data: { maxNumberOfLoginAttempts: value === '' ? null : Number(value) },
+        data: { maxNumberOfLoginAttempts: value },
       }
     case 'idleLogout':
-      if (!isValidLogoutIdleTime(value)) {
-        return null
-      }
-      return { data: { idleLogout: Number(value) * SECONDS_PER_MINUTE } }
+      return { data: { idleLogout: value * SECONDS_PER_MINUTE } }
     case 'passwordResetTime':
-      if (!isValidPasswordResetTime(value)) {
-        return null
-      }
-      return { data: { passwordResetTime: Number(value) * SECONDS_PER_DAY } }
+      return { data: { passwordResetTime: value * SECONDS_PER_DAY } }
     case 'passwordComplexityMinimumLength':
-      if (!isValidPasswordComplexityMinimumLength(value)) {
-        return null
-      }
-      return { data: { passwordComplexityMinimumLength: Number(value) } }
-
+      return { data: { passwordComplexityMinimumLength: value } }
     default:
       return null
   }
@@ -177,15 +132,11 @@ export function getAuthInputPatch(
 
 export function getAuditInputPatch(
   id: AuditServerSettingFieldId,
-  value: string,
-  fieldValues: FieldValues
+  value: number
 ): PatchAuditSettingsRequest | null {
   switch (id) {
     case 'minLengthOfReasonForInteraction':
-      if (!fieldValues.requireReasonForInteraction || value === '') {
-        return null
-      }
-      return { data: { minLengthOfReasonForInteraction: Number(value) } }
+      return { data: { minLengthOfReasonForInteraction: value } }
     default:
       return null
   }
