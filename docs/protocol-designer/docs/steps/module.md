@@ -168,13 +168,13 @@ Click **Edit protocol** to add or edit a vacuum step and and module components.
 * Setting vacuum by gauge pressure (mbar) or by running the pump continuously at a percentage of its total power.
 * Adding an optional vacuum duration (in mm:ss).
 
-If you need to run the pump sequentially with different vacuum or power settings, you can create multiple state steps. However, it may be more efficient to create a vacuum profile or cycle, which run multiple operations sequentially once or in a loop within a single step.
+If you need to run the pump sequentially with different vacuum or power settings, you can create multiple state steps. However, it may be more efficient to create a vacuum profile or cycle, which run multiple operations sequentially once or in a loop, both within a single step.
 
 ### Vacuum profiles
 
 A vacuum profile is a multi-step sequence of module pump actions that run in order within a single protocol step. A vacuum profile is useful when used with a step that requires sequential changes, like incrementally increasing vacuum pressure in a series or alternating between holding vacuum and venting.
 
-Unlike a standalone vacuum staat step, which performs a single acton, a profile lets you run individual sub-steps within a single vacuum step. Each profile sub-step executes only once, in sequence.
+Unlike a standalone vacuum staat step, which performs a single acton, a profile lets you run individual sub-steps within a single vacuum step. Each profile executes its steps only once, in sequence.
 
 When designing a profile, choose one mode type for the entire set of sub-steps:
 
@@ -205,9 +205,9 @@ Cycles are loops of pressure or power substeps. Unlike each operation in a vacuu
 
 ### Last module state
 
-The "Last module state" is a read-only status indicator. It changes when a previous vacuum step changes the state of the module. For example, in the first vacuum step of a protocol, the module's state is **pump: off** and **vent: open**. If the step ends with the pump on and the vent closed, the next sequential vacuum step will show the state as **pump: on** and **vent: closed**.
+The "Last module state" is a read-only status indicator. It updates when a previous vacuum step changes the state of the module. For example, in the first vacuum step of a protocol, the module's state is **pump: off** and **vent: open**. If the step ends with the pump on and the vent closed, the next vacuum step will show the state as **pump: on** and **vent: closed**.
 
 <figure class="screenshot" markdown>
 ![Last module state status indicator](../images/last-vacuum-state.png){ width="60%" }
-<figcaption>Shows module status from a previous step.</figcaption>
+<figcaption>Shows module status from the previous vacuum step.</figcaption>
 </figure>
