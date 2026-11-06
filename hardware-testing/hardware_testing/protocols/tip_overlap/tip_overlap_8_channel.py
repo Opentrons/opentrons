@@ -273,7 +273,10 @@ def run(ctx: ProtocolContext) -> None:
         for val in results.values():
             trial_deltas.extend(val)
 
-        tip_overlap = ctx.params.default_overlap - sum(nozzle_results[:active_nozzles]) / active_nozzles + sum(trial_deltas) / (active_nozzles * len(results))
+        tip_overlap = (
+            ctx.params.default_overlap
+            - sum(nozzle_results[:active_nozzles]) / active_nozzles
+            + sum(trial_deltas) / (active_nozzles * len(results))
+        )
         ctx.comment(f"Tip Overlap: {tip_overlap}")
         csv_output.write_row(["tip_overlap"] + [str(tip_overlap)])
-
