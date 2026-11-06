@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -11,11 +10,9 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
-  RESPONSIVENESS,
   SIZE_1,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { RIGHT, WEIGHT_OF_96_CHANNEL } from '@opentrons/shared-data'
@@ -41,25 +38,6 @@ interface DetachPipetteProps extends PipetteWizardStepProps {
   setFetching: Dispatch<SetStateAction<boolean>>
 }
 const BACKGROUND_SIZE = '47rem'
-
-const GO_BACK_BUTTON_TEXT_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.grey50};
-
-  &:hover {
-    opacity: 70%;
-  }
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-    font-size: ${TYPOGRAPHY.fontSize22};
-    line-height: ${TYPOGRAPHY.lineHeight28};
-
-    &:hover {
-      opacity: 100%;
-    }
-  }
-`
 
 export const DetachPipette = (props: DetachPipetteProps): ReactNode => {
   const {
@@ -210,11 +188,11 @@ export const DetachPipette = (props: DetachPipetteProps): ReactNode => {
               setShowPipetteStillAttached(false)
             }}
             marginLeft={SPACING.spacing32}
-            css={GO_BACK_BUTTON_TEXT_STYLE}
           >
             <StyledText
-              forwardedAs="p"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              desktopStyle="bodyDefaultSemiBold"
+              oddStyle="bodyTextSemiBold"
+              color={COLORS.grey50}
             >
               {t('shared:go_back')}
             </StyledText>
@@ -244,9 +222,14 @@ export const DetachPipette = (props: DetachPipetteProps): ReactNode => {
             backgroundSize={BACKGROUND_SIZE}
           />
         ) : (
-          `${i18n.format(t('loose_detach'))}${
-            memoizedAttachedPipettes[mount]?.displayName
-          }`
+          <StyledText
+            desktopStyle="headingSmallBold"
+            oddStyle="level4HeaderSemiBold"
+          >
+            {`${i18n.format(t('loose_detach'))}${
+              memoizedAttachedPipettes[mount]?.displayName
+            }`}
+          </StyledText>
         )
       }
       rightHandBody={

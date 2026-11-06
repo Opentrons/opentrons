@@ -2641,6 +2641,7 @@ class OT3API(
         }
 
     @property
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def hardware_gripper(self) -> Optional[Gripper]:
         if not self.has_gripper():
             return None

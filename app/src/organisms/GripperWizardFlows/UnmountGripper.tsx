@@ -12,10 +12,8 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
-  RESPONSIVENESS,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
@@ -30,25 +28,6 @@ import { getIsOnDevice } from '/app/redux/config'
 
 import type { GripperData } from '@opentrons/api-client'
 import type { GripperWizardStepProps } from './types'
-
-const GO_BACK_BUTTON_TEXT_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.grey50};
-
-  &:hover {
-    opacity: 70%;
-  }
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-    font-size: ${TYPOGRAPHY.fontSize22};
-    line-height: ${TYPOGRAPHY.lineHeight28};
-
-    &:hover {
-      opacity: 100%;
-    }
-  }
-`
 
 const QUICK_GRIPPER_POLL_MS = 3000
 
@@ -118,11 +97,11 @@ export const UnmountGripper = (
           onClick={() => {
             setShowGripperStillDetected(false)
           }}
-          css={GO_BACK_BUTTON_TEXT_STYLE}
         >
           <StyledText
-            forwardedAs="p"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            desktopStyle="bodyDefaultSemiBold"
+            oddStyle="bodyTextSemiBold"
+            color={COLORS.grey50}
           >
             {t('shared:go_back')}
           </StyledText>
@@ -142,7 +121,14 @@ export const UnmountGripper = (
     </SimpleWizardBody>
   ) : (
     <GenericWizardTile
-      header={t('branded:loosen_screws_and_detach')}
+      header={
+        <StyledText
+          desktopStyle="headingSmallBold"
+          oddStyle="level4HeaderSemiBold"
+        >
+          {t('branded:loosen_screws_and_detach')}
+        </StyledText>
+      }
       rightHandBody={
         <AnimationVideo
           css={css`
@@ -155,7 +141,10 @@ export const UnmountGripper = (
         </AnimationVideo>
       }
       bodyText={
-        <StyledText forwardedAs="p">
+        <StyledText
+          desktopStyle="bodyDefaultRegular"
+          oddStyle="bodyTextRegular"
+        >
           {t('hold_gripper_and_loosen_screws')}
         </StyledText>
       }

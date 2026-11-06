@@ -13,7 +13,6 @@ import {
   RESPONSIVENESS,
   SPACING,
   StyledText,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { SimpleWizardBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
@@ -53,11 +52,12 @@ export const ProbeNotAttached = (
           onClick={() => {
             dismissError()
           }}
-          css={GO_BACK_BUTTON_STYLE}
         >
           <StyledText
-            forwardedAs="p"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            desktopStyle="bodyDefaultSemiBold"
+            oddStyle="bodyTextSemiBold"
+            color={COLORS.grey50}
+            paddingLeft={SPACING.spacing32}
           >
             {t('shared:go_back')}
           </StyledText>
@@ -90,23 +90,5 @@ const ALIGN_BUTTONS = css`
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     align-items: ${ALIGN_CENTER};
-  }
-`
-const GO_BACK_BUTTON_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.grey50};
-  padding-left: ${SPACING.spacing32};
-
-  &:hover {
-    opacity: 70%;
-  }
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-    font-size: ${TYPOGRAPHY.fontSize22};
-    padding-left: 0rem;
-    &:hover {
-      opacity: 100%;
-    }
   }
 `
