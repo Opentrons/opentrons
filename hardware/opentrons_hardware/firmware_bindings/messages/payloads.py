@@ -22,6 +22,7 @@ from .fields import (
     MotorUsageTypeField,
     MoveStopConditionField,
     OptionalRevisionField,
+    PipetteConfigDataField,
     PipetteNameField,
     PipetteTipActionTypeField,
     SensorIdField,
@@ -310,6 +311,43 @@ class FirmwareUpdateWithAddress(EmptyPayload):
     """A FW update payload with an address."""
 
     address: utils.UInt32Field
+
+
+@dataclass(eq=False)
+class PipetteConfigData(EmptyPayload):
+    """Send the pipette function to the eeprom."""
+
+    num_bytes: utils.UInt8Field
+    data: PipetteConfigDataField
+
+    def __post_init__(self) -> None:
+        """Post init processing."""
+        data_length = len(self.data.value)
+        if data_length > PipetteConfigDataField.NUM_BYTES:
+            raise InternalMessageFormatError(
+                f"PipetteConfigDataField: Data cannot be more than"
+                f" {PipetteConfigDataField.NUM_BYTES} bytes got {data_length}.",
+                detail={"size": str(data_length)},
+            )
+
+
+@dataclass(eq=False)
+class PipetteConfigDataAcknowledge(EmptyPayload):
+    """A response to a firmware update message with an error code."""
+
+    error_code: ErrorCodeField
+
+
+@dataclass(eq=False)
+class PipetteConfigDataCompleteAcknowledge(EmptyPayload):
+    """A response to a firmware update message with an error code."""
+
+    error_code: ErrorCodeField
+
+
+@dataclass(eq=False)
+class PipetteConfigUpdateComplete(EmptyPayload):
+    """All data messages have been transmitted."""
 
 
 @dataclass(eq=False)
