@@ -3468,7 +3468,7 @@ class InstrumentContext(publisher.CommandPublisher):
     @requires_version(2, 16)
     def configure_nozzle_layout(  # noqa: C901
         self,
-        style: NozzleLayout,
+        style: NozzleLayout | str,
         start: Optional[str] = None,
         end: Optional[str] = None,
         front_right: Optional[str] = None,
@@ -3489,8 +3489,8 @@ class InstrumentContext(publisher.CommandPublisher):
             tips from a tip rack that is in an adapter, the API will raise an error.
 
         Args:
-            style (NozzleLayout or None): The shape of the nozzle layout.
-                You must [import the layout constant][nozzle-layouts] in order to use it.
+            style (NozzleLayout or str): The shape of the nozzle layout.
+                Can use str name or [import the layout constant][nozzle-layouts] directly.
 
                 - `ALL` resets the pipette to use all of its nozzles. Calling
                 `configure_nozzle_layout()` with no arguments also resets the pipette.
@@ -3525,6 +3525,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip].
 
         *Changed in version 2.20*: Added partial column, row, and single layouts.
+        *Changes in version 2.31*: Added support for providing style as a string.
         """
         #       TODO: add the following back into the docstring when QUADRANT is supported
         #
@@ -3535,6 +3536,10 @@ class InstrumentContext(publisher.CommandPublisher):
         #       NOTE: Disabled layouts error case can be removed once desired map configurations
         #       have appropriate data regarding tip-type to map current values added to the
         #       pipette definitions.
+
+        if isinstance(style, str):
+            # Handle instances where style was loaded with a direct name
+            style = NozzleLayout(style)
 
         disabled_layouts = [
             NozzleLayout.QUADRANT,
