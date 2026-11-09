@@ -57,6 +57,9 @@ from opentrons.protocol_engine.resources.camera_provider import (
     ImageParameters,
 )
 from opentrons.protocol_engine.state.state import StateStore
+from opentrons.protocol_engine.state.update_types import StateUpdate
+from opentrons.protocol_engine.types import LabwareWellId, TipGeometry
+from opentrons.types import MountType
 
 
 @pytest.fixture
@@ -774,3 +777,145 @@ async def test_execute_defined_error(
             ),
             times=0,
         )
+
+
+async def test_false_positive_tip_pickup_prepares_before_command_is_final(
+    decoy: Decoy,
+    subject: CommandExecutor,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+    hardware_api: HardwareControlAPI,
+    equipment: EquipmentHandler,
+    file_provider: FileProvider,
+    camera_provider: CameraProvider,
+    movement: MovementHandler,
+    mock_gantry_mover: GantryMover,
+    labware_movement: LabwareMovementHandler,
+    pipetting: PipettingHandler,
+    mock_tip_handler: TipHandler,
+    run_control: RunControlHandler,
+    rail_lights: RailLightsHandler,
+    status_bar: StatusBarHandler,
+    task_handler: TaskHandler,
+    model_utils: ModelUtils,
+    command_note_tracker: CommandNoteTracker,
+    error_recovery_policy: ErrorRecoveryPolicy,
+) -> None:
+    """A false-positive pickup prepares the plunger before the protocol can continue."""
+    TestCommandImplCls = decoy.mock(func=_TestCommandImpl)
+    command_impl = decoy.mock(cls=_TestCommandImpl)
+
+    class _TestCommand(
+        BaseCommand[_TestCommandParams, _TestCommandResult, ErrorOccurrence]
+    ):
+        commandType: str = "testCommand"
+        params: _TestCommandParams
+        result: Optional[_TestCommandResult]
+
+        _ImplementationCls: Type[_TestCommandImpl] = PrivateAttr(
+            default_factory=lambda: TestCommandImplCls
+        )
+
+    tip = TipGeometry(length=40, diameter=1, volume=200)
+    false_positive_update = (
+        StateUpdate()
+        .update_pipette_tip_state(
+            pipette_id="pipette-id",
+            tip_geometry=tip,
+            tip_source=LabwareWellId(labware_id="labware-id", well_name="A1"),
+        )
+        .set_pipette_ready_to_aspirate("pipette-id", True)
+    )
+    command_params = _TestCommandParams()
+    command_id = "command-id"
+    created_at = datetime(year=2021, month=1, day=1)
+    started_at = datetime(year=2022, month=2, day=2)
+    failed_at = datetime(year=2023, month=3, day=3)
+    returned_error = DefinedErrorData(
+        public=_TestCommandDefinedError(id="error-id", createdAt=failed_at),
+        state_update_if_false_positive=false_positive_update,
+    )
+    queued_command = cast(
+        Command,
+        _TestCommand.model_construct(  # type: ignore[call-arg]
+            id=command_id,
+            key="command-key",
+            createdAt=created_at,
+            status=CommandStatus.QUEUED,
+            params=command_params,
+        ),
+    )
+    running_command = cast(
+        Command,
+        _TestCommand.model_construct(  # type: ignore[call-arg]
+            id=command_id,
+            key="command-key",
+            createdAt=created_at,
+            startedAt=started_at,
+            status=CommandStatus.RUNNING,
+            params=command_params,
+        ),
+    )
+
+    decoy.when(state_store.commands.get(command_id=command_id)).then_return(
+        queued_command
+    )
+    decoy.when(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
+            RunCommandAction(command_id=command_id, started_at=started_at)
+        )
+    ).then_do(
+        lambda _: decoy.when(
+            state_store.commands.get(command_id=command_id)
+        ).then_return(running_command)
+    )
+    decoy.when(
+        queued_command._ImplementationCls(
+            state_view=state_store,
+            hardware_api=hardware_api,
+            file_provider=file_provider,
+            camera_provider=camera_provider,
+            equipment=equipment,
+            movement=movement,
+            gantry_mover=mock_gantry_mover,
+            labware_movement=labware_movement,
+            pipetting=pipetting,
+            tip_handler=mock_tip_handler,
+            task_handler=task_handler,
+            run_control=run_control,
+            rail_lights=rail_lights,
+            model_utils=model_utils,
+            status_bar=status_bar,
+            command_note_adder=command_note_tracker,
+        )
+    ).then_return(command_impl)  # type: ignore[arg-type]
+    decoy.when(await command_impl.execute(command_params)).then_return(returned_error)
+    decoy.when(model_utils.get_timestamp()).then_return(started_at)
+    decoy.when(command_note_tracker.get_notes()).then_return([])
+    decoy.when(
+        error_recovery_policy(
+            matchers.Anything(),
+            matchers.Anything(),
+            returned_error,  # type: ignore[arg-type]
+        )
+    ).then_return(ErrorRecoveryType.ASSUME_FALSE_POSITIVE_AND_CONTINUE)
+    mount = MountType.LEFT.to_hw_mount()
+    decoy.when(state_store.pipettes.get_mount("pipette-id")).then_return(MountType.LEFT)
+
+    await subject.execute(command_id)
+
+    decoy.verify(
+        hardware_api.cache_tip(mount=mount, tip_length=tip.length),
+        await hardware_api.prepare_for_aspirate(mount=mount),
+        action_dispatcher.dispatch(
+            FailCommandAction(
+                command_id=command_id,
+                running_command=running_command,
+                error_id="error-id",
+                failed_at=failed_at,
+                error=returned_error,  # type: ignore[arg-type]
+                type=ErrorRecoveryType.ASSUME_FALSE_POSITIVE_AND_CONTINUE,
+                notes=matchers.Anything(),
+            )
+        ),
+    )

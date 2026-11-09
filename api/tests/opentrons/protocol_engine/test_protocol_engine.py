@@ -68,6 +68,7 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetCreateInternal,
     LabwareOffsetVector,
     LabwareUri,
+    LabwareWellId,
     LegacyLabwareOffsetCreate,
     LegacyLabwareOffsetLocation,
     Liquid,
@@ -75,8 +76,9 @@ from opentrons.protocol_engine.types import (
     ModuleModel,
     OnAddressableAreaOffsetLocationSequenceComponent,
     PostRunHardwareState,
+    TipGeometry,
 )
-from opentrons.types import DeckSlotName
+from opentrons.types import DeckSlotName, MountType
 
 
 @pytest.fixture
@@ -781,7 +783,7 @@ def test_pause(
 
 
 @pytest.mark.parametrize("reconcile_false_positive", [True, False])
-def test_resume_from_recovery(
+async def test_resume_from_recovery(
     decoy: Decoy,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
@@ -789,24 +791,63 @@ def test_resume_from_recovery(
     reconcile_false_positive: bool,
 ) -> None:
     """It should dispatch a ResumeFromRecoveryAction."""
+    # Ready is false, so this does not try to move the plunger.
+    false_positive_update = StateUpdate().set_pipette_ready_to_aspirate(
+        "pipette-id", False
+    )
     decoy.when(state_store.commands.get_state_update_for_false_positive()).then_return(
-        sentinel.state_update_for_false_positive
+        false_positive_update
     )
     empty_state_update = StateUpdate()
 
     expected_action = ResumeFromRecoveryAction(
-        sentinel.state_update_for_false_positive
-        if reconcile_false_positive
-        else empty_state_update
+        false_positive_update if reconcile_false_positive else empty_state_update
     )
 
     decoy.when(
         state_store.commands.validate_action_allowed(expected_action)
     ).then_return(expected_action)
 
-    subject.resume_from_recovery(reconcile_false_positive)
+    await subject.resume_from_recovery(reconcile_false_positive)
 
     decoy.verify(action_dispatcher.dispatch(expected_action))
+
+
+async def test_resume_from_recovery_prepares_plunger_before_dispatch(
+    decoy: Decoy,
+    hardware_api: HardwareControlAPI,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+    subject: ProtocolEngine,
+) -> None:
+    """A false-positive pickup should move the plunger before the protocol resumes."""
+    tip = TipGeometry(length=40, diameter=1, volume=200)
+    state_update = (
+        StateUpdate()
+        .update_pipette_tip_state(
+            pipette_id="pipette-id",
+            tip_geometry=tip,
+            tip_source=LabwareWellId(labware_id="labware-id", well_name="A1"),
+        )
+        .set_pipette_ready_to_aspirate("pipette-id", True)
+    )
+    mount = MountType.LEFT.to_hw_mount()
+    decoy.when(state_store.commands.get_state_update_for_false_positive()).then_return(
+        state_update
+    )
+    decoy.when(state_store.pipettes.get_mount("pipette-id")).then_return(MountType.LEFT)
+    expected_action = ResumeFromRecoveryAction(state_update)
+    decoy.when(
+        state_store.commands.validate_action_allowed(expected_action)
+    ).then_return(expected_action)
+
+    await subject.resume_from_recovery(True)
+
+    decoy.verify(
+        hardware_api.cache_tip(mount=mount, tip_length=tip.length),
+        await hardware_api.prepare_for_aspirate(mount=mount),
+        action_dispatcher.dispatch(expected_action),
+    )
 
 
 @pytest.mark.parametrize("drop_tips_after_run", [True, False])

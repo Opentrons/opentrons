@@ -37,8 +37,13 @@ from .task_handler import TaskHandler
 from .tip_handler import TipHandler
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.execution.defined_error_failure import (
     dispatch_fail_command_for_defined_error,
+    get_error_recovery_type_for_defined_error,
+)
+from opentrons.protocol_engine.execution.error_recovery_hardware_state_synchronizer import (
+    ErrorRecoveryHardwareStateSynchronizer,
 )
 from opentrons.protocol_engine.notes import make_error_recovery_debug_note
 
@@ -211,13 +216,32 @@ class CommandExecutor:
                 )
             else:
                 # The command encountered a defined error.
-                error_recovery_type = dispatch_fail_command_for_defined_error(
+                # Prepare a false-positive pickup before the command is finalized.
+                # Finalizing unblocks the protocol, which would otherwise insert
+                # its own prepareToAspirate and shift the command-key chain.
+                error_recovery_type = get_error_recovery_type_for_defined_error(
+                    state_store=self._state_store,
+                    running_command=running_command,
+                    defined_error=result,
+                )
+                if (
+                    error_recovery_type
+                    == ErrorRecoveryType.ASSUME_FALSE_POSITIVE_AND_CONTINUE
+                ):
+                    await ErrorRecoveryHardwareStateSynchronizer(
+                        hardware_api=self._hardware_api,
+                        state_view=self._state_store,
+                    ).prepare_for_false_positive_tip_pickup(
+                        result.state_update_if_false_positive
+                    )
+                dispatch_fail_command_for_defined_error(
                     action_dispatcher=self._action_dispatcher,
                     state_store=self._state_store,
                     command_id=running_command.id,
                     running_command=running_command,
                     defined_error=result,
                     notes=note_tracker.get_notes(),
+                    error_recovery_type=error_recovery_type,
                 )
                 note_tracker(make_error_recovery_debug_note(error_recovery_type))
                 error_occurred = True
