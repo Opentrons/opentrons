@@ -80,8 +80,8 @@ _LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN = APIVersion(2, 25)
 """The version after which the user can supply liquid class transfers with non-assigned tip racks."""
 _LIQUID_CLASS_TRANSFER_TIPS_ARG_ADDED_IN = APIVersion(2, 27)
 """The version after which the user can supply liquid class transfers with selected tips."""
-_PARTIAL_NOZZLE_CONFIGURATION_STYLE_STRING = APIVersion(2, 32)
-"""The version after which the user can supply the nozzle configuration style as a string instead of a NozzleLayout type."""
+_PARTIAL_NOZZLE_CONFIGURATION_REAR_PARTIAL_COLUMN = APIVersion(2, 32)
+"""The version after which the user can utilize partial columns beginning at nozzle A1."""
 
 AdvancedLiquidHandling = v1_transfer.AdvancedLiquidHandling
 
@@ -3539,10 +3539,10 @@ class InstrumentContext(publisher.CommandPublisher):
         #       pipette definitions.
 
         if isinstance(style, str):
-            if self._api_version < _PARTIAL_NOZZLE_CONFIGURATION_STYLE_STRING:
+            if self._api_version < _PARTIAL_NOZZLE_CONFIGURATION_REAR_PARTIAL_COLUMN:
                 raise APIVersionError(
                     api_element="Nozzle layout `style` parameter as `string`",
-                    until_version=f"{_PARTIAL_NOZZLE_CONFIGURATION_STYLE_STRING}",
+                    until_version=f"{_PARTIAL_NOZZLE_CONFIGURATION_REAR_PARTIAL_COLUMN}",
                     current_version=f"{self._api_version}",
                 )
             # Handle instances where style was loaded with a direct name
