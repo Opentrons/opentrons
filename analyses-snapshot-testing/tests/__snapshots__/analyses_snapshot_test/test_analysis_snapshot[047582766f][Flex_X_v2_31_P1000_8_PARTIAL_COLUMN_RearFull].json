@@ -3868,7 +3868,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "ValueError [line 25]: A partial column configuration with 'start'=A1 cannot have its 'end' parameter be in row H. Use `ALL` configuration to utilize all nozzles.",
+      "detail": "APIVersionError [line 25]: Error 4011 INCORRECT_API_VERSION (APIVersionError): Partial column beginning with nozzle `A1` is not available until API version 2.32. You are currently using API version 2.31.",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",
@@ -3877,14 +3877,14 @@
       "wrappedErrors": [
         {
           "createdAt": "TIMESTAMP",
-          "detail": "ValueError: A partial column configuration with 'start'=A1 cannot have its 'end' parameter be in row H. Use `ALL` configuration to utilize all nozzles.",
-          "errorCode": "4000",
+          "detail": "Partial column beginning with nozzle `A1` is not available until API version 2.32. You are currently using API version 2.31.",
+          "errorCode": "4011",
           "errorInfo": {
-            "args": "(\"A partial column configuration with 'start'=A1 cannot have its 'end' parameter be in row H. Use `ALL` configuration to utilize all nozzles.\",)",
-            "class": "ValueError",
-            "traceback": "  File \"<PATH>\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"Flex_X_v2_31_P1000_8_PARTIAL_COLUMN_RearFull.py\", line N, in run\n\n  File \"<PATH>\", line N, in _decorated\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n\n  File \"<PATH>\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"<PATH>\", line N, in configure_nozzle_layout\n    validated_end = _check_valid_end_nozzle(validated_start, end)\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"<PATH>\", line N, in _check_valid_end_nozzle\n    raise ValueError(\n"
+            "current_version": "2.31",
+            "identifier": "Partial column beginning with nozzle `A1`",
+            "until_version": "2.32"
           },
-          "errorType": "PythonException",
+          "errorType": "APIVersionError",
           "id": "UUID",
           "isDefined": false,
           "wrappedErrors": []
