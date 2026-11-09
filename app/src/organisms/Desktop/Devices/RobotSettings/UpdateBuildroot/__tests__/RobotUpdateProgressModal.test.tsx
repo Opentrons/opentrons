@@ -142,7 +142,7 @@ describe('DownloadUpdateModal', () => {
     const exitButton = screen.getByRole('button', { name: 'Exit' })
 
     expect(
-      screen.getByText('Robot software successfully updated')
+      screen.getByText('Robot successfully updated')
     ).toBeInTheDocument()
     expect(exitButton).toBeInTheDocument()
     expect(mockCreateLiveCommand).toHaveBeenCalled()
