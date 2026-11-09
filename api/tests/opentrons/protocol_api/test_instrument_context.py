@@ -8,7 +8,6 @@ from unittest.mock import sentinel
 
 import pytest
 from decoy import Decoy, matchers
-from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
@@ -47,9 +46,6 @@ from opentrons.protocol_api.core.common import (
     WellCore,
 )
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
-from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
-    LegacyInstrumentCore,
-)
 from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
 from opentrons.protocol_engine.errors.error_occurrence import (
@@ -67,7 +63,6 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     APIVersionError,
     FlowRates,
-    PlungerSpeeds,
     UnsupportedAPIError,
 )
 from opentrons.types import (
@@ -118,14 +113,6 @@ def mock_instrument_core(decoy: Decoy) -> InstrumentCore:
     instrument_core.get_liquid_presence_detection = _getter  # type: ignore[method-assign]
     instrument_core.set_liquid_presence_detection = _setter  # type: ignore[method-assign]
 
-    return instrument_core
-
-
-@pytest.fixture
-def mock_legacy_instrument_core(decoy: Decoy) -> LegacyInstrumentCore:
-    """Get a mock instrument implementation core."""
-    instrument_core = decoy.mock(cls=LegacyInstrumentCore)
-    decoy.when(instrument_core.get_mount()).then_return(Mount.LEFT)
     return instrument_core
 
 
@@ -1815,25 +1802,6 @@ def test_liquid_presence_detection(
     assert subject.liquid_presence_detection is False
     subject.liquid_presence_detection = True
     decoy.verify(mock_instrument_core.set_liquid_presence_detection(True), times=1)
-
-
-@pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
-@pytest.mark.parametrize(
-    "mock_instrument_core",
-    [lazy_fixture("mock_legacy_instrument_core")],
-)
-def test_plunger_speed(
-    decoy: Decoy,
-    mock_legacy_instrument_core: LegacyInstrumentCore,
-    subject: InstrumentContext,
-) -> None:
-    """It should return a PlungerSpeeds object on PAPI <= v2.13."""
-    plunger_speeds = decoy.mock(cls=PlungerSpeeds)
-    decoy.when(mock_legacy_instrument_core.get_speed()).then_return(plunger_speeds)
-
-    result = subject.speed
-
-    assert result == plunger_speeds
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
