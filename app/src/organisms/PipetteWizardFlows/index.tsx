@@ -429,11 +429,7 @@ export const PipetteWizardFlows = (
       handleClose()
     } else {
       deleteMaintenanceRun(maintenanceRunData.data.id, {
-        onSuccess: () => {
-          onComplete?.()
-          closeFlow()
-        },
-        onError: () => {
+        onSettled: () => {
           onComplete?.()
           closeFlow()
         },
