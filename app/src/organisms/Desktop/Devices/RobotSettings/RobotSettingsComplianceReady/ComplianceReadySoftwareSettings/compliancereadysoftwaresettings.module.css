@@ -47,3 +47,10 @@
 .toggle_label {
   flex: 1;
 }
+
+.confirm_button_row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: var(--spacing-8);
+}

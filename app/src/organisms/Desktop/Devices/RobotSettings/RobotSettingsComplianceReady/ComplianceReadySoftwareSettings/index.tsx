@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Divider, StyledText } from '@opentrons/components'
@@ -16,17 +16,14 @@ import {
   MAX_C_INT,
   MAX_IDLE_LOGOUT_MINUTES,
   MAX_NUMBER_OF_LOGIN_ATTEMPTS,
-  MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
   MAX_PASSWORD_RESET_TIME_DAYS,
   MIN_IDLE_LOGOUT_MINUTES,
   MIN_LENGTH_OF_REASON_FOR_INTERACTION,
   MIN_NUMBER_OF_LOGIN_ATTEMPTS,
-  MIN_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
   MIN_PASSWORD_RESET_TIME_DAYS,
 } from '/app/resources/auth'
 
 import { Accordion } from '../Accordion'
-import { SettingsConfirmationModal } from '../SettingsConfirmationModal'
 import {
   getAuditInputPatch,
   getFieldValuesFromSettings,
@@ -40,6 +37,7 @@ import {
 import styles from './compliancereadysoftwaresettings.module.css'
 import { ComplianceReadyToggleField } from './ComplianceReadyToggleField'
 import { InputSetting } from './InputSetting'
+import { PasswordComplexity } from './PasswordComplexity'
 
 import type { JSX, ReactNode } from 'react'
 import type {
@@ -84,12 +82,6 @@ export function ComplianceReadySoftwareSettings({
 }: ComplianceReadySoftwareSettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const documentationState = useDocumentationState()
-  const [
-    showPasswordComplexityConfirmModal,
-    setShowPasswordComplexityConfirmModal,
-  ] = useState(false)
-  const [passwordComplexityToggleKey, setPasswordComplexityToggleKey] =
-    useState(0)
   const authSettingsQuery = useAuthSettingsQuery()
   const auditSettingsQuery = useAuditSettingsQuery()
   const robotServerAccessControlSettingsQuery =
@@ -186,30 +178,6 @@ export function ComplianceReadySoftwareSettings({
     }
   }
 
-  const handlePasswordComplexityEnabledToggle = (toggledOn: boolean): void => {
-    if (toggledOn) {
-      setShowPasswordComplexityConfirmModal(true)
-      return
-    }
-
-    handleToggleChange('passwordComplexityEnabled', false)
-  }
-
-  const handlePasswordComplexityConfirm = (): void => {
-    patchAuthSettings({
-      data: {
-        passwordComplexitySpecialCharacters: true,
-        passwordComplexityMinimumLength: 8,
-      },
-    })
-    setShowPasswordComplexityConfirmModal(false)
-  }
-
-  const handlePasswordComplexityCancel = (): void => {
-    setShowPasswordComplexityConfirmModal(false)
-    setPasswordComplexityToggleKey(key => key + 1)
-  }
-
   return (
     <Accordion
       id="compliance-ready-software-settings"
@@ -263,43 +231,10 @@ export function ComplianceReadySoftwareSettings({
             />
           </ComplianceReadyToggleField>
           <Divider />
-          <ComplianceReadyToggleField
-            key={passwordComplexityToggleKey}
-            id="passwordComplexityEnabled"
-            labelKey="desktop_require_password_complexity_requirements"
-            values={fieldValues}
-            onToggleChange={handlePasswordComplexityEnabledToggle}
-          >
-            <ComplianceReadyToggleField
-              id="passwordComplexitySpecialCharacters"
-              labelKey="desktop_require_special_characters"
-              values={fieldValues}
-              onToggleChange={toggledOn => {
-                handleToggleChange(
-                  'passwordComplexitySpecialCharacters',
-                  toggledOn
-                )
-              }}
-            />
-            <InputSetting
-              key="passwordComplexityMinimumLength"
-              label={t('desktop_minimum_password_length')}
-              value={
-                fieldValues.passwordComplexityMinimumLength != null
-                  ? String(fieldValues.passwordComplexityMinimumLength)
-                  : ''
-              }
-              units={t('desktop_characters')}
-              min={MIN_PASSWORD_COMPLEXITY_MINIMUM_LENGTH}
-              max={MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH}
-              onBlur={value =>
-                handleAuthSettingInputBlur(
-                  'passwordComplexityMinimumLength',
-                  value
-                )
-              }
-            />
-          </ComplianceReadyToggleField>
+          <PasswordComplexity
+            patchAuthSettings={patchAuthSettings}
+            fieldValues={fieldValues}
+          />
           <Divider />
           <InputSetting
             key="idleLogout"
@@ -424,20 +359,6 @@ export function ComplianceReadySoftwareSettings({
           />
         </ComplianceReadySettingsSection>
       </div>
-      {showPasswordComplexityConfirmModal ? (
-        <SettingsConfirmationModal
-          title={t('desktop_require_password_complexity_modal_title') as string}
-          heading={
-            t('desktop_require_password_complexity_modal_heading') as string
-          }
-          description={
-            t('desktop_require_password_complexity_modal_description') as string
-          }
-          confirmLabel={t('shared:confirm') as string}
-          onConfirm={handlePasswordComplexityConfirm}
-          onCancel={handlePasswordComplexityCancel}
-        />
-      ) : null}
     </Accordion>
   )
 }

@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
@@ -236,6 +236,15 @@ describe('ComplianceReadySoftwareSettings', () => {
       })
     )
 
+    screen.getByText('Require special characters')
+    screen.getByRole('button', { name: 'Save' })
+    expect(
+      screen.queryByText('Require password complexity?')
+    ).not.toBeInTheDocument()
+    expect(mockPatchAuthSettings).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
     screen.getByText('Require password complexity?')
     screen.getByText('Users will need to reset their passwords')
     screen.getByText(
@@ -243,7 +252,9 @@ describe('ComplianceReadySoftwareSettings', () => {
     )
     expect(mockPatchAuthSettings).not.toHaveBeenCalled()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    fireEvent.click(
+      within(screen.getByRole('dialog')).getByRole('button', { name: 'Cancel' })
+    )
 
     expect(
       screen.queryByText('Require password complexity?')
@@ -268,7 +279,12 @@ describe('ComplianceReadySoftwareSettings', () => {
       })
     )
 
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    fireEvent.click(
+      within(screen.getByRole('dialog')).getByRole('button', {
+        name: 'Confirm',
+      })
+    )
 
     await waitFor(() => {
       expect(mockPatchAuthSettings).toHaveBeenCalledWith({
