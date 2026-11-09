@@ -30,6 +30,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { getWizardHeaderExit } from '/app/components/adhoc/shared/wizards/getWizardHeaderExit'
 import { SimpleWizardBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
 import { SmallButton } from '/app/components/ODD/buttons'
 import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
@@ -422,6 +423,23 @@ export const PipetteWizardFlows = (
         })
     }
   }
+
+  const handleCloseWithoutHome = (): void => {
+    if (maintenanceRunData?.data.id == null) {
+      handleClose()
+    } else {
+      deleteMaintenanceRun(maintenanceRunData.data.id, {
+        onSuccess: () => {
+          onComplete?.()
+          closeFlow()
+        },
+        onError: () => {
+          onComplete?.()
+          closeFlow()
+        },
+      })
+    }
+  }
   const {
     confirm: confirmExit,
     showConfirmation: showConfirmExit,
@@ -498,7 +516,7 @@ export const PipetteWizardFlows = (
     attachedPipettes[mount]?.serialNumber ?? ''
   )
 
-  let onExit: () => void
+  let onExit: (() => void) | undefined
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   // These flows often have custom error messaging, so this fallback modal is shown only in specific circumstances.
   if (isFatalError) {
@@ -694,13 +712,17 @@ export const PipetteWizardFlows = (
       <MountingPlate {...currentStep} {...calibrateBaseProps} />
     )
   }
-  const buildWizardOnExit = (): (() => void) => {
-    if (isFatalError || showConfirmExit) {
-      return handleCleanUpAndClose
-    } else {
-      return onExit
-    }
-  }
+  const isError = isFatalError || errorMessage != null
+  const idleOnExit = showConfirmExit ? handleCleanUpAndClose : onExit
+  const { onExit: headerOnExit, exitDisabled } = getWizardHeaderExit({
+    isError,
+    isBusy:
+      currentStep.section === SECTIONS.FIRMWARE_UPDATE ||
+      isCommandMutationLoading ||
+      isFetchingPipettes,
+    onExitError: handleCloseWithoutHome,
+    onExitIdle: idleOnExit ?? handleCleanUpAndClose,
+  })
 
   const progressBarForCalError =
     currentStep.section === SECTIONS.DETACH_PROBE && errorMessage != null
@@ -712,8 +734,8 @@ export const PipetteWizardFlows = (
         progressBarForCalError ? currentStepIndex : currentStepIndex + 1
       }
       totalSteps={totalStepCount + 1}
-      onExit={buildWizardOnExit()}
-      exitDisabled={isCommandMutationLoading || isFetchingPipettes}
+      onExit={headerOnExit}
+      exitDisabled={exitDisabled}
     />
   )
 
