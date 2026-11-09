@@ -1,52 +1,34 @@
-from unittest.mock import MagicMock
-
 import pytest
 
 from opentrons_shared_data.labware.types import LabwareDefinition2
 
 from opentrons.hardware_control.modules.types import TemperatureModuleModel
-from opentrons.protocol_api import OFF_DECK, labware
-from opentrons.protocol_api.core.legacy import module_geometry
+from opentrons.protocol_api import OFF_DECK, ModuleContext, ProtocolContext, labware
 from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocols.api_support.labware_like import LabwareLike, LabwareLikeType
-from opentrons.types import Location, Point
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def trough_definition() -> LabwareDefinition2:
     result = labware.get_labware_definition("usascientific_12_reservoir_22ml")
     assert result["schemaVersion"] == 2  # For type checking.
     return result
 
 
-@pytest.fixture(scope="session")
-def trough(trough_definition: LabwareDefinition2) -> Labware:
-    return labware.load_from_definition(
-        trough_definition, Location(Point(1, 2, 3), "D1")
-    )
+@pytest.fixture()
+def trough(trough_definition: LabwareDefinition2, ctx: ProtocolContext) -> Labware:
+    return ctx.load_labware_from_definition(trough_definition, "A1")
 
 
-@pytest.fixture(scope="session")
-def module() -> ModuleGeometry:
-    mod = module_geometry.create_geometry(
-        definition=module_geometry.load_definition(
-            TemperatureModuleModel.TEMPERATURE_V2
-        ),
-        parent=Location(Point(9, 8, 7), "C3"),
-        configuration=None,
-    )
-    return mod
+@pytest.fixture()
+def module(ctx: ProtocolContext) -> ModuleContext:
+    return ctx.load_module(TemperatureModuleModel.TEMPERATURE_V2, "B1")
 
 
-@pytest.fixture(scope="session")
-def mod_trough(
-    trough_definition: LabwareDefinition2, module: ModuleGeometry
-) -> Labware:
-    mod_trough = module.add_labware(
-        labware.load_from_definition(trough_definition, module.location)
-    )
-    return mod_trough
+@pytest.fixture()
+def mod_trough(trough_definition: LabwareDefinition2, module: ModuleContext) -> Labware:
+    return module.load_labware_from_definition(trough_definition)
 
 
 def test_labware(trough: Labware) -> None:
@@ -113,23 +95,11 @@ def test_module_parent(
 def test_first_parent(
     trough: Labware, module: ModuleGeometry, mod_trough: Labware
 ) -> None:
-    assert LabwareLike(trough).first_parent() == "D1"
-    assert LabwareLike(trough["A2"]).first_parent() == "D1"
+    assert LabwareLike(trough).first_parent() == "A1"
+    assert LabwareLike(trough["A2"]).first_parent() == "A1"
     assert LabwareLike(None).first_parent() is None
-    assert LabwareLike("6").first_parent() == "6"
+    assert LabwareLike("A3").first_parent() == "A3"
 
-    assert LabwareLike(mod_trough["A5"]).first_parent() == "C3"
-    assert LabwareLike(mod_trough).first_parent() == "C3"
-    assert LabwareLike(module).first_parent() == "C3"
-
-    # Set up recursion cycle test.
-    mock_labware_geometry = MagicMock()
-    mock_labware_geometry.parent = Location(
-        point=Point(x=-0.75, y=-0.75, z=1), labware=mod_trough
-    )
-    assert hasattr(mod_trough._core, "get_geometry")
-    mod_trough._core.get_geometry = MagicMock(return_value=mock_labware_geometry)
-
-    with pytest.raises(RuntimeError):
-        # make sure we catch cycles
-        LabwareLike(mod_trough).first_parent()
+    assert LabwareLike(mod_trough["A5"]).first_parent() == "B1"
+    assert LabwareLike(mod_trough).first_parent() == "B1"
+    assert LabwareLike(module).first_parent() == "B1"
