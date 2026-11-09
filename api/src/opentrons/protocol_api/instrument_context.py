@@ -80,7 +80,7 @@ _LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN = APIVersion(2, 25)
 """The version after which the user can supply liquid class transfers with non-assigned tip racks."""
 _LIQUID_CLASS_TRANSFER_TIPS_ARG_ADDED_IN = APIVersion(2, 27)
 """The version after which the user can supply liquid class transfers with selected tips."""
-_PARTIAL_NOZZLE_CONFIGURATION_REAR_PARTIAL_COLUMN = APIVersion(2, 32)
+_PARTIAL_NOZZLE_CONFIGURATION_REAR_PARTIAL_COLUMN_ADDED_IN = APIVersion(2, 32)
 """The version after which the user can utilize partial columns beginning at nozzle A1."""
 
 
@@ -3802,11 +3802,14 @@ def _check_valid_start_nozzle(
     if (
         style == NozzleLayout.PARTIAL_COLUMN
         and start == "A1"
-        and (api_version is not None and api_version < APIVersion(2, 32))
+        and (
+            api_version is not None
+            and api_version < _PARTIAL_NOZZLE_CONFIGURATION_REAR_PARTIAL_COLUMN_ADDED_IN
+        )
     ):
         raise APIVersionError(
             api_element="Partial column beginning with nozzle `A1`",
-            until_version=f"{_PARTIAL_NOZZLE_CONFIGURATION_REAR_PARTIAL_COLUMN}",
+            until_version=f"{_PARTIAL_NOZZLE_CONFIGURATION_REAR_PARTIAL_COLUMN_ADDED_IN}",
             current_version=f"{api_version}",
         )
     return start
