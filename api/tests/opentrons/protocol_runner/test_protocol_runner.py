@@ -47,7 +47,6 @@ from opentrons.protocol_runner import (
 )
 from opentrons.protocol_runner.json_file_reader import JsonFileReader
 from opentrons.protocol_runner.json_translator import JsonTranslator
-from opentrons.protocol_runner.legacy_context_plugin import LegacyContextPlugin
 from opentrons.protocol_runner.python_protocol_wrappers import (
     ProtocolContextCreator,
     PythonAndLegacyFileReader,
@@ -672,7 +671,6 @@ async def test_load_python_with_pe_papi_core(
         run_time_param_paths=None,
     )
 
-    decoy.verify(protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)), times=0)
     assert broker_captor.value is python_runner_subject.broker
 
 
