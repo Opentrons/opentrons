@@ -80,6 +80,8 @@ _LIQUID_CLASS_TRANSFER_TIP_RACKS_ARG_ADDED_IN = APIVersion(2, 25)
 """The version after which the user can supply liquid class transfers with non-assigned tip racks."""
 _LIQUID_CLASS_TRANSFER_TIPS_ARG_ADDED_IN = APIVersion(2, 27)
 """The version after which the user can supply liquid class transfers with selected tips."""
+_PARTIAL_NOZZLE_CONFIGURATION_REAR_PARTIAL_COLUMN_ADDED_IN = APIVersion(2, 32)
+"""The version after which the user can utilize partial columns beginning at nozzle A1."""
 
 
 AdvancedLiquidHandling = v1_transfer.AdvancedLiquidHandling
@@ -3489,7 +3491,7 @@ class InstrumentContext(publisher.CommandPublisher):
             tips from a tip rack that is in an adapter, the API will raise an error.
 
         Args:
-            style (NozzleLayout or None): The shape of the nozzle layout.
+            style (NozzleLayout): The shape of the nozzle layout.
                 You must [import the layout constant][nozzle-layouts] in order to use it.
 
                 - `ALL` resets the pipette to use all of its nozzles. Calling
@@ -3574,7 +3576,9 @@ class InstrumentContext(publisher.CommandPublisher):
                 )
             case NozzleLayout.PARTIAL_COLUMN:
                 self._raise_if_configuration_not_supported_by_pipette(style)
-                validated_start = _check_valid_start_nozzle(style, start)
+                validated_start = _check_valid_start_nozzle(
+                    style, start, self._api_version
+                )
                 validated_end = _check_valid_end_nozzle(validated_start, end)
                 _raise_if_has_front_right_or_back_left_for_partial_column(
                     front_right, back_left
@@ -3784,7 +3788,9 @@ def _raise_if_has_end_or_front_right_or_back_left(
         )
 
 
-def _check_valid_start_nozzle(style: NozzleLayout, start: Optional[str]) -> str:
+def _check_valid_start_nozzle(
+    style: NozzleLayout, start: Optional[str], api_version: Optional[APIVersion] = None
+) -> str:
     if start is None:
         raise ValueError(
             f"Cannot configure a nozzle layout of style {style.value} without a starting nozzle."
@@ -3792,6 +3798,19 @@ def _check_valid_start_nozzle(style: NozzleLayout, start: Optional[str]) -> str:
     if start not in types.ALLOWED_PRIMARY_NOZZLES:
         raise ValueError(
             f"Starting nozzle specified is not one of {types.ALLOWED_PRIMARY_NOZZLES}."
+        )
+    if (
+        style == NozzleLayout.PARTIAL_COLUMN
+        and start == "A1"
+        and (
+            api_version is not None
+            and api_version < _PARTIAL_NOZZLE_CONFIGURATION_REAR_PARTIAL_COLUMN_ADDED_IN
+        )
+    ):
+        raise APIVersionError(
+            api_element="Partial column beginning with nozzle `A1`",
+            until_version=f"{_PARTIAL_NOZZLE_CONFIGURATION_REAR_PARTIAL_COLUMN_ADDED_IN}",
+            current_version=f"{api_version}",
         )
     return start
 
