@@ -40,6 +40,7 @@ from opentrons.protocol_api import (
     Well,
     labware,
 )
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocol_api.core.common import (
     InstrumentCore,
     LabwareCore,
@@ -1942,6 +1943,27 @@ def test_configure_nozzle_layout(
             back_left_nozzle=expected_core_args.back_left_nozzle,
         )
     )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 31)])
+def test_configure_nozzle_layout_raises_on_rear_partial_column_on_old_api(
+    subject: InstrumentContext,
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+) -> None:
+    """It should pass the correct configuration model to the engine client."""
+    decoy.when(mock_instrument_core.get_channels()).then_return(8)
+
+    with pytest.raises(
+        APIVersionError, match="Partial column beginning with nozzle `A1`"
+    ):
+        subject.configure_nozzle_layout(
+            style=NozzleLayout.PARTIAL_COLUMN,
+            start="A1",
+            end="B1",
+            front_right="A1",
+            back_left="B!",
+        )
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
