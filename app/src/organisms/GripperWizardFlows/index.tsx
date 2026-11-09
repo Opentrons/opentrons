@@ -21,6 +21,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { getWizardHeaderExit } from '/app/components/adhoc/shared/wizards/getWizardHeaderExit'
 import { SimpleWizardBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
 import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
 import { getIsOnDevice } from '/app/redux/config'
@@ -339,7 +340,7 @@ export const GripperWizard = (
     errorMessage,
     selectedSlot,
   }
-  let onExit
+  let onExit: (() => void) | undefined
   if (currentStep == null) return null
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (showConfirmExit && maintenanceRunId !== null) {
@@ -458,19 +459,23 @@ export const GripperWizard = (
     [GRIPPER_FLOW_TYPES.ATTACH]: t('attach_gripper'),
     [GRIPPER_FLOW_TYPES.DETACH]: t('detach_gripper'),
   }
-  let handleExit = onExit
-  if (isRobotMoving) {
-    handleExit = undefined
-  } else if (showConfirmExit || errorMessage != null) {
-    handleExit = handleCleanUpAndClose
-  }
+  const isError =
+    errorMessage != null || maintenanceRunStatus === RUN_STATUS_FAILED
+  const idleOnExit = showConfirmExit ? handleCleanUpAndClose : onExit
+  const { onExit: headerOnExit, exitDisabled } = getWizardHeaderExit({
+    isError,
+    isBusy: isRobotMoving,
+    onExitError: handleClose,
+    onExitIdle: idleOnExit ?? handleCleanUpAndClose,
+  })
 
   const wizardHeader = (
     <WizardHeader
       title={titleByFlowType[flowType]}
       currentStep={currentStepIndex + 1}
       totalSteps={totalStepCount + 1}
-      onExit={handleExit}
+      onExit={headerOnExit}
+      exitDisabled={exitDisabled}
     />
   )
 
