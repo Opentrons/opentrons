@@ -1936,12 +1936,34 @@ def test_configure_nozzle_layout(
     )
     decoy.verify(
         mock_instrument_core.configure_nozzle_layout(
-            style=nozzle_layout_args.style,
+            style=expected_core_args.style,
             primary_nozzle=expected_core_args.primary_nozzle,
             front_right_nozzle=expected_core_args.front_right_nozzle,
             back_left_nozzle=expected_core_args.back_left_nozzle,
         )
     )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 31)])
+def test_configure_nozzle_layout_style_string_raises(
+    subject: InstrumentContext,
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+) -> None:
+    """It should raise an API Version error for ."""
+    decoy.when(mock_instrument_core.get_channels()).then_return(8)
+
+    with pytest.raises(
+        APIVersionError,
+        match="Nozzle layout `style` parameter as `string` is not available until API version 2.32. You are currently using API version 2.31.",
+    ):
+        subject.configure_nozzle_layout(
+            style="PARTIAL_COLUMN",
+            start="A1",
+            end="B1",
+            front_right="B1",
+            back_left="A1",
+        )
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
