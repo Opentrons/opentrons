@@ -3,11 +3,9 @@ from typing import Type, cast
 import mock
 import pytest
 
-from opentrons_shared_data.labware import load_definition as load_labware_definition
 from opentrons_shared_data.module.types import ModuleDefinitionV3
 
 import opentrons.protocol_api as papi
-from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
 from opentrons.hardware_control.modules.types import (
     ThermocyclerModuleModel,
 )
@@ -79,83 +77,7 @@ def test_load_simulating_module(
     assert mod._core._sync_module_hardware.model() == model
 
 
-# _________ Thermocycler tests __________
-
-
-@pytest.mark.apiv2_non_pe_only  # Semi plate configuration removed in PAPIv2.14.
-def test_thermocycler_semi_plate_configuration(ctx: papi.ProtocolContext) -> None:
-    labware_name = "nest_96_wellplate_100ul_pcr_full_skirt"
-    mod = ctx.load_module("thermocycler", configuration="semi")
-    assert mod.geometry.labware_offset == Point(-23.28, 82.56, 97.8)
-
-    tc_labware = mod.load_labware(labware_name)
-
-    other_labware = ctx.load_labware(labware_name, 2)
-    without_first_two_cols = other_labware.wells()[16::]
-    for tc_well, other_well in zip(tc_labware.wells(), without_first_two_cols):
-        tc_well_name = tc_well.display_name.split()[0]
-        other_well_name = other_well.display_name.split()[0]
-        assert tc_well_name == other_well_name
-
-
 # __________ Testing loading Labware on modules ___________
-
-
-@pytest.mark.apiv2_non_pe_only  # engage(height=...) param was removed in PAPIv2.14.
-async def test_magdeck_gen1_labware_props(ctx: papi.ProtocolContext) -> None:
-    # TODO Ian 2019-05-29 load fixtures, not real defs
-    labware_name = "biorad_96_wellplate_200ul_pcr"
-    labware_def = load_labware_definition(labware_name, 1)
-    mod = ctx.load_module("magdeck", 1)
-    assert mod.labware is None
-    assert isinstance(mod, papi.MagneticModuleContext)
-    mod.engage(height=45)
-    assert mod._core._sync_module_hardware.current_height == 45  # type: ignore[attr-defined]
-    with pytest.raises(ValueError):
-        mod.engage(height=45.1)  # max engage height for gen1 is 45 mm
-    mod.load_labware(labware_name)
-    mod.engage()
-    if "magneticModuleEngageHeight" not in labware_def["parameters"]:
-        assert False
-    lw_offset = labware_def["parameters"]["magneticModuleEngageHeight"]
-    assert await mod._core._sync_module_hardware._driver.get_plate_height() == lw_offset  # type: ignore[attr-defined]
-    mod.disengage()
-    mod.engage(offset=2)
-    assert (
-        await mod._core._sync_module_hardware._driver.get_plate_height()  # type: ignore[attr-defined]
-        == lw_offset + 2
-    )
-    mod.disengage()
-    mod.engage(height=3)
-    assert await mod._core._sync_module_hardware._driver.get_plate_height() == 3  # type: ignore[attr-defined]
-    mod.geometry.reset_labware()
-    labware_name = "corning_96_wellplate_360ul_flat"
-    mod.load_labware(labware_name)
-    with pytest.raises(ValueError):
-        mod.engage()
-    with pytest.raises(ValueError):
-        mod.engage(offset=1)
-    mod.engage(height=2)
-    assert await mod._core._sync_module_hardware._driver.get_plate_height() == 2  # type: ignore[attr-defined]
-    mod.engage(height=0)
-    assert await mod._core._sync_module_hardware._driver.get_plate_height() == 0  # type: ignore[attr-defined]
-    mod.engage(height_from_base=2)
-    assert (
-        await mod._core._sync_module_hardware._driver.get_plate_height()  # type: ignore[attr-defined]
-        == 2 + OFFSET_TO_LABWARE_BOTTOM[mod._core._sync_module_hardware.model()]  # type: ignore[attr-defined]
-    )
-
-
-@pytest.mark.apiv2_non_pe_only  # engage(height=...) param was removed in PAPIv2.14.
-def test_magdeck_gen2_labware_props(ctx: papi.ProtocolContext) -> None:
-    mod = ctx.load_module("magnetic module gen2", 1)
-    assert isinstance(mod, papi.MagneticModuleContext)
-    mod.engage(height=25)
-    assert mod._core._sync_module_hardware.current_height == 25  # type: ignore[attr-defined]
-    with pytest.raises(ValueError):
-        mod.engage(height=25.1)  # max engage height for gen2 is 25 mm
-    mod.engage(height=0)
-    assert mod._core._sync_module_hardware.current_height == 0  # type: ignore[attr-defined]
 
 
 def test_module_compatibility() -> None:

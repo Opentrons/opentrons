@@ -59,18 +59,11 @@ def test_validate_takes_liquid(ctx: ProtocolContext, reject_module: bool) -> Non
         )
 
 
-# TODO(mm, 2023-04-28): The validate_takes_liquid() function is used both by ProtocolContexts
-# that are backed by Protocol Engine, and those that aren't. But this test is only runnable
-# with a non-Protocol-Engine ProtocolContext because it relies on the internal module.geometry
-# property.
-#
-# Find a different way to test this so that both paths are covered.
-@pytest.mark.apiv2_non_pe_only
 def test_validate_takes_liquid_module_location(ctx: ProtocolContext) -> None:
-    module = ctx.load_module("magdeck", 1)
+    module = ctx.load_module("temperatureModuleV2", "A1")
 
     validate_takes_liquid(
-        location=module.geometry.location,
+        location=Location(Point(0, 0, 0), module),
         reject_module=False,
         reject_adapter=False,
     )
@@ -80,7 +73,7 @@ def test_validate_takes_liquid_module_location(ctx: ProtocolContext) -> None:
         match="Cannot aspirate/dispense directly to a module",
     ):
         validate_takes_liquid(
-            location=module.geometry.location,
+            location=Location(Point(0, 0, 0), module),
             reject_module=True,
             reject_adapter=False,
         )
