@@ -155,7 +155,7 @@ Adding a Vacuum Module step to your protocol lets you:
 
 - **Manage labware and components:** Configure the module with any required labware, collars, and spacers. When working with an imported Protocol Designer file, this tool will also show you any installed spacers, collars, and other staged components.
 
-- **Control vacuum operation:** Set the _state_ of the module through features that control a an individual step in a vacuum protocol, or create a _profile_ that lets you specify multiple operations within a single step.
+- **Control module operations:** Set the _state_ of the module through features that control a an individual step in a vacuum protocol, or create a _profile_ that lets you specify multiple operations within a single step.
 
 To set up your Vacuum Module and add vacuum steps to a protocol, click **Edit protocol** from the module overview screen and:
 
@@ -183,9 +183,9 @@ The **Turn on Vacuum pump** button runs the pump by gauge pressure or by a perce
 
 * **Gauge pressure:** The pump runs until the system reaches a set vacuum pressure (0 to –800 mbar). In this state, the module monitors internal sensors to reach and maintain the desired vacuum pressure.
 
-* **Pump power (%):** The pump runs at a set % of the its rated power. In this state, the pump runs continuously until it is turned off, either by separate state change step or in a vacuum profile step.  Checking the optional **Duration** box exposes controls that let you set a time-at-pressure limit and open the vent.
+* **Pump power (%):** The pump runs at a set % of the its rated power. In this state, the pump runs continuously until it is turned off, either by separate state change step or in a vacuum profile step.
 
-Checking the optional **Duration** box exposes controls that place a time limit (mm:ss) on your pressure or power settings and a slider that lets you open the vent when the timer expires.
+Both pressure and power settings include an optional **Duration** checkbox and an **Ending hold** toggle. The duration controls let you place a time limit (mm:ss) on your pressure or power settings. The toggle switch opens the vent when the pressure or pump duration timer expires.
 
 <figure class="screenshot side-by-side" markdown>
 ![Pump power, vent slider](../images/vacuum-pump-power-vent.png)
@@ -229,7 +229,7 @@ Cycles are repeating loops of pressure or power operations nested within a vacuu
 
 ### Last module state
 
-When working with pressure controls, the step menu includes a "Last module state" section. This is a read-only status indicator. It updates when a previous vacuum step changes the state of the module. For example, in the first vacuum step of a protocol, the module's state is **pump: off** and **vent: open**. If the step ends with the pump on and the vent closed, the next vacuum step will show the state as **pump: on** and **vent: closed**.
+The step menu includes a "Last module state" section. This is a read-only status indicator. It changes when a vacuum step changes the status of the pump or vent. For example, in the first vacuum step of a protocol, the module's state is **pump: off** and **vent: open**. If the step ends with the pump on and the vent closed, the next vacuum step updates the module's status and shows state as **pump: on** and **vent: closed**.
 
 <figure class="screenshot" markdown>
 ![Last module state status indicator](../images/last-vacuum-state.png){ width="60%" }
