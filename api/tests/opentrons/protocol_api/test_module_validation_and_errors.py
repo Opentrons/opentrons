@@ -1,3 +1,5 @@
+"""Tests module validation and errors."""
+
 import pytest
 
 from opentrons.protocol_api.module_validation_and_errors import (

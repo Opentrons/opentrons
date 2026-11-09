@@ -28,7 +28,6 @@ from typing import (
 
 from opentrons_shared_data.labware.types import (
     LabwareDefinition,
-    LabwareDefinition2,
     LabwareParameters2,
     LabwareParameters3,
 )
@@ -43,7 +42,6 @@ from .core.engine import (
     SET_OFFSET_RESTORED_API_VERSION,
 )
 from .core.labware import AbstractLabware
-from .core.legacy.legacy_labware_core import LegacyLabwareCore
 from .core.module import AbstractModuleCore
 from opentrons.protocol_engine.types import LiquidTrackingType
 from opentrons.protocols.api_support.types import APIVersion
@@ -1584,102 +1582,3 @@ def next_available_tip(
             start,
             nozzle_map=nozzle_map,
         )
-
-
-# TODO(mc, 2022-11-09): implementation detail, move somewhere else
-# only used in old calibration flows by robot-server
-def load_from_definition(
-    definition: "LabwareDefinition2",
-    parent: Location,
-    label: Optional[str] = None,
-    api_level: Optional[APIVersion] = None,
-) -> Labware:
-    """
-    Return a labware object constructed from a provided labware definition dict
-
-    :param definition: A dict representing all required data for a labware,
-        including metadata such as the display name of the labware, a
-        definition of the order to iterate over wells, the shape of wells
-        (shape, physical dimensions, etc), and so on. The correct shape of
-        this definition is governed by the "labware-designer" project in
-        the Opentrons/opentrons repo.
-    :param parent: A [`Location`][opentrons.types.Location] representing the location where
-                   the front and left most point of the outside of labware is
-                   (often the front-left corner of a slot on the deck).
-    :param str label: An optional label that will override the labware's
-                      display name from its definition
-    :param api_level: the API version to set for the loaded labware
-                      instance. The [`Labware`][opentrons.protocol_api.Labware] will
-                      conform to this level. If not specified,
-                      defaults to ``APIVersion(2, 13)``.
-    """
-    return Labware(
-        core=LegacyLabwareCore(
-            definition=definition,
-            parent=parent,
-            label=label,
-        ),
-        api_version=api_level or APIVersion(2, 13),
-        protocol_core=None,  # type: ignore[arg-type]
-        core_map=None,  # type: ignore[arg-type]
-    )
-
-
-# TODO(mc, 2022-11-09): implementation detail, move somewhere else
-# only used in old calibration flows by robot-server
-def load(
-    load_name: str,
-    parent: Location,
-    label: Optional[str] = None,
-    namespace: Optional[str] = None,
-    version: int = 1,
-    bundled_defs: Optional[Mapping[str, LabwareDefinition2]] = None,
-    extra_defs: Optional[Mapping[str, LabwareDefinition2]] = None,
-    api_level: Optional[APIVersion] = None,
-) -> Labware:
-    """
-    Return a labware object constructed from a labware definition dict looked
-    up by name (definition must have been previously stored locally on the
-    robot)
-
-    :param load_name: A string to use for looking up a labware definition
-        previously saved to disc. The definition file must have been saved in a
-        known location
-    :param parent: A [`Location`][opentrons.types.Location] representing the location where
-                   the front and left most point of the outside of labware is
-                   (often the front-left corner of a slot on the deck).
-    :param str label: An optional label that will override the labware's
-                      display name from its definition
-    :param str namespace: The namespace the labware definition belongs to.
-        If unspecified, will search 'opentrons' then 'custom_beta'
-    :param int version: The version of the labware definition. If unspecified,
-        will use version 1.
-    :param bundled_defs: If specified, a mapping of labware names to labware
-        definitions. Only the bundle will be searched for definitions.
-    :param extra_defs: If specified, a mapping of labware names to labware
-        definitions. If no bundle is passed, these definitions will also be
-        searched.
-    :param api_level: the API version to set for the loaded labware
-                      instance. The [`Labware`][opentrons.protocol_api.Labware] will
-                      conform to this level. If not specified,
-                      defaults to ``APIVersion(2, 13)``.
-    """
-    definition = get_labware_definition(
-        load_name,
-        namespace,
-        version,
-        bundled_defs=bundled_defs,
-        extra_defs=extra_defs,
-    )
-
-    # The legacy `load_from_definition()` function that we're calling only supports
-    # schemaVersion==2 labware. Fortunately, when robot-server calls this function,
-    # we only expect it to try to load schemaVersion==2 labware, so we never expect
-    # this ValueError to be raised in practice.
-    if definition["schemaVersion"] != 2:
-        raise ValueError(
-            f"{namespace}/{load_name}/{version} has schema {definition['schemaVersion']}."
-            " Only schema 2 is supported."
-        )
-
-    return load_from_definition(definition, parent, label, api_level)

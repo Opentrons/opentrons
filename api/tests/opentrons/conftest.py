@@ -54,7 +54,6 @@ from opentrons_shared_data.deck import (
     load as load_deck,
 )
 from opentrons_shared_data.deck.types import (
-    DeckDefinitionV3,
     DeckDefinitionV6,
     RobotModel,
 )
@@ -91,11 +90,7 @@ from opentrons.hardware_control import (
     ThreadManagedHardware,
     ThreadManager,
 )
-from opentrons.protocol_api import Labware, ProtocolContext, create_protocol_context
-from opentrons.protocol_api.core.legacy.deck import (
-    DEFAULT_LEGACY_DECK_DEFINITION_VERSION,
-)
-from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocol_api import ProtocolContext, create_protocol_context
 from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
 )
@@ -108,8 +103,6 @@ from opentrons.protocol_engine.create_protocol_engine import (
 )
 from opentrons.protocols.api_support import deck_type
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.types import Location, Point
 
 
 class Protocol(NamedTuple):
@@ -265,11 +258,6 @@ def deck_definition_name(robot_model: RobotModel) -> str:
 @pytest.fixture
 def deck_definition(deck_definition_name: str) -> DeckDefinitionV6:
     return load_deck(deck_definition_name, DEFAULT_DECK_DEFINITION_VERSION)
-
-
-@pytest.fixture
-def legacy_deck_definition(deck_definition_name: str) -> DeckDefinitionV3:
-    return load_deck(deck_definition_name, DEFAULT_LEGACY_DECK_DEFINITION_VERSION)
 
 
 @pytest.fixture()
@@ -661,40 +649,6 @@ def minimal_labware_def2() -> LabwareDefinition2:
         "namespace": "dummy_namespace",
         "brand": {"brand": "opentrons"},
     }
-
-
-@pytest.fixture()
-def min_lw_impl(minimal_labware_def: LabwareDefinition2) -> LegacyLabwareCore:
-    return LegacyLabwareCore(
-        definition=minimal_labware_def, parent=Location(Point(0, 0, 0), "deck")
-    )
-
-
-@pytest.fixture()
-def min_lw2_impl(minimal_labware_def2: LabwareDefinition2) -> LegacyLabwareCore:
-    return LegacyLabwareCore(
-        definition=minimal_labware_def2, parent=Location(Point(0, 0, 0), "deck")
-    )
-
-
-@pytest.fixture()
-def min_lw(min_lw_impl: LegacyLabwareCore) -> Labware:
-    return Labware(
-        core=min_lw_impl,
-        api_version=APIVersion(2, 13),
-        protocol_core=None,  # type: ignore[arg-type]
-        core_map=None,  # type: ignore[arg-type]
-    )
-
-
-@pytest.fixture()
-def min_lw2(min_lw2_impl: LegacyLabwareCore) -> Labware:
-    return Labware(
-        core=min_lw2_impl,
-        api_version=APIVersion(2, 13),
-        protocol_core=None,  # type: ignore[arg-type]
-        core_map=None,  # type: ignore[arg-type]
-    )
 
 
 @pytest.fixture()
