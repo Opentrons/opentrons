@@ -5,19 +5,17 @@ import { COLORS, StyledText } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
-import { DEFAULT_MIN_PASSWORD_LENGTH } from '/app/resources/auth'
 import {
+  DEFAULT_MIN_PASSWORD_LENGTH,
+  DEFAULT_PASSWORD_COMPLEXITY_DISABLED_SETTINGS,
+  DEFAULT_PASSWORD_COMPLEXITY_SETTINGS,
   isValidPasswordComplexityMinimumLength,
   MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
-} from '/app/resources/auth/helpers'
+  MIN_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
+} from '/app/resources/auth'
 
 import { ChildNavigation } from '../../ChildNavigation'
 import styles from './compliance_ready_settings.module.css'
-import {
-  DEFAULT_PASSWORD_COMPLEXITY_DISABLED_SETTINGS,
-  DEFAULT_PASSWORD_COMPLEXITY_SETTINGS,
-  MIN_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
-} from './constants'
 import { NumericSettingPage } from './NumericSettingPage'
 import { SettingsListButton } from './SettingsListButton'
 import { ToggleSetting } from './ToggleSetting'

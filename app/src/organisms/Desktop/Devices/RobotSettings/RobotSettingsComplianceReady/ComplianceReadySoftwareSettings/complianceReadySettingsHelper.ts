@@ -20,10 +20,6 @@ import type {
 
 export const SECONDS_PER_MINUTE = 60
 export const SECONDS_PER_DAY = 24 * 60 * 60
-export const MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH = 256
-export const MAX_NUMBER_OF_LOGIN_ATTEMPTS = 5
-export const MIN_PASSWORD_RESET_TIME_DAYS = 1
-export const MAX_C_INT = 2147483647
 
 function getAuthSettingFieldValue(
   key: AuthSettingFieldId,

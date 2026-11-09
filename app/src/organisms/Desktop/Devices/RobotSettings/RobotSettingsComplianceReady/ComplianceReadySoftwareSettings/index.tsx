@@ -12,6 +12,18 @@ import {
 } from '@opentrons/react-api-client'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import {
+  MAX_C_INT,
+  MAX_IDLE_LOGOUT_MINUTES,
+  MAX_NUMBER_OF_LOGIN_ATTEMPTS,
+  MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
+  MAX_PASSWORD_RESET_TIME_DAYS,
+  MIN_IDLE_LOGOUT_MINUTES,
+  MIN_LENGTH_OF_REASON_FOR_INTERACTION,
+  MIN_NUMBER_OF_LOGIN_ATTEMPTS,
+  MIN_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
+  MIN_PASSWORD_RESET_TIME_DAYS,
+} from '/app/resources/auth'
 
 import { Accordion } from '../Accordion'
 import { SettingsConfirmationModal } from '../SettingsConfirmationModal'
@@ -19,12 +31,6 @@ import {
   getAuditInputPatch,
   getFieldValuesFromSettings,
   getInputPatch,
-  MAX_C_INT,
-  MAX_NUMBER_OF_LOGIN_ATTEMPTS,
-  MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
-  MIN_PASSWORD_RESET_TIME_DAYS,
-  SECONDS_PER_DAY,
-  SECONDS_PER_MINUTE,
 } from './complianceReadySettingsHelper'
 import {
   isAuditServerSettingKey,
@@ -225,7 +231,7 @@ export function ComplianceReadySoftwareSettings({
                 : ''
             }
             units={t('desktop_logins')}
-            min={1}
+            min={MIN_NUMBER_OF_LOGIN_ATTEMPTS}
             max={MAX_NUMBER_OF_LOGIN_ATTEMPTS}
             onBlur={value =>
               handleAuthSettingInputBlur('maxNumberOfLoginAttempts', value)
@@ -250,7 +256,7 @@ export function ComplianceReadySoftwareSettings({
               }
               units={t('desktop_days')}
               min={MIN_PASSWORD_RESET_TIME_DAYS}
-              max={Math.floor(MAX_C_INT / SECONDS_PER_DAY)}
+              max={MAX_PASSWORD_RESET_TIME_DAYS}
               onBlur={value =>
                 handleAuthSettingInputBlur('passwordResetTime', value)
               }
@@ -284,7 +290,7 @@ export function ComplianceReadySoftwareSettings({
                   : ''
               }
               units={t('desktop_characters')}
-              min={1}
+              min={MIN_PASSWORD_COMPLEXITY_MINIMUM_LENGTH}
               max={MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH}
               onBlur={value =>
                 handleAuthSettingInputBlur(
@@ -304,8 +310,8 @@ export function ComplianceReadySoftwareSettings({
                 : ''
             }
             units={t('desktop_minutes')}
-            min={1}
-            max={Math.floor(MAX_C_INT / SECONDS_PER_MINUTE)}
+            min={MIN_IDLE_LOGOUT_MINUTES}
+            max={MAX_IDLE_LOGOUT_MINUTES}
             onBlur={value => handleAuthSettingInputBlur('idleLogout', value)}
           />
         </ComplianceReadySettingsSection>
@@ -380,7 +386,7 @@ export function ComplianceReadySoftwareSettings({
                   value
                 )
               }
-              min={1}
+              min={MIN_LENGTH_OF_REASON_FOR_INTERACTION}
               max={MAX_C_INT}
             />
           </ComplianceReadyToggleField>

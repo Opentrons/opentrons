@@ -3,8 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { COLORS, InputField, StyledText } from '@opentrons/components'
 
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
+import { parseNumericalInput } from '/app/resources/utils/parseNumericalInput'
 
 import styles from './inputsetting.module.css'
 

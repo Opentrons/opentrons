@@ -11,7 +11,7 @@ import {
 
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
+import { parseNumericalInput } from '/app/resources/utils/parseNumericalInput'
 
 import { ACTIONS, CONSOLIDATE, DISTRIBUTE } from './constants'
 import { getVolumeRange } from './utils'

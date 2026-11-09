@@ -1,4 +1,4 @@
-import { DEFAULT_MIN_PASSWORD_LENGTH } from '/app/resources/auth'
+import { DEFAULT_MIN_PASSWORD_LENGTH } from './getPasswordComplexityError'
 
 import type { AuthSettingsData } from '@opentrons/api-client'
 
@@ -9,6 +9,7 @@ export const MIN_PASSWORD_RESET_TIME_DAYS = 1
 export const MAX_PASSWORD_RESET_TIME_DAYS = 3000
 
 export const MIN_PASSWORD_COMPLEXITY_MINIMUM_LENGTH = 1
+export const MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH = 256
 
 export const MIN_IDLE_LOGOUT_MINUTES = 1
 export const MAX_IDLE_LOGOUT_MINUTES = 30000000
@@ -18,7 +19,12 @@ export const MIN_LENGTH_OF_REASON_FOR_INTERACTION = 1
 /** Maximum value of a signed 32-bit C int. */
 export const MAX_C_INT = 2147483647
 
-export const DEFAULT_PASSWORD_COMPLEXITY_SETTINGS: AuthSettingsData = {
+export const DEFAULT_PASSWORD_COMPLEXITY_SETTINGS: Required<
+  Pick<
+    AuthSettingsData,
+    'passwordComplexitySpecialCharacters' | 'passwordComplexityMinimumLength'
+  >
+> = {
   passwordComplexitySpecialCharacters: true,
   passwordComplexityMinimumLength: DEFAULT_MIN_PASSWORD_LENGTH,
 }
