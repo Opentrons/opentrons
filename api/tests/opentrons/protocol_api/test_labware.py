@@ -11,6 +11,7 @@ from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefD
 from . import versions_at_or_above, versions_at_or_below, versions_between
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
+    MIN_SUPPORTED_VERSION,
     Labware,
     TemperatureModuleContext,
     Well,
@@ -82,16 +83,10 @@ def subject(
     )
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
+@pytest.mark.parametrize("api_version", [MIN_SUPPORTED_VERSION, MAX_SUPPORTED_VERSION])
 def test_api_version(api_version: APIVersion, subject: Labware) -> None:
     """It should have an api_version property."""
     assert subject.api_version == api_version
-
-
-@pytest.mark.parametrize("api_version", [APIVersion(2, 12)])
-def test_api_version_clamped(subject: Labware) -> None:
-    """It should not allow the API version to go any lower than 2.13."""
-    assert subject.api_version == APIVersion(2, 13)
 
 
 def test_is_tiprack(

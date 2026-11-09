@@ -80,14 +80,6 @@ if TYPE_CHECKING:
 _log = logging.getLogger(__name__)
 
 
-_IGNORE_API_VERSION_BREAKPOINT = APIVersion(2, 13)
-"""API version after which to respect... the API version setting.
-
-At this API version and below, `Labware` objects were always
-erroneously constructed set to MAX_SUPPORTED_VERSION.
-"""
-
-
 class TipSelectionError(Exception):
     pass
 
@@ -112,9 +104,6 @@ class Well:
     """
 
     def __init__(self, parent: Labware, core: WellCore, api_version: APIVersion):
-        if api_version <= _IGNORE_API_VERSION_BREAKPOINT:
-            api_version = _IGNORE_API_VERSION_BREAKPOINT
-
         self._parent = parent
         self._core = core
         self._api_version = api_version
@@ -465,8 +454,6 @@ class Labware:
                                      defaults to
                                      `MAX_SUPPORTED_VERSION`.
         """
-        if api_version <= _IGNORE_API_VERSION_BREAKPOINT:
-            api_version = _IGNORE_API_VERSION_BREAKPOINT
 
         self._api_version = api_version
         self._core: LabwareCore = core
