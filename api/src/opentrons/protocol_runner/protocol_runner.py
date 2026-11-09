@@ -14,11 +14,11 @@ from ..protocol_engine.types import (
     PrimitiveRunTimeParamValuesType,
     RunTimeParameter,
 )
+from ..protocols.api_support.definitions import MIN_SUPPORTED_JSON_SCHEMA_VERSION
 from ..protocols.types import PythonProtocol
 from .json_file_reader import JsonFileReader
 from .json_translator import JsonTranslator
 from .python_protocol_wrappers import (
-    LEGACY_JSON_SCHEMA_VERSION_CUTOFF,
     LEGACY_PYTHON_API_VERSION_CUTOFF,
     ProtocolContextCreator,
     PythonAndLegacyFileReader,
@@ -543,10 +543,12 @@ def create_protocol_runner(
     drop_tips_after_run: bool = True,
 ) -> Union[JsonRunner, PythonAndLegacyRunner]:
     """Create a protocol runner."""
-    if (
-        isinstance(protocol_config, JsonProtocolConfig)
-        and protocol_config.schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF
-    ):
+    if isinstance(protocol_config, JsonProtocolConfig):
+        if protocol_config.schema_version < MIN_SUPPORTED_JSON_SCHEMA_VERSION:
+            raise NotImplementedError(
+                f"JSON protocols with schema versions below {MIN_SUPPORTED_JSON_SCHEMA_VERSION} are "
+                "no longer supported. Upload them to Protocol Designer to update them for Flex."
+            )
         return JsonRunner(
             protocol_engine=protocol_engine,
             hardware_api=hardware_api,

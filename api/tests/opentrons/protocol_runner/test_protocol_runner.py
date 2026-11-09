@@ -183,7 +183,6 @@ def live_runner_subject(
             PythonProtocolConfig(api_version=MIN_SUPPORTED_VERSION_FOR_FLEX),
             PythonAndLegacyRunner,
         ),
-        (JsonProtocolConfig(schema_version=5), PythonAndLegacyRunner),
         (
             PythonProtocolConfig(api_version=MAX_SUPPORTED_VERSION),
             PythonAndLegacyRunner,
@@ -683,7 +682,7 @@ async def test_load_legacy_json_fails(
     protocol_engine: ProtocolEngine,
     python_runner_subject: PythonAndLegacyRunner,
 ) -> None:
-    """It should load a legacy context-based JSON protocol."""
+    """It should fail to load a legacy context-based JSON protocol."""
     labware_definition = LabwareDefinition2.model_construct()  # type: ignore[call-arg]
 
     legacy_protocol_source = ProtocolSource(
