@@ -71,7 +71,6 @@ from opentrons.protocols.api_support.deck_type import (
 )
 from opentrons.protocols.api_support.definitions import MIN_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.duration import DurationEstimator
 from opentrons.protocols.types import (
     ApiDeprecationError,
     BundleContents,
@@ -440,7 +439,6 @@ def simulate(
     custom_data_paths: Optional[List[str]] = None,
     propagate_logs: bool = False,
     hardware_simulator_file_path: Optional[str] = None,
-    duration_estimator: Optional[DurationEstimator] = None,
     log_level: str = "warning",
 ) -> _SimulateResult:
     """
@@ -501,8 +499,6 @@ def simulate(
         hardware_simulator_file_path: A path to a JSON file defining the simulated
             hardware. This is mainly for internal use by Opentrons, and is not necessary
             to simulate protocols.
-        duration_estimator: For internal use only.
-            Optional duration estimator object.
         propagate_logs: Whether this function should allow logs from the
             Opentrons stack to propagate up to the root handler.
             This can be useful if you're integrating this
@@ -737,15 +733,6 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
         parser = _get_bundle_args(parser)
 
     parser.add_argument(
-        "-e",
-        "--estimate-duration",
-        action="store_true",
-        # TODO (AL, 2021-07-26): Better wording.
-        help="Estimate how long the protocol will take to complete."
-        " This is an experimental feature.",
-    )
-
-    parser.add_argument(
         "protocol",
         metavar="PROTOCOL",
         type=argparse.FileType("rb"),
@@ -967,16 +954,12 @@ def main() -> int:
 
     args = parser.parse_args()
 
-    # TODO(mm, 2022-12-01): Configure the DurationEstimator with the correct deck type.
-    duration_estimator = DurationEstimator() if args.estimate_duration else None
-
     try:
         runlog, maybe_bundle = simulate(
             protocol_file=args.protocol,
             file_name=args.protocol.name,
             custom_labware_paths=args.custom_labware_path,
             custom_data_paths=(args.custom_data_path + args.custom_data_file),
-            duration_estimator=duration_estimator,
             hardware_simulator_file_path=getattr(
                 args, "custom_hardware_simulator_file"
             ),
@@ -998,15 +981,6 @@ def main() -> int:
 
     if args.output == "runlog":
         print(format_runlog(runlog))
-
-    if duration_estimator:
-        duration_seconds = duration_estimator.get_total_duration()
-        hours = int(duration_seconds / 60 / 60)
-        minutes = int((duration_seconds % (60 * 60)) / 60)
-        print("--------------------------------------------------------------")
-        print(f"Estimated protocol duration: {hours}h:{minutes}m")
-        print("--------------------------------------------------------------")
-        print("WARNING: Protocol duration estimation is an experimental feature")
 
     return 0
 
