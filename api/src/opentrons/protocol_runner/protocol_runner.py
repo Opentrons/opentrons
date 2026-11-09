@@ -1,6 +1,5 @@
 """Protocol run control and management."""
 
-import asyncio
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional, Union
 
@@ -18,7 +17,6 @@ from ..protocol_engine.types import (
 from ..protocols.types import PythonProtocol
 from .json_file_reader import JsonFileReader
 from .json_translator import JsonTranslator
-from .legacy_context_plugin import LegacyContextPlugin
 from .python_protocol_wrappers import (
     LEGACY_JSON_SCHEMA_VERSION_CUTOFF,
     LEGACY_PYTHON_API_VERSION_CUTOFF,
@@ -31,7 +29,6 @@ from opentrons import protocol_reader
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import ParameterContext
-from opentrons.protocol_api.core.legacy.load_info import LoadInfo
 from opentrons.protocol_engine import (
     Command,
     ProtocolEngine,
@@ -55,7 +52,6 @@ from opentrons.protocol_reader import (
 )
 from opentrons.protocols.parse import PythonParseMode
 from opentrons.util.async_helpers import asyncio_yield
-from opentrons.util.broker import Broker
 
 
 class RunResult(BaseModel):
@@ -225,9 +221,7 @@ class PythonAndLegacyRunner(AbstractRunner):
 
         # fixme(mm, 2022-12-23): This does I/O and compute-bound parsing that will block
         # the event loop. Jira RSS-165.
-        protocol = self._protocol_file_reader.read(
-            protocol_source, labware_definitions, python_parse_mode
-        )
+        protocol = self._protocol_file_reader.read(protocol_source, python_parse_mode)
         if isinstance(protocol, PythonProtocol):
             self._parameter_context = ParameterContext(api_version=protocol.api_level)
             run_time_parameters_with_overrides = (
@@ -238,27 +232,21 @@ class PythonAndLegacyRunner(AbstractRunner):
                     run_time_param_file_overrides=run_time_param_paths,
                 )
             )
+
         else:
             run_time_parameters_with_overrides = None
-        equipment_broker = None
 
         if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
-            equipment_broker = Broker[LoadInfo]()
-            self._protocol_engine.add_plugin(
-                LegacyContextPlugin(
-                    engine_loop=asyncio.get_running_loop(),
-                    broker=self._broker,
-                    equipment_broker=equipment_broker,
-                )
+            raise NotImplementedError(
+                f"This protocol requests API level {protocol.api_level}, but this simulator "
+                f"can only simulate protocols of API level {LEGACY_PYTHON_API_VERSION_CUTOFF} or higher"
             )
-            self._hardware_api.should_taskify_movement_execution(taskify=True)
         else:
             self._hardware_api.should_taskify_movement_execution(taskify=False)
 
         context = self._protocol_context_creator.create(
             protocol=protocol,
             broker=self._broker,
-            equipment_broker=equipment_broker,
         )
         initial_home_command = pe_commands.HomeCreate(
             # this command homes all axes, including pipette plunger and gripper jaw

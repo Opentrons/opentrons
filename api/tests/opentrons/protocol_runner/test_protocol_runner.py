@@ -61,7 +61,6 @@ from opentrons.protocols.api_support.definitions import (
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parse import PythonParseMode
 from opentrons.protocols.types import JsonProtocol, PythonProtocol
-from opentrons.util.broker import Broker
 
 
 @pytest.fixture
@@ -658,15 +657,12 @@ async def test_load_python_with_pe_papi_core(
     decoy.when(
         python_and_legacy_file_reader.read(
             protocol_source=protocol_source,
-            labware_definitions=[],
             python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         )
     ).then_return(protocol)
     broker_captor = matchers.Captor()
     decoy.when(
-        protocol_context_creator.create(
-            protocol=protocol, broker=broker_captor, equipment_broker=None
-        )
+        protocol_context_creator.create(protocol=protocol, broker=broker_captor)
     ).then_return(protocol_context)
 
     await python_runner_subject.load(
@@ -680,7 +676,7 @@ async def test_load_python_with_pe_papi_core(
     assert broker_captor.value is python_runner_subject.broker
 
 
-async def test_load_legacy_json(
+async def test_load_legacy_json_fails(
     decoy: Decoy,
     python_and_legacy_file_reader: PythonAndLegacyFileReader,
     protocol_context_creator: ProtocolContextCreator,
@@ -720,7 +716,6 @@ async def test_load_legacy_json(
     decoy.when(
         python_and_legacy_file_reader.read(
             protocol_source=legacy_protocol_source,
-            labware_definitions=[labware_definition],
             python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
         )
     ).then_return(legacy_protocol)
@@ -728,38 +723,16 @@ async def test_load_legacy_json(
         protocol_context_creator.create(
             legacy_protocol,
             broker=matchers.IsA(LegacyBroker),
-            equipment_broker=matchers.IsA(Broker),
         )
     ).then_return(protocol_context)
 
-    await python_runner_subject.load(
-        legacy_protocol_source,
-        python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
-        run_time_param_values=None,
-        run_time_param_paths=None,
-    )
-
-    run_func_captor = matchers.Captor()
-
-    decoy.verify(
-        protocol_engine.add_labware_definition(labware_definition),
-        protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)),
-        task_queue.set_run_func(run_func_captor),
-    )
-
-    # Verify that the run func calls the right things:
-    run_func = run_func_captor.value
-    await run_func()
-    decoy.verify(
-        await protocol_engine.add_and_execute_command(
-            request=pe_commands.HomeCreate(params=pe_commands.HomeParams(axes=None))
-        ),
-        await python_protocol_executor.execute(
-            protocol=legacy_protocol,
-            context=protocol_context,
-            run_time_parameters_with_overrides=None,
-        ),
-    )
+    with pytest.raises(NotImplementedError):
+        await python_runner_subject.load(
+            legacy_protocol_source,
+            python_parse_mode=PythonParseMode.ALLOW_LEGACY_METADATA_AND_REQUIREMENTS,
+            run_time_param_values=None,
+            run_time_param_paths=None,
+        )
 
 
 async def test_run_python_runner(

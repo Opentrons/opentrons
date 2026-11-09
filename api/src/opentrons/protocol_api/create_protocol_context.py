@@ -1,17 +1,12 @@
 """ProtocolContext factory."""
 
 import asyncio
-from typing import Any, Dict, Optional, Union, cast
+from typing import Dict, Optional, Union, cast
 
 from Pyro5.api import Proxy
 
-from opentrons_shared_data.labware.types import LabwareDefinition
-
 from .core.common import ProtocolCore as AbstractProtocolCore
 from .core.engine import ProtocolCore
-from .core.legacy.legacy_protocol_core import LegacyProtocolCore
-from .core.legacy_simulator.legacy_protocol_core import LegacyProtocolCoreSimulator
-from .deck import Deck
 from .disposal_locations import TrashBin
 from .protocol_context import ProtocolContext
 from opentrons.hardware_control import (
@@ -30,15 +25,7 @@ from opentrons.protocols.api_support.definitions import (
     MIN_SUPPORTED_VERSION,
 )
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.util.broker import Broker
 from opentrons.util.pyro.pyro_client_async_adapter import AsyncClientPyroObject
-
-
-class ProtocolEngineCoreRequiredError(Exception):
-    """Raised when a Protocol Engine core was required, but not provided.
-
-    This can happen when creating a ProtocolContext with a high api_version.
-    """
 
 
 def create_protocol_context(  # noqa: C901
@@ -49,10 +36,6 @@ def create_protocol_context(  # noqa: C901
     protocol_engine: ProtocolEngine,
     protocol_engine_loop: asyncio.AbstractEventLoop,
     broker: Optional[LegacyBroker] = None,
-    equipment_broker: Optional[Broker[Any]] = None,
-    use_simulating_core: bool = False,
-    extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
-    bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
     bundled_data: Optional[Dict[str, bytes]] = None,
 ) -> ProtocolContext:
     """Create a ProtocolContext for use in a Python protocol.
@@ -68,14 +51,6 @@ def create_protocol_context(  # noqa: C901
         protocol_engine_loop: An event loop running in the thread where
             ProtocolEngine mutations must occur.
         broker: A message broker for protocol command event publishing.
-        equipment_broker: A message broker for equipment load event publishing.
-        use_simulating_core: For pre-ProtocolEngine API versions,
-            use a simulating protocol core that will skip _most_ calls
-            to the `hardware_api`.
-        extra_labware: Extra labware definitions to include in
-            labware definition lookup paths.
-        bundled_labware: Do not use in new code. Leftover from
-            experimental ZIP protocol bundles.
         bundled_data: Do not use in new code. Leftover from
             experimental ZIP protocol bundles.
 
@@ -97,7 +72,6 @@ def create_protocol_context(  # noqa: C901
         )
 
     sync_hardware: SynchronousAdapter[HardwareControlAPI]
-    core: Union[ProtocolCore, LegacyProtocolCoreSimulator, LegacyProtocolCore]
 
     if isinstance(hardware_api, ThreadManager):
         sync_hardware = hardware_api.sync
@@ -120,10 +94,6 @@ def create_protocol_context(  # noqa: C901
         sync_hardware=sync_hardware,
     )
 
-    # TODO(mc, 2022-12-06): add API version guard in addition to instance check
-    # this swap may happen once `ctx.move_labware` off-deck is implemented
-    deck = None if isinstance(core, ProtocolCore) else cast(Deck, core.get_deck())
-
     context = ProtocolContext(
         api_version=api_version,
         # TODO(mm, 2023-05-11): This cast shouldn't be necessary.
@@ -131,7 +101,6 @@ def create_protocol_context(  # noqa: C901
         # https://peps.python.org/pep-0484/#covariance-and-contravariance
         core=cast(AbstractProtocolCore, core),
         broker=broker,
-        deck=deck,
         bundled_data=bundled_data,
     )
     # If we're loading an engine based core into the context, and we're on api level 2.16 or above, on an OT-2 we need
