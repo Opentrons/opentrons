@@ -4,7 +4,6 @@ from opentrons_shared_data.labware.types import LabwareDefinition2
 
 from opentrons.hardware_control.modules.types import TemperatureModuleModel
 from opentrons.protocol_api import OFF_DECK, ModuleContext, ProtocolContext, labware
-from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocols.api_support.labware_like import LabwareLike, LabwareLikeType
 
@@ -48,14 +47,13 @@ def test_well(trough: Labware) -> None:
     assert ll.object_type == LabwareLikeType.WELL
 
 
-def test_module(module: ModuleGeometry) -> None:
+def test_module(module: ModuleContext) -> None:
     ll = LabwareLike(module)
     assert ll.has_parent is True
     assert ll.parent.object is module.parent
     assert ll.object is module
     assert ll.object_type == LabwareLikeType.MODULE
     assert ll.is_module
-    assert ll.as_module() == module
 
 
 def test_slot() -> None:
@@ -83,7 +81,7 @@ def test_off_deck() -> None:
 
 
 def test_module_parent(
-    trough: Labware, module: ModuleGeometry, mod_trough: Labware
+    trough: Labware, module: ModuleContext, mod_trough: Labware
 ) -> None:
     assert LabwareLike(mod_trough).module_parent() == module
     assert LabwareLike(mod_trough["A1"]).module_parent() == module
@@ -93,7 +91,7 @@ def test_module_parent(
 
 
 def test_first_parent(
-    trough: Labware, module: ModuleGeometry, mod_trough: Labware
+    trough: Labware, module: ModuleContext, mod_trough: Labware
 ) -> None:
     assert LabwareLike(trough).first_parent() == "A1"
     assert LabwareLike(trough["A2"]).first_parent() == "A1"

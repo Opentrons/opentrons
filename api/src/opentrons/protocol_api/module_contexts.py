@@ -23,8 +23,6 @@ from .core.common import (
 )
 from .core.core_map import LoadedCoreMap
 from .core.engine import ENGINE_CORE_API_VERSION
-from .core.legacy.legacy_labware_core import LegacyLabwareCore as LegacyLabwareCore
-from .core.legacy.legacy_module_core import LegacyModuleCore
 from .labware import Labware
 from .module_validation_and_errors import (
     validate_heater_shaker_speed,
@@ -344,17 +342,12 @@ class ModuleContext(CommandPublisher):
             location=self._core,
         )
 
-        if isinstance(self._core, LegacyModuleCore) and isinstance(
-            labware_core, LegacyLabwareCore
-        ):
-            adapter = self._core.add_labware_core(labware_core)
-        else:
-            adapter = Labware(
-                core=labware_core,
-                api_version=self._api_version,
-                protocol_core=self._protocol_core,
-                core_map=self._core_map,
-            )
+        adapter = Labware(
+            core=labware_core,
+            api_version=self._api_version,
+            protocol_core=self._protocol_core,
+            core_map=self._core_map,
+        )
 
         self._core_map.add(labware_core, adapter)
 
@@ -1921,17 +1914,12 @@ class VacuumModuleContext(ModuleContext):
             location=self.manifold_dock,
         )
 
-        if isinstance(self._core, LegacyModuleCore) and isinstance(
-            labware_core, LegacyLabwareCore
-        ):
-            adapter = self._core.add_labware_core(labware_core)
-        else:
-            adapter = Labware(
-                core=labware_core,
-                api_version=self._api_version,
-                protocol_core=self._protocol_core,
-                core_map=self._core_map,
-            )
+        adapter = Labware(
+            core=labware_core,
+            api_version=self._api_version,
+            protocol_core=self._protocol_core,
+            core_map=self._core_map,
+        )
 
         self._core_map.add(labware_core, adapter)
 
