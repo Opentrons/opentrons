@@ -165,15 +165,36 @@ To set up your Vacuum Module and add vacuum steps to a protocol, click **Edit pr
 
 ### Vacuum state
 
-A *state* step sets an single configuration on the Vacuum Module rather than running a multi-step sequence.
+In a *state* step you can either turn on the vacuum pump or open the vent.
 
-In the step menu, click **Change Vacuum state** to configure module actions:
+<figure class=screenshot markdown>
+![Change state buttons](../images/vacuum-change-state-button.png)
+<figcaption>Change state options on the Vacuum Module</figcaption>
+</figure>
 
-* **Turn on the pump:** Run the pump using closed-loop gauge pressure (between 0 and -800 mbar) or open-loop pump power (between 1% and 100%).
-* **Open the vent:** Open the release valve to vent the chamber and return the system to atmospheric pressure (0 mbar).
-* **Set a duration:** _(Optional)_ Specify how long to run the pump (in mm:ss). When unselected, the pump runs continuously until a subsequent vacuum step changes the module's state.
+When opened, the vent remains in that state until closed by another step in the protocol.
 
-If you need to run the pump sequentially with different vacuum or power settings, you can create multiple state steps. However, it may be more efficient to create a vacuum profile or cycle, which run multiple operations sequentially once or in a loop, both within a single step.
+The **Turn on Vacuum pump** button runs the pump by gauge pressure or by a percentage of the pump's rated power.
+
+<figure class="screenshot" markdown>
+![Change state by pump pressure or operation by % of rated power](../images/vacuum-state-mode-type.png)
+<figcaption>Pump state: pressure or power</figcaption>
+</figure>
+
+* **Gauge pressure:** The pump runs until the system reaches a set vacuum pressure (0 to –800 mbar). In this state, the module monitors internal sensors to reach and maintain the desired vacuum pressure.
+
+* **Pump power (%):** The pump runs at a set % of the its rated power. In this state, the pump runs continuously until it is turned off, either by separate state change step or in a vacuum profile step.  Checking the optional **Duration** box exposes controls that let you set a time-at-pressure limit and open the vent.
+
+Checking the optional **Duration** box exposes controls that place a time limit (mm:ss) on your pressure or power settings and a slider that lets you open the vent when the timer expires.
+
+<figure class="screenshot side-by-side" markdown>
+![Pump power, vent slider](../images/vacuum-pump-power-vent.png)
+![Pump pressure, vent slider](../images/vacuum-gague-pressure-vent.png)
+<figcaption>Optional duration and vent end states</figcaption>
+</figure>
+
+!!! tip "Vacuum state vs profiles and cycles"
+    If you need to run the pump sequentially using different vacuum or power settings, you can create individual state steps. However, it may be more efficient to create a vacuum profile or cycle, which run multiple operations once or in a loop, both within a single step.
 
 ### Vacuum profiles
 
@@ -214,50 +235,3 @@ When working with pressure controls, the step menu includes a "Last module state
 ![Last module state status indicator](../images/last-vacuum-state.png){ width="60%" }
 <figcaption>Shows module status from the previous vacuum step.</figcaption>
 </figure>
-
-## Unused test section
-
-Testing with images from the step menu. Too complicated, I think.
-
-<font color="red"><strong>REMOVE UNUSED IMAGES REMINDER</strong></font>
-
-### Vacuum state image test 3
-
-A *state* step sets a single pressure or power condition on the Vacuum Module rather than running a multi-step sequence.
-
-Under **Select the state to change**, choose a primary action: change stat or program a profile. Here we only want to change state.
-
-<figure class="screenshot" markdown>
-![Options to change state or program a profile](../images/vacuum-change-state.png){ width="60%" }
-</figure>
-
-Next, you can turn on the vacuum pump or open the vent (and save the step). Selecting the pump option opens the settings that let you specify vacuum pressure, duration, and vent open/closed slider (not shown).
-
-<figure class="screenshot side-by-side" markdown>
-![blah blah test](../images/vacuum-state-pump.png)
-![test](../images/vacuum-state-pressure.png)
-</figure>
-
-### Vacuum state image test 2
-
-<div style="display: flex; gap: 2rem; align-items: flex-start;" markdown>
-<div style="flex: 1;" markdown>
-
-A *state* step sets a single pressure or power condition on the Vacuum Module rather than running a multi-step sequence.
-
-In the step menu, configure:
-
-* **Module action:** Choose whether to turn the pump on or open the vent valve.
-* **Control mode:** Select closed-loop **Gauge pressure** (0 to -800 mbar) or open-loop **Pump power** (1–100%).
-* **Duration:** Run continuously until the next command or set an optional hold time (`mm:ss`).
-
-</div>
-<div style="flex: 0 0 320px;" markdown>
-
-<figure class="screenshot" markdown>
-  ![Vacuum state step menu](../images/vacuum-state-profile.png)
-  <figcaption>Vacuum step menu configured for a state change.</figcaption>
-</figure>
-
-</div>
-</div>
