@@ -568,7 +568,7 @@
   "robot_up_to_date": "Robot is up to date",
   "robot_up_to_date_description": "It looks like your robot is already up to date, but if you're experiencing issues you can re-apply the latest update.",
   "robot_update_available": "Robot Update Available",
-  "robot_update_success": "Robot software successfully updated",
+  "robot_update_success": "Robot successfully updated",
   "robot_update_version_mismatch": "Robot reconnected with version {{actual}}, but we expected {{expected}}. Check your robot's settings page to verify whether or not the update was successful.",
   "saturation": "Saturation",
   "save": "Save",

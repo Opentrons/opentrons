@@ -141,9 +141,7 @@ describe('DownloadUpdateModal', () => {
 
     const exitButton = screen.getByRole('button', { name: 'Exit' })
 
-    expect(
-      screen.getByText('Robot software successfully updated')
-    ).toBeInTheDocument()
+    expect(screen.getByText('Robot successfully updated')).toBeInTheDocument()
     expect(exitButton).toBeInTheDocument()
     expect(mockCreateLiveCommand).toHaveBeenCalled()
     fireEvent.click(exitButton)
