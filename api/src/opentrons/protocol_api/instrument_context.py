@@ -3540,7 +3540,10 @@ class InstrumentContext(publisher.CommandPublisher):
         #       pipette definitions.
 
         if isinstance(style, str):
-            if self._api_version < _PARTIAL_NOZZLE_CONFIGURATION_REAR_PARTIAL_COLUMN_ADDED_IN:
+            if (
+                self._api_version
+                < _PARTIAL_NOZZLE_CONFIGURATION_REAR_PARTIAL_COLUMN_ADDED_IN
+            ):
                 raise APIVersionError(
                     api_element="Nozzle layout `style` parameter as `string`",
                     until_version=f"{_PARTIAL_NOZZLE_CONFIGURATION_REAR_PARTIAL_COLUMN_ADDED_IN}",
