@@ -56,7 +56,6 @@ class ProtocolsWithOverrides:
             "ninety_six_partial_column_1",
             "ninety_six_partial_column_2",
             "ninety_six_partial_column_3",
-            "eight_partial_column_bottom_left",
             "eight_partial_column_bottom_right",
             "eight_partial_column_no_end",
             "return_tip_error",
