@@ -3868,7 +3868,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "ValueError [line 23]: A partial column configuration with 'start'=A1 cannot have its 'end' parameter be in row H. Use `ALL` configuration to utilize all nozzles.",
+      "detail": "ValueError [line 25]: A partial column configuration with 'start'=A1 cannot have its 'end' parameter be in row H. Use `ALL` configuration to utilize all nozzles.",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",

@@ -1,3 +1,5 @@
+from opentrons.protocol_api import PARTIAL_COLUMN
+
 metadata = {
     "protocolName": "Rear partial column cannot be a full column",
     "description": "A1-H1 is outside the new rear partial-column maps.",
@@ -21,7 +23,7 @@ def run(protocol):
     destination = protocol.load_labware("nest_96_wellplate_100ul_pcr_full_skirt", "C1")
     pipette = protocol.load_instrument("flex_8channel_1000", "left")
     pipette.configure_nozzle_layout(
-        style="PARTIAL_COLUMN",
+        style=PARTIAL_COLUMN,
         start="A1",
         end="H1",
         tip_racks=[tiprack],

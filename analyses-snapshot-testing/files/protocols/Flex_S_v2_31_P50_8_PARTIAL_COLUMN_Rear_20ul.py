@@ -1,3 +1,5 @@
+from opentrons.protocol_api import PARTIAL_COLUMN
+
 metadata = {
     "protocolName": "Rear partial column 20 uL tips",
     "description": "Rear partial column on a 20 uL tip rack, automatic and named pickups.",
@@ -12,7 +14,6 @@ requirements = {
 def run(protocol):
     """Succeed with the new rear partial-column maps on this tip rack.
 
-    style is passed as a string, which API 2.31 accepts.
     Pickups alternate automatic tracking and a named well, and the nozzle map changes each time:
     A1-B1 automatic, A1-D1 named, A1-G1 automatic again.
     After each pickup the protocol checks that exactly the expected tip wells were consumed.
@@ -41,7 +42,7 @@ def run(protocol):
             )
 
     pipette.configure_nozzle_layout(
-        style="PARTIAL_COLUMN",
+        style=PARTIAL_COLUMN,
         start="A1",
         end="B1",
         tip_racks=[tiprack],
@@ -54,7 +55,7 @@ def run(protocol):
     pipette.drop_tip()
 
     pipette.configure_nozzle_layout(
-        style="PARTIAL_COLUMN",
+        style=PARTIAL_COLUMN,
         start="A1",
         end="D1",
         tip_racks=[tiprack],
@@ -67,7 +68,7 @@ def run(protocol):
     pipette.drop_tip()
 
     pipette.configure_nozzle_layout(
-        style="PARTIAL_COLUMN",
+        style=PARTIAL_COLUMN,
         start="A1",
         end="G1",
         tip_racks=[tiprack],
