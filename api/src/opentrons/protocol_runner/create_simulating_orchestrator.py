@@ -7,7 +7,7 @@ from ..protocol_engine.types import (
     PostRunHardwareState,
 )
 from .protocol_runner import LiveRunner, create_protocol_runner
-from .python_protocol_wrappers import SimulatingContextCreator
+from .python_protocol_wrappers import ProtocolContextCreator
 from .run_orchestrator import RunOrchestrator
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import (
@@ -104,7 +104,7 @@ async def create_simulating_orchestrator(
         command_store_provider=analysis_store_provider,
     )
 
-    simulating_context_creator = SimulatingContextCreator(
+    simulating_context_creator = ProtocolContextCreator(
         hardware_api=simulating_hardware_api,
         protocol_engine=protocol_engine,
     )

@@ -27,7 +27,6 @@ from ._types import (
     OffDeckType,
 )
 from .create_protocol_context import (
-    ProtocolEngineCoreRequiredError,
     create_protocol_context,
 )
 from .csv_context import CSVContext
@@ -108,5 +107,4 @@ __all__ = [
     "Task",
     # For internal Opentrons use only:
     "create_protocol_context",
-    "ProtocolEngineCoreRequiredError",
 ]
