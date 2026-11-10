@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next'
 import { StyledText, TouchInputField } from '@opentrons/components'
 
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard/NumericalKeyboard'
+import { MAX_C_INT } from '/app/resources/auth'
+import { parseNumericalInput } from '/app/resources/utils/parseNumericalInput'
 
 import { ChildNavigation } from '../../ChildNavigation'
-import { parseNumericalInput } from '../../utils/parseNumericalInput'
 import styles from './compliance_ready_settings.module.css'
-import { MAX_C_INT } from './constants'
 
 import type { ChangeEvent, ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'

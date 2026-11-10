@@ -93,4 +93,4 @@ export function isUiOnlyFieldId(id: SettingFieldId): id is UiSettingFieldId {
   return (UI_ONLY_FIELD_IDS as readonly string[]).includes(id)
 }
 
-export type FieldValues = Record<SettingFieldId, string | boolean>
+export type FieldValues = Record<SettingFieldId, number | boolean | null>
