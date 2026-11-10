@@ -153,15 +153,27 @@ Running Thermocycler profiles is time-consuming, so you can choose to run other 
 
 Adding a Vacuum Module step to your protocol lets you:
 
-- **Manage labware and components:** Configure the module with any required labware, collars, and spacers. When working with an imported Protocol Designer file, this tool will also show you any installed spacers, collars, and other staged components.
+* **Manage module hardware:** Assemble and move various components on and off the module. Through these different combinations of spacers, collars, filter plates, and well plates you can create a vacuum stack that either collects filtrate into standard labware or evacuates liquids directly to waste.
 
-- **Control module operations:** Set the _state_ of the module through features that control a an individual step in a vacuum protocol, or create a _profile_ that lets you specify multiple operations within a single step.
+- **Control module operations:** You can run the Vacuum Module by creating a _state step_ or a _profile step_. A state step is a simple operation that instructs the Vacuum Module to reach a specific vacuum or run the pump continuously at a percentage of its rated power. A profile step lets you develop complex, multi-part sequences of pressure or power sub-steps within a single protocol step.
 
-To set up your Vacuum Module and add vacuum steps to a protocol, click **Edit protocol** from the module overview screen and:
+### Start designing
 
-* **Add hardware:** Click on the module's deck icon (slot A3 or A4). From the popup menu, select **Edit labware** to choose the filter plates, well plates, spacers, and collars that you want to use on the module.
+Click **Edit protocol** from the deck overview screen to create Vacuum Module steps with Protocol Designer. From the starting deck screen, you can:
 
-* **Add steps:** Click **Add step** to open the step menu. From the popup menu, select **Vacuum** to change the module's state or profile and save those settings in a vacuum step.
+* Click on the module icon (slot A3 or A4) to add, remove, and manage the different spacers, collars, well plates, and filter plates used in your vacuum protocol.
+
+<figure class=screenshot markdown>
+![Deck map with Vacuum Module icon. Click to add module components or labware.](../images//vacuum-add-labware.png){ width="60%" }
+<figcaption>Click the module icon to add or edit labware.</figcaption>
+</figure>
+
+* Click **Add step** and select **Vacuum** from the popup menu to create and add a state, profile, or cycle step to your vacuum protocol.
+
+<figure class=screenshot markdown>
+![Vacuum step button showing the vacuum menu option](../images/vacuum-add-step-btn.png){ width="60%" }
+<figcaption>Adding a vacuum step.</figcaption>
+</figure>
 
 ### Vacuum state
 
@@ -212,7 +224,7 @@ When building a profile, choose one mode type only for the entire sequence of su
 <figcaption>Pressure and power profiles showing multiple sub-steps.</figcaption>
 </figure>
 
-!!! tip
+!!! info "Loops and pressure controls"
     See [Controlling vacuum operations](../../python-api/modules/vacuum.md#controlling-vacuum-operations) for more information about open and closed loop pressure controls.
 
 ### Vacuum cycles
@@ -233,5 +245,5 @@ The step menu includes a "Last module state" section. This is a read-only status
 
 <figure class="screenshot" markdown>
 ![Last module state status indicator](../images/last-vacuum-state.png){ width="60%" }
-<figcaption>Shows module status from the previous vacuum step.</figcaption>
+<figcaption>Module status from the previous vacuum step.</figcaption>
 </figure>
