@@ -239,6 +239,42 @@ def test_get_pipette_location_with_current_location_with_y_center(
     )
 
 
+def test_get_pipette_location_irregular_ordering_falls_back_to_y_center(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    pipette_view: PipetteView,
+    subject: MotionView,
+) -> None:
+    """Quirked labware that is neither a clean column nor row still gets Y_CENTER."""
+    decoy.when(pipette_view.get_current_location()).then_return(
+        CurrentWell(pipette_id="pipette-id", labware_id="reservoir-id", well_name="A1")
+    )
+
+    decoy.when(pipette_view.get("pipette-id")).then_return(
+        LoadedPipette(
+            id="pipette-id",
+            mount=MountType.RIGHT,
+            pipetteName=PipetteNameType.P300_SINGLE,
+        )
+    )
+
+    decoy.when(
+        labware_view.get_should_center_column_or_row_on_target_well(
+            "reservoir-id",
+        )
+    ).then_return(True)
+
+    decoy.when(labware_view.get_is_column_labware("reservoir-id")).then_return(False)
+    decoy.when(labware_view.get_is_row_labware("reservoir-id")).then_return(False)
+
+    result = subject.get_pipette_location("pipette-id")
+
+    assert result == PipetteLocationData(
+        mount=MountType.RIGHT,
+        critical_point=CriticalPoint.Y_CENTER,
+    )
+
+
 def test_get_pipette_location_with_current_location_with_xy_center(
     decoy: Decoy,
     labware_view: LabwareView,
