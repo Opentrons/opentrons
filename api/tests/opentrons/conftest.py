@@ -284,7 +284,7 @@ def _make_ot3_pe_ctx(
         post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
         # TODO(jbl 10-30-2023) load_fixed_trash being hardcoded to True will be refactored once we need tests to have
         #   this be False
-        load_fixed_trash=True,
+        load_fixed_trash=False,
         camera_provider=None,
     ) as (
         engine,
