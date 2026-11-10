@@ -62,6 +62,7 @@ from opentrons.protocols.advanced_control.transfers.common import (
 from opentrons.protocols.api_support import instrument as mock_instrument_support
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
+    APIVersionError,
     FlowRates,
     UnsupportedAPIError,
 )
