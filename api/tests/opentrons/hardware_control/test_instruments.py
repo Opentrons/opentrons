@@ -79,8 +79,6 @@ def dummy_instruments_ot3() -> Tuple[OT3DummyInstrumentConfig, int]:
 
 @pytest.fixture
 def mock_api_verify_tip_presence_ot3(request: SubRequest) -> Iterator[mock.AsyncMock]:
-    if request.config.getoption("--ot2-only"):
-        pytest.skip("testing ot2 only")
     from opentrons.hardware_control.ot3api import OT3API
 
     with mock.patch.object(OT3API, "verify_tip_presence") as mock_tip_presence:
@@ -98,8 +96,6 @@ def wrap_build_ot3_sim() -> Callable[[Any], Coroutine[Any, Any, OT3API]]:
 def ot3_api_obj(
     request: SubRequest, mock_api_verify_tip_presence_ot3: Iterator[mock.AsyncMock]
 ) -> Callable[[Any], Coroutine[Any, Any, OT3API]]:
-    if request.config.getoption("--ot2-only"):
-        pytest.skip("testing ot2 only")
     from opentrons.hardware_control.ot3api import OT3API
 
     return OT3API.build_hardware_simulator
