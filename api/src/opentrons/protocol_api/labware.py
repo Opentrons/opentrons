@@ -470,18 +470,11 @@ class Labware:
 
     @property
     def separate_calibration(self) -> bool:
-        if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise UnsupportedAPIError(
-                api_element="Labware.separate_calibration",
-                since_version=f"{ENGINE_CORE_API_VERSION}",
-                current_version=f"{self._api_version}",
-            )
-
-        _log.warning(
-            "Labware.separate_calibrations is a deprecated internal property."
-            " It no longer has meaning, but will always return `False`"
+        raise UnsupportedAPIError(
+            api_element="Labware.separate_calibration",
+            since_version=f"{ENGINE_CORE_API_VERSION}",
+            current_version=f"{self._api_version}",
         )
-        return False
 
     @classmethod
     def _builder_for_core_map(
@@ -852,14 +845,12 @@ class Labware:
 
         *Deprecated in version 2.14*
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise UnsupportedAPIError(
-                api_element="Labware.set_calibration()",
-                since_version=f"{ENGINE_CORE_API_VERSION}",
-                current_version=f"{self._api_version}",
-                extra_message="Try using the Opentrons App's Labware Position Check.",
-            )
-        self._core.set_calibration(delta)
+        raise UnsupportedAPIError(
+            api_element="Labware.set_calibration()",
+            since_version=f"{ENGINE_CORE_API_VERSION}",
+            current_version=f"{self._api_version}",
+            extra_message="Try using the Opentrons App's Labware Position Check.",
+        )
 
     @requires_version(2, 12)
     def set_offset(self, x: float, y: float, z: float) -> None:
@@ -920,10 +911,7 @@ class Labware:
 
         *Changed in version 2.18:* Restored, and now applies to labware type–location pairs.
         """
-        if (
-            self._api_version >= ENGINE_CORE_API_VERSION
-            and self._api_version < SET_OFFSET_RESTORED_API_VERSION
-        ):
+        if self._api_version < SET_OFFSET_RESTORED_API_VERSION:
             raise APIVersionError(
                 api_element="Labware.set_offset()",
                 until_version=f"{SET_OFFSET_RESTORED_API_VERSION}",
