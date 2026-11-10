@@ -28,7 +28,6 @@ from ._transfer_liquid_validation import (
 from .config import Clearances
 from .core.common import InstrumentCore, ProtocolCore, WellCore
 from .core.core_map import LoadedCoreMap
-from .core.engine import ENGINE_CORE_API_VERSION
 from .disposal_locations import TrashBin, WasteChute
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -58,12 +57,8 @@ _DEFAULT_DISPENSE_CLEARANCE = 1.0
 
 _log = logging.getLogger(__name__)
 
-_PREP_AFTER_ADDED_IN = APIVersion(2, 13)
-"""The version after which the pick-up tip procedure should also prepare the plunger."""
 _PRESSES_INCREMENT_REMOVED_IN = APIVersion(2, 14)
 """The version after which the pick-up tip procedure deprecates presses and increment arguments."""
-_DROP_TIP_LOCATION_ALTERNATING_ADDED_IN = APIVersion(2, 15)
-"""The version after which a drop-tip-into-trash procedure drops tips in different alternating locations within the trash well."""
 _PARTIAL_NOZZLE_CONFIGURATION_ADDED_IN = APIVersion(2, 16)
 """The version after which a partial nozzle configuration became available for the 96 Channel Pipette."""
 _PARTIAL_NOZZLE_CONFIGURATION_AUTOMATIC_TIP_TRACKING_IN = APIVersion(2, 18)
@@ -356,12 +351,11 @@ class InstrumentContext(publisher.CommandPublisher):
                 end_well,
                 end_meniscus_tracking,
             ) = self._handle_aspirate_target(target=end_target)
-        if self.api_version >= APIVersion(2, 11):
-            instrument.validate_takes_liquid(
-                location=move_to_location,
-                reject_module=self.api_version >= APIVersion(2, 13),
-                reject_adapter=self.api_version >= APIVersion(2, 15),
-            )
+        instrument.validate_takes_liquid(
+            location=move_to_location,
+            reject_module=True,
+            reject_adapter=True,
+        )
 
         if self.api_version >= APIVersion(2, 16):
             c_vol = self._core.get_available_volume() if volume is None else volume
@@ -515,13 +509,6 @@ class InstrumentContext(publisher.CommandPublisher):
 
         *Changed in version 2.27*: Added the `end_location` and `movement_delay` parameters.
         """
-        if self.api_version < APIVersion(2, 15) and push_out:
-            raise APIVersionError(
-                api_element="Parameter push_out",
-                until_version="2.15",
-                current_version=f"{self.api_version}",
-            )
-
         if flow_rate is not None:
             if self.api_version < APIVersion(2, 24):
                 raise APIVersionError(
@@ -633,12 +620,11 @@ class InstrumentContext(publisher.CommandPublisher):
                 end_meniscus_tracking,
             ) = self._handle_dispense_target(target=end_target)
 
-        if self.api_version >= APIVersion(2, 11):
-            instrument.validate_takes_liquid(
-                location=move_to_location,
-                reject_module=self.api_version >= APIVersion(2, 13),
-                reject_adapter=self.api_version >= APIVersion(2, 15),
-            )
+        instrument.validate_takes_liquid(
+            location=move_to_location,
+            reject_module=True,
+            reject_adapter=True,
+        )
 
         with publisher.publish_context(
             broker=self.broker,
@@ -1170,10 +1156,7 @@ class InstrumentContext(publisher.CommandPublisher):
         return self
 
     def _determine_speed(self, speed: float) -> float:
-        if self.api_version < APIVersion(2, 4):
-            return clamp_value(speed, 80, 20, "touch_tip:")
-        else:
-            return clamp_value(speed, 80, 1, "touch_tip:")
+        return clamp_value(speed, 80, 1, "touch_tip:")
 
     @publisher.publish(command=cmds.touch_tip)
     @requires_version(2, 0)
@@ -1284,10 +1267,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 "Touch_tip being performed on a tiprack. Please re-check your code"
             )
 
-        if self.api_version < APIVersion(2, 4):
-            move_to_location = well.top()
-        else:
-            move_to_location = well.top(z=v_offset)
+        move_to_location = well.top(z=v_offset)
 
         self._core.touch_tip(
             location=move_to_location,
@@ -1562,24 +1542,17 @@ class InstrumentContext(publisher.CommandPublisher):
         with the pipette nozzle.
         """
 
-        if presses is not None and self._api_version >= _PRESSES_INCREMENT_REMOVED_IN:
+        if presses is not None:
             raise UnsupportedAPIError(
                 api_element="presses",
                 since_version=f"{_PRESSES_INCREMENT_REMOVED_IN}",
                 current_version=f"{self._api_version}",
             )
 
-        if increment is not None and self._api_version >= _PRESSES_INCREMENT_REMOVED_IN:
+        if increment is not None:
             raise UnsupportedAPIError(
                 api_element="increment",
                 since_version=f"{_PRESSES_INCREMENT_REMOVED_IN}",
-                current_version=f"{self._api_version}",
-            )
-
-        if prep_after is not None and self._api_version < _PREP_AFTER_ADDED_IN:
-            raise APIVersionError(
-                api_element="prep_after",
-                until_version=f"{_PREP_AFTER_ADDED_IN}",
                 current_version=f"{self._api_version}",
             )
 
@@ -1675,11 +1648,8 @@ class InstrumentContext(publisher.CommandPublisher):
         instrument.validate_tiprack(self.name, tip_rack, _log)
 
         move_to_location = move_to_location or well.top()
-        prep_after = (
-            prep_after
-            if prep_after is not None
-            else self.api_version >= _PREP_AFTER_ADDED_IN
-        )
+        if prep_after is None:
+            prep_after = True
 
         with publisher.publish_context(
             broker=self.broker,
@@ -1773,10 +1743,8 @@ class InstrumentContext(publisher.CommandPublisher):
         # Set the default for alternate_drop_location, preserving historical behavior:
         if alternate_drop_location is None:
             if location is None:
-                # When location is None, we alternated the drop position since API 2.15.
-                alternate_drop_location = (
-                    self.api_version >= _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN
-                )
+                # When location is None, alternate tip drop position (since API 2.15).
+                alternate_drop_location = True
             elif isinstance(location, (TrashBin, WasteChute)):
                 # In 2.16 (when we first added support for location=TrashBin/WasteChute)
                 # and 2.17, we would always automatically alternate tip drop locations
@@ -1785,8 +1753,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 # bypassed the automatic behavior and instead went to the fixed offset or
                 # the XY center if none is provided.
                 alternate_drop_location = (
-                    self.api_version >= _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN
-                    and self.api_version < _DISPOSAL_LOCATION_OFFSET_ADDED_IN
+                    self.api_version < _DISPOSAL_LOCATION_OFFSET_ADDED_IN
                 )
             else:
                 alternate_drop_location = False
@@ -3345,13 +3312,10 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         if self._api_version >= APIVersion(2, 24):
             return self._protocol_core.get_last_location(mount=self._core.get_mount())
-        elif self._api_version >= ENGINE_CORE_API_VERSION:
-            last_location = self._protocol_core.get_last_location(
-                mount=self._core.get_mount()
-            )
-            return last_location if isinstance(last_location, types.Location) else None
-        else:
-            return self._protocol_core.get_last_location()
+        last_location = self._protocol_core.get_last_location(
+            mount=self._core.get_mount()
+        )
+        return last_location if isinstance(last_location, types.Location) else None
 
     def __repr__(self) -> str:
         return "<{}: {} in {}>".format(
