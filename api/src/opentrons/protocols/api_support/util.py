@@ -32,7 +32,6 @@ from opentrons.protocols.api_support.types import APIVersion
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.core.engine.instrument import InstrumentCore
-    from opentrons.protocol_api.labware import Labware, Well
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -62,19 +61,6 @@ def _assert_gzero(val: Any, message: str) -> float:
         return new_val
     except (TypeError, ValueError, AssertionError):
         raise AssertionError(message)
-
-
-def labware_column_shift(
-    initial_well: "Well",
-    tiprack: "Labware",
-    well_spacing: int = 4,
-    modulo_value: int = 8,
-) -> "Well":
-    unshifted_index = tiprack.wells().index(initial_well)
-    unshifted_column = unshifted_index // modulo_value
-    shifted_column = unshifted_column + well_spacing
-    shifted_well = unshifted_index % modulo_value
-    return tiprack.columns()[shifted_column][shifted_well]
 
 
 class FlowRates:

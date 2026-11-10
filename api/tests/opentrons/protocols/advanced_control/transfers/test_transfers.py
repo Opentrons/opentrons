@@ -49,7 +49,7 @@ def _instr_labware(ctx: ProtocolContext) -> InstrLabware:
 # +++++++ Test Helper Functions ++++++++++
 def test_check_if_zero() -> None:
     tclass = tx.TransferPlan
-    assert tclass._check_volume_not_zero(APIVersion(2, 6), 0)
+    assert not tclass._check_volume_not_zero(APIVersion(2, 6), 0)
     assert tclass._check_volume_not_zero(APIVersion(2, 6), 15)
     assert not tclass._check_volume_not_zero(APIVersion(2, 8), 0)
     assert tclass._check_volume_not_zero(APIVersion(2, 8), 15)

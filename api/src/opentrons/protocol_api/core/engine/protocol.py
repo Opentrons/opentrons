@@ -83,7 +83,6 @@ from opentrons.protocol_engine.types import (
     ModuleModel as ProtocolEngineModuleModel,
 )
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.types import (
     DeckSlotName,
     Location,
@@ -197,10 +196,6 @@ class ProtocolCore(
     def get_disposal_locations(self) -> List[Union[Labware, TrashBin, WasteChute]]:
         """Get disposal locations."""
         return self._disposal_locations
-
-    def get_max_speeds(self) -> AxisMaxSpeeds:
-        """Get a control interface for maximum move speeds."""
-        raise NotImplementedError("ProtocolCore.get_max_speeds not implemented")
 
     def get_hardware(self) -> SyncHardwareAPI:
         """Get direct access to a hardware control interface."""

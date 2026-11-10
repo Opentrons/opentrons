@@ -890,7 +890,7 @@ class TransferPlan:
     def _check_valid_well_list(
         self, well_list: List[Any], id: str, old_well_list: List[Any]
     ) -> None:
-        if self._api_version >= APIVersion(2, 2) and len(well_list) < 1:
+        if len(well_list) < 1:
             raise RuntimeError(
                 f"Invalid {id} for multichannel transfer: {old_well_list}"
             )
@@ -899,11 +899,7 @@ class TransferPlan:
     def _check_volume_not_zero(api_version: APIVersion, volume: float) -> bool:
         # We should only be adding volumes to transfer plans if it is
         # greater than zero to prevent extraneous robot movements.
-        if api_version < APIVersion(2, 8):
-            return True
-        elif volume > 0:
-            return True
-        return False
+        return volume > 0
 
     def _multichannel_transfer(
         self, s: AdvancedLiquidHandling, d: AdvancedLiquidHandling
@@ -957,15 +953,10 @@ class TransferPlan:
         else:
             test_well = well
 
-        if self._api_version < APIVersion(2, 2):
-            return test_well in test_well.parent.rows()[0]
+        # Allow the first 2 rows to be accessible to 384-well plates;
+        # otherwise, only the first row is accessible
+        if test_well.parent.parameters["format"] == "384Standard":
+            valid_wells = [well for row in test_well.parent.rows()[:2] for well in row]
+            return test_well in valid_wells
         else:
-            # Allow the first 2 rows to be accessible to 384-well plates;
-            # otherwise, only the first row is accessible
-            if test_well.parent.parameters["format"] == "384Standard":
-                valid_wells = [
-                    well for row in test_well.parent.rows()[:2] for well in row
-                ]
-                return test_well in valid_wells
-            else:
-                return test_well in test_well.parent.rows()[0]
+            return test_well in test_well.parent.rows()[0]

@@ -22,7 +22,6 @@ from .core.common import (
     VacuumModuleCore,
 )
 from .core.core_map import LoadedCoreMap
-from .core.engine import ENGINE_CORE_API_VERSION
 from .labware import Labware
 from .module_validation_and_errors import (
     validate_heater_shaker_speed,
@@ -149,14 +148,6 @@ class ModuleContext(CommandPublisher):
         *New in version 2.26:* The `adapter_namespace`, `adapter_version`,
         `lid_namespace`, and `lid_version` parameters.
         """
-        if self._api_version < APIVersion(2, 1) and (
-            label is not None or namespace is not None or version != 1
-        ):
-            _log.warning(
-                f"You have specified API {self.api_version}, but you "
-                "are trying to utilize new load_labware parameters in 2.1"
-            )
-
         if self._api_version < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE:
             if adapter_namespace is not None:
                 raise APIVersionError(
@@ -193,13 +184,6 @@ class ModuleContext(CommandPublisher):
 
         load_location: Union[ModuleCore, LabwareCore]
         if adapter is not None:
-            if self._api_version < APIVersion(2, 15):
-                raise APIVersionError(
-                    api_element="Loading a labware on an adapter",
-                    until_version="2.15",
-                    current_version=f"{self._api_version}",
-                )
-
             if (
                 self._api_version
                 < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
@@ -539,17 +523,10 @@ class MagneticModuleContext(ModuleContext):
 
         *Deprecated in version 2.14:* This method is unnecessary; remove any usage.
         """
-        if self._api_version < ENGINE_CORE_API_VERSION:
-            _log.warning(
-                "`MagneticModuleContext.calibrate` doesn't do anything useful"
-                " and will be removed in Protocol API version 2.14 and higher."
-            )
-            self._core._sync_module_hardware.calibrate()  # type: ignore[attr-defined]
-        else:
-            raise UnsupportedAPIError(
-                api_element="`MagneticModuleContext.calibrate`",
-                since_version="2.14",
-            )
+        raise UnsupportedAPIError(
+            api_element="`MagneticModuleContext.calibrate`",
+            since_version="2.14",
+        )
 
     @publish(command=cmds.magdeck_engage)
     @requires_version(2, 0)
@@ -589,27 +566,20 @@ class MagneticModuleContext(ModuleContext):
         their order of precedence is `height`, then `height_from_base`, then `offset`.
         """
         if height is not None:
-            if self._api_version >= _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN:
-                raise UnsupportedAPIError(
-                    api_element="The height parameter of MagneticModuleContext.engage()",
-                    since_version=f"{_MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN}",
-                    current_version=f"{self._api_version}",
-                    extra_message="Use offset or height_from_base.",
-                )
-            self._core.engage(height_from_home=height)
+            raise UnsupportedAPIError(
+                api_element="The height parameter of MagneticModuleContext.engage()",
+                since_version=f"{_MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN}",
+                current_version=f"{self._api_version}",
+                extra_message="Use offset or height_from_base.",
+            )
 
-        # This version check has a bug:
-        # if the caller sets height_from_base in an API version that's too low,
-        # we will silently ignore it instead of raising APIVersionError.
-        # Leaving this unfixed because we haven't thought through
-        # how to do backwards-compatible fixes to our version checking itself.
-        elif height_from_base is not None and self._api_version >= APIVersion(2, 2):
+        elif height_from_base is not None:
             self._core.engage(height_from_base=height_from_base)
 
         else:
             self._core.engage_to_labware(
                 offset=offset or 0,
-                preserve_half_mm=self._api_version < APIVersion(2, 3),
+                preserve_half_mm=False,
             )
 
     @publish(command=cmds.magdeck_disengage)
