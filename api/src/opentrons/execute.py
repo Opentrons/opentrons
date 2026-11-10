@@ -69,7 +69,7 @@ from opentrons.protocols.api_support.definitions import MIN_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.types import (
     ApiDeprecationError,
-    Protocol,
+    PythonProtocol,
 )
 
 if TYPE_CHECKING:
@@ -563,7 +563,7 @@ def _create_live_context_pe(
 
 
 def _run_file_pe(
-    protocol: Protocol,
+    protocol: PythonProtocol,
     hardware_api: ThreadManagedHardware,
     emit_runlog: Optional[_EmitRunlogCallable],
 ) -> None:

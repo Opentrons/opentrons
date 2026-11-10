@@ -16,3 +16,5 @@ handle anything but OT-2s.
 The additional bump to 2.15 is because that's what we tested on, and because it adds all the
 Flex-specific features.
 """
+
+MIN_SUPPORTED_JSON_SCHEMA_VERSION = 6

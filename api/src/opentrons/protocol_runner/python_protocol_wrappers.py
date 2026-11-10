@@ -23,7 +23,7 @@ from opentrons.protocol_reader import ProtocolFileRole, ProtocolSource
 from opentrons.protocols.execution.execute import run_protocol
 from opentrons.protocols.execution.execute_python import exec_add_parameters
 from opentrons.protocols.parse import PythonParseMode, parse
-from opentrons.protocols.types import Protocol, PythonProtocol
+from opentrons.protocols.types import PythonProtocol
 
 # The earliest Python Protocol API version ("apiLevel") where the protocol's simulation
 # and execution will be handled by Protocol Engine, rather than the previous direct hardware calls from protocol api.
@@ -34,11 +34,6 @@ from opentrons.protocols.types import Protocol, PythonProtocol
 LEGACY_PYTHON_API_VERSION_CUTOFF = ENGINE_CORE_API_VERSION
 
 
-# The earliest JSON protocol schema version where the protocol is executed directly by
-# Protocol Engine, rather than going through Python Protocol API v2.
-LEGACY_JSON_SCHEMA_VERSION_CUTOFF = 6
-
-
 class PythonAndLegacyFileReader:
     """Interface to read Protocol API v2 protocols prior to execution."""
 
@@ -46,7 +41,7 @@ class PythonAndLegacyFileReader:
     def read(
         protocol_source: ProtocolSource,
         python_parse_mode: PythonParseMode,
-    ) -> Protocol:
+    ) -> PythonProtocol:
         """Read a PAPIv2 protocol into a data structure."""
         protocol_file_path = protocol_source.main_file
         protocol_contents = protocol_file_path.read_text(encoding="utf-8")
@@ -87,14 +82,10 @@ class ProtocolContextCreator:
 
     def create(
         self,
-        protocol: Protocol,
+        protocol: PythonProtocol,
         broker: Optional[LegacyBroker],
     ) -> ProtocolContext:
         """Create a Protocol API v2 context."""
-        bundled_data = (
-            protocol.bundled_data if isinstance(protocol, PythonProtocol) else None
-        )
-
         return create_protocol_context(
             api_version=protocol.api_level,
             hardware_api=self._hardware_api,
@@ -102,7 +93,7 @@ class ProtocolContextCreator:
             protocol_engine=self._protocol_engine,
             protocol_engine_loop=asyncio.get_running_loop(),
             broker=broker,
-            bundled_data=bundled_data,
+            bundled_data=protocol.bundled_data,
         )
 
 
@@ -111,7 +102,7 @@ class PythonProtocolExecutor:
 
     @staticmethod
     async def execute(
-        protocol: Protocol,
+        protocol: PythonProtocol,
         context: ProtocolContext,
         run_time_parameters_with_overrides: Optional[Parameters],
     ) -> None:
