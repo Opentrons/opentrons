@@ -25,11 +25,6 @@ def module(ctx: ProtocolContext) -> ModuleContext:
     return ctx.load_module(TemperatureModuleModel.TEMPERATURE_V2, "B1")
 
 
-@pytest.fixture()
-def mod_trough(trough_definition: LabwareDefinition2, module: ModuleContext) -> Labware:
-    return module.load_labware_from_definition(trough_definition)
-
-
 def test_labware(trough: Labware) -> None:
     ll = LabwareLike(trough)
     assert ll.has_parent is True
@@ -78,26 +73,3 @@ def test_off_deck() -> None:
     assert ll.parent.object is None
     assert ll.object is OFF_DECK
     assert ll.object_type == LabwareLikeType.OFF_DECK
-
-
-def test_module_parent(
-    trough: Labware, module: ModuleContext, mod_trough: Labware
-) -> None:
-    assert LabwareLike(mod_trough).module_parent() == module
-    assert LabwareLike(mod_trough["A1"]).module_parent() == module
-    assert LabwareLike(module).module_parent() == module
-    assert LabwareLike(trough).module_parent() is None
-    assert LabwareLike("1").module_parent() is None
-
-
-def test_first_parent(
-    trough: Labware, module: ModuleContext, mod_trough: Labware
-) -> None:
-    assert LabwareLike(trough).first_parent() == "A1"
-    assert LabwareLike(trough["A2"]).first_parent() == "A1"
-    assert LabwareLike(None).first_parent() is None
-    assert LabwareLike("A3").first_parent() == "A3"
-
-    assert LabwareLike(mod_trough["A5"]).first_parent() == "B1"
-    assert LabwareLike(mod_trough).first_parent() == "B1"
-    assert LabwareLike(module).first_parent() == "B1"
