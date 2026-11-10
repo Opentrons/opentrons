@@ -21,7 +21,6 @@ from .protocols.api_support.labware_like import LabwareLike
 
 if TYPE_CHECKING:
     from .protocol_api._types import OffDeckType
-    from .protocol_api.core.legacy.module_geometry import ModuleGeometry
     from .protocol_api.labware import Labware, Well
     from .protocol_api.module_contexts import ModuleContext
 
@@ -111,7 +110,6 @@ LocationLabware = Union[
     "Labware",
     "Well",
     str,
-    "ModuleGeometry",
     LabwareLike,
     None,
     "OffDeckType",
@@ -162,7 +160,6 @@ class Location:
             "Labware",
             "Well",
             str,
-            "ModuleGeometry",
             LabwareLike,
             None,
             "ModuleContext",

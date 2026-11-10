@@ -5,7 +5,6 @@ from __future__ import annotations
 import functools
 import logging
 from collections import UserDict
-from dataclasses import astuple, dataclass, field
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -14,7 +13,6 @@ from typing import (
     ItemsView,
     Iterator,
     KeysView,
-    List,
     Optional,
     TypeVar,
     Union,
@@ -28,20 +26,12 @@ from opentrons_shared_data.errors.exceptions import (
 )
 from opentrons_shared_data.robot.types import RobotType
 
-from opentrons import types as top_types
 from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.util import ot2_axis_to_string
 from opentrons.protocols.api_support.types import APIVersion
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.core.engine.instrument import InstrumentCore
-    from opentrons.protocol_api.core.legacy.deck import Deck
-    from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
-        LegacyInstrumentCore,
-    )
-    from opentrons.protocol_api.core.legacy_simulator.legacy_instrument_core import (
-        LegacyInstrumentCoreSimulator,
-    )
     from opentrons.protocol_api.labware import Labware, Well
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -74,77 +64,6 @@ def _assert_gzero(val: Any, message: str) -> float:
         raise AssertionError(message)
 
 
-@dataclass
-class EdgeList:
-    right: Optional[top_types.Point] = field(default_factory=top_types.Point)
-    left: Optional[top_types.Point] = field(default_factory=top_types.Point)
-    center: Optional[top_types.Point] = field(default_factory=top_types.Point)
-    up: top_types.Point = field(default_factory=top_types.Point)
-    down: top_types.Point = field(default_factory=top_types.Point)
-
-
-def determine_edge_path(
-    where: "Well", mount: top_types.Mount, default_edges: EdgeList, deck: "Deck"
-) -> EdgeList:
-    left_path = EdgeList(
-        left=default_edges.left,
-        right=None,
-        center=default_edges.center,
-        up=default_edges.up,
-        down=default_edges.down,
-    )
-    right_path = EdgeList(
-        left=None,
-        right=default_edges.right,
-        center=default_edges.center,
-        up=default_edges.up,
-        down=default_edges.down,
-    )
-    labware = where.parent
-
-    r_mount = top_types.Mount.RIGHT
-    l_mount = top_types.Mount.LEFT
-    l_col = labware.columns()[0]
-    r_col = labware.columns()[-1]
-    right_pip_criteria = mount is r_mount and where in l_col
-    left_pip_criteria = mount is l_mount and where in r_col
-
-    next_to_mod = deck.is_edge_move_unsafe(mount, labware)
-    if labware.parent in ["3", "6", "9"] and left_pip_criteria:
-        return left_path
-    elif left_pip_criteria and next_to_mod:
-        return left_path
-    elif right_pip_criteria and next_to_mod:
-        return right_path
-    return default_edges
-
-
-def build_edges(
-    where: "Well",
-    offset: float,
-    mount: top_types.Mount,
-    deck: "Deck",
-    radius: float = 1.0,
-    version: APIVersion = APIVersion(2, 7),
-) -> List[top_types.Point]:
-    # Determine the touch_tip edges/points
-    offset_pt = top_types.Point(0, 0, offset)
-    edge_list = EdgeList(
-        right=where.from_center_cartesian(x=radius, y=0, z=1) + offset_pt,
-        left=where.from_center_cartesian(x=-radius, y=0, z=1) + offset_pt,
-        center=where.from_center_cartesian(x=0, y=0, z=1) + offset_pt,
-        up=where.from_center_cartesian(x=0, y=radius, z=1) + offset_pt,
-        down=where.from_center_cartesian(x=0, y=-radius, z=1) + offset_pt,
-    )
-
-    if version < APIVersion(2, 4):
-        edge_list.center = None
-        # Add the center value before switching axes
-        return [edge for edge in astuple(edge_list) if edge]
-    new_edges = determine_edge_path(where, mount, edge_list, deck)
-    return [edge for edge in astuple(new_edges) if edge]
-
-
 def labware_column_shift(
     initial_well: "Well",
     tiprack: "Labware",
@@ -161,12 +80,7 @@ def labware_column_shift(
 class FlowRates:
     """Utility class for rich setters/getters for flow rates"""
 
-    def __init__(
-        self,
-        instr: Union[
-            InstrumentCore, LegacyInstrumentCore, LegacyInstrumentCoreSimulator
-        ],
-    ) -> None:
+    def __init__(self, instr: InstrumentCore) -> None:
         self._instr = instr
 
     def set_defaults(
@@ -237,45 +151,6 @@ def find_value_for_api_version(
             break
         last = values[str(version)]
     return last
-
-
-class PlungerSpeeds:
-    """Utility class for rich setters/getters for speeds"""
-
-    def __init__(
-        self, instr: Union[LegacyInstrumentCore, LegacyInstrumentCoreSimulator]
-    ) -> None:
-        self._instr = instr
-
-    @property
-    def aspirate(self) -> float:
-        return self._instr.get_hardware_state()["aspirate_speed"]
-
-    @aspirate.setter
-    def aspirate(self, new_val: float) -> None:
-        self._instr.set_pipette_speed(
-            aspirate=_assert_gzero(new_val, "speed should be a numerical value in mm/s")
-        )
-
-    @property
-    def dispense(self) -> float:
-        return self._instr.get_hardware_state()["dispense_speed"]
-
-    @dispense.setter
-    def dispense(self, new_val: float) -> None:
-        self._instr.set_pipette_speed(
-            dispense=_assert_gzero(new_val, "speed should be a numerical value in mm/s")
-        )
-
-    @property
-    def blow_out(self) -> float:
-        return self._instr.get_hardware_state()["blow_out_speed"]
-
-    @blow_out.setter
-    def blow_out(self, new_val: float) -> None:
-        self._instr.set_pipette_speed(
-            blow_out=_assert_gzero(new_val, "speed should be a numerical value in mm/s")
-        )
 
 
 class AxisMaxSpeeds(UserDict[Union[str, Axis], float]):

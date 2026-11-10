@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING, Any, List, Optional, Set, Tuple, Union, cast
 
 if TYPE_CHECKING:
     from opentrons.protocol_api._types import OffDeckType
-    from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
     from opentrons.protocol_api.labware import Labware, Well
     from opentrons.protocol_api.module_contexts import ModuleContext
 
@@ -11,7 +10,6 @@ WrappableLabwareLike = Union[
     "Labware",
     "Well",
     str,
-    "ModuleGeometry",
     "LabwareLike",
     None,
     "OffDeckType",
@@ -37,9 +35,6 @@ class LabwareLike:
         """
         # Import locally to avoid circular dependency
         from opentrons.protocol_api._types import OffDeckType
-        from opentrons.protocol_api.core.legacy.module_geometry import (
-            ModuleGeometry,
-        )
         from opentrons.protocol_api.labware import Labware, Well
         from opentrons.protocol_api.module_contexts import ModuleContext
 
@@ -57,7 +52,7 @@ class LabwareLike:
         elif isinstance(self._labware_like, str):
             self._type = LabwareLikeType.SLOT
             self._as_str = self._labware_like
-        elif isinstance(self._labware_like, (ModuleGeometry, ModuleContext)):
+        elif isinstance(self._labware_like, ModuleContext):
             self._type = LabwareLikeType.MODULE
             self._as_str = repr(self._labware_like)
         elif isinstance(self._labware_like, LabwareLike):
@@ -127,16 +122,10 @@ class LabwareLike:
 
         return cast(Labware, self.object)
 
-    def as_module(self) -> Union["ModuleContext", "ModuleGeometry"]:
-        from opentrons.protocol_api.core.legacy.module_geometry import (
-            ModuleGeometry,
-        )
+    def as_module(self) -> "ModuleContext":
         from opentrons.protocol_api.module_contexts import ModuleContext
 
-        if isinstance(self.object, ModuleContext):
-            return self.object
-
-        return cast(ModuleGeometry, self.object)
+        return cast(ModuleContext, self.object)
 
     def get_parent_labware_and_well(
         self,
@@ -174,15 +163,15 @@ class LabwareLike:
 
         return _fp_recurse(self)
 
-    def module_parent(self) -> Union["ModuleGeometry", "ModuleContext", None]:
+    def module_parent(self) -> Union["ModuleContext", None]:
         """
         Return the closest parent of this LabwareLike (including, possibly,
-        the wrapped object) that is a ModuleGeometry
+        the wrapped object) that is a module
         """
 
         def recursive_get_module_parent(
             obj: LabwareLike,
-        ) -> Union["ModuleGeometry", "ModuleContext", None]:
+        ) -> Union["ModuleContext", None]:
             if obj.is_module:
                 return obj.as_module()
             next_obj = obj.parent
