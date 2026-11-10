@@ -63,9 +63,8 @@ def mock_deck_configuration_store(decoy: Decoy) -> DeckConfigurationStore:
 
 
 @pytest.fixture
-def ot3_hardware_api(request: pytest.FixtureRequest) -> OT3API:
+def ot3_hardware_api() -> OT3API:
     """Real OT3API backed by the software simulator, bound to a dedicated event loop."""
-    request.node.add_marker("ot3_only")
     try:
         from opentrons.hardware_control.ot3api import OT3API
 

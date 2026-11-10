@@ -32,7 +32,6 @@ async def robot_client(base_url: str) -> AsyncGenerator[RobotClient, None]:
             "2",
             "D1",
             "D2",
-            marks=pytest.mark.ot3_only,
         ),
         pytest.param(
             lf("ot3_server_base_url"),
@@ -41,7 +40,6 @@ async def robot_client(base_url: str) -> AsyncGenerator[RobotClient, None]:
             "D2",
             "D1",
             "D2",
-            marks=pytest.mark.ot3_only,
         ),
     ],
 )

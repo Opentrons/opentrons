@@ -50,9 +50,8 @@ TEST_PYRO_TIMEOUT = 5
 
 
 @pytest.fixture
-def ot3_hardware_api(decoy: Decoy, request: pytest.FixtureRequest) -> OT3API:
+def ot3_hardware_api(decoy: Decoy) -> OT3API:
     """Get a mocked out OT3API."""
-    request.node.add_marker("ot3_only")
     try:
         from opentrons.hardware_control.ot3api import OT3API
 
