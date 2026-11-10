@@ -17,15 +17,7 @@ def validate_blowout_location(
     blowout_location: Optional[Any],
 ) -> None:
     """Validate the blowout location."""
-    if blowout_location and api_version < APIVersion(2, 8):
-        raise ValueError(
-            "Cannot specify blowout location when using api"
-            + " version below 2.8, current version is {api_version}".format(
-                api_version=api_version
-            )
-        )
-
-    elif liquid_handling_command == "consolidate" and blowout_location == "source well":
+    if liquid_handling_command == "consolidate" and blowout_location == "source well":
         raise ValueError("blowout location for consolidate cannot be source well")
     elif (
         liquid_handling_command == "distribute"
