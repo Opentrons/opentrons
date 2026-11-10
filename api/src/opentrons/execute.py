@@ -415,7 +415,7 @@ def execute(
     if protocol.api_level < MIN_SUPPORTED_VERSION:
         raise NotImplementedError(
             f"This protocol requests API level {protocol.api_level}, but this simulator "
-            f"can only simulate protocols of API level {MIN_SUPPORTED_VERSION} or higher"
+            f"can only execute protocols of API level {MIN_SUPPORTED_VERSION} or higher"
         )
 
     # TODO(mm, 2023-07-06): Once these NotImplementedErrors are resolved, consider removing
