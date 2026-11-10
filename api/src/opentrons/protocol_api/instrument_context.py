@@ -29,7 +29,6 @@ from .config import Clearances
 from .core.common import InstrumentCore, ProtocolCore, WellCore
 from .core.core_map import LoadedCoreMap
 from .core.engine import ENGINE_CORE_API_VERSION
-from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
 from .disposal_locations import TrashBin, WasteChute
 from opentrons import types
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -49,7 +48,6 @@ from opentrons.protocols.api_support.types import APIVersion, TransferArgs
 from opentrons.protocols.api_support.util import (
     APIVersionError,
     FlowRates,
-    PlungerSpeeds,
     UnsupportedAPIError,
     clamp_value,
     requires_version,
@@ -3065,7 +3063,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @property
     @requires_version(2, 0)
-    def speed(self) -> "PlungerSpeeds":
+    def speed(self) -> None:
         """
         The speeds (in mm/s) configured for the pipette plunger.
 
@@ -3081,13 +3079,9 @@ class InstrumentContext(publisher.CommandPublisher):
         speed configuration. Use [`flow_rate`][opentrons.protocol_api.InstrumentContext.flow_rate]
         instead.
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise UnsupportedAPIError(
-                message="InstrumentContext.speed has been removed. Use InstrumentContext.flow_rate, instead."
-            )
-
-        assert isinstance(self._core, LegacyInstrumentCore)
-        return self._core.get_speed()
+        raise UnsupportedAPIError(
+            message="InstrumentContext.speed has been removed. Use InstrumentContext.flow_rate, instead."
+        )
 
     @property
     @requires_version(2, 0)

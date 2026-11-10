@@ -34,7 +34,6 @@ from .core.common import LabwareCore, ModuleCore, ProtocolCore
 from .core.core_map import LoadedCoreMap
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.engine.module_core import NonConnectedModuleCore
-from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 from .core.module import (
     AbstractAbsorbanceReaderCore,
     AbstractFlexStackerCore,
@@ -1275,16 +1274,12 @@ class ProtocolContext(CommandPublisher):
         If you're looking for a way for your protocol to resume automatically
         after a period of time, use [`delay()`][opentrons.protocol_api.ProtocolContext.delay].
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise UnsupportedAPIError(
-                api_element="A Python Protocol safely resuming itself after a pause",
-                since_version=f"{ENGINE_CORE_API_VERSION}",
-                current_version=f"{self._api_version}",
-                extra_message="To wait automatically for a period of time, use ProtocolContext.delay().",
-            )
-
-        assert isinstance(self._core, LegacyProtocolCore)
-        self._core.resume()
+        raise UnsupportedAPIError(
+            api_element="A Python Protocol safely resuming itself after a pause",
+            since_version=f"{ENGINE_CORE_API_VERSION}",
+            current_version=f"{self._api_version}",
+            extra_message="To wait automatically for a period of time, use ProtocolContext.delay().",
+        )
 
     @publish(command=cmds.comment)
     @requires_version(2, 0)

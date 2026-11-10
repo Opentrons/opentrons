@@ -25,7 +25,6 @@ from .core.core_map import LoadedCoreMap
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_labware_core import LegacyLabwareCore as LegacyLabwareCore
 from .core.legacy.legacy_module_core import LegacyModuleCore
-from .core.legacy.module_geometry import ModuleGeometry as LegacyModuleGeometry
 from .labware import Labware
 from .module_validation_and_errors import (
     validate_heater_shaker_speed,
@@ -115,22 +114,11 @@ class ModuleContext(CommandPublisher):
 
         *Deprecated in version 2.14:* Use `load_labware()` or `load_labware_by_definition()`.
         """
-        if not isinstance(self._core, LegacyModuleCore):
-            raise UnsupportedAPIError(
-                api_element="`ModuleContext.load_labware_object`",
-                since_version="2.14",
-                extra_message="Use `ModuleContext.load_labware` or `load_labware_by_definition` instead.",
-            )
-
-        _log.warning(
-            "`ModuleContext.load_labware_object` is an internal, deprecated method. Use `ModuleContext.load_labware` or `load_labware_by_definition` instead."
+        raise UnsupportedAPIError(
+            api_element="`ModuleContext.load_labware_object`",
+            since_version="2.14",
+            extra_message="Use `ModuleContext.load_labware` or `load_labware_by_definition` instead.",
         )
-
-        assert labware.parent == self._core.geometry, (
-            "Labware is not configured with this module as its parent"
-        )
-
-        return self._core.geometry.add_labware(labware)
 
     def load_labware(  # noqa: C901
         self,
@@ -276,17 +264,12 @@ class ModuleContext(CommandPublisher):
                 version=checked_lid_version,
             )
 
-        if isinstance(self._core, LegacyModuleCore) and isinstance(
-            labware_core, LegacyLabwareCore
-        ):
-            labware = self._core.add_labware_core(labware_core)
-        else:
-            labware = Labware(
-                core=labware_core,
-                api_version=self._api_version,
-                protocol_core=self._protocol_core,
-                core_map=self._core_map,
-            )
+        labware = Labware(
+            core=labware_core,
+            api_version=self._api_version,
+            protocol_core=self._protocol_core,
+            core_map=self._core_map,
+        )
 
         self._core_map.add(labware_core, labware)
 
@@ -415,16 +398,13 @@ class ModuleContext(CommandPublisher):
 
     @property
     @requires_version(2, 0)
-    def geometry(self) -> LegacyModuleGeometry:
+    def geometry(self) -> None:
         """The object representing the module as an item on the deck.
 
         *Deprecated in version 2.14:*
             Use properties of the `ModuleContext` instead,
             like `model` and `type`.
         """
-        if isinstance(self._core, LegacyModuleCore):
-            return self._core.geometry
-
         raise UnsupportedAPIError(
             api_element="`ModuleContext.geometry`",
             since_version="2.14",

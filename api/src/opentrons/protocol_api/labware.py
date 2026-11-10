@@ -44,8 +44,6 @@ from .core.engine import (
 )
 from .core.labware import AbstractLabware
 from .core.legacy.legacy_labware_core import LegacyLabwareCore
-from .core.legacy.legacy_well_core import LegacyWellCore
-from .core.legacy.well_geometry import WellGeometry
 from .core.module import AbstractModuleCore
 from opentrons.protocol_engine.types import LiquidTrackingType
 from opentrons.protocols.api_support.types import APIVersion
@@ -82,14 +80,6 @@ if TYPE_CHECKING:
 _log = logging.getLogger(__name__)
 
 
-_IGNORE_API_VERSION_BREAKPOINT = APIVersion(2, 13)
-"""API version after which to respect... the API version setting.
-
-At this API version and below, `Labware` objects were always
-erroneously constructed set to MAX_SUPPORTED_VERSION.
-"""
-
-
 class TipSelectionError(Exception):
     pass
 
@@ -114,9 +104,6 @@ class Well:
     """
 
     def __init__(self, parent: Labware, core: WellCore, api_version: APIVersion):
-        if api_version <= _IGNORE_API_VERSION_BREAKPOINT:
-            api_version = _IGNORE_API_VERSION_BREAKPOINT
-
         self._parent = parent
         self._core = core
         self._api_version = api_version
@@ -174,9 +161,7 @@ class Well:
         return self._core.get_max_volume()
 
     @property
-    def geometry(self) -> WellGeometry:
-        if isinstance(self._core, LegacyWellCore):
-            return self._core.geometry
+    def geometry(self) -> None:
         raise UnsupportedAPIError(api_element="Well.geometry")
 
     @property
@@ -469,8 +454,6 @@ class Labware:
                                      defaults to
                                      `MAX_SUPPORTED_VERSION`.
         """
-        if api_version <= _IGNORE_API_VERSION_BREAKPOINT:
-            api_version = _IGNORE_API_VERSION_BREAKPOINT
 
         self._api_version = api_version
         self._core: LabwareCore = core
@@ -563,9 +546,6 @@ class Labware:
             off-deck. Formerly, if the labware was removed by using `del` on
             [`deck`][opentrons.protocol_api.ProtocolContext.deck], this would return where it was before its removal.
         """
-        if isinstance(self._core, LegacyLabwareCore):
-            # Type ignoring to preserve backwards compatibility
-            return self._core.get_geometry().parent.labware.object  # type: ignore
 
         assert self._protocol_core and self._core_map, "Labware initialized incorrectly"
 
@@ -596,15 +576,11 @@ class Labware:
         .. deprecated: 2.14
             Set the name of labware in `load_labware` instead.
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise UnsupportedAPIError(
-                api_element="Labware.name setter",
-                since_version=f"{ENGINE_CORE_API_VERSION}",
-                current_version=f"{self._api_version}",
-            )
-
-        assert isinstance(self._core, LegacyLabwareCore)
-        self._core.set_name(new_name)
+        raise UnsupportedAPIError(
+            api_element="Labware.name setter",
+            since_version=f"{ENGINE_CORE_API_VERSION}",
+            current_version=f"{self._api_version}",
+        )
 
     @property
     @requires_version(2, 0)
@@ -1235,15 +1211,11 @@ class Labware:
         *Deprecated in version 2.14:* Ensure tip length is set properly in your tip rack's definition
         and/or use the Opentrons App's tip length calibration feature.
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise UnsupportedAPIError(
-                api_element="Labware.tip_length setter",
-                since_version=f"{ENGINE_CORE_API_VERSION}",
-                current_version=f"{self._api_version}",
-            )
-
-        assert isinstance(self._core, LegacyLabwareCore)
-        self._core.set_tip_length(length)
+        raise UnsupportedAPIError(
+            api_element="Labware.tip_length setter",
+            since_version=f"{ENGINE_CORE_API_VERSION}",
+            current_version=f"{self._api_version}",
+        )
 
     # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def next_tip(
@@ -1299,22 +1271,11 @@ class Labware:
         *Deprecated in version 2.14:* Modification of tip tracking state outside
         [`reset()`][opentrons.protocol_api.labware.Labware.reset] has been deprecated.
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise UnsupportedAPIError(
-                api_element="Labware.use_tips",
-                since_version=f"{ENGINE_CORE_API_VERSION}",
-                current_version=f"{self._api_version}",
-                extra_message="To modify tip state, use Labware.reset.",
-            )
-
-        assert num_channels > 0, "Bad call to use_tips: num_channels<=0"
-        fail_if_full = self._api_version < APIVersion(2, 2)
-
-        assert isinstance(self._core, LegacyLabwareCore)
-        self._core.get_tip_tracker().use_tips(
-            start_well=start_well._core,
-            num_channels=num_channels,
-            fail_if_full=fail_if_full,
+        raise UnsupportedAPIError(
+            api_element="Labware.use_tips",
+            since_version=f"{ENGINE_CORE_API_VERSION}",
+            current_version=f"{self._api_version}",
+            extra_message="To modify tip state, use Labware.reset.",
         )
 
     def __repr__(self) -> str:
@@ -1345,18 +1306,11 @@ class Labware:
 
         *Removed in version 2.14*
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise UnsupportedAPIError(
-                api_element="Labware.previous_tip",
-                since_version=f"{ENGINE_CORE_API_VERSION}",
-                current_version=f"{self._api_version}",
-            )
-
-        # This logic is the inverse of `next_tip()`
-        assert num_tips > 0, "Bad call to previous_tip: num_tips <= 0"
-        assert isinstance(self._core, LegacyLabwareCore)
-        well_core = self._core.get_tip_tracker().previous_tip(num_tips=num_tips)
-        return self._wells_by_name[well_core.get_name()] if well_core else None
+        raise UnsupportedAPIError(
+            api_element="Labware.previous_tip",
+            since_version=f"{ENGINE_CORE_API_VERSION}",
+            current_version=f"{self._api_version}",
+        )
 
     # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def return_tips(self, start_well: Well, num_channels: int = 1) -> None:
@@ -1383,20 +1337,11 @@ class Labware:
         *Removed in version 2.14:* Use
         [`reset()`][opentrons.protocol_api.labware.Labware.reset] instead.
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise UnsupportedAPIError(
-                api_element="Labware.return_tips()",
-                since_version=f"{ENGINE_CORE_API_VERSION}",
-                current_version=f"{self._api_version}",
-                extra_message="Use Labware.reset() instead.",
-            )
-
-        # This logic is the inverse of `use_tips()`
-        assert num_channels > 0, "Bad call to return_tips: num_channels <= 0"
-
-        assert isinstance(self._core, LegacyLabwareCore)
-        self._core.get_tip_tracker().return_tips(
-            start_well=start_well._core, num_channels=num_channels
+        raise UnsupportedAPIError(
+            api_element="Labware.return_tips()",
+            since_version=f"{ENGINE_CORE_API_VERSION}",
+            current_version=f"{self._api_version}",
+            extra_message="Use Labware.reset() instead.",
         )
 
     @requires_version(2, 0)
