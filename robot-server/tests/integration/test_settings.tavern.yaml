@@ -2,62 +2,84 @@
 test_name: GET Settings
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: Settings GET request returns correct info
     request:
       method: GET
-      url: '{ot2_server_base_url}/settings'
+      url: '{ot3_server_base_url}/settings'
     response:
       status_code: 200
       json:
         settings:
-          - id: shortFixedTrash
-            old_id: short-fixed-trash
-            title: Short (55mm) fixed trash
-            description: !re_search 'Trash box is 55mm tall'
-            restart_required: false
-            value: !anything
-          - id: deckCalibrationDots
-            old_id: dots-deck-type
-            title: Deck calibration to dots
-            description: !re_search 'Perform deck calibration to dots'
-            restart_required: false
-            value: !anything
           - id: disableHomeOnBoot
             old_id: disable-home-on-boot
             title: Disable home on boot
             description: Prevent robot from homing motors on boot
             restart_required: false
             value: !anything
-          - id: useOldAspirationFunctions
+          - id: disableStallDetection
             old_id: Null
-            title: Use older aspirate behavior
-            description: !re_search 'Aspirate with the less accurate volumetric calibrations'
+            title: Disable stall detection on the Flex.
+            description: This is an Opentrons-internal setting for hardware-testing.
             restart_required: false
             value: !anything
-          - id: enableDoorSafetySwitch
+          - id: disableStatusBar
             old_id: Null
-            title: Enable robot door safety switch
-            description: !re_search 'Automatically pause protocols when robot door opens'
+            title: Disable the LED status bar on the Flex.
+            description: This setting disables the LED status bar on the Flex.
+            restart_required: false
+            value: !anything
+          - id: disableOverpressureDetection
+            old_id: Null
+            title: Disable Flex pipette pressure sensing.
+            description: !re_search 'When this setting is on, Flex will continue its activities'
+            restart_required: false
+            value: !anything
+          - id: enableOEMMode
+            old_id: Null
+            title: Enable OEM Mode
+            description: This setting anonymizes Opentrons branding in the ODD app.
+            restart_required: false
+            value: !anything
+          - id: disableFlexStackerLabwareDetection
+            old_id: Null
+            title: Disable Flex Stacker's labware detection features
+            description: !re_search 'Flex Stackers will ignore labware'
+            restart_required: false
+            value: !anything
+          - id: internal96chAttach
+            old_id: Null
+            title: Modified 96-channel pipette attachment
+            description: !re_search 'Lower the right mount to attach mount'
+            restart_required: false
+            value: !anything
+          - id: disableVacuumModuleWasteDetection
+            old_id: Null
+            title: Disable Vacuum Module's waste full detection features
+            description: !re_search 'Vacuum Modules will ignore when the waste is full'
             restart_required: false
             value: !anything
         links: !anydict
 
 ---
 # All Possible Settings with bool values
+# enableOEMMode is excluded because POSTing it requires a running system-server.
 test_name: POST Setting and value
 marks:
+  - ot3_only
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
   - parametrize:
       key: id
       vals:
-        - shortFixedTrash
-        - deckCalibrationDots
         - disableHomeOnBoot
-        - useOldAspirationFunctions
-        - enableDoorSafetySwitch
+        - disableStallDetection
+        - disableStatusBar
+        - disableOverpressureDetection
+        - disableFlexStackerLabwareDetection
+        - internal96chAttach
+        - disableVacuumModuleWasteDetection
   - parametrize:
       key: value
       vals:
@@ -67,7 +89,7 @@ stages:
   - name: Set each setting to acceptable values
     request:
       method: POST
-      url: '{ot2_server_base_url}/settings'
+      url: '{ot3_server_base_url}/settings'
       json:
         id: '{id}'
         value: '{value}'
@@ -81,23 +103,27 @@ stages:
 
 ---
 # All Possible Settings with no values
+# enableOEMMode is excluded because POSTing it requires a running system-server.
 test_name: POST Settings with no values
 marks:
+  - ot3_only
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
   - parametrize:
       key: id
       vals:
-        - shortFixedTrash
-        - deckCalibrationDots
         - disableHomeOnBoot
-        - useOldAspirationFunctions
-        - enableDoorSafetySwitch
+        - disableStallDetection
+        - disableStatusBar
+        - disableOverpressureDetection
+        - disableFlexStackerLabwareDetection
+        - internal96chAttach
+        - disableVacuumModuleWasteDetection
 stages:
   - name: Set each setting to acceptable values
     request:
       method: POST
-      url: '{ot2_server_base_url}/settings'
+      url: '{ot3_server_base_url}/settings'
       json:
         id: '{id}'
     response:
@@ -112,13 +138,14 @@ stages:
 # POST Incorrect Values
 test_name: POST With incorrect ID
 marks:
+  - ot3_only
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: Post with incorrect ID
     request:
       method: POST
-      url: '{ot2_server_base_url}/settings'
+      url: '{ot3_server_base_url}/settings'
       json:
         id: notARealID
         value: true
