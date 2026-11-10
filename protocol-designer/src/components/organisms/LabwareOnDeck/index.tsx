@@ -57,8 +57,9 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): ReactNode {
     borderStroke,
     ignoreMissingTips = false,
     wellLabelOptions,
-    // Default true so deck/module labware is centered; pass false when a parent
-    // already applies CenterLabwareInModuleChildSlot
+    // Default true: wrap with CenterLabwareInSlot. Pass false when a parent
+    // already centers (e.g. CenterLabwareInModuleChildSlot) or must not center
+    // (e.g. stacker shuttle).
     centerInSlot = true,
   } = props
   const missingAndUsedTipsByLabwareId = useSelector(
