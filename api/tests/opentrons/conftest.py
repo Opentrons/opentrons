@@ -100,7 +100,6 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.create_protocol_engine import (
     create_protocol_engine_in_thread,
 )
-from opentrons.protocols.api_support import deck_type
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 
@@ -156,10 +155,6 @@ async def enable_ot3_hardware_controller(
     decoy: Decoy,
     mock_feature_flags: None,
 ) -> None:
-    # this is from the command line parameters added in root conftest
-    if request.config.getoption("--ot2-only"):
-        pytest.skip("testing only ot2")
-
     decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(True)
 
 
@@ -198,42 +193,25 @@ async def ot3_hardware(
     request: pytest.FixtureRequest,
     enable_ot3_hardware_controller: None,
 ) -> AsyncGenerator[ThreadManagedHardware, None]:
-    # this is from the command line parameters added in root conftest
-    if request.config.getoption("--ot2-only"):
-        pytest.skip("testing only ot2")
     async with _build_ot3_hw() as hw:
         yield hw
 
 
-@pytest.fixture(params=["OT-3 Standard"])
+@pytest.fixture()
 async def robot_model(
-    request: pytest.FixtureRequest,
     decoy: Decoy,
     mock_feature_flags: None,
 ) -> AsyncGenerator[RobotModel, None]:
-    which_machine = cast(RobotModel, request.param)
-    if request.node.get_closest_marker("ot2_only") and which_machine == "OT-3 Standard":
-        pytest.skip("test requests only ot-2")
-    if request.node.get_closest_marker("ot3_only") and which_machine == "OT-2 Standard":
-        pytest.skip("test requests only ot-3")
-    if which_machine == "OT-3 Standard" and request.config.getoption("--ot2-only"):
-        pytest.skip("testing only ot2")
-
-    decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(
-        which_machine == "OT-3 Standard"
-    )
-    yield which_machine
+    decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(True)
+    yield "OT-3 Standard"
 
 
 @pytest.fixture
 def deck_definition_name(robot_model: RobotModel) -> str:
     if robot_model == "OT-3 Standard":
         return DeckType.OT3_STANDARD
-    elif robot_model == "OT-2 Standard":
-        # There are two OT-2 deck definitions (standard and short-trash),
-        # but RobotModel does not draw such a distinction. We assume here that it's
-        # sufficient to run OT-2 tests with the standard deck definition only.
-        return deck_type.STANDARD_OT2_DECK
+    else:
+        raise UnsupportedHardwareCommand(message="No OT-2 support anymore")
 
 
 @pytest.fixture
@@ -261,7 +239,6 @@ async def hardware(
 @contextlib.contextmanager
 def _make_ot3_pe_ctx(
     hardware: ThreadManagedHardware,
-    deck_type: str,
 ) -> Generator[ProtocolContext, None, None]:
     """Return a ProtocolContext configured for an OT-3 and backed by Protocol Engine."""
     with create_protocol_engine_in_thread(
@@ -293,7 +270,7 @@ def _make_ot3_pe_ctx(
         yield create_protocol_context(
             api_version=MAX_SUPPORTED_VERSION,
             hardware_api=hardware,
-            deck_type=deck_type,
+            deck_type=DeckType.OT3_STANDARD,
             protocol_engine=engine,
             protocol_engine_loop=loop,
         )
@@ -301,21 +278,15 @@ def _make_ot3_pe_ctx(
 
 @pytest.fixture()
 def ctx(
-    request: pytest.FixtureRequest,
     robot_model: RobotModel,
     hardware: ThreadManagedHardware,
     deck_definition_name: str,
 ) -> Generator[ProtocolContext, None, None]:
-    if robot_model == "OT-2 Standard":
+    if robot_model == "OT-3 Standard":
+        with _make_ot3_pe_ctx(hardware=hardware) as ctx:
+            yield ctx
+    else:
         raise UnsupportedHardwareCommand(message="No OT-2 support anymore")
-    elif robot_model == "OT-3 Standard":
-        if request.node.get_closest_marker("apiv2_non_pe_only"):
-            pytest.skip("Test requests only non-Protocol-Engine ProtocolContexts")
-        else:
-            with _make_ot3_pe_ctx(
-                hardware=hardware, deck_type=deck_definition_name
-            ) as ctx:
-                yield ctx
 
 
 @pytest.fixture
