@@ -177,24 +177,6 @@ def protocol(protocol_file: str) -> Generator[Protocol, None, None]:
         yield Protocol(text=text, filename=filename, filelike=file)
 
 
-@pytest.fixture(params=["ot3"])
-async def machine_variant_ffs(
-    request: SubRequest,
-    decoy: Decoy,
-    mock_feature_flags: None,
-) -> None:
-    device_param = request.param
-
-    if request.node.get_closest_marker("ot3_only") and device_param == "ot2":
-        pytest.skip()
-    if request.node.get_closest_marker("ot2_only") and device_param == "ot3":
-        pytest.skip()
-
-    decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(
-        device_param == "ot3"
-    )
-
-
 @contextlib.asynccontextmanager
 async def _build_ot3_hw() -> AsyncGenerator[ThreadManagedHardware, None]:
     from opentrons.hardware_control.ot3api import OT3API
