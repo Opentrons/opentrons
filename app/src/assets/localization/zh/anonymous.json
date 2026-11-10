@@ -8,7 +8,7 @@
   "calibration_block_description": "<block>这个金属块是一个特制的工具，完美适配您的甲板，有助于校准。</block><block>如果您没有校准块，请发送电子邮件给支持团队，以便我们寄送一个给您。在您提供的信息中，请确保包括您的姓名、公司或机构名称和寄送地址。在等待校准块到达过程中，您可以暂时利用工作站里垃圾桶上的平面进行校准。</block>",
   "calibration_on_opentrons_tips_is_important": "使用上述吸头和吸头盒进行校准非常重要，因为工作站的准确性是基于这些吸头的已知尺寸来确定的。",
   "choose_what_data_to_share": "选择要共享的工作站数据。",
-  "clear_images_on_desktop": "如果未在App中清除上一次运行记录中的图像以释放存储空间，本次运行可能会失败。",
+  "clear_images_on_desktop": "如果未在 App 中清除上一次运行记录中的图像以释放存储空间，本次运行可能会失败。",
   "close_stacker_doors_description": "确保侧面面板已更换，并且设备门已关闭。",
   "computer_in_app_is_controlling_robot": "当前正在由一台已联网的计算机控制此工作站。",
   "confirm_terminate": "这将立即停止计算机上进行的活动。您或其他用户可能会丢失进度或在该计算机上出现报错提示。",
