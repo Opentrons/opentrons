@@ -85,16 +85,6 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine import ProtocolEngine
 
 
-# See Jira RCORE-535.
-_JSON_TOO_NEW_MESSAGE = (
-    "Protocols created by recent versions of Protocol Designer"
-    " cannot currently be simulated with"
-    " the opentrons_simulate command-line tool"
-    " or the opentrons.simulate.simulate() function."
-    " Use the Opentrons App instead."
-)
-
-
 # When a ProtocolContext is using a ProtocolEngine to control the robot,
 # it requires some long-lived resources. There's a background thread,
 # an asyncio event loop in that thread, and some ProtocolEngine-controlled background tasks in that
@@ -534,20 +524,14 @@ def simulate(
         extra_data = {}
 
     contents = protocol_file.read()
-    try:
-        protocol = parse.parse(
-            contents,
-            file_name,
-            extra_labware={
-                uri: details.definition for uri, details in extra_labware.items()
-            },
-            extra_data=extra_data,
-        )
-    except parse.JSONSchemaVersionTooNewError as e:
-        # opentrons.protocols.parse() doesn't support new JSON protocols.
-        # The code to do that should be moved from opentrons.protocol_reader.
-        # See https://opentrons.atlassian.net/browse/PLAT-94.
-        raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
+    protocol = parse.parse(
+        contents,
+        file_name,
+        extra_labware={
+            uri: details.definition for uri, details in extra_labware.items()
+        },
+        extra_data=extra_data,
+    )
 
     if protocol.api_level < APIVersion(2, 0):
         raise ApiDeprecationError(version=protocol.api_level)

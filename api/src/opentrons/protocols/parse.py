@@ -36,21 +36,6 @@ MODULE_LOG = logging.getLogger(__name__)
 
 # match e.g. "2.0" but not "hi", "2", "2.0.1"
 API_VERSION_RE = re.compile(r"^(\d+)\.(\d+)$")
-MAX_SUPPORTED_JSON_SCHEMA_VERSION = 5
-API_VERSION_FOR_JSON_V5_AND_BELOW = APIVersion(2, 8)
-
-
-class JSONSchemaVersionTooNewError(RuntimeError):
-    def __init__(self, attempted_schema_version: int) -> None:
-        super().__init__(attempted_schema_version)
-        self.attempted_schema_version = attempted_schema_version
-
-    def __str__(self) -> str:
-        return (
-            f"The protocol you are trying to open is a"
-            f" JSONv{self.attempted_schema_version} protocol,"
-            f" which is not supported by this software version."
-        )
 
 
 class PythonParseMode(enum.Enum):

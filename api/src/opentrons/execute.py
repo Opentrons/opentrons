@@ -99,16 +99,6 @@ _THREAD_MANAGED_HW: Optional[ThreadManagedHardware] = None
 _LIVE_PROTOCOL_ENGINE_CONTEXTS = contextlib.ExitStack()
 
 
-# See Jira RCORE-535.
-_JSON_TOO_NEW_MESSAGE = (
-    "Protocols created by recent versions of Protocol Designer"
-    " cannot currently be executed with"
-    " the opentrons_execute command-line tool"
-    " or the opentrons.execute.execute() function."
-    " Use the Opentrons App instead."
-)
-
-
 _EmitRunlogCallable = Callable[[command_types.CommandMessage], None]
 
 
@@ -384,20 +374,14 @@ def execute(
         extra_data = {}
 
     contents = protocol_file.read()
-    try:
-        protocol = parse.parse(
-            contents,
-            protocol_name,
-            extra_labware={
-                uri: details.definition for uri, details in extra_labware.items()
-            },
-            extra_data=extra_data,
-        )
-    except parse.JSONSchemaVersionTooNewError as e:
-        # opentrons.protocols.parse() doesn't support new JSON protocols.
-        # The code to do that should be moved from opentrons.protocol_reader.
-        # See https://opentrons.atlassian.net/browse/PLAT-94.
-        raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
+    protocol = parse.parse(
+        contents,
+        protocol_name,
+        extra_labware={
+            uri: details.definition for uri, details in extra_labware.items()
+        },
+        extra_data=extra_data,
+    )
 
     if protocol.api_level < APIVersion(2, 0):
         raise ApiDeprecationError(version=protocol.api_level)
