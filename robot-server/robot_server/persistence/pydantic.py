@@ -12,10 +12,9 @@ _TypeAdapterArgT = TypeVar("_TypeAdapterArgT")
 def pydantic_to_json(obj: BaseModel) -> str:
     """Serialize a Pydantic object for storing in the SQL database."""
     return obj.model_dump_json(
-        # by_alias and exclude_none should match how
+        # by_alias should match how
         # FastAPI + Pydantic + our customizations serialize these objects
         by_alias=True,
-        exclude_none=True,
     )
 
 

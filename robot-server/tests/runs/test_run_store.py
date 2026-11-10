@@ -388,8 +388,7 @@ async def test_update_run_state(
     assert run_summary_result == state_summary
     assert parameters_result == run_time_parameters
     assert commands_result.commands == [
-        command.model_dump_json(by_alias=True, exclude_none=True)
-        for command in protocol_commands
+        command.model_dump_json(by_alias=True) for command in protocol_commands
     ]
     mock_runs_publisher.publish_runs_advise_refetch.assert_called_once_with(
         run_id="run-id"
@@ -1192,8 +1191,7 @@ def test_get_command_slice(
         cursor=0,
         total_length=len(protocol_commands),
         commands=[
-            command.model_dump_json(by_alias=True, exclude_none=True)
-            for command in protocol_commands
+            command.model_dump_json(by_alias=True) for command in protocol_commands
         ],
     )
 
@@ -1342,16 +1340,16 @@ def test_get_all_commands_as_preserialized_list(
     assert result == [
         '{"id":"pause-1","createdAt":"2021-01-01T00:00:00","commandType":"waitForResume",'
         '"key":"command-key","status":"succeeded","params":{"message":"hello world"},"result":{},'
-        '"intent":"protocol","commandAnnotationIds":["annotation-1"]}',
+        '"error":null,"startedAt":null,"completedAt":null,"intent":"protocol","notes":null,"commandAnnotationIds":["annotation-1"],"failedCommandId":null}',
         '{"id":"pause-2","createdAt":"2022-02-02T00:00:00","commandType":"waitForResume",'
         '"key":"command-key","status":"succeeded","params":{"message":"hey world"},"result":{},'
-        '"intent":"protocol","commandAnnotationIds":[]}',
+        '"error":null,"startedAt":null,"completedAt":null,"intent":"protocol","notes":null,"commandAnnotationIds":[],"failedCommandId":null}',
         '{"id":"pause-3","createdAt":"2023-03-03T00:00:00","commandType":"waitForResume",'
         '"key":"command-key","status":"succeeded","params":{"message":"sup world"},"result":{},'
-        '"commandAnnotationIds":["annotation-1","annotation-2"]}',
+        '"error":null,"startedAt":null,"completedAt":null,"intent":null,"notes":null,"commandAnnotationIds":["annotation-1","annotation-2"],"failedCommandId":null}',
         '{"id":"fixit-pause-1","createdAt":"2021-01-01T00:00:00","commandType":"waitForResume",'
         '"key":"command-key","status":"succeeded","params":{"message":"hello world"},"result":{},'
-        '"intent":"fixit","commandAnnotationIds":[]}',
+        '"error":null,"startedAt":null,"completedAt":null,"intent":"fixit","notes":null,"commandAnnotationIds":[],"failedCommandId":null}',
     ]
 
 
@@ -1381,11 +1379,11 @@ def test_get_all_commands_as_preserialized_list_no_fixit(
     assert result == [
         '{"id":"pause-1","createdAt":"2021-01-01T00:00:00","commandType":"waitForResume",'
         '"key":"command-key","status":"succeeded","params":{"message":"hello world"},"result":{},'
-        '"intent":"protocol","commandAnnotationIds":["annotation-1"]}',
+        '"error":null,"startedAt":null,"completedAt":null,"intent":"protocol","notes":null,"commandAnnotationIds":["annotation-1"],"failedCommandId":null}',
         '{"id":"pause-2","createdAt":"2022-02-02T00:00:00","commandType":"waitForResume",'
         '"key":"command-key","status":"succeeded","params":{"message":"hey world"},"result":{},'
-        '"intent":"protocol","commandAnnotationIds":[]}',
+        '"error":null,"startedAt":null,"completedAt":null,"intent":"protocol","notes":null,"commandAnnotationIds":[],"failedCommandId":null}',
         '{"id":"pause-3","createdAt":"2023-03-03T00:00:00","commandType":"waitForResume",'
         '"key":"command-key","status":"succeeded","params":{"message":"sup world"},"result":{},'
-        '"commandAnnotationIds":["annotation-1","annotation-2"]}',
+        '"error":null,"startedAt":null,"completedAt":null,"intent":null,"notes":null,"commandAnnotationIds":["annotation-1","annotation-2"],"failedCommandId":null}',
     ]

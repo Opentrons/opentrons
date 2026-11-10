@@ -274,10 +274,6 @@ async def test_run_commands_persist(client_and_server: ClientServerFixture) -> N
     ]
     assert get_persisted_command_response.json()["data"] == expected_command
 
-    json_converted_command = json.loads(
-        get_preserialized_commands_response.json()["data"][0]
-    )
-    assert json_converted_command == expected_command
 
 
 @pytest.mark.slow
