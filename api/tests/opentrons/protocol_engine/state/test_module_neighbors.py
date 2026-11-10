@@ -4,14 +4,16 @@ from types import SimpleNamespace
 from typing import cast
 
 import pytest
-from decoy import Decoy
+from decoy import Decoy, matchers
 
 from opentrons.protocol_engine.commands.move_labware import (
     _gripper_move_grazes_collar_neighbor,
+    _has_vacuum_neighbor,
 )
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError
 from opentrons.protocol_engine.state.geometry import GeometryView
 from opentrons.protocol_engine.state.labware import LabwareView
+from opentrons.protocol_engine.state.modules import ModuleView
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
@@ -19,7 +21,9 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     LabwareLocation,
     LoadedLabware,
+    LoadedModule,
     ModuleLocation,
+    ModuleModel,
 )
 from opentrons.types import DeckSlotName, StagingSlotName
 
@@ -164,3 +168,44 @@ def test_off_deck_location_does_not_graze(decoy: Decoy) -> None:
     )
 
     assert _gripper_move_grazes_collar_neighbor(OFF_DECK_LOCATION, state) is None
+
+
+def _state_for_jaw_limit(
+    decoy: Decoy, area: str, vacuum_slot: str | None
+) -> tuple[DeckSlotLocation | AddressableAreaLocation, StateView]:
+    geometry = decoy.mock(cls=GeometryView)
+    module_view = decoy.mock(cls=ModuleView)
+    location = _location_for_area(area)
+    module = LoadedModule(id="vacuum-id", model=ModuleModel.VACUUM_MODULE_V1)
+    decoy.when(geometry.get_parent_from_location(location)).then_return(area)
+    decoy.when(module_view.get_by_slot(matchers.Anything())).then_do(
+        lambda slot: module if slot.id == vacuum_slot else None
+    )
+    state = cast(
+        StateView,
+        SimpleNamespace(geometry=geometry, modules=module_view),
+    )
+    return location, state
+
+
+def test_b3_limits_jaws_when_vacuum_module_is_north(decoy: Decoy) -> None:
+    """A B3 gripper move keeps the jaws narrow while the vacuum module is on A3."""
+    location, state = _state_for_jaw_limit(decoy, "B3", "A3")
+
+    assert _has_vacuum_neighbor(location, state) is True
+
+
+def test_b3_does_not_limit_jaws_without_vacuum_module(decoy: Decoy) -> None:
+    """B3 uses a full jaw open when no vacuum module is north or south of it."""
+    location, state = _state_for_jaw_limit(decoy, "B3", None)
+
+    assert _has_vacuum_neighbor(location, state) is False
+
+
+def test_slot_does_not_limit_jaws_when_vacuum_module_is_not_a_neighbor(
+    decoy: Decoy,
+) -> None:
+    """An attached vacuum module only limits the slots directly north or south of it."""
+    location, state = _state_for_jaw_limit(decoy, "C1", "A3")
+
+    assert _has_vacuum_neighbor(location, state) is False

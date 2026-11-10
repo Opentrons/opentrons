@@ -368,6 +368,8 @@ async def test_gripper_move_labware_implementation(
             ),
             user_drop_offset=Point(),
             post_drop_slide_offset=None,
+            restrict_pickup_approach=False,
+            restrict_drop_retract=False,
         ),
     )
     assert result == SuccessData(
@@ -395,6 +397,91 @@ async def test_gripper_move_labware_implementation(
             ),
         ),
     )
+
+
+@pytest.mark.parametrize(
+    ("origin_slot", "destination_slot", "restrict_pickup", "restrict_drop"),
+    [
+        (DeckSlotName.SLOT_B3, DeckSlotName.SLOT_C1, True, False),
+        (DeckSlotName.SLOT_C1, DeckSlotName.SLOT_B3, False, True),
+        (DeckSlotName.SLOT_C1, DeckSlotName.SLOT_D1, False, False),
+    ],
+)
+async def test_gripper_move_limits_jaws_beside_vacuum_module(
+    decoy: Decoy,
+    subject: MoveLabwareImplementation,
+    labware_movement: LabwareMovementHandler,
+    state_view: StateView,
+    origin_slot: DeckSlotName,
+    destination_slot: DeckSlotName,
+    restrict_pickup: bool,
+    restrict_drop: bool,
+) -> None:
+    """A vacuum module on A3 narrows the jaws only for the move directly south of it."""
+    origin = DeckSlotLocation(slotName=origin_slot)
+    destination = DeckSlotLocation(slotName=destination_slot)
+    data = MoveLabwareParams(
+        labwareId="plate-id",
+        newLocation=destination,
+        strategy=LabwareMovementStrategy.USING_GRIPPER,
+    )
+    lw_def = LabwareDefinition2.model_construct(
+        namespace="opentrons-test",
+        parameters=Parameters2.model_construct(),  # type: ignore[call-arg]
+    )
+    decoy.when(state_view.labware.get_definition(labware_id="plate-id")).then_return(
+        lw_def
+    )
+    decoy.when(state_view.labware.get(labware_id="plate-id")).then_return(
+        LoadedLabware(
+            id="plate-id",
+            loadName="corning_96_wellplate_360ul_flat",
+            definitionUri="opentrons-test/corning_96_wellplate_360ul_flat/1",
+            location=origin,
+            offsetId=None,
+        )
+    )
+    decoy.when(
+        state_view.geometry.ensure_location_not_occupied(destination, None, lw_def)
+    ).then_return(destination)
+    decoy.when(state_view.geometry.ensure_valid_gripper_location(origin)).then_return(
+        origin
+    )
+    decoy.when(
+        state_view.geometry.ensure_valid_gripper_location(destination)
+    ).then_return(destination)
+    decoy.when(labware_validation.validate_gripper_compatible(lw_def)).then_return(True)
+    decoy.when(state_view.geometry.get_parent_from_location(origin)).then_return(
+        origin_slot.id
+    )
+    decoy.when(state_view.geometry.get_parent_from_location(destination)).then_return(
+        destination_slot.id
+    )
+    decoy.when(state_view.labware.get_all()).then_return([])
+    vacuum = LoadedModule(
+        id="vacuum-id",
+        model=ModuleModel.VACUUM_MODULE_V1,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+    )
+    decoy.when(state_view.modules.get_by_slot(matchers.Anything())).then_do(
+        lambda slot: vacuum if slot == DeckSlotName.SLOT_A3 else None
+    )
+
+    result = await subject.execute(data)
+
+    decoy.verify(
+        await labware_movement.move_labware_with_gripper(
+            labware_id="plate-id",
+            current_location=origin,
+            new_location=destination,
+            user_pick_up_offset=Point(),
+            user_drop_offset=Point(),
+            post_drop_slide_offset=None,
+            restrict_pickup_approach=restrict_pickup,
+            restrict_drop_retract=restrict_drop,
+        ),
+    )
+    assert isinstance(result, SuccessData)
 
 
 @pytest.mark.parametrize(
@@ -464,6 +551,8 @@ async def test_gripper_error(
             user_pick_up_offset=Point(),
             user_drop_offset=Point(),
             post_drop_slide_offset=None,
+            restrict_pickup_approach=False,
+            restrict_drop_retract=False,
         )
     ).then_raise(underlying_exception)
     decoy.when(model_utils.get_timestamp()).then_return(error_created_at)
@@ -662,6 +751,8 @@ async def test_gripper_move_to_waste_chute_implementation(
             user_pick_up_offset=Point(1, 2, 3),
             user_drop_offset=Point(),
             post_drop_slide_offset=expected_slide_offset,
+            restrict_pickup_approach=False,
+            restrict_drop_retract=False,
         ),
     )
     assert result == SuccessData(
