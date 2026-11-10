@@ -197,10 +197,10 @@ Turning on the vacuum pump lets the module create vacuum by regulating gauge pre
 
 * **Pump power (%):** The pump runs continuously at a fixed percentage of its rated motor power (1% to 100%), without active pressure regulation.
 
-Both gauge pressure and pump power settings include an optional **Duration** checkbox and an **Ending hold** toggle.
+Both gauge pressure and pump power settings include an optional **Duration** checkbox and an **Vent** toggle.
 
 * **Duration:** Check to set a time limit (`mm:ss`). If unchecked, the pump runs indefinitely until the next vacuum step changes the module's state.
-* **Ending hold:** Use the **Vent** toggle to open or close the pressure valve when the interval set by the duration timer finishes. Opening the vent returns the system to atmospheric pressure (0 mbar).
+* **Venting:** Use the **Vent** toggle to open or close the pressure valve when the interval set by the duration timer finishes. Opening the vent returns the system to atmospheric pressure (0 mbar).
 
 <figure class="screenshot side-by-side" markdown>
 ![Pump power, vent slider](../images/vacuum-pump-power-vent.png)
