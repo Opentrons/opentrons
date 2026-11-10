@@ -21,7 +21,6 @@ from .robot import AbstractRobot
 from .tasks import TaskCoreType
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
-from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.types import (
     DeckSlotName,
     Location,
@@ -47,9 +46,6 @@ class AbstractProtocol(
     @property
     @abstractmethod
     def robot_type(self) -> RobotType: ...
-
-    @abstractmethod
-    def get_max_speeds(self) -> AxisMaxSpeeds: ...
 
     @abstractmethod
     def get_hardware(self) -> SyncHardwareAPI: ...
