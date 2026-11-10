@@ -1113,7 +1113,7 @@
     "z": 0
   },
   "gripForce": 15,
-  "gripHeightFromLabwareBottom": 29.1,
+  "gripHeightFromLabwareBottom": 27.1,
   "stackingOffsetWithLabware": {
     "default": {
       "x": 0,

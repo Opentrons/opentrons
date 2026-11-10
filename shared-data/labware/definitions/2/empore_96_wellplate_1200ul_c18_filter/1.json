@@ -30,7 +30,7 @@
     "zDimension": 38
   },
   "gripForce": 15,
-  "gripHeightFromLabwareBottom": 35.5,
+  "gripHeightFromLabwareBottom": 33.5,
   "wells": {
     "A1": {
       "depth": 30.81,
