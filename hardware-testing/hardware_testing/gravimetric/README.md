@@ -20,6 +20,37 @@ The new `use_impact_protection_v2` variable independently controls V2 for all pi
 Turning V2 off does not disable the 96ch fixture. When V2 is explicitly enabled, a missing V2 still fails initialization.
 Re-upload the updated protocol and create a new run to use the new parameter defaults.
 
+## P1000H extra profile: manual replacement after 5 uL
+
+`protocol_replacement/96ch1000_extra.csv` uses a separate A3 probe rack before
+the normal T50 / T200 / T1000 sequence. This behavior applies to full-rack
+P1000H profiles with `is_extra=TRUE`, tips `50,200,1000`, and T50 test volumes
+`5,50` in that order.
+
+Start with **ten T50 racks on adapters**, including one at A3 for initial liquid
+probing and evaporation blanks. The A3 rack stays in place and is never moved by
+the gripper or recovered into a stacker. Keep the normal P1000H stacker supply
+layout, including the spare T50 rack on the B4 shuttle and its six T200 hopper
+racks. The C4 and D4 supplies also retain the normal P1000H layout.
+
+The 5 uL trials use the nine preloaded T50 racks in order:
+`D2, D3, C2, C3, B1, B2, B3, A1, A2`. After all nine trials pass the existing QC
+check, the protocol pauses once. Replace only the nine test racks with fresh T50
+racks. Keep the original A3 probe rack in place, without moving or replacing it,
+and retain all ten adapters. Leave the stacker supplies unchanged. On resume,
+the protocol registers the nine new racks and performs the normal T50 liquid
+probe from D2. The normal rack refresh then recovers that probe rack to A4 and
+replaces it with the spare T50 from B4. Testing continues with 50 uL, then
+T200 / 200 uL and T1000 / 1000 uL using the original stacker flow. No additional
+evaporation blank is run. The 5 uL racks leave the deck manually; none enter the
+stackers.
+
+With stackers disabled, use the same initial ten-rack deck layout and replacement
+pause after 5 uL, with manual rack changes thereafter.
+A3 is included in protocol analysis for Labware Position Check. The evaporation
+calculation and the `fail_early` behavior are unchanged: a failed 5 uL QC check
+stops the run before the replacement pause.
+
 ## Before pushing to the robot
 
 These tests need some special patches applied to the main source code in order to work as intended.

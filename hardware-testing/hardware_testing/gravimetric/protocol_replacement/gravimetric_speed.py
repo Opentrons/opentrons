@@ -129,7 +129,7 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
 from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
 
 
-metadata = {"protocolName": "Gravimetric QC V3 speed"}
+metadata = {"protocolName": "Gravimetric QC V3"}
 requirements = {"robotType": "Flex", "apiLevel": "2.29"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
@@ -928,6 +928,9 @@ def _get_tips_for_test_96_single(
 def _get_tips_for_test_96(
     fixture_settings: FixtureSettings, tip: int, blank: bool = False
 ) -> List[Well]:
+    if blank and tip == 50 and _uses_p1000h_extra_manual_exchange(fixture_settings):
+        return [_get_p1000h_extra_probe_tip(fixture_settings)]
+
     if fixture_settings.stackers_96 is not None:
         if blank:
             probe_slots = [fixture_settings.tips[tip][0]]
@@ -967,6 +970,12 @@ def _get_tips_for_test_96(
         slot
         for slot in slots_to_load
         if slot in fixture_settings.active_96ch_racks_by_slot
+        and (
+            not _uses_p1000h_extra_manual_exchange(fixture_settings)
+            or _tip_size_from_rack(fixture_settings.active_96ch_racks_by_slot[slot])
+            != tip
+            or _rack_has_used_tips(fixture_settings.active_96ch_racks_by_slot[slot])
+        )
     ]
     if len(need_to_swap) != 0:
         fixture_settings.pipette._retract()
@@ -2228,6 +2237,12 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                     d=dispense_d,
                     flag="",
                 )
+            if (
+                _uses_p1000h_extra_manual_exchange(fixture_settings)
+                and tip == 50
+                and volume == 5
+            ):
+                _replace_p1000h_extra_deck_tips(fixture_settings)
         tip_sizes_done.append(tip)
         maybe_close_all_gratings(fixture_settings)
 
@@ -2691,7 +2706,9 @@ def _uses_dual_mount_no_trash(csv_settings: "CSVSettings") -> bool:
 
 def _uses_no_trash_runtime_settings(csv_settings: "CSVSettings") -> bool:
     """Whether setup must avoid registering a physical trash bin."""
-    return _uses_dual_single_no_trash(csv_settings)
+    return _uses_dual_single_no_trash(
+        csv_settings
+    ) or _uses_p1000h_extra_manual_exchange(csv_settings)
 
 
 def _trash_bin_slot(csv_settings: "CSVSettings") -> str:
@@ -3013,6 +3030,76 @@ def _uses_p1000h_three_tip_stacker_plan(csv_settings: "CSVSettings") -> bool:
     )
 
 
+def _uses_p1000h_extra_manual_exchange(csv_settings: "CSVSettings") -> bool:
+    """Recognize the extra profile's 5 uL pretest before normal T50 testing."""
+    return (
+        csv_settings.extra
+        and csv_settings.pipette_channels == 96
+        and csv_settings.pipette_volume == 1000
+        and not csv_settings.single_tip_96
+        and csv_settings.tip_sizes == [50, 200, 1000]
+        and csv_settings.volumes.get(50) == [5.0, 50.0]
+    )
+
+
+def _get_p1000h_extra_probe_tip(fixture_settings: "FixtureSettings") -> Well:
+    """Use the T50 probe/blank rack already placed on the A3 adapter."""
+    rack = _load_96ch_tiprack_on_adapter(fixture_settings, 50, "A3")
+    return rack.wells()[0]
+
+
+def _replace_p1000h_extra_deck_tips(fixture_settings: "FixtureSettings") -> None:
+    """Replace the nine test racks, then resume normal T50 stacker probing."""
+    ctx = fixture_settings.ctx
+    slots = fixture_settings.tips[50]
+    # Resolve the physical racks before pausing, but keep the Engine and tip
+    # bookkeeping unchanged until the operator has resumed the protocol.
+    old_racks = {
+        slot: fixture_settings.active_96ch_racks_by_slot[slot] for slot in slots
+    }
+    fixture_settings.pipette._retract()
+    maybe_close_all_gratings(fixture_settings)
+    maybe_home_impact_protection_96ch(fixture_settings, "manual T50 replacement")
+    ctx.pause(
+        f"5 µL 测试完成。请将 {', '.join(slots)} 上的全部 9 盒针管更换为全新的 T50 针管盒。"
+        "保留各槽位的针管支架。A3 的探测用盒保持原位，不移动、不更换；"
+        "不要更换 stacker 中的针管。"
+        "更换完成后点击继续，开始 50 µL 测试。 / "
+        "5 uL testing complete: replace the nine test racks with fresh T50 "
+        "racks. Keep the A3 probe rack and all adapters in place, and "
+        "leave stacker supplies unchanged. Resume to start 50 uL testing."
+    )
+    for slot, old_rack in old_racks.items():
+        adapter = cast(Labware, old_rack.parent)
+        ctx._core.move_labware(
+            old_rack._core,
+            new_location=OFF_DECK,
+            use_gripper=False,
+            pause_for_manual_move=False,
+            pick_up_offset=None,
+            drop_offset=None,
+        )
+        fixture_settings.active_96ch_racks_by_slot.pop(slot)
+        fixture_settings.tiprack_adapters_by_slot[slot] = adapter
+        _register_loaded_labware_in_slot(slot, adapter)
+        rack = adapter.load_labware(_tiprack_load_name(50))
+        _capture_or_apply_shared_tiprack_offset(fixture_settings, 50, slot, rack)
+        fixture_settings.active_96ch_racks_by_slot[slot] = rack
+        _register_loaded_labware_in_slot(slot, rack)
+
+    if _uses_96ch_stacker_runtime(fixture_settings):
+        # Resume the normal T50 entry point using D2, not the special A3 probe.
+        # The next normal rack refresh recovers this used probe rack to A4 and
+        # consumes B4's spare T50, preserving the original supply/recovery flow.
+        probe_slot = slots[0]
+        ctx.comment(f"resume normal T50 liquid probe in slot {probe_slot}")
+        probe_tip = fixture_settings.active_96ch_racks_by_slot[probe_slot].wells()[0]
+        _configure_tip_count(fixture_settings, 0)
+        pick_up_tip_for_channel(fixture_settings, probe_tip, 0)
+        fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
+        remove_tip(fixture_settings)
+
+
 # Stacker placement entry point.
 #
 # Change this function when the physical starting layout changes. The rest of
@@ -3100,7 +3187,9 @@ def _load_simulating_96ch_stacker_lpc_layout(
         else _first_96ch_stacker_tip(csv_settings)
     )
     load_name = _tiprack_load_name(tip_size)
-    active_slots = csv_settings.tips.get(tip_size, [])
+    active_slots = list(csv_settings.tips.get(tip_size, []))
+    if _uses_p1000h_extra_manual_exchange(csv_settings):
+        active_slots.append("A3")
     for slot in active_slots:
         adapter = ctx.load_adapter(TIPRACK_ADAPTER, slot)
         _register_loaded_labware_in_slot(slot, adapter)
@@ -3114,6 +3203,8 @@ def _build_96ch_stackers(
     use_96ch_stackers: bool,
 ) -> Optional[Dict[str, StackerState]]:
     if not _uses_96ch_stackers(csv_settings, use_96ch_stackers):
+        if ctx.is_simulating() and _uses_p1000h_extra_manual_exchange(csv_settings):
+            _load_simulating_96ch_stacker_lpc_layout(ctx, csv_settings)
         return None
     supply_plan = _build_96ch_stacker_supply_plan(csv_settings)
     stackers = {
@@ -3703,7 +3794,9 @@ def _do_simulating_lpc_moves(
     """Touch CSV tip racks and scale labware during analysis so LPC is offered."""
     if not ctx.is_simulating():
         return
-    if _uses_96ch_stackers(csv_settings, use_96ch_stackers):
+    if _uses_96ch_stackers(
+        csv_settings, use_96ch_stackers
+    ) or _uses_p1000h_extra_manual_exchange(csv_settings):
         print_info(
             "Simulating 96CH stacker LPC layout was handled by stacker "
             "calibration moves."
@@ -4256,6 +4349,10 @@ def _run_fixture(
         ):
             if fixture_settings.fast_simulate:
                 # do LPC when it is simulating
+                if _uses_p1000h_extra_manual_exchange(fixture_settings):
+                    probe_tip = _get_p1000h_extra_probe_tip(fixture_settings)
+                    pick_up_tip_for_channel(fixture_settings, probe_tip, 0)
+                    remove_tip(fixture_settings)
                 for tip in _tip_sizes_for_lpc(fixture_settings):
                     for channel in fixture_settings.channels:
                         tips = _get_tips_for_test(
