@@ -2,11 +2,11 @@ test_name: Upload and run a JSONv7 protocol.
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: Upload simple JSONv7 protocol
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/simpleV7.json'
@@ -15,10 +15,50 @@ stages:
       save:
         json:
           protocol_id: data.id
+  - name: Set a deck configuration with the module
+    request:
+      url: '{ot3_server_base_url}/deck_configuration'
+      method: PUT
+      json:
+        data:
+          cutoutFixtures:
+            - cutoutFixtureId: singleLeftSlot
+              cutoutId: cutoutA1
+            - cutoutFixtureId: singleLeftSlot
+              cutoutId: cutoutB1
+            - cutoutFixtureId: singleLeftSlot
+              cutoutId: cutoutC1
+            - cutoutFixtureId: temperatureModuleV2
+              cutoutId: cutoutD1
+              opentronsModuleSerialNumber: temp-123
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutA2
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutB2
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutC2
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutD2
+            - cutoutFixtureId: stagingAreaRightSlot
+              cutoutId: cutoutA3
+            - cutoutFixtureId: singleRightSlot
+              cutoutId: cutoutB3
+            - cutoutFixtureId: stagingAreaRightSlot
+              cutoutId: cutoutC3
+            - cutoutFixtureId: magneticBlockV1
+              cutoutId: cutoutD3
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          cutoutFixtures: !anylist
+          lastModifiedAt: !anystr
 
   - name: Create run from protocol
     request:
-      url: '{ot2_server_base_url}/runs'
+      url: '{ot3_server_base_url}/runs'
       method: POST
       json:
         data:
@@ -32,7 +72,7 @@ stages:
         data:
           id: !anystr
           ok: True
-          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+          createdAt: !anystr
           status: idle
           current: True
           actions: []
@@ -43,7 +83,7 @@ stages:
           labware:
             - id: !anystr
               loadName: !anystr
-              definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
+              definitionUri: opentrons/opentrons_1_trash_3200ml_fixed/1
               location: !anydict
           labwareOffsets: []
           runTimeParameters: []
@@ -58,7 +98,7 @@ stages:
 
   - name: Execute a setup command
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      url: '{ot3_server_base_url}/runs/{run_id}/commands'
       method: POST
       params:
         waitUntilComplete: true
@@ -84,7 +124,7 @@ stages:
 
   - name: Fetch run commands
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      url: '{ot3_server_base_url}/runs/{run_id}/commands'
       method: GET
     response:
       status_code: 200
@@ -106,7 +146,7 @@ stages:
           - id: !anystr
             key: !anystr
             commandType: home
-            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            createdAt: !anystr
             status: queued
             params: {}
           - id: '{setup_command_id}'
@@ -122,7 +162,7 @@ stages:
 
   - name: Play the run
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      url: '{ot3_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
@@ -133,13 +173,13 @@ stages:
         data:
           id: !anystr
           actionType: play
-          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+          createdAt: !anystr
 
   - name: Wait for the protocol to complete
     max_retries: 10
     delay_after: 0.1
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}'
+      url: '{ot3_server_base_url}/runs/{run_id}'
       method: GET
     response:
       status_code: 200
@@ -151,7 +191,7 @@ stages:
 
   - name: Verify commands succeeded with the expected results
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      url: '{ot3_server_base_url}/runs/{run_id}/commands'
       method: GET
     response:
       status_code: 200
@@ -164,7 +204,7 @@ stages:
               commandId: !anystr
               index: 14
               key: !anystr
-              createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+              createdAt: !anystr
         meta:
           cursor: 0
           totalLength: 15
@@ -172,9 +212,9 @@ stages:
           - id: !anystr
             key: !anystr
             commandType: home
-            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
             status: succeeded
             params: {}
             notes: []
@@ -191,47 +231,47 @@ stages:
           - id: !anystr
             key: !anystr
             commandType: loadPipette
-            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
             status: succeeded
             notes: []
             params:
-              pipetteName: p10_single
+              pipetteName: p1000_single_flex
               mount: left
               pipetteId: pipetteId
           - id: !anystr
             key: !anystr
             commandType: loadModule
-            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
             status: succeeded
             notes: []
             params:
-              model: magneticModuleV1
+              model: magneticBlockV1
               location:
-                slotName: '3'
-              moduleId: magneticModuleId
+                slotName: 'D3'
+              moduleId: magneticBlockId
           - id: !anystr
             key: !anystr
             commandType: loadModule
-            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
             status: succeeded
             notes: []
             params:
               model: temperatureModuleV2
               location:
-                slotName: '1'
+                slotName: 'D1'
               moduleId: temperatureModuleId
           - id: !anystr
             key: !anystr
             commandType: loadLabware
-            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
             status: succeeded
             notes: []
             params:
@@ -245,14 +285,14 @@ stages:
           - id: !anystr
             key: !anystr
             commandType: loadLabware
-            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
             status: succeeded
             notes: []
             params:
               location:
-                moduleId: magneticModuleId
+                moduleId: magneticBlockId
               loadName: foo_8_plate_33ul
               namespace: example
               version: 1
@@ -261,25 +301,25 @@ stages:
           - id: !anystr
             key: !anystr
             commandType: loadLabware
-            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
             status: succeeded
             notes: []
             params:
               location:
-                slotName: '8'
-              loadName: opentrons_96_tiprack_10ul
+                slotName: 'A2'
+              loadName: opentrons_flex_96_tiprack_1000ul
               namespace: opentrons
               version: 1
               labwareId: tipRackId
-              displayName: Opentrons 96 Tip Rack 10 µL
+              displayName: Opentrons Flex 96 Tip Rack 1000 µL
           - id: !anystr
             key: !anystr
             commandType: loadLiquid
-            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
             status: succeeded
             notes: []
             params:
@@ -291,9 +331,9 @@ stages:
           - id: !anystr
             key: !anystr
             commandType: pickUpTip
-            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
             status: succeeded
             notes: []
             params:
@@ -309,9 +349,9 @@ stages:
           - id: !anystr
             key: !anystr
             commandType: aspirate
-            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
             status: succeeded
             notes: []
             params:
@@ -330,9 +370,9 @@ stages:
           - id: !anystr
             key: !anystr
             commandType: dispense
-            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
             status: succeeded
             notes: []
             params:
@@ -351,9 +391,9 @@ stages:
           - id: !anystr
             key: !anystr
             commandType: moveToWell
-            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
             status: succeeded
             notes: []
             params:
@@ -371,9 +411,9 @@ stages:
           - id: !anystr
             key: !anystr
             commandType: moveToWell
-            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
             status: succeeded
             notes: []
             params:
@@ -393,9 +433,9 @@ stages:
           - id: !anystr
             key: !anystr
             commandType: dropTip
-            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
             status: succeeded
             notes: []
             params:

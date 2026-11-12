@@ -2,11 +2,11 @@ test_name: Upload and run a JSON v6 protocol that should fail.
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: Upload a protocol
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/simple_v6_failure.json'
@@ -18,7 +18,7 @@ stages:
 
   - name: Create run from protocol
     request:
-      url: '{ot2_server_base_url}/runs'
+      url: '{ot3_server_base_url}/runs'
       method: POST
       json:
         data:
@@ -31,7 +31,7 @@ stages:
 
   - name: Play the run
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      url: '{ot3_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
@@ -45,7 +45,7 @@ stages:
     max_retries: 10
     delay_after: 0.1
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}'
+      url: '{ot3_server_base_url}/runs/{run_id}'
       method: GET
     response:
       status_code: 200
@@ -57,7 +57,7 @@ stages:
 
   - name: Verify the run contains the expected error
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}'
+      url: '{ot3_server_base_url}/runs/{run_id}'
       method: GET
     response:
       status_code: 200
@@ -76,7 +76,7 @@ stages:
               wrappedErrors: !anylist
   - name: Verify commands contain the expected results
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      url: '{ot3_server_base_url}/runs/{run_id}/commands'
       method: GET
     response:
       status_code: 200

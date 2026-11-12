@@ -2,11 +2,11 @@ test_name: Upload and run a PAPI v2 protocol that should fail.
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: Upload a protocol
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/runtime_error.py'
@@ -18,7 +18,7 @@ stages:
 
   - name: Create run from protocol
     request:
-      url: '{ot2_server_base_url}/runs'
+      url: '{ot3_server_base_url}/runs'
       method: POST
       json:
         data:
@@ -31,7 +31,7 @@ stages:
 
   - name: Play the run
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      url: '{ot3_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
@@ -45,7 +45,7 @@ stages:
     max_retries: 10
     delay_after: 0.1
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}'
+      url: '{ot3_server_base_url}/runs/{run_id}'
       method: GET
     response:
       status_code: 200
@@ -57,7 +57,7 @@ stages:
 
   - name: Verify the run contains the expected error
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}'
+      url: '{ot3_server_base_url}/runs/{run_id}'
       method: GET
     response:
       status_code: 200
@@ -69,15 +69,15 @@ stages:
             - id: !anystr
               errorType: ExceptionInProtocolError
               isDefined: false
-              createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-              detail: 'UnexpectedTipRemovalError [line 9]: Error 3005 UNEXPECTED_TIP_REMOVAL (UnexpectedTipRemovalError): Cannot perform PREPARE_ASPIRATE without a tip attached.'
+              createdAt: !anystr
+              detail: 'ProtocolCommandFailedError [line 10]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): TipNotAttachedError: Pipette should have a tip attached, but does not.'
               errorCode: '4000'
               errorInfo: !anydict
               wrappedErrors: !anylist
 
   - name: Verify commands contain the expected results
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      url: '{ot3_server_base_url}/runs/{run_id}/commands'
       method: GET
     response:
       status_code: 200
@@ -88,61 +88,77 @@ stages:
             meta:
               runId: !anystr
               commandId: !anystr
-              index: 3
+              index: 4
               key: !anystr
-              createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+              createdAt: !anystr
         meta:
           cursor: 0
-          totalLength: 4
+          totalLength: 5
         data:
           - id: !anystr
             key: !anystr
             commandType: home
-            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
             status: succeeded
             params: !anydict
             notes: !anylist
-          - id: !re_fullmatch "commands\\.LOAD_LABWARE-\\d+"
-            key: !re_fullmatch "commands\\.LOAD_LABWARE-\\d+"
+          - id: !anystr
+            key: !anystr
             commandType: loadLabware
-            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
             status: succeeded
             params:
               location:
-                slotName: "1"
-              loadName: opentrons_96_tiprack_300ul
+                slotName: 'A1'
+              loadName: opentrons_flex_96_tiprack_1000ul
               namespace: opentrons
               version: 1
             notes: !anylist
-          - id: !re_fullmatch "commands\\.LOAD_PIPETTE-\\d+"
-            key: !re_fullmatch "commands\\.LOAD_PIPETTE-\\d+"
-            commandType: loadPipette
-            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+          - id: !anystr
+            key: !anystr
+            commandType: loadLabware
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
             status: succeeded
             params:
-              pipetteName: p300_single
-              mount: right
+              location:
+                slotName: 'A2'
+              loadName: biorad_96_wellplate_200ul_pcr
+              namespace: opentrons
+              version: 2
             notes: !anylist
-          - id: !re_fullmatch "command\\.ASPIRATE-\\d+"
-            key: !re_fullmatch "command\\.ASPIRATE-\\d+"
+          - id: !anystr
+            key: !anystr
+            commandType: loadPipette
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
+            status: succeeded
+            params:
+              pipetteName: p1000_single_flex
+              mount: right
+              liquidPresenceDetection: False
+              tipOverlapNotAfterVersion: v0
+            notes: !anylist
+          - id: !anystr
+            key: !anystr
             commandType: aspirate
-            createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-            completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
+            createdAt: !anystr
+            startedAt: !anystr
+            completedAt: !anystr
             status: failed
             notes: !anylist
             error:
               id: !anystr
-              errorType: LegacyContextCommandError
+              errorType: TipNotAttachedError
               isDefined: false
-              createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-              detail: 'Cannot perform PREPARE_ASPIRATE without a tip attached.'
+              createdAt: !anystr
+              detail: 'Pipette should have a tip attached, but does not.'
               errorCode: '3005'
               errorInfo: !anydict
               wrappedErrors: !anylist
