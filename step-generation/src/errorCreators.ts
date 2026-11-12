@@ -302,6 +302,17 @@ export const possiblePipetteCollision = (args: {
               .displayName,
         },
       }
+    case 'vacuumCollarCollision':
+      return {
+        type: 'POSSIBLE_PIPETTE_COLLISION_VACUUM_COLLAR',
+        message: `Cannot move the 96-channel pipette to ${unsafePipetteMovementReason.labwareName} on ${unsafePipetteMovementReason.slot} while ${unsafePipetteMovementReason.collarName} is on ${unsafePipetteMovementReason.collarSlot}.`,
+        translationParams: {
+          labwareName: unsafePipetteMovementReason.labwareName,
+          slot: unsafePipetteMovementReason.slot,
+          collarName: unsafePipetteMovementReason.collarName,
+          collarSlot: unsafePipetteMovementReason.collarSlot,
+        },
+      }
   }
 }
 
