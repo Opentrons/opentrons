@@ -2,11 +2,11 @@
 test_name: GET openapi.json
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: Raw openapi.json endpoint is served and json is received
     request:
-      url: "{ot2_server_base_url}/openapi.json"
+      url: '{ot3_server_base_url}/openapi.json'
       method: GET
     response:
       status_code: 200
