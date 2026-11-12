@@ -153,29 +153,45 @@ Running Thermocycler profiles is time-consuming, so you can choose to run other 
 
 Adding a Vacuum Module step to your protocol lets you:
 
-* **Manage module hardware:** Assemble and move various components on and off the module. Through these different combinations of spacers, collars, filter plates, and well plates you can create a vacuum stack that either collects filtrate into standard labware or evacuates liquids directly to waste.
+* **Manage module components:** Assemble and move various components on and off the module. Through these different combinations of spacers, collars, filter plates, and well plates you can create a vacuum stack that either collects filtrate into standard labware or evacuates liquids directly to waste.
 
 - **Control module operations:** You can run the Vacuum Module by creating a _state step_ or a _profile step_. A state step is a simple operation that instructs the Vacuum Module to reach a specific vacuum or run the pump continuously at a percentage of its rated power. A profile step lets you develop complex, multi-part sequences of pressure or power sub-steps within a single protocol step.
 
-### Start designing
+### Managing components
 
-Click **Edit protocol** from the deck overview screen to create Vacuum Module steps with Protocol Designer. From the starting deck screen, you can:
-
-* Click on the module icon (slot A3 or A4) to add, remove, and manage the different spacers, collars, well plates, and filter plates used in your vacuum protocol.
+For a new protocol, Protocol Designer shows an empty, top-down view of the module icon.
 
 <figure class=screenshot markdown>
 ![Deck map with Vacuum Module icon. Click to add module components or labware.](../images//vacuum-add-labware.png){ width="60%" }
 <figcaption>Click the module icon to add or edit labware.</figcaption>
 </figure>
 
-* Click **Add step** and select **Vacuum** from the popup menu to create and add a state, profile, or cycle step to your vacuum protocol.
+Clicking on the module in slot A3 or A4 opens the step menu, which lets you add compatible spacers, collars, well and filter plate to the Vacuum Module.
+
+<figure class="screenshot" markdown>
+![Add labware modal window. Shows options for adding well plates, spacers, and collars.](../images/vacuum-add-labware2.png){ width="70%" }
+<figcaption>Add labware to the Vacuum Module.</figcaption>
+</figure>
+
+If you're editing an existing profile, the step menu shows you the spacers, collars, and labware that are already attached to the module. Features on the step menu let you add, edit, rename, and delete labware.
+
+<figure class="screenshot" markdown>
+![Edit labware modal window. Shows options for adding, removing, and editing attached pieces.](../images/vacuum-edit-labware.png){ width="70%" }
+<figcaption>Edit attached labware.</figcaption>
+</figure>
+
+### Adding steps
+
+A protocol comprises a set of steps that execute in a linear sequence. After adding labware to the Vacuum Module you can create one or more vacuum steps.
 
 <figure class=screenshot markdown>
 ![Vacuum step button showing the vacuum menu option](../images/vacuum-add-step-btn.png){ width="60%" }
 <figcaption>Adding a vacuum step.</figcaption>
 </figure>
 
-### Vacuum state
+Each step includes features that let you program module operations. These operations include setting the state (pressure or power) of the module for a single operation, or by adding more complex state conditions and profiles.
+
+### Creating vacuum states
 
 In a state step, you can either open the vent or turn on the vacuum pump.
 
@@ -208,12 +224,9 @@ Both gauge pressure and pump power settings include an optional **Duration** che
 <figcaption>Optional duration and vent controls.</figcaption>
 </figure>
 
-!!! tip "Vacuum state vs profiles and cycles"
-    If you need to run the pump sequentially using different vacuum or power settings, you can create individual state steps. However, it may be more efficient to create a vacuum profile or cycle, which run multiple operations once or in a loop, both within a single step.
-
 If you need to run the pump sequentially using different vacuum or power settings, you can create multiple individual state steps. However, it is usually more efficient to create a vacuum profile or cycle. These are sub-steps of sequential operations or repeating loops that run within a single protocol step.
 
-### Vacuum profiles
+### Creating vacuum profiles
 
 A vacuum profile executes a linear sequence of sub-steps once, within a single protocol step. Unlike a basic state step that maintains a single target, a profile chains together multiple pressure or power settings that create a set of progressive operations—such as ramping gradually from a gentle draw to a high vacuum, or following an evacuation hold with an automated vent.
 
@@ -239,7 +252,7 @@ When building a profile, choose one mode type only for the set of operations:
 
 All sub-steps within a single vacuum profile must use the same mode type (either pressure or power). You cannot mix pressure and power operations within the same profile.
 
-### Vacuum cycles
+### Creating vacuum cycles
 
 A vacuum cycle runs a repeating loop of pressure or power profiles within a single step, executing a its operations consecutively for a specified count. While standard profile steps run once and advance the protocol, a cycle repeats its operations according to the value entered in the **Number of cycles** field before moving to the next step. This ability to loop through multiple operations in a single step makes a vacuum cycle ideal for repetitive, multi-stage filtration workflows.
 
@@ -256,5 +269,5 @@ The step menu includes a "Last module state" section. This is a read-only status
 
 <figure class="screenshot" markdown>
 ![Last module state status indicator](../images/last-vacuum-state.png){ width="60%" }
-<figcaption>Module status from the previous vacuum step.</figcaption>
+<figcaption>Shows module status from the previous vacuum step.</figcaption>
 </figure>
