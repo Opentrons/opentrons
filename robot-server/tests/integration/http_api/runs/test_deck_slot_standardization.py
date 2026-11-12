@@ -1,41 +1,34 @@
 from typing import AsyncGenerator
 
 import pytest
-from pytest_lazy_fixtures import lf
 
 from ...robot_client import RobotClient
 
 
 @pytest.fixture
-async def robot_client(base_url: str) -> AsyncGenerator[RobotClient, None]:
-    async with RobotClient.make(base_url=base_url, version="*") as robot_client:
+async def robot_client(ot3_server_base_url: str) -> AsyncGenerator[RobotClient, None]:
+    async with RobotClient.make(
+        base_url=ot3_server_base_url, version="*"
+    ) as robot_client:
         yield robot_client
 
 
 @pytest.mark.slow
 @pytest.mark.parametrize(
     (
-        "base_url",
-        "is_ot3",
         "input_slot_1",
         "input_slot_2",
         "standardized_slot_1",
         "standardized_slot_2",
     ),
     [
-        (lf("ot2_server_base_url"), False, "1", "2", "1", "2"),
-        (lf("ot2_server_base_url"), False, "D1", "D2", "1", "2"),
         pytest.param(
-            lf("ot3_server_base_url"),
-            True,
             "1",
             "2",
             "D1",
             "D2",
         ),
         pytest.param(
-            lf("ot3_server_base_url"),
-            True,
             "D1",
             "D2",
             "D1",
@@ -44,8 +37,8 @@ async def robot_client(base_url: str) -> AsyncGenerator[RobotClient, None]:
     ],
 )
 async def test_deck_slot_standardization(
+    ot3_server_base_url: None,
     robot_client: RobotClient,
-    is_ot3: bool,
     input_slot_1: str,
     input_slot_2: str,
     standardized_slot_1: str,
@@ -79,10 +72,9 @@ async def test_deck_slot_standardization(
         {"cutoutFixtureId": "singleRightSlot", "cutoutId": "cutoutC3"},
         {"cutoutFixtureId": "singleRightSlot", "cutoutId": "cutoutD3"},
     ]
-    if is_ot3:
-        await robot_client.put_deck_configuration(
-            req_body={"data": {"cutoutFixtures": deck_configuration_request}}
-        )
+    await robot_client.put_deck_configuration(
+        req_body={"data": {"cutoutFixtures": deck_configuration_request}}
+    )
 
     labware_load_name = "armadillo_96_wellplate_200ul_pcr_full_skirt"
     labware_namespace = "opentrons"
