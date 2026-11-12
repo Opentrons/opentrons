@@ -1,37 +1,8 @@
-test_name: Make sure an OT-2 server rejects OT-3 protocols.
-
-marks:
-  - usefixtures:
-    - ot2_server_base_url
-  - parametrize:
-      key: protocol_file_path
-      vals:
-        - 'tests/integration/protocols/empty_ot3.json'
-        - 'tests/integration/protocols/empty_ot3.py'
-
-stages:
-  - name: Upload the protocol.
-    request:
-      url: '{ot2_server_base_url}/protocols'
-      method: POST
-      files:
-        files: "{protocol_file_path}"
-    response:
-      status_code: 422
-      json:
-        errors:
-          - id: ProtocolRobotTypeMismatch
-            title: Protocol For Different Robot Type
-            detail: "This protocol is for Flex robots. It can't be analyzed or run on this robot, which is an OT-2."
-            errorCode: '4000'
-
----
-
 test_name: Make sure an OT-3 server rejects OT-2 protocols.
 
 marks:
   - usefixtures:
-    - ot3_server_base_url
+      - ot3_server_base_url
   - parametrize:
       key: protocol_file_path
       vals:
@@ -44,7 +15,7 @@ stages:
       url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
-        files: "{protocol_file_path}"
+        files: '{protocol_file_path}'
     response:
       status_code: 422
       json:

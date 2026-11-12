@@ -2,11 +2,11 @@ test_name: Upload, analyze, and validate protocol analysis failure for api level
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
-  - name: Upload a python protocol with non-conforming api level 
+  - name: Upload a python protocol with non-conforming api level
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/non_conforming_api_level.py'
@@ -18,4 +18,4 @@ stages:
         errors:
           - id: ProtocolFilesInvalid
             title: Protocol File(s) Invalid
-            detail: "API version 2.1000 is not supported by this robot software. Please either reduce your requested API version or update your robot."
+            detail: 'API version 2.1000 is not supported by this robot software. Please either reduce your requested API version or update your robot.'

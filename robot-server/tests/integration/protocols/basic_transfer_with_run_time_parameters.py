@@ -1,10 +1,11 @@
 from opentrons.protocol_api import ParameterContext, ProtocolContext
 
 metadata = {
-    "apiLevel": "2.20",
     "author": "engineer@opentrons.com",
     "protocolName": "basic_transfer_standalone",
 }
+
+requirements = {"robotType": "Flex", "apiLevel": "2.20"}
 
 
 def add_parameters(parameters: ParameterContext):
@@ -53,8 +54,10 @@ def add_parameters(parameters: ParameterContext):
 
 def run(protocol: ProtocolContext) -> None:
     plate = protocol.load_labware("corning_96_wellplate_360ul_flat", 1)
-    tiprack_1 = protocol.load_labware("opentrons_96_tiprack_300ul", 2)
-    p300 = protocol.load_instrument("p300_single", "right", tip_racks=[tiprack_1])
+    tiprack_1 = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", 2)
+    p300 = protocol.load_instrument(
+        "flex_1channel_1000", "right", tip_racks=[tiprack_1]
+    )
 
     p300.pick_up_tip()
     p300.aspirate(100, plate["A1"])

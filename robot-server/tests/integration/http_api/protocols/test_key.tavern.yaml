@@ -2,14 +2,14 @@ test_name: Verify protocol key.
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: Upload basic_transfer_standalone protocol with key
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
-        files: 'tests/integration/protocols/basic_transfer_standalone.py'
+        files: 'tests/integration/protocols/flex_basic_transfer_standalone.py'
       data:
         key: protocol_key
     response:
@@ -22,14 +22,13 @@ stages:
           id: !anystr
           protocolType: python
           files:
-            - name: basic_transfer_standalone.py
+            - name: flex_basic_transfer_standalone.py
               role: main
-          createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-          robotType: OT-2 Standard
+          createdAt: !anystr
+          robotType: OT-3 Standard
           protocolKind: standard
           metadata:
-            apiLevel: '2.6'
-            protocolName: basic_transfer_standalone
+            protocolName: Flex basic transfer protocol
             author: engineer@opentrons.com
           analyses: []
           analysisSummaries:
@@ -39,7 +38,7 @@ stages:
           key: protocol_key
   - name: Verify the key in GET /protocols
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: GET
     response:
       strict:
@@ -52,7 +51,7 @@ stages:
 
   - name: Verify the key in GET /protocols/{protocol_id}
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}'
       method: GET
     response:
       strict:
@@ -68,14 +67,14 @@ test_name: Protocols may have a duplicate key.
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: Upload basic_transfer_standalone protocol with key
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
-        files: 'tests/integration/protocols/basic_transfer_standalone.py'
+        files: 'tests/integration/protocols/flex_basic_transfer_standalone.py'
       data:
         key: duplicate_key
     response:
@@ -90,16 +89,15 @@ stages:
           id: !anystr
           protocolType: python
           files:
-            - name: basic_transfer_standalone.py
+            - name: flex_basic_transfer_standalone.py
               role: main
           metadata:
-            apiLevel: '2.6'
-            protocolName: basic_transfer_standalone
+            protocolName: Flex basic transfer protocol
             author: engineer@opentrons.com
           key: duplicate_key
   - name: Upload basic_transfer_with_config protocol with same key
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/basic_transfer_with_config.py'
@@ -119,12 +117,10 @@ stages:
           files:
             - name: basic_transfer_with_config.py
               role: main
-          metadata:
-            apiLevel: '2.6'
           key: duplicate_key
   - name: Get protocols and validate id and key
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: GET
     response:
       strict:
@@ -141,14 +137,14 @@ test_name: Protocols sources not get duplicated.
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: Upload basic_transfer_standalone protocol with key
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
-        files: 'tests/integration/protocols/basic_transfer_standalone.py'
+        files: 'tests/integration/protocols/flex_basic_transfer_standalone.py'
       data:
         key: duplicate_key
     response:
@@ -163,21 +159,20 @@ stages:
           id: !anystr
           protocolType: python
           files:
-            - name: basic_transfer_standalone.py
+            - name: flex_basic_transfer_standalone.py
               role: main
           metadata:
-            apiLevel: '2.6'
-            protocolName: basic_transfer_standalone
+            protocolName: Flex basic transfer protocol
             author: engineer@opentrons.com
           key: duplicate_key
   - name: Upload basic_transfer_standalone protocol with same key
     # add a delay before starting to let previous analysis complete
     delay_before: 2
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
-        files: 'tests/integration/protocols/basic_transfer_standalone.py'
+        files: 'tests/integration/protocols/flex_basic_transfer_standalone.py'
       data:
         key: duplicate_key
     response:
@@ -193,14 +188,12 @@ stages:
           id: !anystr
           protocolType: python
           files:
-            - name: basic_transfer_standalone.py
+            - name: flex_basic_transfer_standalone.py
               role: main
-          metadata:
-            apiLevel: '2.6'
           key: duplicate_key
   - name: Get protocols and validate id and key
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: GET
     response:
       strict:

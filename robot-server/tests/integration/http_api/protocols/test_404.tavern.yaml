@@ -2,11 +2,11 @@ test_name: Verify error upon GET of nonexistent protocol id.
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: GET nonexistent protocol id
     request:
-      url: '{ot2_server_base_url}/protocols/idontexist'
+      url: '{ot3_server_base_url}/protocols/idontexist'
       method: GET
     response:
       status_code: 404
@@ -22,17 +22,17 @@ test_name: Verify error upon DELETE of nonexistent protocol id.
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: DELETE nonexistent protocol id
     request:
-      url: '{ot2_server_base_url}/protocols/idontexist'
+      url: '{ot3_server_base_url}/protocols/idontexist'
       method: DELETE
     response:
       status_code: 404
       json:
         errors:
-        - id: ProtocolNotFound
-          title: Protocol Not Found
-          detail: "'Protocol idontexist was not found.'"
-          errorCode: '4000'
+          - id: ProtocolNotFound
+            title: Protocol Not Found
+            detail: "'Protocol idontexist was not found.'"
+            errorCode: '4000'

@@ -2,15 +2,15 @@ test_name: Test the protocol analysis endpoints
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 
 stages:
   - name: Upload a protocol
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
-        files: 'tests/integration/protocols/basic_transfer_standalone.py'
+        files: 'tests/integration/protocols/flex_basic_transfer_standalone.py'
     response:
       save:
         json:
@@ -31,7 +31,7 @@ stages:
     max_retries: 5
     delay_after: 1
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}'
     response:
       status_code: 200
       json:
@@ -52,7 +52,7 @@ stages:
 
   - name: Check that the analysis data is present in /protocols/:id/analyses/:id
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id}'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id}'
     response:
       save:
         json:
@@ -66,10 +66,9 @@ stages:
             # Check for this command's presence as a smoke test that the analysis isn't empty.
             - commandType: loadPipette
 
-
   - name: Check that the analysis data is present in /protocols/:id/analyses
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses'
     response:
       json:
         data:
@@ -80,7 +79,7 @@ stages:
 
   - name: Check that the analysis data is present in /protocols/:id/analyses/:id/asDocument
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id}/asDocument'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id}/asDocument'
     response:
       headers:
         # This endpoint's steps outside our usual FastAPI implementation.
@@ -88,10 +87,9 @@ stages:
         Content-Type: application/json
       json: !force_format_include '{analysis_data}'
 
-
   - name: Check that a new analysis is started with forceReAnalyze
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses'
       method: POST
       json:
         data:
@@ -111,12 +109,11 @@ stages:
             status: pending
             runTimeParameters: []
 
-
   - name: Retry until analysis is completed
     max_retries: 5
     delay_after: 1
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id2}'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id2}'
     response:
       strict:
         - json:off
@@ -125,10 +122,9 @@ stages:
           id: '{analysis_id2}'
           status: completed
 
-
   - name: Check that a new analysis is NOT started for the same protocol
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses'
       method: POST
     response:
       strict:

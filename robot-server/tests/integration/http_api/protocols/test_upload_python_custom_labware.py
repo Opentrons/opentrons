@@ -31,11 +31,11 @@ ANALYSIS_POLL_TIMEOUT = 10
 
 @pytest.fixture
 async def robot_client(
-    ot2_server_base_url: str,
+    ot3_server_base_url: str,
 ) -> AsyncGenerator[RobotClient, None]:
     """Return a client for a running dev server."""
     async with RobotClient.make(
-        base_url=ot2_server_base_url, version="*"
+        base_url=ot3_server_base_url, version="*"
     ) as robot_client:
         await robot_client.wait_until_ready()
         yield robot_client
@@ -64,25 +64,20 @@ async def poll_until_analysis_returns_ok(
 
 def make_test_protocol(api_level: str, labware_load_name: str) -> bytes:
     """Return a Python protocol that loads a labware."""
-    return textwrap.dedent(
-        f"""
-        metadata = {{"apiLevel": "{api_level}"}}
+    return textwrap.dedent(f"""
+        requirements = {{"apiLevel": "{api_level}", "robotType": "Flex"}}
         def run(protocol) -> None:
             protocol.load_labware(
                 load_name="{labware_load_name}",
                 location=1,
             )
-        """
-    ).encode("utf-8")
+        """).encode("utf-8")
 
 
 @pytest.mark.slow
 @pytest.mark.parametrize(
     "api_level",
-    [
-        "2.0",  # Not executed by Protocol Engine.
-        "2.14",  # Executed by Protocol Engine.
-    ],
+    ["2.15", "2.30"],
 )
 async def test_python_custom_labware_upload(
     robot_client: RobotClient, api_level: str

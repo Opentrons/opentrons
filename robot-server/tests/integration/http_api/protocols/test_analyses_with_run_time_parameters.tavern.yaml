@@ -2,12 +2,12 @@ test_name: Test the protocol analysis endpoints with run time parameters
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 
 stages:
   - name: Upload a protocol
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/basic_transfer_with_run_time_parameters.py'
@@ -31,7 +31,7 @@ stages:
     max_retries: 5
     delay_after: 1
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}'
     response:
       status_code: 200
       json:
@@ -52,7 +52,7 @@ stages:
 
   - name: Check that the analysis data is present in /protocols/:id/analyses/:id
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id}'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id}'
     response:
       strict:
         - json:off
@@ -108,7 +108,7 @@ stages:
   - name: Check that uploading same protocol with new run time parameter values re-triggers analysis
     # This test must be executed after the analysis of the previous upload is completed.
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       data:
         runTimeParameterValues: '{{"sample_count": 10, "volume": 10.23, "dry_run": true}}'
@@ -125,7 +125,7 @@ stages:
       json:
         data:
           id: '{protocol_id}'
-          analyses: [ ]
+          analyses: []
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
@@ -174,12 +174,11 @@ stages:
                   variableName: liq_handling_csv_file
                   description: A CSV file that contains wells to use for pipetting
 
-
   - name: Check that the new analysis uses run time parameter values from client; retry until analysis is completed
     max_retries: 5
     delay_after: 1
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id2}'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id2}'
     response:
       strict:
         - json:off
@@ -193,7 +192,7 @@ stages:
 
   - name: Check that a new analysis is started for the protocol because of new RTP values
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses'
       method: POST
       json:
         data:
@@ -265,7 +264,7 @@ stages:
     max_retries: 5
     delay_after: 1
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id3}'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id3}'
     response:
       strict:
         - json:off
@@ -276,7 +275,7 @@ stages:
 
   - name: Check that a new analysis is NOT started for the protocol when RTP values are same
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses'
       method: POST
       json:
         data:

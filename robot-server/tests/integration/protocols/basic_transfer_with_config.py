@@ -2,14 +2,15 @@ from helpers import load_config, pick_up_then_drop  # type: ignore[import]
 
 from opentrons.protocol_api import ProtocolContext
 
-metadata = {"apiLevel": "2.6"}
+
+requirements = {"robotType": "Flex", "apiLevel": "2.16"}
 
 
 def run(protocol: ProtocolContext) -> None:
     configuration = load_config("basic_transfer_config.json")
 
-    plate = protocol.load_labware(configuration["plate"], 1)
-    tiprack_1 = protocol.load_labware(configuration["tiprack"], 2)
+    plate = protocol.load_labware(configuration["plate"], "A1")
+    tiprack_1 = protocol.load_labware(configuration["tiprack"], "B1")
     instrument = protocol.load_instrument(
         configuration["instrument"]["model"],
         configuration["instrument"]["mount"],
