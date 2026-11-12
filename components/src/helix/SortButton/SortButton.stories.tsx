@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import * as React from 'react'
 
 import { SortButton as SortButtonComponent } from './index'
 
@@ -20,23 +20,27 @@ const meta: Meta<typeof SortButtonComponent> = {
 export default meta
 type Story = StoryObj<typeof SortButtonComponent>
 
-export const SortButton: Story = {
-  render: args => {
-    const [active, setActive] = useState(args.active)
-    const [direction, setDirection] = useState(args.direction)
+const SortButtonTemplate = (
+  args: React.ComponentProps<typeof SortButtonComponent>
+): React.ReactNode => {
+  const [active, setActive] = React.useState(args.active)
+  const [direction, setDirection] = React.useState(args.direction)
 
-    return (
-      <SortButtonComponent
-        {...args}
-        active={active}
-        direction={direction}
-        onClick={() => {
-          setActive(true)
-          setDirection(direction === 'asc' ? 'desc' : 'asc')
-        }}
-      />
-    )
-  },
+  return (
+    <SortButtonComponent
+      {...args}
+      active={active}
+      direction={direction}
+      onClick={() => {
+        setActive(true)
+        setDirection(direction === 'asc' ? 'desc' : 'asc')
+      }}
+    />
+  )
+}
+
+export const SortButton: Story = {
+  render: SortButtonTemplate,
   args: {
     label: 'Label',
     active: false,
@@ -45,7 +49,7 @@ export const SortButton: Story = {
 }
 
 export const ActiveDescending: Story = {
-  render: SortButton.render,
+  render: SortButtonTemplate,
   args: {
     label: 'Label',
     active: true,
