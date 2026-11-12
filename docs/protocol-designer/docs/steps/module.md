@@ -166,36 +166,36 @@ For a new protocol, Protocol Designer shows an empty, top-down view of the modul
 <figcaption>Click the module icon to add or edit labware.</figcaption>
 </figure>
 
-Clicking on the module in slot A3 or A4 opens the step menu, which lets you add compatible spacers, collars, well and filter plate to the Vacuum Module.
+Clicking the module in slot A3 or A4 opens the step menu, which lets you add compatible spacers, collars, well and filter plate to the Vacuum Module.
 
 <figure class="screenshot" markdown>
 ![Add labware modal window. Shows options for adding well plates, spacers, and collars.](../images/vacuum-add-labware2.png){ width="70%" }
 <figcaption>Add labware to the Vacuum Module.</figcaption>
 </figure>
 
-If you're editing an existing profile, the step menu shows you the spacers, collars, and labware that are already attached to the module. Features on the step menu let you add, edit, rename, and delete labware.
+If you're editing an existing profile, the step menu shows you the spacers, collars, and labware already attached to the module. Options on the the step menu let you add, edit, rename, and delete labware.
 
 <figure class="screenshot" markdown>
 ![Edit labware modal window. Shows options for adding, removing, and editing attached pieces.](../images/vacuum-edit-labware.png){ width="70%" }
-<figcaption>Edit attached labware.</figcaption>
+<figcaption>Manage attached labware.</figcaption>
 </figure>
 
 ### Adding steps
 
-A protocol comprises a set of steps that execute in a linear sequence. After adding labware to the Vacuum Module you can create one or more vacuum steps.
+After adding labware to the Vacuum Module you can create and vacuum steps to your protocol. Click **Add Step** in the protocol timeline to get started.
 
 <figure class=screenshot markdown>
 ![Vacuum step button showing the vacuum menu option](../images/vacuum-add-step-btn.png){ width="60%" }
 <figcaption>Adding a vacuum step.</figcaption>
 </figure>
 
-Each step includes features that let you program module operations. These operations include setting the state (pressure or power) of the module for a single operation, or by adding more complex state conditions and profiles.
+Each step includes options that let you program module operations. These include setting the module state for a single action, adding multiple sub-steps to a vacuum profile, or creating looping sequences in a vacuum cycle.
 
 ### Creating vacuum states
 
-In a state step, you can either open the vent or turn on the vacuum pump.
+In a staat step, you can either open the vent or turn on the vacuum pump.
 
-<figure class=screenshot markdown>
+<figure class="screenshot" markdown>
 ![Change state buttons](../images/vacuum-change-state-button.png)
 <figcaption>Change state options on the Vacuum Module</figcaption>
 </figure>
@@ -224,22 +224,22 @@ Both gauge pressure and pump power settings include an optional **Duration** che
 <figcaption>Optional duration and vent controls.</figcaption>
 </figure>
 
-If you need to run the pump sequentially using different vacuum or power settings, you can create multiple individual state steps. However, it is usually more efficient to create a vacuum profile or cycle. These are sub-steps of sequential operations or repeating loops that run within a single protocol step.
+Create multiple state steps if you need to run the pump sequentially using different vacuum or power settings,. However, it is usually more efficient to create a vacuum profile or vacuum cycle, which lets you run sequential operations or repeating loops within a single protocol step.
 
 ### Creating vacuum profiles
 
-A vacuum profile executes a linear sequence of sub-steps once, within a single protocol step. Unlike a basic state step that maintains a single target, a profile chains together multiple pressure or power settings that create a set of progressive operations—such as ramping gradually from a gentle draw to a high vacuum, or following an evacuation hold with an automated vent.
+A vacuum profile executes a sequence of sub-steps once, within a single protocol step. Unlike a basic state step that maintains a single target, a profile chains together multiple pressure or power settings that create a set of progressive operations—such as ramping gradually from a gentle draw to a high vacuum, or following an vacuum hold with an opened vent.
 
 <figure class="screenshot" markdown>
 ![Vacuum program profile button](../images/vacuum-program-profile.png){ width="60%" }
 <figcaption>Create pressure or power profiles and cycles.</figcaption>
 </figure>
 
-When building a profile, choose one mode type only for the set of operations:
+When building a profile, choose only one mode type for the set of operations:
 
-* **Pressure mode:** This is a closed loop operation where you set target gauge pressures between 0 and -800 mbar. The module continuously monitors internal sensors to reach and maintain the desired vacuum pressure.
+* **Pressure mode:** This is a closed-loop operation where you set target gauge pressures between 0 and -800 mbar. In a closed loop, the module continuously monitors internal sensors to reach and maintain the desired vacuum pressure.
 
-* **Power mode:** This is an open loop operation where you set the pump motor to run at a fixed percentage of its rated power.
+* **Power mode:** This is an open-loop operation where you set the pump motor to run at a fixed percentage of its rated power (1% to 100%). In an open look, the pump motor runs continuously until another operation changes its state.
 
 <figure class="screenshot side-by-side" markdown>
 ![Pressure profile in a Vacuum Module step](../images/vacuum-pressure-profile.png)
@@ -247,7 +247,7 @@ When building a profile, choose one mode type only for the set of operations:
 <figcaption>Pressure and power profiles showing multiple sub-steps.</figcaption>
 </figure>
 
-!!! info "Loops and pressure controls"
+!!! tip "Loops and pressure controls"
     See [Controlling vacuum operations](../../python-api/modules/vacuum.md#controlling-vacuum-operations) for more information about open and closed loop pressure controls.
 
 All sub-steps within a single vacuum profile must use the same mode type (either pressure or power). You cannot mix pressure and power operations within the same profile.
@@ -261,11 +261,11 @@ A vacuum cycle runs a repeating loop of pressure or power profiles within a sing
 <figcaption>Vacuum profile with cyclical operations</figcaption>
 </figure>
 
-You can combine standalone steps and repeating cycles within a single vacuum cycle, but all operations must use the same mode type (either pressure or power). Mixed pressure and power cycles are not supported.
+You can combine standalone steps and repeating cycles within a single vacuum cycle, but all operations must use the same mode type (either pressure or power). Mixed pressure and power cycles are not supported. <!--- reminder to verify --->
 
 ### Last module state
 
-The step menu includes a "Last module state" section. This is a read-only status indicator. It changes when a vacuum step changes the status of the pump or vent. For example, in the first vacuum step of a protocol, the module's state is **pump: off** and **vent: open**. If the step ends with the pump on and the vent closed, the next vacuum step updates the module's status and shows state as **pump: on** and **vent: closed**.
+Regardless of operation type, the step menu includes **Last module state**. This is a read-only status indicator. It updates when a vacuum step changes the status of the pump or vent. For example, in the first vacuum step of a protocol, the module's state is **pump: off** and **vent: open**. If the step ends with the pump on and the vent closed, the next vacuum step updates the module's status and shows the state as **pump: on** and **vent: closed**.
 
 <figure class="screenshot" markdown>
 ![Last module state status indicator](../images/last-vacuum-state.png){ width="60%" }
