@@ -15,7 +15,6 @@ from opentrons.motion_planning.adjacent_slots_getters import (
     get_adjacent_slots,
     get_adjacent_staging_slot,
     get_east_west_slots,
-    get_north_south_slots,
     get_south_slot,
 )
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
@@ -445,17 +444,6 @@ def _create_flex_restrictions(  # noqa: C901
                 source_location=location,
             )
         )
-        # Gripper paddles collide with the vacuum collar when they open on a
-        # module in a north/south neighboring standard slot (A3 → B3, D3 → C3).
-        # Staging slots are not a gripper collision risk.
-        for blocked_location in _flex_slots_blocked_by_vacuum_module(location):
-            restrictions.append(
-                _NoModule(
-                    location=blocked_location,
-                    source_item=item,
-                    source_location=location,
-                )
-            )
     elif location in _flex_slots_allowing_stacker():
         restrictions.append(
             _NothingButStackerAllowed(
@@ -535,24 +523,6 @@ def _flex_slots_allowing_stacker() -> Set[DeckSlotName]:
         DeckSlotName.SLOT_C3,
         DeckSlotName.SLOT_D3,
     }
-
-
-def _flex_slots_blocked_by_vacuum_module(
-    vacuum_module_location: DeckSlotName,
-) -> List[DeckSlotName]:
-    """Standard slots that cannot hold a module when a vacuum module occupies this slot.
-
-    The gripper paddles collide with the vacuum collar when they open on a
-    module in a north/south neighboring standard slot:
-    - vacuum module on A3 → no modules on B3
-    - vacuum module on D3 (future) → no modules on C3
-
-    Staging slots are not included; they are not a gripper collision risk.
-    """
-    return [
-        DeckSlotName.from_primitive(neighbor_int).to_ot3_equivalent()
-        for neighbor_int in get_north_south_slots(vacuum_module_location.as_int())
-    ]
 
 
 def _is_ot2_fixed_trash(item: DeckItem) -> bool:

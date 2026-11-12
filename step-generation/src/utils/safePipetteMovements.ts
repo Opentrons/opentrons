@@ -24,7 +24,11 @@ import {
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { EMPTY } from '../constants'
+import {
+  EMPTY,
+  VACUUM_DOCK_ADDRESSABLE_AREA,
+  VACUUM_DOCK_LOCATION,
+} from '../constants'
 import { getPipetteCriticalPoint } from './getPipetteCriticalPoint'
 import { getFullStackFromLabwares, getSlotInLocationStack } from './misc'
 
@@ -312,6 +316,103 @@ const getWellPosition = (
   }
 }
 
+const FLEX_DECK_SLOT = /^[ABCD][1-4]$/
+const FLEX_ROWS = ['A', 'B', 'C', 'D'] as const
+
+const deckSlotFromStack = (
+  stack: string[] | null | undefined,
+  modules: RobotState['modules']
+): string | null => {
+  if (stack == null) {
+    return null
+  }
+  for (let index = stack.length - 1; index >= 0; index--) {
+    const item = stack[index]
+    if (FLEX_DECK_SLOT.test(item)) {
+      return item
+    }
+    if (
+      item === VACUUM_DOCK_ADDRESSABLE_AREA ||
+      item === VACUUM_DOCK_LOCATION
+    ) {
+      return 'A4'
+    }
+    const moduleSlot = modules[item]?.slot
+    if (moduleSlot != null && FLEX_DECK_SLOT.test(moduleSlot)) {
+      return moduleSlot
+    }
+  }
+  return null
+}
+
+const cardinalNeighborSlots = (slot: string): string[] => {
+  const match = slot.match(/^([ABCD])([1-4])$/)
+  if (match == null) {
+    return []
+  }
+  const row = match[1]
+  const column = Number(match[2])
+  const rowIndex = FLEX_ROWS.indexOf(row as (typeof FLEX_ROWS)[number])
+  const neighbors: string[] = []
+  if (rowIndex > 0) {
+    neighbors.push(`${FLEX_ROWS[rowIndex - 1]}${column}`)
+  }
+  if (rowIndex < FLEX_ROWS.length - 1) {
+    neighbors.push(`${FLEX_ROWS[rowIndex + 1]}${column}`)
+  }
+  if (column > 1) {
+    neighbors.push(`${row}${column - 1}`)
+  }
+  if (column < 4) {
+    neighbors.push(`${row}${column + 1}`)
+  }
+  return neighbors
+}
+
+const labwareDisplayName = (entity: LabwareEntity, id: string): string =>
+  entity.def.metadata.displayName ?? entity.def.parameters.loadName ?? id
+
+// The 96-channel housing hits a vacuum collar in any orthogonally adjacent slot.
+const getVacuumCollarCollision = (args: {
+  labwareId: string
+  labwareState: RobotState['labware']
+  labwareEntities: InvariantContext['labwareEntities']
+  modules: RobotState['modules']
+}): {
+  type: 'vacuumCollarCollision'
+  labwareName: string
+  slot: string
+  collarName: string
+  collarSlot: string
+} | null => {
+  const { labwareId, labwareState, labwareEntities, modules } = args
+  const destinationEntity = labwareEntities[labwareId]
+  const destination = deckSlotFromStack(labwareState[labwareId]?.stack, modules)
+  if (destinationEntity == null || destination == null) {
+    return null
+  }
+  const neighbors = cardinalNeighborSlots(destination)
+  for (const [id, entity] of Object.entries(labwareEntities)) {
+    const isCollar =
+      entity.def.parameters.quirks?.includes('vacuumModuleDock') === true
+    if (id === labwareId || !isCollar) {
+      continue
+    }
+    const collarSlot = deckSlotFromStack(labwareState[id]?.stack, modules)
+    if (collarSlot == null || !neighbors.includes(collarSlot)) {
+      continue
+    }
+    return {
+      type: 'vacuumCollarCollision',
+      labwareName: labwareDisplayName(destinationEntity, labwareId),
+      slot: destination,
+      collarName: labwareDisplayName(entity, id),
+      collarSlot,
+    }
+  }
+  return null
+}
+
 //  util to use in step-generation for if the pipette movement is safe
 export const getPipetteMovementSafetyStatus = (args: {
   robotState: RobotState
@@ -366,6 +467,17 @@ export const getPipetteMovementSafetyStatus = (args: {
     channels === 1
   ) {
     return { isSafe: true }
+  }
+  if (channels === 96) {
+    const collarCollision = getVacuumCollarCollision({
+      labwareId,
+      labwareState,
+      labwareEntities,
+      modules: robotState.modules,
+    })
+    if (collarCollision != null) {
+      return { isSafe: false, reason: collarCollision }
+    }
   }
   // If tiprackId is explicitly provided, assume the pipette currently has a tip attached.
   // This is used in WellSelector.ts / getAllWellsSafetyStatus to force "tip present"

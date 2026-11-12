@@ -265,5 +265,146 @@ describe('getPipetteMovementSafetyStatus', () => {
     })
     expect(isSafe).toEqual(false)
   })
+
+  const collarId = 'collarId'
+  const collarOn = (stack: string[]): void => {
+    mockRobotState.labware[collarId] = { stack }
+    mockInvariantProperties.labwareEntities[collarId] = {
+      id: collarId,
+      labwareDefURI: 'opentrons/opentrons_vacuum_manifold_collar_short/1',
+      pythonName: 'collar',
+      def: {
+        ...(fixture96Plate as LabwareDefinition2),
+        parameters: {
+          ...(fixture96Plate as LabwareDefinition2).parameters,
+          loadName: 'opentrons_vacuum_manifold_collar_short',
+          quirks: ['vacuumModuleDock'],
+        },
+        metadata: {
+          ...(fixture96Plate as LabwareDefinition2).metadata,
+          displayName: 'Vacuum collar',
+        },
+        dimensions: {
+          ...(fixture96Plate as LabwareDefinition2).dimensions,
+          zDimension: 10,
+        },
+      },
+    }
+  }
+
+  const moveTo = (channels: 1 | 8 | 96 = 96) =>
+    getPipetteMovementSafetyStatus({
+      robotState: mockRobotState,
+      invariantContext: {
+        ...mockInvariantProperties,
+        pipetteEntities: {
+          pip: {
+            ...mockInvariantProperties.pipetteEntities.pip,
+            spec: {
+              ...fixtureP100096V2Specs,
+              channels,
+            },
+          },
+        },
+      },
+      pipetteId: mockPipId,
+      labwareId: mockLabwareId,
+      wellLocationOffset: { x: 0, y: 0, z: 0 },
+      wellTargetName: mockWellName,
+      primaryNozzle: A1_NOZZLE,
+      nozzleConfiguration: ALL,
+    })
+
+  it('blocks a 96-channel move south of a vacuum collar', () => {
+    mockRobotState.labware[mockLabwareId] = {
+      stack: [mockLabwareId, 'B3'],
+    }
+    collarOn(['collarId', 'vacuum-id', 'A3'])
+    const result = moveTo()
+    expect(result).toEqual({
+      isSafe: false,
+      reason: {
+        type: 'vacuumCollarCollision',
+        labwareName: fixture96Plate.metadata.displayName,
+        slot: 'B3',
+        collarName: 'Vacuum collar',
+        collarSlot: 'A3',
+      },
+    })
+  })
+
+  it('blocks a 96-channel move west of a vacuum collar', () => {
+    mockRobotState.labware[mockLabwareId] = {
+      stack: [mockLabwareId, 'A2'],
+    }
+    collarOn(['collarId', 'A3'])
+    expect(moveTo()).toEqual({
+      isSafe: false,
+      reason: {
+        type: 'vacuumCollarCollision',
+        labwareName: fixture96Plate.metadata.displayName,
+        slot: 'A2',
+        collarName: 'Vacuum collar',
+        collarSlot: 'A3',
+      },
+    })
+  })
+
+  it('blocks a 96-channel move on A3 when the collar is on the dock', () => {
+    mockRobotState.labware[mockLabwareId] = {
+      stack: [mockLabwareId, 'A3'],
+    }
+    collarOn(['collarId', 'vacuumDock', 'vacuum-id', 'vacuumModuleV1DockA4'])
+    const result = moveTo()
+    expect(result).toEqual({
+      isSafe: false,
+      reason: {
+        type: 'vacuumCollarCollision',
+        labwareName: fixture96Plate.metadata.displayName,
+        slot: 'A3',
+        collarName: 'Vacuum collar',
+        collarSlot: 'A4',
+      },
+    })
+  })
+
+  it('allows a 96-channel move on the collar slot and on a diagonal slot', () => {
+    mockRobotState.labware[mockLabwareId] = {
+      stack: [mockLabwareId, 'collarId', 'vacuum-id', 'A3'],
+    }
+    collarOn(['collarId', 'vacuum-id', 'A3'])
+    expect(moveTo().isSafe).toEqual(true)
+
+    mockRobotState.labware[mockLabwareId] = {
+      stack: [mockLabwareId, 'B2'],
+    }
+    const diagonal = moveTo()
+    if (!diagonal.isSafe) {
+      expect(diagonal.reason.type).not.toEqual('vacuumCollarCollision')
+    }
+  })
+
+  it('allows an 8-channel move beside a vacuum collar', () => {
+    mockRobotState.labware[mockLabwareId] = {
+      stack: [mockLabwareId, 'B3'],
+    }
+    collarOn(['collarId', 'A3'])
+    const result = moveTo(8)
+    if (!result.isSafe) {
+      expect(result.reason.type).not.toEqual('vacuumCollarCollision')
+    }
+  })
+
+  it('allows a 96-channel move beside labware that is not a collar', () => {
+    mockRobotState.labware[mockLabwareId] = {
+      stack: [mockLabwareId, 'B3'],
+    }
+    collarOn(['collarId', 'A3'])
+    mockInvariantProperties.labwareEntities[collarId].def.parameters.quirks = []
+    const result = moveTo()
+    if (!result.isSafe) {
+      expect(result.reason.type).not.toEqual('vacuumCollarCollision')
+    }
+  })
   //    todo(jr, 4/23/24): add more test cases, test thermocycler collision - i'll do this in a follow up
 })

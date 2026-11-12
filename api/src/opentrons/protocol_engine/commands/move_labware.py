@@ -62,8 +62,7 @@ from .command import (
     SuccessData,
 )
 from opentrons.motion_planning.adjacent_slots_getters import (
-    get_north_south_slots,
-    get_north_south_staging_slots,
+    get_north_south_neighbor_slots,
 )
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.protocol_engine.types.labware import LoadedLabware
@@ -93,26 +92,36 @@ def _move_slot_label(location: LabwareLocation) -> str:
     return str(location)
 
 
+def _location_slot(
+    location: LabwareLocation, state_view: StateView
+) -> DeckSlotName | StagingSlotName | None:
+    try:
+        parent = state_view.geometry.get_parent_from_location(location)
+        return fixture_validation.get_slot_name_from_addressable_area(parent)
+    except (LabwareNotOnDeckError, ValueError, TypeError):
+        return None
+
+
+def _has_vacuum_neighbor(location: LabwareLocation, state_view: StateView) -> bool:
+    """Return True if a north/south neighbor holds a vacuum module."""
+    slot = _location_slot(location, state_view)
+    for neighbor in get_north_south_neighbor_slots(slot):
+        if not isinstance(neighbor, DeckSlotName):
+            continue
+        module = state_view.modules.get_by_slot(neighbor)
+        if module is not None and module.model == ModuleModel.VACUUM_MODULE_V1:
+            return True
+    return False
+
+
 def _gripper_move_grazes_collar_neighbor(
     location: LabwareLocation, state_view: StateView
 ) -> Tuple[LoadedLabware, str] | None:
     """Return the collar and its slot when a north/south neighbor would graze this move."""
-    try:
-        parent = state_view.geometry.get_parent_from_location(location)
-        parent_slot = fixture_validation.get_slot_name_from_addressable_area(parent)
-    except (LabwareNotOnDeckError, ValueError, TypeError):
+    parent_slot = _location_slot(location, state_view)
+    if parent_slot is None:
         return None
-
-    neighbors: List[StagingSlotName | DeckSlotName] = []
-    if isinstance(parent_slot, StagingSlotName):
-        neighbors.extend(get_north_south_staging_slots(parent_slot))
-    elif isinstance(parent_slot, DeckSlotName):
-        neighbors.extend(
-            [
-                DeckSlotName.from_primitive(slot_id).to_ot3_equivalent()
-                for slot_id in get_north_south_slots(parent_slot.as_int())
-            ]
-        )
+    neighbors = get_north_south_neighbor_slots(parent_slot)
 
     for labware in state_view.labware.get_all():
         try:
@@ -535,6 +544,10 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     immediate_destination_location_sequence
                 )
 
+            # Narrow the jaws when a vacuum module is north or south of the labware,
+            # including the staging column. B4's north is the dock on A4.
+            restrict_pick = _has_vacuum_neighbor(validated_cur_loc, self._state_view)
+            restrict_drop = _has_vacuum_neighbor(validated_new_loc, self._state_view)
             try:
                 # Skips gripper moves when using virtual gripper
                 await self._labware_movement.move_labware_with_gripper(
@@ -544,6 +557,8 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     user_pick_up_offset=user_pick_up_offset,
                     user_drop_offset=user_drop_offset,
                     post_drop_slide_offset=post_drop_slide_offset,
+                    restrict_pickup_approach=restrict_pick,
+                    restrict_drop_retract=restrict_drop,
                 )
             except (
                 FailedGripperPickupError,

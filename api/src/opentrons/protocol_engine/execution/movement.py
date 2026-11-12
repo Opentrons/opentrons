@@ -23,10 +23,58 @@ from .gantry_mover import GantryMover
 from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_engine.errors import LocationIsStagingSlotError
+from opentrons.motion_planning.adjacent_slots_getters import (
+    get_cardinal_neighbor_slots,
+)
+from opentrons.protocol_engine.errors import (
+    InvalidLabwarePositionError,
+    LabwareNotOnDeckError,
+    LocationIsLidDockSlotError,
+    LocationIsStagingSlotError,
+    LocationNotAccessibleByPipetteError,
+)
 from opentrons.types import MountType, Point, StagingSlotName
 
 log = logging.getLogger(__name__)
+
+_ANCESTOR_SLOT_ERRORS = (
+    LabwareNotOnDeckError,
+    InvalidLabwarePositionError,
+    LocationIsLidDockSlotError,
+)
+
+
+def raise_if_96_channel_hits_vacuum_collar(
+    pipette_id: str,
+    labware_id: str,
+    state_view: StateStore,
+) -> None:
+    """Reject a 96-channel move whose target slot is beside a vacuum collar."""
+    if state_view.pipettes.get_channels(pipette_id) != 96:
+        return
+
+    try:
+        destination = state_view.geometry.get_ancestor_slot_name(labware_id)
+    except _ANCESTOR_SLOT_ERRORS:
+        return
+
+    neighbors = get_cardinal_neighbor_slots(destination)
+    for labware in state_view.labware.get_all():
+        if labware.id == labware_id:
+            continue
+        try:
+            collar_slot = state_view.geometry.get_ancestor_slot_name(labware.id)
+        except _ANCESTOR_SLOT_ERRORS:
+            continue
+        if collar_slot not in neighbors or not state_view.labware.get_has_quirk(
+            labware.id, "vacuumModuleDock"
+        ):
+            continue
+        destination_labware = state_view.labware.get(labware_id)
+        raise LocationNotAccessibleByPipetteError(
+            f"Cannot move the 96-channel pipette to {destination_labware.loadName} "
+            f"on {destination.id} while {labware.loadName} is on {collar_slot.id}."
+        )
 
 
 class MovementHandler:
@@ -111,6 +159,12 @@ class MovementHandler:
             raise LocationIsStagingSlotError(
                 "Cannot move to well on labware in Staging Area Slot."
             )
+
+        raise_if_96_channel_hits_vacuum_collar(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            state_view=self._state_store,
+        )
 
         dest_slot_int = ancestor.as_int()
 
