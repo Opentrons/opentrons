@@ -2,26 +2,63 @@ test_name: loadModule command success
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
-  - parametrize:
-      key: model
-      vals:
-        - magneticModuleV1
-        - thermocyclerModuleV1
-        - temperatureModuleV1
-        - temperatureModuleV2 # can map to attached temperatureModuleV1
-        - heaterShakerModuleV1
+      - ot3_server_base_url
 
 stages:
   - name: Get modules
     request:
-      url: '{ot2_server_base_url}/modules'
+      url: '{ot3_server_base_url}/modules'
       method: GET
     response:
       status_code: 200
+  - name: Set a deck configuration with the module
+    request:
+      url: '{ot3_server_base_url}/deck_configuration'
+      method: PUT
+      json:
+        data:
+          cutoutFixtures:
+            - cutoutFixtureId: thermocyclerModuleV2Rear
+              cutoutId: cutoutA1
+              opentronsModuleSerialNumber: therm-123
+            - cutoutFixtureId: thermocyclerModuleV2Front
+              cutoutId: cutoutB1
+              opentronsModuleSerialNumber: therm-123
+            - cutoutFixtureId: heaterShakerModuleV1
+              cutoutId: cutoutC1
+              opentronsModuleSerialNumber: hs-123
+            - cutoutFixtureId: temperatureModuleV2
+              cutoutId: cutoutD1
+              opentronsModuleSerialNumber: temp-123
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutA2
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutB2
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutC2
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutD2
+            - cutoutFixtureId: stagingAreaRightSlot
+              cutoutId: cutoutA3
+            - cutoutFixtureId: singleRightSlot
+              cutoutId: cutoutB3
+            - cutoutFixtureId: stagingAreaRightSlot
+              cutoutId: cutoutC3
+            - cutoutFixtureId: flexStackerModuleV1WithMagneticBlockV1
+              cutoutId: cutoutD3
+              opentronsModuleSerialNumber: EMPTYSN
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          cutoutFixtures: !anylist
+          lastModifiedAt: !anystr
+
   - name: Create Empty Run
     request:
-      url: '{ot2_server_base_url}/runs'
+      url: '{ot3_server_base_url}/runs'
       json:
         data: {}
       method: POST
@@ -37,9 +74,9 @@ stages:
       save:
         json:
           run_id: data.id
-  - name: Create loadModule Command
+  - name: Load the thermocycler
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      url: '{ot3_server_base_url}/runs/{run_id}/commands'
       method: POST
       params:
         waitUntilComplete: true
@@ -47,9 +84,69 @@ stages:
         data:
           commandType: loadModule
           params:
-            model: '{model}'
+            model: thermocyclerModuleV2
             location:
-              slotName: '7'
+              slotName: 'B1'
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          status: succeeded
+  - name: Load the heatershaker
+    request:
+      url: '{ot3_server_base_url}/runs/{run_id}/commands'
+      method: POST
+      params:
+        waitUntilComplete: true
+      json:
+        data:
+          commandType: loadModule
+          params:
+            model: heaterShakerModuleV1
+            location:
+              slotName: 'C1'
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          status: succeeded
+  - name: Load the tempdeck
+    request:
+      url: '{ot3_server_base_url}/runs/{run_id}/commands'
+      method: POST
+      params:
+        waitUntilComplete: true
+      json:
+        data:
+          commandType: loadModule
+          params:
+            model: temperatureModuleV2
+            location:
+              slotName: 'D1'
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          status: succeeded
+  - name: Load the stacker
+    request:
+      url: '{ot3_server_base_url}/runs/{run_id}/commands'
+      method: POST
+      params:
+        waitUntilComplete: true
+      json:
+        data:
+          commandType: loadModule
+          params:
+            model: flexStackerModuleV1
+            location:
+              slotName: 'D3'
     response:
       strict:
         - json:off
