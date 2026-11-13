@@ -90,7 +90,7 @@ describe('VacuumModuleSlideout', () => {
     const pressureButton = screen.getByLabelText('Pressure')
     fireEvent.click(pressureButton)
 
-    expect(screen.getByText('Gauge pressure')).toBeInTheDocument()
+    expect(screen.getByRole('textbox')).toBeInTheDocument()
     expect(screen.getByText('Valid range between -800-0')).toBeInTheDocument()
     expect(screen.getByText('mbar')).toBeInTheDocument()
   })
@@ -108,7 +108,7 @@ describe('VacuumModuleSlideout', () => {
   it('does not render pressure input or power slider initially', () => {
     render(props)
 
-    expect(screen.queryByText('Gauge pressure')).not.toBeInTheDocument()
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
     expect(screen.queryByText('Pump power')).not.toBeInTheDocument()
   })
 
@@ -118,13 +118,13 @@ describe('VacuumModuleSlideout', () => {
     // Select pressure mode
     const pressureButton = screen.getByLabelText('Pressure')
     fireEvent.click(pressureButton)
-    expect(screen.getByText('Gauge pressure')).toBeInTheDocument()
+    expect(screen.getByRole('textbox')).toBeInTheDocument()
     expect(screen.queryByText('Pump power')).not.toBeInTheDocument()
 
     // Switch to power mode
     const powerButton = screen.getByLabelText('Power')
     fireEvent.click(powerButton)
-    expect(screen.queryByText('Gauge pressure')).not.toBeInTheDocument()
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
     expect(screen.getByText('Pump power')).toBeInTheDocument()
   })
 
@@ -141,7 +141,7 @@ describe('VacuumModuleSlideout', () => {
     const pressureButton = screen.getByLabelText('Pressure')
     fireEvent.click(pressureButton)
 
-    screen.getByText('Gauge pressure')
+    expect(screen.getByRole('textbox')).toBeInTheDocument()
     screen.getByText('Valid range between -800-0')
   })
 
@@ -151,7 +151,7 @@ describe('VacuumModuleSlideout', () => {
     const pressureButton = screen.getByLabelText('Pressure')
     fireEvent.click(pressureButton)
 
-    const input = screen.getByLabelText('Gauge pressure')
+    const input = screen.getByRole('textbox')
     fireEvent.change(input, { target: { value: '-50' } })
 
     const confirmButton = screen.getByTestId(
