@@ -53,7 +53,7 @@ The opentrons-ai-server/api/settings.py file manages environment variables and s
 1. select the python version `pyenv local 3.12.6`.
    1. This will create a `.python-version` file in this directory.
 1. select the node version with `nvs` or `nvm` currently 22.11\*.
-1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and python dependencies using `make setup`.
+1. Install the pinned [uv](https://docs.astral.sh/uv/getting-started/installation/) version from the repo-root [`uv.toml`](../uv.toml) (`curl -LsSf https://astral.sh/uv/0.12.1/install.sh | sh`) and python dependencies using `make setup`.
    1. `make setup` also syncs Python API docs from the pinned mkdocs tag in the Makefile (`DOCS_TAG`).
 1. Install docker if you plan to run and build the docker container locally.
 1. `make teardown` will remove the virtual environment.
