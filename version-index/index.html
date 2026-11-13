@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Opentrons releases</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --text: #1c1917;
+      --muted: #57534e;
+      --line: #e7e5e4;
+      --bg: #fafaf9;
+      --card: #fff;
+      --link: #1d4ed8;
+      --download: #047857;
+      --current: #ecfdf5;
+      --current-text: #065f46;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font: 16px/1.5 "Segoe UI", system-ui, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+    main { max-width: 52rem; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    h1 { font-size: 1.75rem; line-height: 1.2; margin: 0 0 0.4rem; }
+    h2 { font-size: 1.15rem; margin: 0; }
+    p { margin: 0; }
+    a { color: var(--link); }
+    .lede { color: var(--muted); max-width: 40rem; }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.25rem;
+      align-items: center;
+      margin: 1.25rem 0 1.5rem;
+    }
+    input[type="search"] {
+      flex: 1 1 16rem;
+      font: inherit;
+      padding: 0.45rem 0.7rem;
+      border: 1px solid #d6d3d1;
+      border-radius: 0.4rem;
+      background: var(--card);
+    }
+    label.alpha { color: var(--muted); font-size: 0.95rem; }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.75rem;
+    }
+    .summary a {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 0.5rem;
+      padding: 0.75rem 0.9rem;
+    }
+    .summary a:hover { border-color: #a8a29e; }
+    .summary .k { display: block; color: var(--muted); font-size: 0.8rem; }
+    .summary .v { font-weight: 650; }
+    section {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 0.6rem;
+      padding: 1rem 1rem 0.4rem;
+      margin: 0 0 1rem;
+    }
+    .section-head { margin-bottom: 0.35rem; }
+    .section-note { color: var(--muted); font-size: 0.9rem; margin: 0.15rem 0 0.75rem; }
+    .section-note a { font-size: inherit; }
+    ul.releases { list-style: none; margin: 0; padding: 0; }
+    li.release { border-top: 1px solid var(--line); }
+    .row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      padding: 0.55rem 0.15rem;
+    }
+    .row button {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font: inherit;
+      padding: 0 0.15rem;
+      line-height: 1;
+    }
+    .row button[hidden] { visibility: hidden; }
+    .ver { font-weight: 650; text-decoration: none; }
+    .ver:hover { text-decoration: underline; }
+    time, .when { color: var(--muted); font-size: 0.85rem; }
+    .badge {
+      font-size: 0.72rem;
+      font-weight: 650;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--current-text);
+      background: var(--current);
+      border-radius: 999px;
+      padding: 0.05rem 0.45rem;
+    }
+    .assets { list-style: none; margin: 0 0 0.45rem; padding: 0 0 0.35rem 1.6rem; }
+    .assets a { color: var(--download); text-decoration: none; font-size: 0.92rem; }
+    .assets a:hover { text-decoration: underline; }
+    .assets li { padding: 0.12rem 0; }
+    .more, .status {
+      margin: 0.4rem 0 0.8rem;
+      font-size: 0.92rem;
+    }
+    button.linkish {
+      border: 0;
+      background: none;
+      color: var(--link);
+      font: inherit;
+      padding: 0;
+      cursor: pointer;
+    }
+    .subhead { color: var(--muted); font-size: 0.85rem; font-weight: 650; margin: 0.8rem 0 0.2rem; }
+    .error { color: #b91c1c; }
+    footer { color: var(--muted); font-size: 0.85rem; margin-top: 1.5rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Opentrons releases</h1>
+    <p class="lede">Current and recent versions deployed to customers. The lists are read live from published GitHub releases, git tags, and PyPI. Draft builds are not included.</p>
+    <div class="controls">
+      <input id="search" type="search" placeholder="Filter by version" aria-label="Filter by version">
+      <label class="alpha"><input id="prerelease" type="checkbox"> Show alpha and beta</label>
+    </div>
+    <div id="summary" class="summary" hidden></div>
+    <div id="sections"></div>
+    <p id="status" class="status">Loading releases…</p>
+    <footer>App and robot software downloads come from published GitHub releases. Protocol Designer, Labware Library, and the docs site each have one production URL; the versions under those headings are the tags that were deployed there.</footer>
+  </main>
+  <script>
+    const MONTHS = 24
+    const state = {
+      flex: [],
+      ot2: [],
+      protocolDesigner: [],
+      labware: [],
+      docs: [],
+      python: [],
+      sharedData: null,
+      errors: [],
+    }
+
+    const OLDER_COLLAPSED = 3
+    const OLDER_EXPANDED = 6
+    const expandedSections = new Set()
+
+    const searchEl = document.getElementById('search')
+    const prereleaseEl = document.getElementById('prerelease')
+    const summaryEl = document.getElementById('summary')
+    const sectionsEl = document.getElementById('sections')
+    const statusEl = document.getElementById('status')
+
+    searchEl.addEventListener('input', render)
+    prereleaseEl.addEventListener('change', render)
+
+    function isPrerelease(name) {
+      return /alpha|beta|rc|candidate|\d[ab]\d/i.test(name)
+    }
+
+    function withinWindow(iso) {
+      if (!iso) return true
+      const then = new Date(iso).getTime()
+      const cutoff = Date.now() - MONTHS * 30 * 24 * 60 * 60 * 1000
+      return then >= cutoff
+    }
+
+    function formatDate(iso) {
+      if (!iso) return ''
+      return new Date(iso).toLocaleDateString('en-US', {
+        year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC',
+      })
+    }
+
+    function semverParts(name) {
+      const match = String(name).match(/(\d+)\.(\d+)\.(\d+)(?:[-.]?(alpha|beta|rc)\.?(\d+))?/i)
+      if (!match) return null
+      const kind = (match[4] || '').toLowerCase()
+      const rank = kind === 'alpha' ? 1 : kind === 'beta' || kind === 'rc' ? 2 : 3
+      return [Number(match[1]), Number(match[2]), Number(match[3]), rank, Number(match[5] || 0)]
+    }
+
+    function compareSemverDesc(a, b) {
+      const pa = semverParts(a) || [0, 0, 0, 0, 0]
+      const pb = semverParts(b) || [0, 0, 0, 0, 0]
+      for (let i = 0; i < pa.length; i++) {
+        if (pa[i] !== pb[i]) return pb[i] - pa[i]
+      }
+      return 0
+    }
+
+    function assetLabel(name) {
+      const lower = name.toLowerCase()
+      if (lower.endsWith('.dmg')) return 'macOS app'
+      if (lower.endsWith('.exe')) return 'Windows app'
+      if (lower.endsWith('.appimage')) return 'Linux app'
+      if (lower.startsWith('ot3-system') && lower.endsWith('.zip')) return 'Flex system update'
+      if (lower.startsWith('ot3-fullimage')) return 'Flex full image'
+      if (lower.startsWith('ot2-system') && lower.endsWith('.zip')) return 'OT-2 system update'
+      if (lower.startsWith('ot2-fullimage')) return 'OT-2 full image'
+      if (lower.startsWith('version') && lower.endsWith('.json')) return 'Version manifest'
+      return null
+    }
+
+    function releaseAssets(release, predicate) {
+      return release.assets
+        .map(asset => ({ name: asset.name, url: asset.browser_download_url, label: assetLabel(asset.name) }))
+        .filter(asset => asset.label && (!predicate || predicate(asset)))
+        .sort((a, b) => a.label.localeCompare(b.label) || a.name.localeCompare(b.name))
+    }
+
+    async function fetchJson(url) {
+      const response = await fetch(url)
+      if (!response.ok) {
+        throw new Error(`${response.status} ${response.statusText} for ${url}`)
+      }
+      return response.json()
+    }
+
+    async function fetchReleases(repo, pages) {
+      const releases = []
+      for (let page = 1; page <= pages; page++) {
+        const batch = await fetchJson(`https://api.github.com/repos/${repo}/releases?per_page=100&page=${page}`)
+        releases.push(...batch.filter(release => !release.draft))
+        if (batch.length < 100) break
+      }
+      return releases
+    }
+
+    async function fetchTags(prefix) {
+      const refs = await fetchJson(`https://api.github.com/repos/Opentrons/opentrons/git/matching-refs/tags/${encodeURIComponent(prefix)}`)
+      return refs
+        .map(ref => ref.ref.replace('refs/tags/', ''))
+        .filter(tag => tag.startsWith(prefix) && !tag.startsWith('staging-'))
+    }
+
+    const BUILDS_FLEX_URL = '/builds/ot3-oe/releases.json'
+    const ROBOT_TAG = /^v(\d+\.\d+\.\d+(?:-(?:alpha|beta)\.\d+)?)$/
+
+    function flexBuildAssets(version, entry) {
+      const assets = []
+      if (entry.system) assets.push({ name: `ot3-system-${version}.zip`, url: entry.system, label: 'Flex system update' })
+      if (entry.fullImage) assets.push({ name: `ot3-fullimage-${version}.tar`, url: entry.fullImage, label: 'Flex full image' })
+      if (entry.version) assets.push({ name: `VERSION-${version}.json`, url: entry.version, label: 'Version manifest' })
+      return assets
+    }
+
+    function toReleaseItem(release, assets) {
+      return {
+        version: release.tag_name,
+        url: release.html_url,
+        date: release.published_at,
+        prerelease: Boolean(release.prerelease) || isPrerelease(release.tag_name),
+        assets,
+      }
+    }
+
+    function tagsToItems(tags) {
+      return tags
+        .filter(tag => semverParts(tag) || /^mkdocs-\d{4}-\d{2}-\d{2}$/.test(tag))
+        .map(tag => ({
+          version: tag.replace(/^(protocol-designer@|labware-library@|mkdocs-)/, ''),
+          full: tag,
+          url: `https://github.com/Opentrons/opentrons/tree/${encodeURIComponent(tag)}`,
+          date: /^mkdocs-(\d{4}-\d{2}-\d{2})$/.test(tag) ? tag.slice('mkdocs-'.length) + 'T00:00:00Z' : null,
+          prerelease: isPrerelease(tag),
+          assets: [],
+        }))
+        .sort((a, b) => {
+          if (a.date && b.date && !semverParts(a.full)) return b.date.localeCompare(a.date)
+          return compareSemverDesc(a.full || a.version, b.full || b.version)
+        })
+    }
+
+    function visibleItems(items) {
+      const query = searchEl.value.trim().toLowerCase()
+      const showPre = prereleaseEl.checked
+      return items.filter(item => {
+        if (item.date && !withinWindow(item.date)) return false
+        if (!showPre && item.prerelease) return false
+        if (!query) return true
+        const haystack = `${item.version} ${item.assets.map(asset => asset.name).join(' ')}`.toLowerCase()
+        return haystack.includes(query)
+      })
+    }
+
+    function el(tag, props, children) {
+      const node = document.createElement(tag)
+      Object.entries(props || {}).forEach(([key, value]) => {
+        if (value == null || value === false) return
+        if (key === 'text') node.textContent = value
+        else if (key === 'hidden') node.hidden = true
+        else node.setAttribute(key, value)
+      })
+      ;(children || []).forEach(child => { if (child) node.appendChild(child) })
+      return node
+    }
+
+    function renderRelease(item, current) {
+      const assets = item.assets
+      const button = el('button', {
+        type: 'button',
+        'aria-expanded': 'false',
+        'aria-label': `Show downloads for ${item.version}`,
+        text: '▸',
+        hidden: assets.length === 0,
+      })
+      const version = el('a', { class: 'ver', href: item.url, target: '_blank', rel: 'noopener noreferrer', text: item.version })
+      const bits = [button, version]
+      if (current) bits.push(el('span', { class: 'badge', text: 'Current' }))
+      if (item.prerelease) bits.push(el('span', { class: 'when', text: 'prerelease' }))
+      if (item.unpublished) bits.push(el('span', { class: 'when', text: 'not published on GitHub' }))
+      if (item.date) bits.push(el('time', { datetime: item.date, text: formatDate(item.date) }))
+      const row = el('div', { class: 'row' }, bits)
+      const list = el('ul', { class: 'assets', hidden: true }, assets.map(asset => {
+        const link = el('a', { href: asset.url, text: `${asset.label} — ${asset.name}` })
+        return el('li', {}, [link])
+      }))
+      button.addEventListener('click', () => {
+        const open = list.hidden
+        list.hidden = !open
+        button.textContent = open ? '▾' : '▸'
+        button.setAttribute('aria-expanded', open ? 'true' : 'false')
+      })
+      return el('li', { class: 'release' }, [row, assets.length ? list : null])
+    }
+
+    function renderGroup(key, items, currentVersion, hasCurrent) {
+      const searching = Boolean(searchEl.value.trim())
+      const expanded = expandedSections.has(key)
+      const older = expanded ? OLDER_EXPANDED : OLDER_COLLAPSED
+      const limit = (hasCurrent ? 1 : 0) + OLDER_COLLAPSED
+      const max = (hasCurrent ? 1 : 0) + OLDER_EXPANDED
+      const shown = searching ? items : items.slice(0, (hasCurrent ? 1 : 0) + older)
+      const list = el('ul', { class: 'releases' }, shown.map(item => renderRelease(item, hasCurrent && item.version === currentVersion)))
+      const parts = [list]
+      if (!searching && items.length > limit) {
+        const hidden = Math.min(items.length, max) - shown.length
+        const more = el('button', {
+          type: 'button',
+          class: 'linkish',
+          text: expanded ? 'Show fewer' : `Show ${hidden} more`,
+        })
+        more.addEventListener('click', () => {
+          if (expanded) expandedSections.delete(key)
+          else expandedSections.add(key)
+          render()
+        })
+        parts.push(el('p', { class: 'more' }, [more]))
+      }
+      return parts
+    }
+
+    function renderSection(title, noteNodes, items) {
+      const matches = visibleItems(items)
+      if (!matches.length) return null
+      const stable = matches.filter(item => !item.prerelease)
+      const pre = matches.filter(item => item.prerelease)
+      const currentVersion = items.find(item => !item.prerelease && (!item.date || withinWindow(item.date)))?.version
+      const children = [el('div', { class: 'section-head' }, [el('h2', { text: title })])]
+      if (noteNodes) children.push(el('p', { class: 'section-note' }, noteNodes))
+      if (stable.length) children.push(...renderGroup(title, stable, currentVersion, true))
+      if (pre.length) {
+        children.push(el('p', { class: 'subhead', text: 'Alphas and betas' }))
+        children.push(...renderGroup(`${title} (pre)`, pre, null, false))
+      }
+      return el('section', {}, children)
+    }
+
+    function noteLink(href, text) {
+      return el('a', { href, target: '_blank', rel: 'noopener noreferrer', text })
+    }
+
+    function renderSummary() {
+      const cards = [
+        ['Opentrons App', state.flex.find(item => !item.prerelease)],
+        ['OT-2 app', state.ot2.find(item => !item.prerelease)],
+        ['Protocol Designer', state.protocolDesigner.find(item => !item.prerelease)],
+        ['Labware Library', state.labware.find(item => !item.prerelease)],
+        ['Documentation', state.docs.find(item => !item.prerelease)],
+        ['Python package', state.python.find(item => !item.prerelease)],
+      ].filter(([, item]) => item)
+      summaryEl.replaceChildren()
+      if (!cards.length) {
+        summaryEl.hidden = true
+        return
+      }
+      cards.forEach(([label, item]) => {
+        const link = el('a', { href: item.site || item.url, target: '_blank', rel: 'noopener noreferrer' }, [
+          el('span', { class: 'k', text: label }),
+          el('span', { class: 'v', text: item.version }),
+        ])
+        summaryEl.appendChild(link)
+      })
+      summaryEl.hidden = false
+    }
+
+    function render() {
+      const appNote = [document.createTextNode('Desktop installers and Flex robot software from '), noteLink('https://github.com/Opentrons/opentrons/releases', 'Opentrons/opentrons'), document.createTextNode('.')]
+      const ot2Note = [document.createTextNode('The separate OT-2 app is on '), noteLink('https://github.com/Opentrons/opentrons-ot2/releases', 'Opentrons/opentrons-ot2'), document.createTextNode('. Earlier OT-2 system packages shipped on the combined app release with the same version number.')]
+      const pdNote = [document.createTextNode('Production site: '), noteLink('https://designer.opentrons.com/', 'designer.opentrons.com'), document.createTextNode('. Each row is a deploy tag.')]
+      const llNote = [document.createTextNode('Production site: '), noteLink('https://labware.opentrons.com/', 'labware.opentrons.com'), document.createTextNode('. Each row is a deploy tag.')]
+      const docsNote = [document.createTextNode('Production site: '), noteLink('https://docs.opentrons.com/', 'docs.opentrons.com'), document.createTextNode('. Each row is a docs deploy tag.')]
+      const pyNote = [document.createTextNode('Published on '), noteLink('https://pypi.org/project/opentrons/', 'PyPI'), document.createTextNode(state.sharedData ? `. opentrons-shared-data latest is ${state.sharedData}.` : '.')]
+
+      const sections = [
+        renderSection('Opentrons App and Flex', appNote, state.flex),
+        renderSection('OT-2 app and robot software', ot2Note, state.ot2),
+        renderSection('Protocol Designer', pdNote, state.protocolDesigner),
+        renderSection('Labware Library', llNote, state.labware),
+        renderSection('Documentation', docsNote, state.docs),
+        renderSection('Python package', pyNote, state.python),
+      ].filter(Boolean)
+      sectionsEl.replaceChildren(...sections)
+      renderSummary()
+      if (!sections.length) {
+        statusEl.hidden = false
+        statusEl.className = 'status'
+        statusEl.textContent = state.errors.length
+          ? 'Nothing matched, and some sources failed to load.'
+          : 'No versions match that filter.'
+      } else {
+        statusEl.hidden = !state.errors.length
+        statusEl.className = state.errors.length ? 'status error' : 'status'
+        statusEl.textContent = state.errors.join(' ')
+      }
+    }
+
+    async function load() {
+      const jobs = [
+        ['Opentrons app', async () => {
+          const [releases, tags, builds] = await Promise.all([
+            fetchReleases('Opentrons/opentrons', 3),
+            fetchTags('v'),
+            fetchJson(BUILDS_FLEX_URL)
+              .then(data => data.productionV2 || {})
+              .catch(() => {
+                state.errors.push('Flex build downloads are unavailable. Start the page with serve.py to list unpublished builds.')
+                return {}
+              }),
+          ])
+          const isOt2 = asset => asset.label.startsWith('OT-2') || /ot2/i.test(asset.name)
+          const robotReleases = releases.filter(release => /^v\d/.test(release.tag_name))
+          const published = new Set(robotReleases.map(release => release.tag_name))
+
+          const flex = robotReleases
+            .map(release => toReleaseItem(release, releaseAssets(release, asset => !isOt2(asset))))
+            .filter(item => item.assets.length)
+          for (const tag of tags) {
+            const match = tag.match(ROBOT_TAG)
+            if (!match || published.has(tag)) continue
+            const entry = builds[match[1]]
+            if (!entry) continue
+            flex.push({
+              version: tag,
+              url: `https://github.com/Opentrons/opentrons/tree/${encodeURIComponent(tag)}`,
+              date: null,
+              prerelease: isPrerelease(tag),
+              unpublished: true,
+              assets: flexBuildAssets(match[1], entry),
+            })
+          }
+          state.flex = flex.sort((a, b) => compareSemverDesc(a.version, b.version))
+
+          state.ot2Historical = robotReleases
+            .map(release => toReleaseItem(release, releaseAssets(release, asset => isOt2(asset))))
+            .filter(item => item.assets.length)
+        }],
+        ['OT-2 app', async () => {
+          const releases = await fetchReleases('Opentrons/opentrons-ot2', 2)
+          state.ot2Fresh = releases
+            .filter(release => /^v\d/.test(release.tag_name))
+            .map(release => toReleaseItem(release, releaseAssets(release)))
+            .filter(item => item.assets.length)
+        }],
+        ['Protocol Designer', async () => {
+          state.protocolDesigner = tagsToItems(await fetchTags('protocol-designer@')).map(item => ({
+            ...item,
+            site: 'https://designer.opentrons.com/',
+          }))
+        }],
+        ['Labware Library', async () => {
+          state.labware = tagsToItems(await fetchTags('labware-library@')).map(item => ({
+            ...item,
+            site: 'https://labware.opentrons.com/',
+          }))
+        }],
+        ['Documentation', async () => {
+          const tags = await fetchTags('mkdocs-')
+          state.docs = tagsToItems(tags.filter(tag => /^mkdocs-\d{4}-\d{2}-\d{2}$/.test(tag))).map(item => ({
+            ...item,
+            site: 'https://docs.opentrons.com/',
+          }))
+        }],
+        ['Python package', async () => {
+          const data = await fetchJson('https://pypi.org/pypi/opentrons/json')
+          const rows = Object.entries(data.releases).flatMap(([version, files]) => {
+            if (!files.length) return []
+            const date = files.map(file => file.upload_time).sort().at(-1)
+            return [{
+              version,
+              url: `https://pypi.org/project/opentrons/${version}/`,
+              date,
+              prerelease: isPrerelease(version),
+              assets: [],
+            }]
+          })
+          rows.sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+          state.python = rows
+          const shared = await fetchJson('https://pypi.org/pypi/opentrons-shared-data/json')
+          state.sharedData = shared.info.version
+        }],
+      ]
+
+      await Promise.all(jobs.map(async ([name, run]) => {
+        try { await run() } catch (error) { state.errors.push(`${name}: ${error.message}`) }
+      }))
+      state.ot2 = [...(state.ot2Fresh || []), ...(state.ot2Historical || [])]
+        .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+      statusEl.hidden = true
+      render()
+    }
+
+    load()
+  </script>
+</body>
+</html>
