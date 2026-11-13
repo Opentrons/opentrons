@@ -25,7 +25,12 @@ from opentrons_shared_data.pipette import (
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
-from opentrons_shared_data.pipette.types import PipetteModel, PipetteName
+from opentrons_shared_data.pipette.pipette_definition import SupportedTipsDefinition
+from opentrons_shared_data.pipette.types import (
+    PipetteModel,
+    PipetteName,
+    PipetteTipType,
+)
 
 from .flex_protocol import (
     FlexBackend,
@@ -911,3 +916,11 @@ class OT3Simulator(FlexBackend):
     ) -> Optional[float]:
         """Read and return the current sensor information."""
         return 0.0
+
+    async def send_pipetting_function_to_eeprom(
+        self,
+        mount: OT3Mount,
+        supported_tips_def: Dict[PipetteTipType, SupportedTipsDefinition],
+    ) -> None:
+        """Process and send a pipetting function to the pipette's EEPROM over CAN."""
+        return

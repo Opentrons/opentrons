@@ -499,6 +499,58 @@ class FirmwareUpdateEraseAppResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
+class PipetteConfigUpdateInitiate(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[MessageId.pip_config_update_initiate] = (
+        MessageId.pip_config_update_initiate
+    )
+
+
+@dataclass
+class PipetteConfigUpdateRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[MessageId.pip_config_update_initiate] = (
+        MessageId.pip_config_update_initiate
+    )
+
+
+@dataclass
+class PipetteConfigData(BaseMessage):  # noqa: D101
+    payload: payloads.PipetteConfigData
+    payload_type: Type[payloads.PipetteConfigData] = payloads.PipetteConfigData
+    message_id: Literal[MessageId.pip_config_data] = MessageId.pip_config_data
+
+
+@dataclass
+class PipetteConfigDataAcknowledge(BaseMessage):  # noqa: D101
+    payload: payloads.PipetteConfigDataAcknowledge
+    payload_type: Type[payloads.PipetteConfigDataAcknowledge] = (
+        payloads.PipetteConfigDataAcknowledge
+    )
+    message_id: Literal[MessageId.pip_config_data_ack] = MessageId.pip_config_data_ack
+
+
+@dataclass
+class PipetteConfigUpdateComplete(BaseMessage):  # noqa: D101
+    payload: payloads.PipetteConfigUpdateComplete
+    payload_type: Type[payloads.PipetteConfigUpdateComplete] = (
+        payloads.PipetteConfigUpdateComplete
+    )
+    message_id: Literal[MessageId.pip_config_update_complete] = (
+        MessageId.pip_config_update_complete
+    )
+
+
+@dataclass
+class PipetteConfigDataCompleteAcknowledge(BaseMessage):  # noqa: D101
+    payload: payloads.PipetteConfigDataAcknowledge
+    payload_type: Type[payloads.PipetteConfigDataAcknowledge] = (
+        payloads.PipetteConfigDataAcknowledge
+    )
+    message_id: Literal[MessageId.pip_config_update_complete_ack] = (
+        MessageId.pip_config_update_complete_ack
+    )
+
+
+@dataclass
 class HomeRequest(BaseMessage):  # noqa: D101
     payload: payloads.HomeRequestPayload
     payload_type: Type[payloads.HomeRequestPayload] = payloads.HomeRequestPayload

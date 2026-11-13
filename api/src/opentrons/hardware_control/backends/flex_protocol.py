@@ -13,9 +13,8 @@ from typing import (
     TypeVar,
 )
 
-from opentrons_shared_data.pipette.types import (
-    PipetteName,
-)
+from opentrons_shared_data.pipette.pipette_definition import SupportedTipsDefinition
+from opentrons_shared_data.pipette.types import PipetteName, PipetteTipType
 
 from ..dev_types import OT3AttachedInstruments
 from .types import HWStopCondition
@@ -467,4 +466,12 @@ class FlexBackend(Protocol):
         self, expected_axes: Optional[List[Axis]] = None
     ) -> Dict[Axis, Dict[str, int]]:
         """Request and return motor usage data."""
+        ...
+
+    async def send_pipetting_function_to_eeprom(
+        self,
+        mount: OT3Mount,
+        supported_tips_def: Dict[PipetteTipType, SupportedTipsDefinition],
+    ) -> None:
+        """Process and send a pipetting function to the pipette's EEPROM over CAN."""
         ...
