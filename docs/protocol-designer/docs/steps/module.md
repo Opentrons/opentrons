@@ -224,7 +224,7 @@ Both gauge pressure and pump power settings include an optional **Duration** che
 <figcaption>Optional duration and vent controls.</figcaption>
 </figure>
 
-Create multiple state steps if you need to run the pump sequentially using different vacuum or power settings,. However, it is usually more efficient to create a vacuum profile or vacuum cycle, which lets you run sequential operations or repeating loops within a single protocol step.
+Create multiple state steps if you need to run the pump sequentially using different vacuum or power settings. However, it is usually more efficient to create a vacuum profile or vacuum cycle, which lets you run sequential operations or repeating loops within a single protocol step.
 
 ### Creating vacuum profiles
 
