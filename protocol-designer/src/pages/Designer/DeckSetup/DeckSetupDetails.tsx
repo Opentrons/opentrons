@@ -3,7 +3,11 @@ import { useDragLayer } from 'react-dnd'
 import { useDispatch, useSelector } from 'react-redux'
 import values from 'lodash/values'
 
-import { DeckLabelSet, Module } from '@opentrons/components'
+import {
+  AlignToModuleChildSlot,
+  DeckLabelSet,
+  Module,
+} from '@opentrons/components'
 import {
   FLEX_STACKER_MODULE_TYPE,
   getAddressableAreaFromSlotId,
@@ -55,6 +59,7 @@ import { getSlotInformation } from '../utils'
 import { HighlightItems } from './HighlightItems'
 import { useUpdateDeckConfigurationFromStartingDeck } from './hooks/useUpdateDeckConfigurationFromStartingDeck'
 import { HopperLabwareRenders } from './HopperLabwareRenders'
+import { ModuleChildLabware } from './ModuleChildLabware'
 import { AdapterControls, LabwareControls, SlotControls } from './Overlays'
 import { ActiveLabwareControls } from './Overlays/ActiveLabwareControls'
 import { SelectedItems } from './SelectedItems'
@@ -394,6 +399,22 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): ReactNode {
             : null
         const topLabwareGroup =
           labwareInHopper?.[labwareInHopper.length - 1] ?? null
+        // Stacker offset for the hopper.
+        const isFlexStacker = moduleOnDeck.type === FLEX_STACKER_MODULE_TYPE
+        const moduleChildOrigin: [number, number, number] = [0, 0, 0]
+
+        const wrapInChildSlot = (node: ReactNode): ReactNode =>
+          isFlexStacker ? (
+            node
+          ) : (
+            <AlignToModuleChildSlot
+              moduleDefinition={moduleDef}
+              slotId={slotId}
+              deckId={deckDef.otId}
+            >
+              {node}
+            </AlignToModuleChildSlot>
+          )
 
         return moduleOnDeck.slot !== selectedSlot.slot ? (
           <Fragment key={moduleOnDeck.id}>
@@ -408,11 +429,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): ReactNode {
               innerProps={innerProps}
               targetSlotId={slotId}
               targetDeckId={deckDef.otId}
-              childrenPositioningMode={
-                moduleOnDeck.type === FLEX_STACKER_MODULE_TYPE
-                  ? 'passThrough'
-                  : 'offsetToSlot'
-              }
+              childrenPositioningMode="passThrough"
             >
               {topLabwareGroup ? (
                 <HopperLabwareRenders
@@ -426,6 +443,9 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): ReactNode {
                   hover={hover}
                   setHoveredLabware={setHoveredLabware}
                   selectedZoomInSlot={selectedZoomInSlot}
+                  moduleDefinition={moduleDef}
+                  deckId={deckDef.otId}
+                  slotId={slotId}
                 />
               ) : null}
               {labwareOnModule != null &&
@@ -433,102 +453,126 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): ReactNode {
                 <>
                   {vacuumMainModuleStack != null ? (
                     vacuumMainModuleStack.map(lw => (
-                      <LabwareOnDeck
+                      <ModuleChildLabware
                         key={lw.id}
-                        x={0}
-                        y={0}
                         labwareOnDeck={lw}
+                        moduleDefinition={moduleDef}
+                        deckId={deckDef.otId}
+                        slotId={slotId}
                       />
                     ))
-                  ) : (
+                  ) : isFlexStacker ? (
                     <>
                       {labwareRightBelowTopMostLabware != null ? (
                         <LabwareOnDeck
                           x={0}
                           y={0}
+                          centerInSlot={false}
                           labwareOnDeck={labwareRightBelowTopMostLabware}
                         />
                       ) : null}
                       <LabwareOnDeck
                         x={0}
                         y={0}
+                        centerInSlot={false}
                         labwareOnDeck={labwareOnModule}
                       />
                     </>
-                  )}
-                  <HighlightLabware
-                    labwareOnDeck={labwareOnModule}
-                    position={[0, 0, 0]}
-                    isZoomed={selectedZoomInSlot != null}
-                  />
-
-                  {isAdapter ? (
-                    <AdapterControls
-                      itemId={slotId}
-                      swapBlocked={swapBlockedAdapter}
-                      hover={hover}
-                      onDeck={false}
-                      setHover={setHover}
-                      setShowMenuListForId={setShowMenuListForId}
-                      labwareId={labwareOnModule.id}
-                      key={moduleOnDeck.slot}
-                      slotPosition={[0, 0, 0]} // Module Component already handles nested positioning
-                      slotBoundingBox={labwareInterfaceBoundingBox}
-                      handleDragHover={handleHoverEmptySlot}
-                      terminalItemId={terminalItemId}
-                      isSelected={selectedZoomInSlot != null}
-                    />
                   ) : (
-                    <LabwareControls
-                      terminalItemId={terminalItemId}
-                      itemId={slotId}
-                      setHover={setHover}
-                      setShowMenuListForId={setShowMenuListForId}
-                      hover={hover}
-                      slotPosition={[0, 0, 0]} // Module Component already handles nested positioning
-                      setHoveredLabware={setHoveredLabware}
-                      swapBlocked={
-                        (swapBlockedModule || swapBlockedAdapter) &&
-                        (labwareOnModule.id === hoveredLabware?.id ||
-                          labwareOnModule.id === draggedLabware?.id)
-                      }
-                      labwareOnDeck={labwareOnModule}
-                      isSelected={selectedZoomInSlot != null}
-                      allModules={allModules}
-                    />
+                    <>
+                      {labwareRightBelowTopMostLabware != null ? (
+                        <ModuleChildLabware
+                          labwareOnDeck={labwareRightBelowTopMostLabware}
+                          moduleDefinition={moduleDef}
+                          deckId={deckDef.otId}
+                          slotId={slotId}
+                        />
+                      ) : null}
+                      <ModuleChildLabware
+                        labwareOnDeck={labwareOnModule}
+                        moduleDefinition={moduleDef}
+                        deckId={deckDef.otId}
+                        slotId={slotId}
+                      />
+                    </>
                   )}
-                  <ActiveLabwareControls
-                    slotPosition={[0, 0, 0]}
-                    slotBoundingBox={labwareInterfaceBoundingBox}
-                    itemId={slotId}
-                    terminalItemId={terminalItemId}
-                    hover={hover}
-                    setHover={setHover}
-                  />
+                  {wrapInChildSlot(
+                    <>
+                      <HighlightLabware
+                        labwareOnDeck={labwareOnModule}
+                        position={moduleChildOrigin}
+                        isZoomed={selectedZoomInSlot != null}
+                      />
+                      {isAdapter ? (
+                        <AdapterControls
+                          itemId={slotId}
+                          swapBlocked={swapBlockedAdapter}
+                          hover={hover}
+                          onDeck={false}
+                          setHover={setHover}
+                          setShowMenuListForId={setShowMenuListForId}
+                          labwareId={labwareOnModule.id}
+                          key={moduleOnDeck.slot}
+                          slotPosition={moduleChildOrigin}
+                          slotBoundingBox={labwareInterfaceBoundingBox}
+                          handleDragHover={handleHoverEmptySlot}
+                          terminalItemId={terminalItemId}
+                          isSelected={selectedZoomInSlot != null}
+                        />
+                      ) : (
+                        <LabwareControls
+                          terminalItemId={terminalItemId}
+                          itemId={slotId}
+                          setHover={setHover}
+                          setShowMenuListForId={setShowMenuListForId}
+                          hover={hover}
+                          slotPosition={moduleChildOrigin}
+                          setHoveredLabware={setHoveredLabware}
+                          swapBlocked={
+                            (swapBlockedModule || swapBlockedAdapter) &&
+                            (labwareOnModule.id === hoveredLabware?.id ||
+                              labwareOnModule.id === draggedLabware?.id)
+                          }
+                          labwareOnDeck={labwareOnModule}
+                          isSelected={selectedZoomInSlot != null}
+                          allModules={allModules}
+                        />
+                      )}
+                      <ActiveLabwareControls
+                        slotPosition={moduleChildOrigin}
+                        slotBoundingBox={labwareInterfaceBoundingBox}
+                        itemId={slotId}
+                        terminalItemId={terminalItemId}
+                        hover={hover}
+                        setHover={setHover}
+                      />
+                    </>
+                  )}
                 </>
               ) : null}
 
-              {labwareOnModule == null ? (
-                <SlotControls
-                  terminalItemId={terminalItemId}
-                  itemId={slotId}
-                  key={moduleOnDeck.slot}
-                  slotPosition={[0, 0, 0]} // Module Component already handles nested positioning
-                  slotBoundingBox={labwareInterfaceBoundingBox}
-                  moduleType={moduleOnDeck.type}
-                  handleDragHover={handleHoverEmptySlot}
-                  slotId={moduleOnDeck.id}
-                  hover={hover}
-                  setHover={setHover}
-                  setShowMenuListForId={setShowMenuListForId}
-                  isSelected={selectedZoomInSlot != null}
-                  deckDef={deckDef}
-                  stagingAreaAddressableAreas={[]}
-                  addEquipment={addEquipment}
-                />
-              ) : null}
-              {hopperTopMostId == null &&
-              moduleOnDeck.type === FLEX_STACKER_MODULE_TYPE ? (
+              {labwareOnModule == null
+                ? wrapInChildSlot(
+                    <SlotControls
+                      terminalItemId={terminalItemId}
+                      itemId={slotId}
+                      key={moduleOnDeck.slot}
+                      slotPosition={moduleChildOrigin}
+                      slotBoundingBox={labwareInterfaceBoundingBox}
+                      moduleType={moduleOnDeck.type}
+                      handleDragHover={handleHoverEmptySlot}
+                      slotId={moduleOnDeck.id}
+                      hover={hover}
+                      setHover={setHover}
+                      setShowMenuListForId={setShowMenuListForId}
+                      isSelected={selectedZoomInSlot != null}
+                      deckDef={deckDef}
+                      stagingAreaAddressableAreas={[]}
+                      addEquipment={addEquipment}
+                    />
+                  )
+                : null}
+              {hopperTopMostId == null && isFlexStacker ? (
                 <SlotControls
                   terminalItemId={terminalItemId}
                   itemId={`hopper${slotId}`}

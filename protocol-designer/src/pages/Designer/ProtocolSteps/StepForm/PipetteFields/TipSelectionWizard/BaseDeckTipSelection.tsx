@@ -34,6 +34,7 @@ import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { LabwareOnDeck } from '/protocol-designer/components/organisms'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { ModuleChildLabware } from '/protocol-designer/pages/Designer/DeckSetup/ModuleChildLabware'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getLabwaresOnModuleFromStack } from '/protocol-designer/utils'
@@ -238,23 +239,25 @@ export function BaseDeckTipSelection(
                   }
                   targetSlotId={slotId}
                   targetDeckId={deckDef.otId}
-                  childrenPositioningMode="offsetToSlot"
+                  childrenPositioningMode="passThrough"
                 >
                   <>
                     {rightBelowTopId != null ? (
-                      <LabwareOnDeck
-                        x={0}
-                        y={0}
+                      <ModuleChildLabware
                         labwareOnDeck={
                           initialDeckSetup.labware[rightBelowTopId]
                         }
+                        moduleDefinition={moduleDef}
+                        deckId={deckDef.otId}
+                        slotId={slotId}
                       />
                     ) : null}
                     {topMostId != null ? (
-                      <LabwareOnDeck
-                        x={0}
-                        y={0}
+                      <ModuleChildLabware
                         labwareOnDeck={initialDeckSetup.labware[topMostId]}
+                        moduleDefinition={moduleDef}
+                        deckId={deckDef.otId}
+                        slotId={slotId}
                       />
                     ) : null}
                   </>

@@ -1,7 +1,10 @@
-import { LabwareOnDeck } from '/protocol-designer/components/organisms'
-import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
+import {
+  CenterLabwareInModuleChildSlot,
+  STACKER_HOPPER_LABWARE_X_OFFSET,
+} from '@opentrons/components'
 
 import { HighlightLabware } from '../HighlightLabware'
+import { ModuleChildLabware } from './ModuleChildLabware'
 import { LabwareControls } from './Overlays'
 import { ActiveLabwareControls } from './Overlays/ActiveLabwareControls'
 
@@ -9,6 +12,7 @@ import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   DeckSlotId,
   FlexStackerStoredLabwareGroup,
+  ModuleDefinition,
 } from '@opentrons/shared-data'
 import type {
   LabwareOnDeck as LabwareOnDeckType,
@@ -28,18 +32,18 @@ interface HopperLabwareRendersProps {
   setHoveredLabware: Dispatch<
     SetStateAction<LabwareOnDeckType | null | undefined>
   >
-
   selectedZoomInSlot?: DeckSlotId
+  moduleDefinition: ModuleDefinition
+  deckId: string
+  slotId: string
 }
 
 /**
  * HopperLabwareRenders
  *
- * This component renders the labware items of the top group of labware in the hopper of a given Flex Stacker module.
- * It should be called as a child of the hardware-sim `Module` component for proper positioning.
- *
+ * Top labware group in a Flex Stacker hopper. Parent Module must use
+ * childrenPositioningMode="passThrough".
  */
-
 export function HopperLabwareRenders(
   props: HopperLabwareRendersProps
 ): ReactNode {
@@ -54,6 +58,9 @@ export function HopperLabwareRenders(
     hover,
     setHoveredLabware,
     selectedZoomInSlot,
+    moduleDefinition,
+    deckId,
+    slotId,
   } = props
   const { primaryLabwareId, adapterLabwareId, lidLabwareId } = topLabwareGroup
   const primaryLabware = labwaresOnDeck[primaryLabwareId]
@@ -65,53 +72,74 @@ export function HopperLabwareRenders(
     yDimension: primaryLabware.def.dimensions.yDimension,
     zDimension: 0,
   }
+  // TODO: replace this static hopper X offset with one from the module def.
+  const hopperOffset: [number, number, number] = [
+    STACKER_HOPPER_LABWARE_X_OFFSET,
+    0,
+    0,
+  ]
+
   return (
     <>
       {adapterLabwareId != null && labwaresOnDeck[adapterLabwareId] != null ? (
-        <LabwareOnDeck
-          x={HOPPER_LABWARE_X_OFFSET}
-          y={0}
+        <ModuleChildLabware
           labwareOnDeck={labwaresOnDeck[adapterLabwareId]}
+          moduleDefinition={moduleDefinition}
+          deckId={deckId}
+          slotId={slotId}
+          xOffset={STACKER_HOPPER_LABWARE_X_OFFSET}
         />
       ) : null}
-      <LabwareOnDeck
-        x={HOPPER_LABWARE_X_OFFSET}
-        y={0}
+      <ModuleChildLabware
         labwareOnDeck={primaryLabware}
+        moduleDefinition={moduleDefinition}
+        deckId={deckId}
+        slotId={slotId}
+        xOffset={STACKER_HOPPER_LABWARE_X_OFFSET}
       />
       {lidLabwareId != null && labwaresOnDeck[lidLabwareId] != null ? (
-        <LabwareOnDeck
-          x={HOPPER_LABWARE_X_OFFSET}
-          y={0}
+        <ModuleChildLabware
           labwareOnDeck={labwaresOnDeck[lidLabwareId]}
+          moduleDefinition={moduleDefinition}
+          deckId={deckId}
+          slotId={slotId}
+          xOffset={STACKER_HOPPER_LABWARE_X_OFFSET}
         />
       ) : null}
-      <HighlightLabware
-        labwareOnDeck={primaryLabware}
-        position={[HOPPER_LABWARE_X_OFFSET, 0, 0]}
-        isZoomed={selectedZoomInSlot != null}
-      />
-      <LabwareControls
-        terminalItemId={terminalItemId}
-        itemId={`hopper${slot}`}
-        setHover={setHover}
-        setShowMenuListForId={setShowMenuListForId}
-        hover={hover}
-        slotPosition={[HOPPER_LABWARE_X_OFFSET, 0, 0]} // Module Component already handles nested positioning
-        setHoveredLabware={setHoveredLabware}
-        swapBlocked={false}
-        labwareOnDeck={primaryLabware}
-        isSelected={selectedZoomInSlot != null}
-        allModules={allModules}
-      />
-      <ActiveLabwareControls
-        itemId={`hopper${slot}`}
-        slotPosition={[HOPPER_LABWARE_X_OFFSET, 0, 0]}
-        hover={hover}
-        setHover={setHover}
-        slotBoundingBox={labwareInterfaceBoundingBox}
-        terminalItemId={terminalItemId}
-      />
+      {/* Align+center like ModuleChildLabware; hopper X via position props. */}
+      <CenterLabwareInModuleChildSlot
+        moduleDefinition={moduleDefinition}
+        slotId={slotId}
+        deckId={deckId}
+        labwareDefinition={primaryLabware.def}
+      >
+        <HighlightLabware
+          labwareOnDeck={primaryLabware}
+          position={hopperOffset}
+          isZoomed={selectedZoomInSlot != null}
+        />
+        <LabwareControls
+          terminalItemId={terminalItemId}
+          itemId={`hopper${slot}`}
+          setHover={setHover}
+          setShowMenuListForId={setShowMenuListForId}
+          hover={hover}
+          slotPosition={hopperOffset}
+          setHoveredLabware={setHoveredLabware}
+          swapBlocked={false}
+          labwareOnDeck={primaryLabware}
+          isSelected={selectedZoomInSlot != null}
+          allModules={allModules}
+        />
+        <ActiveLabwareControls
+          itemId={`hopper${slot}`}
+          slotPosition={hopperOffset}
+          hover={hover}
+          setHover={setHover}
+          slotBoundingBox={labwareInterfaceBoundingBox}
+          terminalItemId={terminalItemId}
+        />
+      </CenterLabwareInModuleChildSlot>
     </>
   )
 }

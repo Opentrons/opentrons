@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
+  AlignToModuleChildSlot,
   COLORS,
   INACCESSIBLE,
   Module,
@@ -27,6 +28,7 @@ import {
 
 import { LabwareOnDeck } from '/protocol-designer/components/organisms'
 import { SelectionRect } from '/protocol-designer/components/organisms/Labware/SelectionRect'
+import { ModuleChildLabware } from '/protocol-designer/pages/Designer/DeckSetup/ModuleChildLabware'
 import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getCollidingWells } from '/protocol-designer/utils/index'
@@ -542,53 +544,71 @@ export function WellSelector(props: WellSelectorProps): ReactNode {
 
     const is96Channel = channels === 96
 
-    const labwarePositionProps = isLabwareOnModule
-      ? {
-          x: 0,
-          y: 0,
-        }
-      : {
-          x: slotPosition[0],
-          y: slotPosition[1],
-        }
+    const wellInteractionProps = {
+      onMouseEnterWell: handleHoverWell,
+      onMouseLeaveWell: handleLeaveWell,
+      selectedTipsByIndex: allWellsWithStatus,
+      statusByWellName: allWellsWithState,
+      fill: COLORS.white,
+      ignoreMissingTips: true as const,
+      wellLabelOptions: 'SHOW_LABEL_INSIDE' as const,
+    }
+
+    const pipetteShadow =
+      hasMoreThanOneWell && wellShadow !== null ? (
+        <PipetteShadow
+          robotType={robotType}
+          pipetteSpec={pipetteSpecs}
+          slotPosition={isLabwareOnModule ? defaultSlotPosition : slotPosition}
+          hoveredWell={wellShadow}
+          selectedLabwareId={labwareId}
+          labwareState={deckSetup.labware}
+          hasPickupsRemaining={null}
+          isHoveredWellSelected={hoveredIsSelected}
+          isAccessible={isAccessible}
+          inaccessibleReason={inaccessibleReason}
+          primaryNozzle={primaryNozzle}
+          enclosingViewbox={viewBox}
+          nozzles={nozzleConfiguration}
+          rotate={is96Channel}
+        />
+      ) : null
+
     const labwarePipetteContent = (
       <>
-        <LabwareOnDeck
-          labwareOnDeck={labware}
-          {...labwarePositionProps}
-          onMouseEnterWell={handleHoverWell}
-          onMouseLeaveWell={handleLeaveWell}
-          selectedTipsByIndex={allWellsWithStatus}
-          statusByWellName={allWellsWithState}
-          fill={COLORS.white}
-          ignoreMissingTips
-          wellLabelOptions="SHOW_LABEL_INSIDE"
-        />
-        {hasMoreThanOneWell && wellShadow !== null ? (
-          <PipetteShadow
-            robotType={robotType}
-            pipetteSpec={pipetteSpecs}
-            slotPosition={
-              isLabwareOnModule ? defaultSlotPosition : slotPosition
-            }
-            hoveredWell={wellShadow}
-            selectedLabwareId={labwareId}
-            labwareState={deckSetup.labware}
-            hasPickupsRemaining={null}
-            isHoveredWellSelected={hoveredIsSelected}
-            isAccessible={isAccessible}
-            inaccessibleReason={inaccessibleReason}
-            primaryNozzle={primaryNozzle}
-            enclosingViewbox={viewBox}
-            nozzles={nozzleConfiguration}
-            rotate={is96Channel}
+        {isLabwareOnModule && moduleDef != null ? (
+          <ModuleChildLabware
+            labwareOnDeck={labware}
+            moduleDefinition={moduleDef}
+            deckId={deckDef.otId}
+            slotId={slot}
+            {...wellInteractionProps}
           />
-        ) : null}
+        ) : (
+          <LabwareOnDeck
+            labwareOnDeck={labware}
+            x={slotPosition[0]}
+            y={slotPosition[1]}
+            {...wellInteractionProps}
+          />
+        )}
+        {pipetteShadow != null && isLabwareOnModule && moduleDef != null ? (
+          <AlignToModuleChildSlot
+            moduleDefinition={moduleDef}
+            slotId={slot}
+            deckId={deckDef.otId}
+          >
+            {pipetteShadow}
+          </AlignToModuleChildSlot>
+        ) : (
+          pipetteShadow
+        )}
       </>
     )
+
     controls = (
       <Fragment>
-        {moduleDef ? (
+        {moduleDef != null ? (
           <Module
             key={slot}
             x={slotPosition[0]}
@@ -598,7 +618,7 @@ export function WellSelector(props: WellSelectorProps): ReactNode {
             innerProps={{ lidMotorState: 'open' }}
             targetSlotId={slot}
             targetDeckId={deckDef.otId}
-            childrenPositioningMode={'offsetToSlot'}
+            childrenPositioningMode="passThrough"
           >
             {labwarePipetteContent}
           </Module>

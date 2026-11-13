@@ -4,7 +4,7 @@ import {
 } from '@opentrons/components'
 import { getModuleDef } from '@opentrons/shared-data'
 
-import { LabwareOnDeck as LabwareOnDeckComponent } from '../../../components/organisms'
+import { ModuleChildLabware } from './ModuleChildLabware'
 
 import type { ReactNode } from 'react'
 import type {
@@ -58,34 +58,20 @@ export function SelectedModuleLabwareRender(
         </CenterLabwareInModuleChildSlot>
       ) : null}
       {topLabwareOnDeck != null ? (
-        <CenterLabwareInModuleChildSlot
+        <ModuleChildLabware
+          labwareOnDeck={topLabwareOnDeck}
+          moduleDefinition={moduleDefinition}
           deckId={deckId}
           slotId={slotId}
-          moduleDefinition={moduleDefinition}
-          labwareDefinition={topLabwareOnDeck.def}
-        >
-          <LabwareOnDeckComponent
-            labwareOnDeck={topLabwareOnDeck}
-            x={0}
-            y={0}
-            centerInSlot={false}
-          />
-        </CenterLabwareInModuleChildSlot>
+        />
       ) : null}
       {lidOnDeck != null ? (
-        <CenterLabwareInModuleChildSlot
+        <ModuleChildLabware
+          labwareOnDeck={lidOnDeck}
+          moduleDefinition={moduleDefinition}
           deckId={deckId}
           slotId={slotId}
-          moduleDefinition={moduleDefinition}
-          labwareDefinition={lidOnDeck.def}
-        >
-          <LabwareOnDeckComponent
-            labwareOnDeck={lidOnDeck}
-            x={0}
-            y={0}
-            centerInSlot={false}
-          />
-        </CenterLabwareInModuleChildSlot>
+        />
       ) : null}
     </>
   )

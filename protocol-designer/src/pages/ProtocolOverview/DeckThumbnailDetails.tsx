@@ -1,7 +1,11 @@
 import { Fragment } from 'react'
 import values from 'lodash/values'
 
-import { Module } from '@opentrons/components'
+import {
+  AlignToModuleChildSlot,
+  Module,
+  STACKER_HOPPER_LABWARE_X_OFFSET,
+} from '@opentrons/components'
 import {
   FLEX_STACKER_MODULE_TYPE,
   getAddressableAreaFromSlotId,
@@ -31,6 +35,7 @@ import {
   getLabwaresOnModuleFromStack,
   getStagingAreaAddressableAreas,
 } from '../../utils'
+import { ModuleChildLabware } from '../Designer/DeckSetup/ModuleChildLabware'
 import { SlotHover } from './SlotHover'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
@@ -103,56 +108,88 @@ export const DeckThumbnailDetails = (
               }
               targetSlotId={slotId}
               targetDeckId={deckDef.otId}
-              childrenPositioningMode={
-                moduleState.type === FLEX_STACKER_MODULE_TYPE
-                  ? 'passThrough'
-                  : 'offsetToSlot'
-              }
+              childrenPositioningMode="passThrough"
             >
               <>
                 {hopperTopMostId != null ? (
-                  <>
-                    <LabwareOnDeck
-                      x={HOPPER_LABWARE_X_OFFSET}
-                      y={0}
-                      labwareOnDeck={initialDeckSetup.labware[hopperTopMostId]}
-                    />
-                  </>
+                  <ModuleChildLabware
+                    labwareOnDeck={initialDeckSetup.labware[hopperTopMostId]}
+                    moduleDefinition={moduleDef}
+                    deckId={deckDef.otId}
+                    slotId={slotId}
+                    xOffset={STACKER_HOPPER_LABWARE_X_OFFSET}
+                  />
                 ) : null}
                 {rightBelowTopId != null ? (
-                  <LabwareOnDeck
-                    x={0}
-                    y={0}
-                    labwareOnDeck={initialDeckSetup.labware[rightBelowTopId]}
-                  />
+                  moduleType === FLEX_STACKER_MODULE_TYPE ? (
+                    <LabwareOnDeck
+                      x={0}
+                      y={0}
+                      centerInSlot={false}
+                      labwareOnDeck={initialDeckSetup.labware[rightBelowTopId]}
+                    />
+                  ) : (
+                    <ModuleChildLabware
+                      labwareOnDeck={initialDeckSetup.labware[rightBelowTopId]}
+                      moduleDefinition={moduleDef}
+                      deckId={deckDef.otId}
+                      slotId={slotId}
+                    />
+                  )
                 ) : null}
                 {topMostId != null ? (
-                  <LabwareOnDeck
-                    x={0}
-                    y={0}
-                    labwareOnDeck={initialDeckSetup.labware[topMostId]}
-                  />
+                  moduleType === FLEX_STACKER_MODULE_TYPE ? (
+                    <LabwareOnDeck
+                      x={0}
+                      y={0}
+                      centerInSlot={false}
+                      labwareOnDeck={initialDeckSetup.labware[topMostId]}
+                    />
+                  ) : (
+                    <ModuleChildLabware
+                      labwareOnDeck={initialDeckSetup.labware[topMostId]}
+                      moduleDefinition={moduleDef}
+                      deckId={deckDef.otId}
+                      slotId={slotId}
+                    />
+                  )
                 ) : null}
-                <SlotHover
-                  robotType={robotType}
-                  hover={hover}
-                  setHover={setHover}
-                  slotPosition={[0, 0, 0]}
-                  slotId={
-                    moduleState.type === VACUUM_MODULE_TYPE
-                      ? VACUUM_MODULE_A3_ADDRESSABLE_AREA
-                      : slotId
-                  }
-                />
                 {moduleType === FLEX_STACKER_MODULE_TYPE ? (
-                  <SlotHover
-                    robotType={robotType}
-                    hover={hover}
-                    setHover={setHover}
-                    slotPosition={[HOPPER_LABWARE_X_OFFSET, 0, 0]}
-                    slotId={`hopper${slotId}`}
-                  />
-                ) : null}
+                  <>
+                    <SlotHover
+                      robotType={robotType}
+                      hover={hover}
+                      setHover={setHover}
+                      slotPosition={[0, 0, 0]}
+                      slotId={slotId}
+                    />
+                    <SlotHover
+                      robotType={robotType}
+                      hover={hover}
+                      setHover={setHover}
+                      slotPosition={[HOPPER_LABWARE_X_OFFSET, 0, 0]}
+                      slotId={`hopper${slotId}`}
+                    />
+                  </>
+                ) : (
+                  <AlignToModuleChildSlot
+                    moduleDefinition={moduleDef}
+                    slotId={slotId}
+                    deckId={deckDef.otId}
+                  >
+                    <SlotHover
+                      robotType={robotType}
+                      hover={hover}
+                      setHover={setHover}
+                      slotPosition={[0, 0, 0]}
+                      slotId={
+                        moduleState.type === VACUUM_MODULE_TYPE
+                          ? VACUUM_MODULE_A3_ADDRESSABLE_AREA
+                          : slotId
+                      }
+                    />
+                  </AlignToModuleChildSlot>
+                )}
               </>
             </Module>
           </Fragment>
