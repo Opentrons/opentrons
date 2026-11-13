@@ -262,8 +262,8 @@ class WaterPump(AbstractWaterPump):
             while time.perf_counter() - start_time < duration:  # Flush for up to 5 seconds
                 data = self.check_water_level()
                 elapsed_time = time.perf_counter() - start_time
-                print(f"Time: {elapsed_time} , {data}")
-                self._logger.info(f"Time: {elapsed_time} , {data}")
+                # print(f"Time: {elapsed_time} , {data}")
+                # self._logger.info(f"Time: {elapsed_time} , {data}")
         except Exception as e:
             self._logger.error(f"Failed to flush input buffer: {e}")
             raise
@@ -332,11 +332,11 @@ if __name__ == "__main__":
         while condition:
             data = pump.check_water_level()
             elasped_time = time.perf_counter() - start_time
-            print(f"Time: {elasped_time} , {data}")
-            water_reached = pump.water_fill_auto(30)  # Example target level in mm
-            print(f"Water reached: {water_reached}")
-            if water_reached == True:
-                condition = False
+            # print(f"Time: {elasped_time} , {data}")
+            # water_reached = pump.water_fill_auto(30)  # Example target level in mm
+            # print(f"Water reached: {water_reached}")
+            # if water_reached == True:
+            #     condition = False
     finally:
         pump.close_solenoid()  # Close the solenoid valve to stop water flow
         pump.turn_motor_off()
