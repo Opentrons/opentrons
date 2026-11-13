@@ -48,4 +48,11 @@ describe('MenuList', () => {
     expect(menu.style.top).toBe('2.6rem')
     expect(menu.style.bottom).toBe('')
   })
+
+  it('uses an 8px corner radius on all corners', () => {
+    render(props)
+    const menu = screen.getByTestId('MenuList')
+    expect(menu).toHaveStyle('border-radius: 8px')
+    expect(menu).toHaveStyle('overflow: hidden')
+  })
 })
