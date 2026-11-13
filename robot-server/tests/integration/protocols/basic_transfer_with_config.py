@@ -2,7 +2,6 @@ from helpers import load_config, pick_up_then_drop  # type: ignore[import]
 
 from opentrons.protocol_api import ProtocolContext
 
-
 requirements = {"robotType": "Flex", "apiLevel": "2.16"}
 
 
