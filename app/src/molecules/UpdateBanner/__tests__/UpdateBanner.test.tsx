@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { fireEvent, screen } from '@testing-library/react'
+import { cleanup, fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -62,7 +62,7 @@ describe('Module Update Banner', () => {
     screen.getByTestId('ModuleCard_setup_update_banner_test_number')
     screen.getByTestId('InlineNotification_alert')
     expect(screen.queryByLabelText('close_icon')).not.toBeInTheDocument()
-    screen.getByText('Set up module for use.')
+    screen.getByText('Module setup required.')
     screen.getByText('Set up module')
   })
 
@@ -83,17 +83,17 @@ describe('Module Update Banner', () => {
   it('enables clicking of text to open the appropriate update modal', () => {
     render(props) // updateType is 'calibration'
     screen.getByText('Module setup required.')
-    const moduleSetupBtn = screen.getByText('Set up module')
-    fireEvent.click(moduleSetupBtn)
-    expect(props.handleUpdateClick).toHaveBeenCalled()
+    fireEvent.click(screen.getByText('Set up module'))
+    expect(props.handleUpdateClick).toHaveBeenCalledTimes(1)
 
+    cleanup()
     props = {
       ...props,
       updateType: 'setup',
     }
-    render(props) // Re-render with new props
-    screen.getByText('Set up module for use.')
-    fireEvent.click(moduleSetupBtn)
+    render(props)
+    screen.getByText('Module setup required.')
+    fireEvent.click(screen.getByText('Set up module'))
     expect(props.handleUpdateClick).toHaveBeenCalledTimes(2)
   })
 
