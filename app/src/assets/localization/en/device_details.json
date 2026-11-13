@@ -345,7 +345,7 @@
   "set_vacuum": "Set Vacuum for {{displayName}}",
   "setup_instructions": "Setup Instructions",
   "setup_module": "Set up module",
-  "setup_module_for_use": "Set up module for use.",
+  "setup_module_for_use": "Module setup required.",
   "shake_speed": "shake speed",
   "shaker": "Shaker",
   "some_logs_not_deleted": "Some selected logs could not be downloaded and were not deleted.",
