@@ -6,10 +6,10 @@ import { StyledText } from '@opentrons/components'
 import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
 import { NumericalKeyboard } from '/app/components/ODD/keyboard/NumericalKeyboard'
+import { MAX_C_INT } from '/app/resources/auth'
+import { parseNumericalInput } from '/app/resources/utils/parseNumericalInput'
 
-import { parseNumericalInput } from '../../utils/parseNumericalInput'
 import styles from './compliance_ready_settings.module.css'
-import { MAX_C_INT } from './constants'
 
 import type { ChangeEvent, ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
