@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { cleanup, fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -80,13 +80,14 @@ describe('Module Update Banner', () => {
     screen.getByText('Update now')
   })
 
-  it('enables clicking of text to open the appropriate update modal', () => {
-    render(props) // updateType is 'calibration'
+  it('enables clicking calibration banner link to open the update modal', () => {
+    render(props)
     screen.getByText('Module setup required.')
     fireEvent.click(screen.getByText('Set up module'))
     expect(props.handleUpdateClick).toHaveBeenCalledTimes(1)
+  })
 
-    cleanup()
+  it('enables clicking setup banner link to open the update modal', () => {
     props = {
       ...props,
       updateType: 'setup',
@@ -94,7 +95,7 @@ describe('Module Update Banner', () => {
     render(props)
     screen.getByText('Module setup required.')
     fireEvent.click(screen.getByText('Set up module'))
-    expect(props.handleUpdateClick).toHaveBeenCalledTimes(2)
+    expect(props.handleUpdateClick).toHaveBeenCalledTimes(1)
   })
 
   it('should not render a module setup link if pipette attachment is required', () => {

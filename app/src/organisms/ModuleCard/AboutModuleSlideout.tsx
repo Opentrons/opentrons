@@ -39,7 +39,7 @@ export const AboutModuleSlideout = (
   props: AboutModuleSlideoutProps
 ): JSX.Element | null => {
   const { module, isExpanded, onCloseClick, firmwareUpdateClick } = props
-  const { i18n, t } = useTranslation(['device_details', 'shared'])
+  const { t } = useTranslation(['device_details', 'shared'])
   const moduleName = getModuleDisplayName(module.moduleModel)
   const runStatus = useCurrentRunStatus()
   const [showBanner, setShowBanner] = useState<boolean>(true)
