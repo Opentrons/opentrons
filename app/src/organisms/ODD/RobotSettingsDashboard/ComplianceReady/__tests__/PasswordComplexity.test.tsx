@@ -5,11 +5,11 @@ import '@testing-library/jest-dom/vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-
 import {
   DEFAULT_PASSWORD_COMPLEXITY_DISABLED_SETTINGS,
   DEFAULT_PASSWORD_COMPLEXITY_SETTINGS,
-} from '../constants'
+} from '/app/resources/auth'
+
 import { PasswordComplexity } from '../PasswordComplexity'
 
 import type { ComponentProps } from 'react'

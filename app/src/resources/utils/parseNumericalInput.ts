@@ -2,7 +2,7 @@ export type ParseNumericalInputResult =
   | { result: 'success'; data: number }
   | { result: 'empty' }
   | { result: 'syntaxError' }
-  | { result: 'rangeError'; min: number; max: number }
+  | { result: 'rangeError'; min: number; max: number; type: 'min' | 'max' }
 
 export type ParseNumericalInputOptions = {
   allowDecimal: boolean
@@ -58,8 +58,11 @@ export function parseNumericalInput(
     return { result: 'syntaxError' }
   }
 
-  if (min != null && max != null && (data < min || data > max)) {
-    return { result: 'rangeError', min, max }
+  if (min != null && data < min) {
+    return { result: 'rangeError', min, max, type: 'min' }
+  }
+  if (max != null && data > max) {
+    return { result: 'rangeError', min, max, type: 'max' }
   }
 
   return { result: 'success', data }

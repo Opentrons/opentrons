@@ -13,8 +13,8 @@ import {
 import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
 import { NumericalKeyboard } from '/app/components/ODD/keyboard'
-import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useToaster } from '/app/organisms/ToasterOven'
+import { parseNumericalInput } from '/app/resources/utils/parseNumericalInput'
 
 import type { NumberParameter } from '@opentrons/shared-data'
 

@@ -17,9 +17,9 @@ import { getTopPortalEl } from '/app/App/portal'
 import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
 import { NumericalKeyboard } from '/app/components/ODD/keyboard'
-import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+import { parseNumericalInput } from '/app/resources/utils/parseNumericalInput'
 
 import { ACTIONS } from '../constants'
 
