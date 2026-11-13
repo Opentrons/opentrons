@@ -18,6 +18,8 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { getLocalRobot } from '/app/redux/discovery'
 import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 
+import type { ReactNode } from 'react'
+
 const STRETCH_LIST_STYLE = css`
   width: 100%;
   padding: ${SPACING.spacing16};
@@ -31,7 +33,7 @@ interface EthernetConnectionDetailsProps {
 
 export function EthernetConnectionDetails(
   props: EthernetConnectionDetailsProps
-): JSX.Element {
+): ReactNode {
   const { handleGoBack } = props
   const { t, i18n } = useTranslation(['device_settings', 'shared'])
   const localRobot = useSelector(getLocalRobot)
@@ -100,7 +102,7 @@ interface EthernetDetailsRowProps {
 const EthernetDetailsRow = ({
   title,
   detail,
-}: EthernetDetailsRowProps): JSX.Element => {
+}: EthernetDetailsRowProps): ReactNode => {
   return (
     <Flex
       css={STRETCH_LIST_STYLE}

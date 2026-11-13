@@ -13,6 +13,7 @@ import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 import { START_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
 import { selectTerminalItem } from '/protocol-designer/ui/steps/actions/actions'
 
+import type { ReactNode } from 'react'
 import type { ErrorType } from '@opentrons/step-generation'
 import type { AlertLevel } from './types'
 
@@ -21,9 +22,7 @@ interface ErrorContentsProps {
   level: AlertLevel
   translationParams?: Record<string, string>
 }
-export const ErrorContents = (
-  props: ErrorContentsProps
-): JSX.Element | null => {
+export const ErrorContents = (props: ErrorContentsProps): ReactNode => {
   const { errorType, level, translationParams } = props
   const { t } = useTranslation(['alert', 'shared'])
   const dispatch = useDispatch()

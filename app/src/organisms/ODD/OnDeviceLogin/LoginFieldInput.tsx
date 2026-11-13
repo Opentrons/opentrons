@@ -5,7 +5,7 @@ import { setRefs, TouchInputField } from '@opentrons/components'
 import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { PasswordVisibilityToggle } from '/app/molecules/PasswordVisibilityToggle'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { ControllerRenderProps } from 'react-hook-form'
 import type { LoginFormValues } from './index'
 
@@ -31,7 +31,7 @@ export const LoginFieldInput = forwardRef<
 >(function LoginFieldInput(
   { field, label, error, isPasswordField, onClearError, autoFocus },
   ref
-): JSX.Element {
+): ReactNode {
   const [showPassword, setShowPassword] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isPasswordHidden = isPasswordField && !showPassword

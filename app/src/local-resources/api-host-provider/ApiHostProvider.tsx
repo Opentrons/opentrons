@@ -21,7 +21,7 @@ export function ApiHostProvider({
   robotName,
   children,
   requestor,
-}: ApiHostProviderProps): JSX.Element {
+}: ApiHostProviderProps): ReactNode {
   const robot = useRobot(robotName)
   const token = useAccessTokenForRobot(robotName)
 

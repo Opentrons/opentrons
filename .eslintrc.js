@@ -220,6 +220,7 @@ module.exports = {
         'opentrons/no-imports-across-applications': 'error',
         'opentrons/no-margins-in-css': 'warn',
         'opentrons/no-margins-inline': 'warn',
+        'opentrons/no-hardcoded-z-index': 'error',
       },
     },
     {

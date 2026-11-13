@@ -31,6 +31,7 @@ import { HardwareConfigurator } from '../HardwareConfigurator'
 import { useKitchen } from '../Kitchen/useKitchen'
 import { updateInitialDeckState } from './util'
 
+import type { ReactNode } from 'react'
 import type {
   CutoutFixtureId,
   CutoutId,
@@ -42,7 +43,7 @@ import type { ThunkDispatch } from '/protocol-designer/types'
 import type { FixtureName, Fixtures } from '..'
 import type { InitialDeckStateModules } from '../HardwareConfigurator/AddFixtureModal'
 
-export function FlexHardware(): JSX.Element {
+export function FlexHardware(): ReactNode {
   const { t } = useTranslation('protocol_overview')
   const initialDeckSetup = useSelector(getInitialDeckSetup)
   const savedSteps = useSelector(getSavedStepForms)

@@ -5,12 +5,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   ALIGN_CENTER,
   COLORS,
-  DIRECTION_COLUMN,
   DIRECTION_ROW,
-  Divider,
   Flex,
   FLEX_MAX_CONTENT,
   Icon,
+  InfoScreen,
   LegacyStyledText,
   NO_WRAP,
   SPACING,
@@ -66,15 +65,17 @@ import {
   useRunPipetteInfoByMount,
   useUnmatchedModulesForProtocol,
 } from '/app/resources/runs'
-import { INCOMPATIBLE, INEXACT_MATCH } from '/app/resources/runs/constants'
+import { INCOMPATIBLE } from '/app/resources/runs/constants'
 
 import { EmptySetupStep } from './EmptySetupStep'
 import { LearnAboutOffsetsLink } from './LearnAboutOffsetsLink'
+import styles from './protocolrunsetup.module.css'
 import { SetupLabware } from './SetupLabware'
 import { SetupLabwarePositionCheck } from './SetupLabwarePositionCheck'
 import { SetupModuleAndDeck } from './SetupModuleAndDeck'
 import { SetupRobotCalibration } from './SetupRobotCalibration'
 import { SetupStep } from './SetupStep'
+import { useIsProtocolRunSetupLoading } from './useIsProtocolRunSetupLoading'
 
 import type { RefObject } from 'react'
 import type { StepKey } from '/app/redux/protocol-runs'
@@ -93,7 +94,7 @@ export function ProtocolRunSetup({
   robotName,
   runId,
 }: ProtocolRunSetupProps): JSX.Element | null {
-  const { t } = useTranslation('protocol_setup')
+  const { t } = useTranslation(['protocol_setup', 'run_details'])
   const dispatch = useDispatch<Dispatch>()
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
@@ -116,10 +117,13 @@ export function ProtocolRunSetup({
     protocolAnalysis
   )
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
-  const { data: runRecord } = useNotifyRunQuery(runId, {
-    staleTime: Infinity,
-    refetchInterval: RUN_RECORD_REFETCH_MS,
-  })
+  const { data: runRecord, isLoading: isRunRecordLoading } = useNotifyRunQuery(
+    runId,
+    {
+      staleTime: Infinity,
+      refetchInterval: RUN_RECORD_REFETCH_MS,
+    }
+  )
   const { data: protocolRecord } = useProtocolQuery(
     runRecord?.data.protocolId ?? null,
     {
@@ -136,6 +140,13 @@ export function ProtocolRunSetup({
     robotType,
     protocolName,
   })
+  const isSetupLoading = useIsProtocolRunSetupLoading(
+    runId,
+    isRunRecordLoading,
+    isFlex,
+    runHasStarted
+  )
+  const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
   const { enabled: cameraEnabled } = useSelector((state: State) =>
     getCameraUsageState(state, runId)
   )
@@ -148,9 +159,14 @@ export function ProtocolRunSetup({
     selectIsAnyNecessaryDefaultOffsetMissing(runId)
   )
   const { updateWithRunId: updateLPCStatusWithRunId } = useUpdateClientLPC()
-  const flexOffsetsApplied = useSelector(selectAreOffsetsApplied(runId))
+  const hasLpcState = useSelector(
+    (state: State) => state.protocolRuns?.[runId]?.lpc != null
+  )
+  const locationSpecificOffsetCount = useSelector(
+    selectTotalCountLocationSpecificOffsets(runId)
+  )
   const noLwOffsetsInRun =
-    useSelector(selectTotalCountLocationSpecificOffsets(runId)) === 0 && isFlex
+    isFlex && hasLpcState && locationSpecificOffsetCount === 0
 
   // A separate app can apply offsets. We need to update the missing steps as a side effect.
   useEffect(() => {
@@ -185,14 +201,7 @@ export function ProtocolRunSetup({
     (runPipetteInfoByMount.left != null &&
       runPipetteInfoByMount.left.requestedPipetteMatch === INCOMPATIBLE) ||
     (runPipetteInfoByMount.right != null &&
-      runPipetteInfoByMount.right.requestedPipetteMatch === INCOMPATIBLE) ||
-    // for Flex, require exact match
-    (isFlex &&
-      runPipetteInfoByMount.left != null &&
-      runPipetteInfoByMount.left.requestedPipetteMatch === INEXACT_MATCH) ||
-    (isFlex &&
-      runPipetteInfoByMount.right != null &&
-      runPipetteInfoByMount.right.requestedPipetteMatch === INEXACT_MATCH)
+      runPipetteInfoByMount.right.requestedPipetteMatch === INCOMPATIBLE)
 
   const isFixtureMismatch = getIsFixtureMismatch(deckConfigCompatibility)
 
@@ -446,12 +455,14 @@ export function ProtocolRunSetup({
   }
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing16}
-      margin={SPACING.spacing16}
-    >
-      {protocolAnalysis != null ? (
+    <div className={styles.setup_container}>
+      {isSetupLoading ? (
+        <InfoScreen
+          iconName="ot-spinner"
+          content={t('run_details:setup_loading')}
+          height="auto"
+        />
+      ) : (
         <>
           {runHasStarted ? (
             <InfoMessage title={t('setup_is_view_only')} />
@@ -461,22 +472,35 @@ export function ProtocolRunSetup({
               {t('protocol_analysis_failed')}
             </LegacyStyledText>
           ) : (
-            orderedSteps.map((stepKey, index) => {
+            orderedSteps.map(stepKey => {
               const setupStepTitle = t(`${stepKey}_title`)
+              const isDeckHardwareEmpty =
+                stepKey === MODULE_SETUP_STEP_KEY &&
+                ((!isFlex && !hasModules) ||
+                  (isFlex && !hasModules && !hasFixtures))
               const showEmptySetupStep =
-                (stepKey === 'module_setup_step' &&
-                  ((!isFlex && !hasModules) ||
-                    (isFlex && !hasModules && !hasFixtures))) ||
-                (stepKey === 'labware_position_check_step' && noLwOffsetsInRun)
+                isDeckHardwareEmpty ||
+                (stepKey === LPC_STEP_KEY && noLwOffsetsInRun)
               return (
-                <Flex flexDirection={DIRECTION_COLUMN} key={stepKey}>
+                <div className={styles.setup_step} key={stepKey}>
                   {showEmptySetupStep ? (
                     <EmptySetupStep
                       title={t(`${stepKey}_title`)}
                       description={StepDetailMap[stepKey].description}
                       rightElement={
                         <StepRightElement
-                          {...StepDetailMap[stepKey].rightElProps}
+                          {...(isDeckHardwareEmpty
+                            ? {
+                                stepKey: MODULE_SETUP_STEP_KEY,
+                                complete: true,
+                                completeText: t('deck_hardware_ready'),
+                                incompleteText: null,
+                                incompleteElement: null,
+                                disabledHardware: false,
+                                missingHardware: false,
+                                missingHardwareText: '',
+                              }
+                            : StepDetailMap[stepKey].rightElProps)}
                         />
                       }
                     />
@@ -502,20 +526,13 @@ export function ProtocolRunSetup({
                       {StepDetailMap[stepKey].stepInternals}
                     </SetupStep>
                   )}
-                  {index !== orderedSteps.length - 1 ? (
-                    <Divider marginTop={SPACING.spacing24} marginBottom={0} />
-                  ) : null}
-                </Flex>
+                </div>
               )
             })
           )}
         </>
-      ) : (
-        <LegacyStyledText alignSelf={ALIGN_CENTER} color={COLORS.grey50}>
-          {t('loading_data')}
-        </LegacyStyledText>
       )}
-    </Flex>
+    </div>
   )
 }
 

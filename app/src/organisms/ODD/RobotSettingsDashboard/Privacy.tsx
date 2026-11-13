@@ -19,6 +19,7 @@ import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 import { OnOffToggle } from './OnOffToggle'
 import { RobotSettingButton } from './RobotSettingButton'
 
+import type { ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 import type { SetSettingOption } from './types'
 
@@ -30,7 +31,7 @@ interface PrivacyProps {
 export function Privacy({
   robotName,
   setCurrentOption,
-}: PrivacyProps): JSX.Element {
+}: PrivacyProps): ReactNode {
   const { t } = useTranslation(['app_settings', 'branded'])
   const dispatch = useDispatch<Dispatch>()
 

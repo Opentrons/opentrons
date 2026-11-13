@@ -6,6 +6,7 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { BackgroundOverlay } from '../BackgroundOverlay'
@@ -32,7 +33,7 @@ interface OddModalProps extends StyleProps {
 /**
  * For ODD use only.
  */
-export function OddModal(props: OddModalProps): JSX.Element {
+export function OddModal(props: OddModalProps): ReactNode {
   const {
     modalSize = 'medium',
     onOutsideClick,
@@ -66,7 +67,7 @@ export function OddModal(props: OddModalProps): JSX.Element {
       }}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
-      zIndex={modalZIndex}
+      zIndex={modalZIndex ?? Z_INDEX.MODALS}
     >
       <Flex
         backgroundColor={COLORS.white}

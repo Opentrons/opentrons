@@ -67,7 +67,7 @@ const STRIP_PROPS = [
  * ```
  * @deprecated Use {@link Btn}
  */
-export function Button(props: ButtonProps): JSX.Element {
+export function Button(props: ButtonProps): ReactNode {
   const { id, name, title, disabled, hover, tabIndex, form } = props
   const className = cx(props.className, { [styles.hover]: hover })
   const onClick = !disabled ? props.onClick : undefined

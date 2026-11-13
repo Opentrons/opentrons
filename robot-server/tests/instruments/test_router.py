@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 import pytest
 from decoy import Decoy
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
-from opentrons.config import feature_flags
 from opentrons.hardware_control import (
-    API,
     HardwareControlAPI,
 )
 from opentrons.hardware_control.dev_types import (
@@ -21,7 +19,8 @@ from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
     PipetteOffsetSummary,
 )
-from opentrons.hardware_control.protocols.types import FlexRobotType, OT2RobotType
+from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.protocols.types import FlexRobotType
 from opentrons.hardware_control.types import GripperJawState, OT3Mount, SubSystemState
 from opentrons.hardware_control.types import SubSystem as HWSubSystem
 from opentrons.protocol_engine.types import Vec3f
@@ -48,18 +47,6 @@ from robot_server.instruments.router import (
 )
 from robot_server.subsystems.models import SubSystem
 
-if TYPE_CHECKING:
-    from opentrons.hardware_control.ot3api import OT3API
-
-
-@pytest.fixture
-def ot2_hardware_api(decoy: Decoy, mock_feature_flags: None) -> HardwareControlAPI:
-    """Get a mock hardware control API."""
-    mock = decoy.mock(cls=API)
-    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(False)
-    decoy.when(mock.get_robot_type()).then_return(OT2RobotType)
-    return mock
-
 
 def get_sample_pipette_dict(
     name: PipetteName, model: PipetteModel, pipette_id: str, subsystem: SubSystem
@@ -83,18 +70,11 @@ def ot3_hardware_api(
     decoy: Decoy, request: pytest.FixtureRequest
 ) -> HardwareControlAPI:
     """Get a mocked out OT3API."""
-    request.node.add_marker("ot3_only")
-    try:
-        from opentrons.hardware_control.ot3api import OT3API
-
-        mock = decoy.mock(cls=OT3API)
-        decoy.when(mock.get_robot_type()).then_return(FlexRobotType)
-        return mock
-    except ImportError:
-        return None  # type: ignore[return-value]
+    mock = decoy.mock(cls=OT3API)
+    decoy.when(mock.get_robot_type()).then_return(FlexRobotType)
+    return mock
 
 
-@pytest.mark.ot3_only
 async def test_get_instruments_empty(
     decoy: Decoy,
     ot3_hardware_api: OT3API,
@@ -110,7 +90,6 @@ async def test_get_instruments_empty(
     assert result.status_code == 200
 
 
-@pytest.mark.ot3_only
 async def test_get_all_attached_instruments(
     decoy: Decoy, ot3_hardware_api: OT3API, hardware_state_store: HardwareStateStore
 ) -> None:
@@ -289,57 +268,6 @@ async def test_get_all_attached_instruments(
     ]
 
 
-async def test_get_ot2_instruments(
-    decoy: Decoy,
-    ot2_hardware_api: HardwareControlAPI,
-    hardware_state_store: HardwareStateStore,
-) -> None:
-    """It should return attached pipettes on OT2."""
-    # Return empty data when no pipettes attached
-    decoy.when(ot2_hardware_api.attached_instruments).then_return({})
-
-    result1 = await get_attached_instruments(
-        hardware=ot2_hardware_api, hardware_state_store=hardware_state_store
-    )
-    assert result1.content.data == []
-    assert result1.status_code == 200
-
-    # Return attached pipettes
-    decoy.when(ot2_hardware_api.attached_instruments).then_return(
-        {
-            Mount.RIGHT: get_sample_pipette_dict(
-                name="p20_multi_gen2",
-                model=PipetteModel("xyz"),
-                pipette_id="pipette-id",
-                subsystem=SubSystem.pipette_right,
-            ),
-            Mount.LEFT: cast(PipetteDict, {}),
-        }
-    )
-    result2 = await get_attached_instruments(
-        hardware=ot2_hardware_api, hardware_state_store=hardware_state_store
-    )
-    decoy.verify(await ot2_hardware_api.cache_instruments(), times=0)
-    assert result2.status_code == 200
-    assert result2.content.data == [
-        Pipette.model_construct(
-            ok=True,
-            mount="right",
-            instrumentType="pipette",
-            instrumentName="p20_multi_gen2",
-            instrumentModel=PipetteModel("xyz"),
-            serialNumber="pipette-id",
-            data=PipetteData(
-                channels=1,
-                min_volume=1,
-                max_volume=1,
-            ),
-            subsystem=SubSystem.pipette_right,
-        )
-    ]
-
-
-@pytest.mark.ot3_only
 async def test_get_96_channel_instruments(
     decoy: Decoy, ot3_hardware_api: OT3API, hardware_state_store: HardwareStateStore
 ) -> None:
@@ -387,7 +315,6 @@ async def test_get_96_channel_instruments(
     ]
 
 
-@pytest.mark.ot3_only
 async def test_get_instrument_not_ok(
     decoy: Decoy,
     ot3_hardware_api: OT3API,

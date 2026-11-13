@@ -21,7 +21,7 @@ export function TextListTableContent({
   header,
   listTableHeaders,
   children,
-}: TextListTableContentProps): JSX.Element {
+}: TextListTableContentProps): ReactNode {
   return (
     <Flex css={CONTAINER_STYLE}>
       <StyledText

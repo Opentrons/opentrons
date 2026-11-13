@@ -12,7 +12,7 @@ import {
   WellLabels,
 } from './labwareInternals'
 
-import type { CSSProperties, RefObject } from 'react'
+import type { CSSProperties, ReactNode, RefObject } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { LabwareAdapterLoadName } from './LabwareAdapter'
 import type { TipType, WellType } from './labwareInternals/types'
@@ -112,7 +112,7 @@ export interface LabwareRenderProps {
   fill?: CSSProperties['fill']
 }
 
-export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
+export const LabwareRender = (props: LabwareRenderProps): ReactNode => {
   const {
     gRef,
     definition,

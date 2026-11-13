@@ -23,6 +23,7 @@ import {
   Tabs,
   truncateString,
   TYPOGRAPHY,
+  Z_INDEX,
 } from '@opentrons/components'
 import {
   isDocumentedMutationError,
@@ -62,6 +63,7 @@ import { Liquids } from './Liquids'
 import { Parameters } from './Parameters'
 import { RobotOutOfStorageModal } from './RobotOutOfStorageModal'
 
+import type { ReactNode } from 'react'
 import type { Protocol } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
@@ -83,7 +85,7 @@ const ProtocolHeader = ({
   isScrolled,
   isProtocolFetching,
   startSetup,
-}: ProtocolHeaderProps): JSX.Element => {
+}: ProtocolHeaderProps): ReactNode => {
   const navigate = useNavigate()
   const { t } = useTranslation(['protocol_info, protocol_details', 'shared'])
   const [truncate, setTruncate] = useState<boolean>(true)
@@ -107,7 +109,7 @@ const ProtocolHeader = ({
       top="0"
       backgroundColor={COLORS.white}
       marginX={`-${SPACING.spacing32}`}
-      zIndex={1} // the header is always visble when things scroll beneath
+      zIndex={Z_INDEX.BASE} // the header is always visble when things scroll beneath
     >
       <Flex
         alignItems={ALIGN_CENTER}
@@ -198,7 +200,7 @@ interface ProtocolSectionTabsProps {
 const ProtocolSectionTabs = ({
   currentOption,
   setCurrentOption,
-}: ProtocolSectionTabsProps): JSX.Element => {
+}: ProtocolSectionTabsProps): ReactNode => {
   const { t, i18n } = useTranslation('protocol_details')
   return (
     <Flex gridGap={SPACING.spacing8}>
@@ -222,7 +224,7 @@ interface SummaryProps {
   date: string | null
 }
 
-const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
+const Summary = ({ author, description, date }: SummaryProps): ReactNode => {
   const { t, i18n } = useTranslation('protocol_details')
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>

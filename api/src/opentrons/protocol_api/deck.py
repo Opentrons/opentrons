@@ -53,7 +53,7 @@ def _get_slot_name(
 class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
     """A dictionary-like object to access Protocol API objects loaded on the deck.
 
-    Accessible via :py:meth:`ProtocolContext.deck`.
+    Accessible via [`ProtocolContext.deck`][opentrons.protocol_api.ProtocolContext.deck].
     """
 
     def __init__(

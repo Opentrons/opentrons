@@ -11,6 +11,7 @@ import {
 import { useConnectFormField } from './form-state'
 import { FormRow } from './FormRow'
 
+import type { ReactNode } from 'react'
 import type {
   ControllerFieldState,
   ControllerRenderProps,
@@ -27,7 +28,7 @@ export interface TextFieldProps {
   className?: string
 }
 
-export const TextField = (props: TextFieldProps): JSX.Element => {
+export const TextField = (props: TextFieldProps): ReactNode => {
   const { t } = useTranslation('device_settings')
   const { id, name, label, isPassword, className, field, fieldState } = props
   const { value, error, onChange, onBlur } = useConnectFormField(

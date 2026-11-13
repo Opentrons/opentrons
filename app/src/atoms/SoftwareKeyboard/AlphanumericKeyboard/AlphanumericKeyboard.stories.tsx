@@ -17,6 +17,7 @@ import { AlphanumericKeyboard } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import type { Store, StoreEnhancer } from 'redux'
+import type { ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
 const dummyConfig = {
@@ -50,7 +51,7 @@ export default meta
 
 type Story = StoryObj<typeof AlphanumericKeyboard>
 
-const Keyboard = (): JSX.Element => {
+const Keyboard = (): ReactNode => {
   const [showKeyboard, setShowKeyboard] = useState(false)
   const [value, setValue] = useState<string>('')
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)

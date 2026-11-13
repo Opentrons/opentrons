@@ -1,21 +1,12 @@
-import logging
 from dataclasses import make_dataclass
-from pathlib import Path
 from typing import Generator, Optional
 
 import pytest
 from decoy import Decoy
-from mock import MagicMock, call, patch
+from mock import patch
 
 from opentrons.config import advanced_settings
 from opentrons.config.reset import ResetOptionId
-from opentrons.types import Mount
-from opentrons_shared_data.pipette import (
-    pipette_definition as pip_def,
-)
-from opentrons_shared_data.pipette import (
-    types as pip_types,
-)
 from opentrons_shared_data.robot.types import RobotTypeEnum
 from server_utils.persistence.persistence_directory import PersistenceResetter
 
@@ -47,316 +38,39 @@ def test_get_robot_settings(api_client, hardware):
     hardware.update_config.assert_called_once_with()
 
 
-@pytest.fixture
-def mock_pipette_data():
-    return {
-        "p1": {
-            "info": {"model": "p1_model", "name": ""},
-            "fields": {
-                "pickUpCurrent": {
-                    "units": "mm",
-                    "type": "float",
-                    "min": 0.0,
-                    "max": 2.0,
-                    "default": 1.0,
-                    "value": 0.5,
-                },
-                "quirks": {"dropTipShake": True},
-            },
-        },
-        "p2": {
-            "info": {"model": "p2_model", "name": ""},
-            "fields": {
-                "pickUpIncrement": {
-                    "units": "mm/s",
-                    "type": "int",
-                    "min": 0.0,
-                    "max": 2.0,
-                    "default": 1.0,
-                    "value": 2.0,
-                }
-            },
-        },
-    }
-
-
-@pytest.fixture
-def mock_known_pipettes(decoy: Decoy) -> Decoy:
-    with patch(
-        "opentrons_shared_data.pipette.mutable_configurations.known_pipettes",
-        new=decoy.mock(
-            name="opentrons_shared_data.pipette.mutable_configurations.known_pipettes"
-        ),
-    ) as m:
-        yield m
-
-
-@pytest.fixture
-def mock_list_mutable_configs(decoy: Decoy) -> Decoy:
-    with patch(
-        "opentrons_shared_data.pipette.mutable_configurations.list_mutable_configs",
-        new=decoy.mock(
-            name="opentrons_shared_data.pipette.mutable_configurations.list_mutable_configs"
-        ),
-    ) as m:
-        yield m
-
-
-@pytest.fixture
-def mock_list_mutable_configs_with_defaults(decoy: Decoy) -> Decoy:
-    with patch(
-        "opentrons_shared_data.pipette.mutable_configurations.list_mutable_configs_with_defaults",
-        new=decoy.mock(
-            name="opentrons_shared_data.pipette.mutable_configurations.list_mutable_configs_with_defaults"
-        ),
-    ) as m:
-        yield m
-
-
-@pytest.fixture
-def mock_save_overrides(decoy: Decoy) -> Decoy:
-    with patch(
-        "opentrons_shared_data.pipette.mutable_configurations.save_overrides",
-        new=decoy.mock(
-            name="opentrons_shared_data.pipette.mutable_configurations.save_overrides"
-        ),
-    ) as m:
-        yield m
-
-
-@pytest.fixture
-def mock_get_opentrons_dir(decoy: Decoy) -> Decoy:
-    with patch(
-        "robot_server.service.legacy.routers.settings.get_opentrons_path",
-        new=decoy.mock(
-            name="robot_server.service.legacy.routers.settings.get_opentrons_path"
-        ),
-    ) as m:
-        yield m
-
-
 def test_receive_attached_pipette_settings(
     decoy: Decoy,
     api_client,
-    mock_known_pipettes: Decoy,
-    mock_get_opentrons_dir: Decoy,
-    mock_list_mutable_configs_with_defaults: Decoy,
-    hardware: MagicMock,
 ) -> None:
-    decoy.when(mock_get_opentrons_dir("pipette_config_overrides_dir")).then_return(
-        "nope"
-    )
-    decoy.when(mock_known_pipettes("nope")).then_return([])
-    hardware.attached_pipettes = {
-        Mount.LEFT: {"pipette_id": "P12345", "model": "p20_multi_v3.5"}
-    }
-    decoy.when(
-        mock_list_mutable_configs_with_defaults(
-            pipette_model=pip_def.PipetteModelVersionType(
-                pip_types.PipetteModelType.p20,
-                pip_types.PipetteChannelType.EIGHT_CHANNEL,
-                pip_types.PipetteVersionType(3, 5),
-                pip_types.PipetteOEMType.OT,
-            ),
-            pipette_serial_number="P12345",
-            pipette_override_path="nope",
-        )
-    ).then_return(
-        {
-            "pickUpCurrent": pip_types.MutableConfig.build(
-                **{
-                    "units": "mm",
-                    "type": "float",
-                    "min": 1.0,
-                    "max": 3.0,
-                    "default": 1.5,
-                    "value": 1.2,
-                },
-                name="pickUpCurrent",
-            ),
-            "quirks": {
-                "dropTipShake": pip_types.QuirkConfig(name="dropTipShake", value=True)
-            },
-            "model": "p20_multi_v3.5",
-        }
-    )
     resp = api_client.get("/settings/pipettes")
-    assert resp.status_code == 200
-    assert resp.json() == {
-        "P12345": {
-            "info": {"model": "p20_multi_v3.5", "name": ""},
-            "fields": {
-                "pickUpCurrent": {
-                    "units": "mm",
-                    "type": "float",
-                    "min": 1.0,
-                    "max": 3.0,
-                    "default": 1.5,
-                    "value": 1.2,
-                },
-                "quirks": {"dropTipShake": True},
-            },
-        },
-    }
+    assert resp.status_code == 403
 
 
 def test_receive_pipette_settings(
     decoy: Decoy,
     api_client,
-    mock_known_pipettes: Decoy,
-    mock_list_mutable_configs: Decoy,
-    mock_get_opentrons_dir: Decoy,
-    mock_pipette_data,
 ):
-    funny_path = Path("funny/path/pipettes")
-    decoy.when(mock_get_opentrons_dir("pipette_config_overrides_dir")).then_return(
-        funny_path
-    )
-
-    decoy.when(mock_known_pipettes(funny_path)).then_return(["p1", "p2"])
-
-    decoy.when(
-        mock_list_mutable_configs(
-            pipette_serial_number="p1", pipette_override_path=funny_path
-        )
-    ).then_return(
-        {
-            "pickUpCurrent": pip_types.MutableConfig.build(
-                **{
-                    "units": "mm",
-                    "type": "float",
-                    "min": 0.0,
-                    "max": 2.0,
-                    "default": 1.0,
-                    "value": 0.5,
-                },
-                name="pickUpCurrent",
-            ),
-            "quirks": {
-                "dropTipShake": pip_types.QuirkConfig(name="dropTipShake", value=True)
-            },
-            "model": "p1_model",
-        }
-    )
-
-    decoy.when(
-        mock_list_mutable_configs(
-            pipette_serial_number="p2", pipette_override_path=funny_path
-        )
-    ).then_return(
-        {
-            "pickUpIncrement": pip_types.MutableConfig.build(
-                **{
-                    "units": "mm/s",
-                    "type": "int",
-                    "min": 0,
-                    "max": 2,
-                    "default": 1.0,
-                    "value": 2,
-                },
-                name="pickUpIncrement",
-            ),
-            "model": "p2_model",
-        }
-    )
-
     resp = api_client.get("/settings/pipettes")
-    assert resp.status_code == 200
-    assert resp.json() == mock_pipette_data
+    assert resp.status_code == 403
 
 
-def test_receive_pipette_settings_unknown(
-    api_client, mock_known_pipettes: Decoy, mock_get_opentrons_dir: Decoy, decoy: Decoy
-):
-    funny_path = Path("funny/path/pipettes")
-    decoy.when(mock_get_opentrons_dir("pipette_config_overrides_dir")).then_return(
-        funny_path
-    )
-    decoy.when(mock_known_pipettes(funny_path)).then_return([])
-    # Non-existent pipette id and get 404
+def test_receive_pipette_settings_unknown(api_client, decoy: Decoy):
     resp = api_client.get("/settings/pipettes/wannabepipette")
-    assert resp.status_code == 404
+    assert resp.status_code == 403
 
 
 def test_receive_pipette_settings_found(
     decoy: Decoy,
-    mock_known_pipettes: Decoy,
-    mock_list_mutable_configs: Decoy,
-    mock_get_opentrons_dir: Decoy,
     api_client,
-    mock_pipette_data,
 ):
-    funny_path = Path("funny/path/pipettes")
-    decoy.when(mock_get_opentrons_dir("pipette_config_overrides_dir")).then_return(
-        funny_path
-    )
-    decoy.when(mock_known_pipettes(funny_path)).then_return(["p1"])
-    decoy.when(
-        mock_list_mutable_configs(
-            pipette_serial_number="p1", pipette_override_path=funny_path
-        )
-    ).then_return(
-        {
-            "pickUpCurrent": pip_types.MutableConfig.build(
-                **{
-                    "units": "mm",
-                    "type": "float",
-                    "min": 0.0,
-                    "max": 2.0,
-                    "default": 1.0,
-                    "value": 0.5,
-                },
-                name="pickUpCurrent",
-            ),
-            "quirks": {
-                "dropTipShake": pip_types.QuirkConfig(name="dropTipShake", value=True)
-            },
-            "model": "p1_model",
-        }
-    )
     resp = api_client.get("/settings/pipettes/p1")
-    assert resp.status_code == 200
-    assert resp.json() == mock_pipette_data["p1"]
+    assert resp.status_code == 403
 
 
 def test_modify_pipette_settings_call_override(
     decoy: Decoy,
     api_client,
-    mock_pipette_data,
-    mock_known_pipettes: Decoy,
-    mock_save_overrides: Decoy,
-    mock_list_mutable_configs: Decoy,
-    mock_get_opentrons_dir: Decoy,
 ):
-    funny_path = Path("funny/path/pipettes")
-    decoy.when(mock_get_opentrons_dir("pipette_config_overrides_dir")).then_return(
-        funny_path
-    )
-
-    decoy.when(mock_known_pipettes(funny_path)).then_return(["p1"])
-    decoy.when(
-        mock_list_mutable_configs(
-            pipette_serial_number="p1", pipette_override_path=funny_path
-        )
-    ).then_return(
-        {
-            "pickUpCurrent": pip_types.MutableConfig.build(
-                **{
-                    "units": "mm",
-                    "type": "float",
-                    "min": 0.0,
-                    "max": 2.0,
-                    "default": 1.0,
-                    "value": 1.0,
-                },
-                name="pickUpCurrent",
-            ),
-            "quirks": {
-                "dropTipShake": pip_types.QuirkConfig(name="dropTipShake", value=True)
-            },
-            "model": "p1_model",
-        }
-    )
     pipette_id = "p1"
     changes = {
         "fields": {
@@ -369,118 +83,33 @@ def test_modify_pipette_settings_call_override(
 
     # Check that data is changed and matches the changes specified
     resp = api_client.patch(f"/settings/pipettes/{pipette_id}", json=changes)
-    mock_save_overrides.assert_called_once_with(
-        fields={
-            "pickUpCurrent": 1,
-            "dropTipShake": True,
-            "pickUpSpeed": None,
-            "pickUpDistance": None,
-        },
-        pipette_id=pipette_id,
-        pipette_override_path=funny_path,
-    )
-
-    mock_pipette_data[pipette_id]["fields"] = {
-        "pickUpCurrent": {
-            "units": "mm",
-            "type": "float",
-            "min": 0.0,
-            "max": 2.0,
-            "default": 1.0,
-            "value": 1.0,
-        },
-        "quirks": {"dropTipShake": True},
-    }
-    patch_body = resp.json()
-    assert resp.status_code == 200
-    assert patch_body == {
-        "fields": mock_pipette_data[pipette_id]["fields"],
-        "info": mock_pipette_data[pipette_id]["info"],
-    }
+    assert resp.status_code == 403
 
 
 @pytest.mark.parametrize(argnames=["body"], argvalues=[[{}], [{"fields": {}}]])
 def test_modify_pipette_settings_do_not_call_override(
     decoy: Decoy,
     api_client,
-    mock_pipette_data,
     body,
-    mock_known_pipettes: Decoy,
-    mock_save_overrides: Decoy,
-    mock_list_mutable_configs: Decoy,
-    mock_get_opentrons_dir: Decoy,
 ):
     pipette_id = "p1"
-    funny_path = Path("funny/path/pipettes")
-    decoy.when(mock_get_opentrons_dir("pipette_config_overrides_dir")).then_return(
-        funny_path
-    )
-
-    decoy.when(mock_known_pipettes(funny_path)).then_return(["p1"])
-    decoy.when(
-        mock_list_mutable_configs(
-            pipette_serial_number="p1", pipette_override_path=funny_path
-        )
-    ).then_return(
-        {
-            "pickUpCurrent": pip_types.MutableConfig.build(
-                **{
-                    "units": "mm",
-                    "type": "float",
-                    "min": 0.0,
-                    "max": 2.0,
-                    "default": 1.0,
-                    "value": 0.5,
-                },
-                name="pickUpCurrent",
-            ),
-            "quirks": {
-                "dropTipShake": pip_types.QuirkConfig(name="dropTipShake", value=True)
-            },
-            "model": "p1_model",
-        }
-    )
 
     resp = api_client.patch(f"/settings/pipettes/{pipette_id}", json=body)
-    mock_save_overrides.assert_not_called()
-    patch_body = resp.json()
-    assert resp.status_code == 200
-    assert patch_body == {
-        "fields": mock_pipette_data[pipette_id]["fields"],
-        "info": mock_pipette_data[pipette_id]["info"],
-    }
+    assert resp.status_code == 403
 
 
 def test_modify_pipette_settings_failure(
     decoy: Decoy,
     api_client,
-    mock_save_overrides: Decoy,
-    mock_get_opentrons_dir: Decoy,
 ):
     test_id = "p1"
-    funny_path = Path("funny/path/pipettes")
-    decoy.when(mock_get_opentrons_dir("pipette_config_overrides_dir")).then_return(
-        funny_path
-    )
-
     test_fields = {"pickUpCurrent": {"value": 1}}
-
-    decoy.when(
-        mock_save_overrides(
-            overrides={"pickUpCurrent": 1.0},
-            pipette_serial_number=test_id,
-            pipette_override_path=funny_path,
-        )
-    ).then_raise(ValueError("Failed!"))
 
     resp = api_client.patch(
         f"/settings/pipettes/{test_id}",
         json={"fields": test_fields},
     )
-
-    patch_body = resp.json()
-    assert resp.status_code == 412
-    assert patch_body == {"message": "Failed!", "errorCode": "4000"}
+    assert resp.status_code == 403
 
 
 def test_available_resets(api_client):
@@ -628,30 +257,14 @@ def test_reset_invalid_option(
     assert "Input should be" in body["message"]
 
 
-@pytest.fixture()
-def mock_robot_configs():
-    with patch("robot_server.service.legacy.routers.settings.robot_configs") as m:
-        yield m
-
-
-@pytest.fixture()
-def mock_logging_set_level():
-    with patch("logging.Logger.setLevel") as m:
-        yield m
-
-
-@pytest.mark.parametrize(
-    argnames=["body"],
-    argvalues=[[{}], [{"log_level": None}], [{"log_level": "oafajhshda"}]],
-)
-def test_set_log_level_invalid(
-    api_client, body, hardware, mock_logging_set_level, mock_robot_configs
-):
-    resp = api_client.post("/settings/log_level/local", json=body)
-    assert resp.status_code == 422
-    mock_logging_set_level.assert_not_called()
-    hardware.update_config.assert_not_called()
-    mock_robot_configs.save_robot_settings.assert_not_called()
+def test_set_log_level_redirects(api_client):
+    resp = api_client.post(
+        "/settings/log_level/local",
+        json={"log_level": "debug"},
+        follow_redirects=False,
+    )
+    assert resp.status_code == 308
+    assert resp.headers["location"] == "/system/settings/log_level/local"
 
 
 @pytest.mark.parametrize(argnames=["disabled"], argvalues=[[True], [False]])
@@ -662,38 +275,6 @@ def test_set_status_bar_disabled(api_client, hardware, disabled):
     )
     assert resp.status_code == 200
     hardware.set_status_bar_enabled.assert_called_once_with(not disabled)
-
-
-@pytest.mark.parametrize(
-    argnames=["body", "expected_log_level", "expected_log_level_name"],
-    argvalues=[
-        [{"log_level": "debug"}, logging.DEBUG, "DEBUG"],
-        [{"log_level": "deBug"}, logging.DEBUG, "DEBUG"],
-        [{"log_level": "info"}, logging.INFO, "INFO"],
-        [{"log_level": "INFO"}, logging.INFO, "INFO"],
-        [{"log_level": "warning"}, logging.WARNING, "WARNING"],
-        [{"log_level": "warninG"}, logging.WARNING, "WARNING"],
-        [{"log_level": "error"}, logging.ERROR, "ERROR"],
-        [{"log_level": "ERROR"}, logging.ERROR, "ERROR"],
-    ],
-)
-def test_set_log_level(
-    api_client,
-    hardware,
-    mock_robot_configs,
-    mock_logging_set_level,
-    body,
-    expected_log_level,
-    expected_log_level_name,
-):
-    resp = api_client.post("/settings/log_level/local", json=body)
-    assert resp.status_code == 200
-    # Three calls for opentrons, robot_server, and uvicorn loggers
-    mock_logging_set_level.assert_has_calls(
-        [call(expected_log_level), call(expected_log_level), call(expected_log_level)]
-    )
-    hardware.update_config.assert_called_once_with(log_level=expected_log_level_name)
-    mock_robot_configs.save_robot_settings.assert_called_once()
 
 
 @pytest.fixture

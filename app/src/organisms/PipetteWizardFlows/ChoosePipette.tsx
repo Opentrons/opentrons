@@ -19,12 +19,12 @@ import {
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   ModalShell,
   POSITION_ABSOLUTE,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WizardHeader,
 } from '@opentrons/components'
@@ -120,7 +120,7 @@ interface ChoosePipetteProps {
   exit: () => void
   mount: PipetteMount
 }
-export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
+export const ChoosePipette = (props: ChoosePipetteProps): ReactNode => {
   const { selectedPipette, setSelectedPipette, proceed, exit, mount } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation(['pipette_wizard_flows', 'shared', 'audit_log'])
@@ -239,9 +239,12 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText forwardedAs="h1">
+              <StyledText
+                desktopStyle="headingSmallBold"
+                oddStyle="level4HeaderSemiBold"
+              >
                 {t('choose_pipette')}
-              </LegacyStyledText>
+              </StyledText>
               <Flex
                 margin={SPACING.spacing40}
                 justifyContent={JUSTIFY_SPACE_AROUND}
@@ -258,13 +261,13 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                     height="150.99px"
                     alt={singleMount}
                   />
-                  <LegacyStyledText
-                    forwardedAs="h3"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  <StyledText
+                    desktopStyle="bodyLargeSemiBold"
+                    oddStyle="bodyTextSemiBold"
                     textAlign={TYPOGRAPHY.textAlignCenter}
                   >
                     {singleMount}
-                  </LegacyStyledText>
+                  </StyledText>
                 </PipetteMountOption>
                 <PipetteMountOption
                   isSelected={selectedPipette === NINETY_SIX_CHANNEL}
@@ -278,13 +281,13 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                     height="151.2px"
                     alt={bothMounts}
                   />
-                  <LegacyStyledText
-                    forwardedAs="h3"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  <StyledText
+                    desktopStyle="bodyLargeSemiBold"
+                    oddStyle="bodyTextSemiBold"
                     textAlign={TYPOGRAPHY.textAlignCenter}
                   >
                     {bothMounts}
-                  </LegacyStyledText>
+                  </StyledText>
                 </PipetteMountOption>
               </Flex>
             </Flex>
@@ -309,7 +312,7 @@ interface PipetteMountOptionProps extends StyleProps {
   onClick: () => void
   children: ReactNode
 }
-function PipetteMountOption(props: PipetteMountOptionProps): JSX.Element {
+function PipetteMountOption(props: PipetteMountOptionProps): ReactNode {
   const { isSelected, onClick, children, ...styleProps } = props
   return (
     <Flex

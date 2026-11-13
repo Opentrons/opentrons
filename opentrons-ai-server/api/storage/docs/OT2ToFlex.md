@@ -16,7 +16,7 @@ from opentrons import protocol_api
 metadata = {
     "protocolName": "My Protocol",
     "description": "This protocol uses the OT-2",
-    "apiLevel": "2.19"
+    "apiLevel": "2.28"
 }
 ```
 
@@ -32,7 +32,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.19"
+    "apiLevel": "2.28"
 }
 ```
 

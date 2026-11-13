@@ -15,6 +15,8 @@ import {
   TEXT_ALIGN_CENTER,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 export interface overlayButtonProps {
   onClick: () => void
   text: string
@@ -27,7 +29,7 @@ export interface OverlayModalProps {
   secondaryButtonProps?: overlayButtonProps
 }
 
-export function OverlayModal(props: OverlayModalProps): JSX.Element {
+export function OverlayModal(props: OverlayModalProps): ReactNode {
   const { header, subText, primaryButtonProps, secondaryButtonProps } = props
   return (
     <Overlay

@@ -171,6 +171,12 @@ export function patchComponentsPackageJson(
         require: './lib/index.js',
         default: './lib/index.mjs',
       },
+      './localization': {
+        types: './lib/localization.d.ts',
+        import: './lib/localization.mjs',
+        require: './lib/localization.js',
+        default: './lib/localization.mjs',
+      },
       './styles': './lib/style.css',
       './styles/global': './src/styles/global.css',
       './styles/legacy': './src/index.module.css',

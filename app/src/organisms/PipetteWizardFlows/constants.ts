@@ -1,10 +1,6 @@
-import { css } from 'styled-components'
-
-import { RESPONSIVENESS, TYPOGRAPHY } from '@opentrons/components'
-
 export const SECTIONS = {
   BEFORE_BEGINNING: 'BEFORE_BEGINNING',
-  REMOVE_WASTE_CHUTE: 'REMOVE_WASTE_CHUTE',
+  SELECT_SLOT: 'SELECT_SLOT',
   ATTACH_PROBE: 'ATTACH_PROBE',
   DETACH_PROBE: 'DETACH_PROBE',
   RESULTS: 'RESULTS',
@@ -12,9 +8,11 @@ export const SECTIONS = {
   DETACH_PIPETTE: 'DETACH_PIPETTE',
   MOUNTING_PLATE: 'MOUNTING_PLATE',
   CARRIAGE: 'CARRIAGE',
-  ATTACH_WASTE_CHUTE: 'ATTACH_WASTE_CHUTE',
   FIRMWARE_UPDATE: 'FIRMWARE_UPDATE',
 } as const
+
+export const CALIBRATION_DECK_SLOTS = ['B2', 'C2'] as const
+export const DEFAULT_CALIBRATION_SLOT = 'B2'
 
 export const FLOWS = {
   ATTACH: 'ATTACH',
@@ -51,12 +49,3 @@ export const NINETY_SIX_CHANNEL_MOUNTING_PLATE = {
   loadName: 'mounting_plate_96_channel',
   displayName: NINETY_SIX_CHANNEL_MOUNTING_PLATE_DISPLAY_NAME,
 }
-
-export const BODY_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.275rem;
-    line-height: 1.75rem;
-  }
-`

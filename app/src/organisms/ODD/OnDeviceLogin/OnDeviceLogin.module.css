@@ -46,12 +46,12 @@
 
 .overlay {
   position: fixed;
-  z-index: 10001;
+  z-index: var(--z-index-login-modal);
   background-color: var(--white);
   inset: 0;
 }
 
 /* Sit below the documentation overlay (z-index 1000) while choosing a new password. */
 .overlay_below_documentation {
-  z-index: 999;
+  z-index: calc(var(--z-index-compliance-modals) - 1);
 }

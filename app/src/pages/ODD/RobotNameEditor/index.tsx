@@ -44,6 +44,7 @@ import {
   renameRobot,
 } from '/app/redux/discovery'
 
+import type { ReactNode } from 'react'
 import type { FieldError, Resolver } from 'react-hook-form'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { UpdatedRobotName } from '@opentrons/api-client'
@@ -55,7 +56,7 @@ interface FormValues {
   newRobotName: string
 }
 
-export function RobotNameEditor(): JSX.Element {
+export function RobotNameEditor(): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared'])
   const navigate = useNavigate()
   const trackEvent = useTrackEvent()

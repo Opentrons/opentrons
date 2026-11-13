@@ -14,7 +14,7 @@ import { SelectionRect } from './SelectionRect'
 import { SingleLabware } from './SingleLabware'
 import { WellTooltip } from './WellTooltip'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type {
   WellFillByName,
   WellGroup,
@@ -52,9 +52,7 @@ const getChannelsFromNozzleType = (nozzleType: NozzleType): ChannelType => {
   }
 }
 
-export const SelectableLabware = (
-  props: SelectableLabwareProps
-): JSX.Element => {
+export const SelectableLabware = (props: SelectableLabwareProps): ReactNode => {
   const {
     labwareProps,
     selectedPrimaryWells,

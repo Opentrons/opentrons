@@ -3,7 +3,7 @@
 
   /* This z-index is chosen to beat everything else on the ODD. This overlay should
   appear over modals, toasts, everything. */
-  z-index: 1500;
+  z-index: var(--z-index-logged-out-overlay);
   background-color: rgb(from var(--black-90) r g b / 20%);
   inset: 0;
 }

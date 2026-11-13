@@ -34,6 +34,7 @@ import {
   useHoverTooltip,
   useMenuHandleClickOutside,
   useOnClickOutside,
+  Z_INDEX,
 } from '@opentrons/components'
 import {
   isDocumentedMutationError,
@@ -43,7 +44,6 @@ import {
 import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { useRunControls } from '/app/organisms/RunTimeControl'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import {
@@ -65,11 +65,15 @@ import {
 
 import { RobotOutOfStorageModal } from '../RobotOutOfStorageModal.tsx'
 
-import type { Dispatch, MouseEventHandler, SetStateAction } from 'react'
-import type { Run, RunData } from '@opentrons/api-client'
+import type {
+  Dispatch,
+  MouseEventHandler,
+  ReactNode,
+  SetStateAction,
+} from 'react'
+import type { RunData } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
 import type { UseDeleteRunMutationResult } from '@opentrons/react-api-client'
-import type { RunControls } from '/app/organisms/RunTimeControl'
 
 export interface HistoricalProtocolRunOverflowMenuProps {
   run: RunData
@@ -82,7 +86,7 @@ export interface HistoricalProtocolRunOverflowMenuProps {
 
 export function HistoricalProtocolRunOverflowMenu(
   props: HistoricalProtocolRunOverflowMenuProps
-): JSX.Element {
+): ReactNode {
   const { run, robotName } = props
   const {
     menuOverlay,
@@ -106,12 +110,6 @@ export function HistoricalProtocolRunOverflowMenu(
   const [showRobotOutOfStorageModal, setShowRobotOutOfStorageModal] =
     useState<boolean>(false)
   const navigate = useNavigate()
-  const onResetSuccess = (createRunResponse: Run): void => {
-    navigate(
-      `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
-    )
-  }
-  const runControls = useRunControls(run.id, onResetSuccess)
 
   return (
     <>
@@ -151,7 +149,6 @@ export function HistoricalProtocolRunOverflowMenu(
                 isDownloading={isDownloading}
                 setShowRobotOutOfStorageModal={setShowRobotOutOfStorageModal}
                 setShowOverflowMenu={setShowOverflowMenu}
-                runControls={runControls}
               />
             </Box>
             {menuOverlay}
@@ -167,11 +164,10 @@ interface MenuDropdownProps extends HistoricalProtocolRunOverflowMenuProps {
   isDownloading: boolean
   setShowRobotOutOfStorageModal: Dispatch<SetStateAction<boolean>>
   setShowOverflowMenu: Dispatch<SetStateAction<boolean>>
-  runControls: RunControls
   deleteRun: UseDeleteRunMutationResult['deleteRun']
   isDeletingRun: boolean
 }
-function MenuDropdown(props: MenuDropdownProps): JSX.Element {
+function MenuDropdown(props: MenuDropdownProps): ReactNode {
   const { t } = useTranslation('device_details')
 
   const {
@@ -183,13 +179,12 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
     runHasImages,
     setShowRobotOutOfStorageModal,
     setShowOverflowMenu,
-    runControls,
     deleteRun,
     isDeletingRun,
   } = props
 
   const { id: runId } = run
-  const { reset, isResetRunLoading, isRunControlLoading } = runControls
+  const navigate = useNavigate()
   const isRobotOnWrongVersionOfSoftware =
     useIsRobotOnWrongVersionOfSoftware(robotName)
   const documentationState = useDocumentationState()
@@ -229,7 +224,6 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       return
     }
 
-    reset()
     trackEvent({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
       properties: {
@@ -238,6 +232,10 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       },
     })
     trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN })
+    // Navigate immediately so the run page can show loading; clone starts there.
+    navigate(`/devices/${robotName}/protocol-runs/${runId}/setup`, {
+      state: { pendingRerun: true },
+    })
   }
 
   const handleDeleteClick: MouseEventHandler<HTMLButtonElement> = e => {
@@ -272,7 +270,7 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
   return (
     <Flex
       whiteSpace={NO_WRAP}
-      zIndex={10}
+      zIndex={Z_INDEX.MODALS}
       borderRadius={BORDERS.borderRadius8}
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
       position={POSITION_ABSOLUTE}
@@ -293,32 +291,14 @@ function MenuDropdown(props: MenuDropdownProps): JSX.Element {
       <MenuItem
         {...targetProps}
         onClick={handleResetClick}
-        disabled={
-          robotIsBusy || isRobotOnWrongVersionOfSoftware || isRunControlLoading
-        }
+        disabled={robotIsBusy || isRobotOnWrongVersionOfSoftware}
         data-testid="RecentProtocolRun_OverflowMenu_rerunNow"
       >
-        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-          {t('rerun_now')}
-          {isResetRunLoading ? (
-            <Icon
-              name="ot-spinner"
-              size={SIZE_1}
-              color={COLORS.grey50}
-              aria-label="spinner"
-              spin
-            />
-          ) : null}
-        </Flex>
+        {t('rerun_now')}
       </MenuItem>
       {isRobotOnWrongVersionOfSoftware && (
         <Tooltip tooltipProps={tooltipProps}>
           {t('shared:a_software_update_is_available')}
-        </Tooltip>
-      )}
-      {isRunControlLoading && (
-        <Tooltip whiteSpace="normal" tooltipProps={tooltipProps}>
-          {t('rerun_loading')}
         </Tooltip>
       )}
       <MenuItem
@@ -371,7 +351,7 @@ const handleDeleteRunImagesModal = (props: DeleteRunImagesModalProps): void => {
 }
 
 const DeleteRunImagesModal = NiceModal.create(
-  ({ onDeleteRunImages }: DeleteRunImagesModalProps): JSX.Element => {
+  ({ onDeleteRunImages }: DeleteRunImagesModalProps): ReactNode => {
     const { t } = useTranslation('device_details')
     const modal = useModal()
     const [isDeleting, setIsDeleting] = useState(false)

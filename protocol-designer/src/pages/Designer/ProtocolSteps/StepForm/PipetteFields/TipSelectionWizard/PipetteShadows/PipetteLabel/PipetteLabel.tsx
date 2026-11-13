@@ -5,7 +5,7 @@ import { Flex, RobotCoordsForeignDiv, StyledText } from '@opentrons/components'
 
 import styles from './pipettelabel.module.css'
 
-import type { ForwardedRef } from 'react'
+import type { ForwardedRef, ReactNode } from 'react'
 import type { LabelPlacement } from '../../types'
 
 export interface PipetteLabelProps {
@@ -20,7 +20,7 @@ export interface PipetteLabelProps {
 function PipetteLabelComponent(
   { text, isZoomed, isError, x, y, placement }: PipetteLabelProps,
   ref: ForwardedRef<HTMLDivElement>
-): JSX.Element {
+): ReactNode {
   return (
     <RobotCoordsForeignDiv
       x={x}

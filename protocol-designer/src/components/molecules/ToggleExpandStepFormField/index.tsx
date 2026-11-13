@@ -14,6 +14,7 @@ import { ToggleButton } from '/protocol-designer/components/atoms'
 
 import { InputStepFormField } from '../InputStepFormField'
 
+import type { ReactNode } from 'react'
 import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 interface ToggleExpandStepFormFieldProps extends FieldProps {
@@ -31,7 +32,7 @@ interface ToggleExpandStepFormFieldProps extends FieldProps {
 }
 export function ToggleExpandStepFormField(
   props: ToggleExpandStepFormFieldProps
-): JSX.Element {
+): ReactNode {
   const {
     title,
     isSelected,

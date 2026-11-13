@@ -26,7 +26,7 @@ import { RobotOutOfStorageModal } from '../../../../RobotOutOfStorageModal.tsx'
 import { getFallbackRobotSerialNumber } from '../../utils'
 import { useActionButtonProperties } from './hooks'
 
-import type { MutableRefObject } from 'react'
+import type { MutableRefObject, ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 import type { RunHeaderContentProps } from '..'
 
@@ -37,7 +37,7 @@ interface ActionButtonProps extends BaseActionButtonProps {
   isClosingCurrentRun: boolean
 }
 
-export function ActionButton(props: ActionButtonProps): JSX.Element {
+export function ActionButton(props: ActionButtonProps): ReactNode {
   const {
     runId,
     runRecord,

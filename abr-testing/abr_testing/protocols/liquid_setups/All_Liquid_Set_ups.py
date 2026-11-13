@@ -8,6 +8,18 @@ from opentrons.protocol_api import (
     SINGLE,
 )
 
+"""
+Follow the jira ticket https://opentrons.atlassian.net/browse/RQA-5704
+your goal is to address:
+1. ABR2 doesn't fill up the wells enough?
+2. Row/column/single tip pickup now can have return tip!
+for
+ for robot in robot_list:
+        parameters.add_bool(variable_name=robot, display_name=robot, default=True)
+ put robots you aren't interested in to false
+"""
+# For runtime parameters,
+
 metadata = {
     "protocolName": "Liquid Set up for all robots",
     "author": "Rhyann clarke <rhyann.clarke@opentrons.com>",
@@ -16,7 +28,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.21",
+    "apiLevel": "2.28",
 }
 
 
@@ -24,7 +36,7 @@ SLOTS = {
     "FULL_TIP_RACK": "A1",
     "PARTIAL_TIP_RACK_1000": ["C2", "B3"],
     "SRC_RESERVOIR": "B1",
-    "LABWARE": ["D1", "D2", "D3", "C1", "C3"],
+    "LABWARE": ["D1", "D2", "D3", "C1", "C3", "B2"],
     "TRASH_BIN": "A3",
 }
 
@@ -144,7 +156,7 @@ def run(protocol: ProtocolContext) -> None:
             520,
             src_reservoir["A1"],
             [deepwell["A1"].top(), deepwell["A2"].top()],
-            trash=True,
+            trash=False,
             blow_out=False,
             blowout_location="destination well",
         )
@@ -195,6 +207,8 @@ def run(protocol: ProtocolContext) -> None:
             style=COLUMN, start="A1", tip_racks=[tip_rack_partial_1]
         )
 
+        pipette.reset_tipracks()
+
         pipette.transfer(
             volume=[binding2, binding2],
             source=src_reservoir["A1"],
@@ -204,7 +218,7 @@ def run(protocol: ProtocolContext) -> None:
             ],
             blow_out=False,
             blowout_location="destination well",
-            trash=True,
+            trash=False,
         )
 
         pvt1abr10_labware = [res1, res2, res3]
@@ -257,13 +271,16 @@ def run(protocol: ProtocolContext) -> None:
             ],
             blow_out=False,
             blowout_location="destination well",
-            trash=True,
+            trash=False,
         )
         pipette.configure_nozzle_layout(
             style=COLUMN,
             start="A12",
             tip_racks=[tip_rack_partial_1],
         )
+
+        pipette.reset_tipracks()
+
         pipette.transfer(
             volume=[120, 100, 100, 100],
             source=src_reservoir["A1"],
@@ -275,7 +292,7 @@ def run(protocol: ProtocolContext) -> None:
             ],
             blow_out=False,
             blowout_location="destination well",
-            trash=True,
+            trash=False,
         )
         dvt1abr4_labware = [
             reservoir_1,
@@ -306,13 +323,30 @@ def run(protocol: ProtocolContext) -> None:
         dna_plate = protocol.load_labware(
             "opentrons_96_wellplate_200ul_pcr_full_skirt", SLOTS["LABWARE"][3], "DNA"
         )
+
+        pcr_dilution = protocol.load_labware(
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            str(SLOTS["LABWARE"][4]),
+            "PCR Dilution",
+        )
+        pcr_dilution2 = protocol.load_labware(
+            "opentrons_96_wellplate_200ul_pcr_full_skirt",
+            str(SLOTS["LABWARE"][5]),
+            "PCR Dilution Plate",
+        )
         # RESERVOIR, INDICES PLATE, DNA PLATE
         pipette.configure_nozzle_layout(style=ALL, tip_racks=[tip_rack])
         pipette.reset_tipracks()
         pipette.transfer(
-            volume=[150, 100, 100],
-            source=3 * [src_reservoir["A1"]],
-            dest=[reservoir["A1"], indices_plate["A1"], dna_plate["A1"]],
+            volume=[200, 200, 100, 200, 200],
+            source=5 * [src_reservoir["A1"]],
+            dest=[
+                reservoir["A1"],
+                indices_plate["A1"],
+                dna_plate["A1"],
+                pcr_dilution["A1"],
+                pcr_dilution2["A1"],
+            ],
             trash=False,
             blow_out=False,
             blowout_location="destination well",
@@ -324,15 +358,25 @@ def run(protocol: ProtocolContext) -> None:
             start="A12",
             tip_racks=[tip_rack_partial_1],
         )
+
+        pipette.reset_tipracks()
+
         pipette.transfer(
             [100, 100],
             source=2 * [src_reservoir["A1"]],
             dest=[pcr_reagents_plate["A1"], pcr_reagents_plate["A2"]],
-            trash=True,
+            trash=False,
             blow_out=False,
             blowout_location="destination well",
         )
-        dvt2abr5_plates = [reservoir, pcr_reagents_plate, indices_plate, dna_plate]
+        dvt2abr5_plates = [
+            reservoir,
+            pcr_reagents_plate,
+            indices_plate,
+            dna_plate,
+            pcr_dilution,
+            pcr_dilution2,
+        ]
         for plate in dvt2abr5_plates:
             protocol.move_labware(plate, OFF_DECK, use_gripper=False)
 
@@ -370,11 +414,14 @@ def run(protocol: ProtocolContext) -> None:
         pipette.configure_nozzle_layout(
             style=COLUMN, tip_racks=[tip_rack_partial_1], start="A1"
         )
+
+        pipette.reset_tipracks()
+
         pipette.transfer(
             150,
             source=src_reservoir["A1"],
             dest=master_mix["A1"],
-            trash=True,
+            trash=False,
             blow_out=True,
             blowout_location="destination well",
         )
@@ -403,7 +450,7 @@ def run(protocol: ProtocolContext) -> None:
             source=6 * [src_reservoir["A1"]],
             dest=reservoir.wells()[:6],
             blow_out=False,
-            trash=True,
+            trash=False,
             blowout_location="destination well",
         )
         # FILL FIRST 5 COLUMNS
@@ -436,5 +483,8 @@ def run(protocol: ProtocolContext) -> None:
             start="A12",
             tip_racks=[tip_rack_partial_1],
         )
-        pipette.transfer(1000, src_reservoir["A1"], snap_caps["B1"])
-        pipette.transfer(1000, src_reservoir["A1"], snap_caps.rows()[0])
+        pipette.reset_tipracks()
+        pipette.transfer(1000, src_reservoir["A1"], snap_caps["B1"], trash=False)
+
+        pipette.reset_tipracks()
+        pipette.transfer(1000, src_reservoir["A1"], snap_caps.rows()[0], trash=False)

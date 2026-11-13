@@ -41,7 +41,7 @@ export function RecoverySingleColumnContentWrapper({
   children,
   footerDetails,
   ...styleProps
-}: SingleColumnContentWrapperProps & StyleProps): JSX.Element {
+}: SingleColumnContentWrapperProps & StyleProps): ReactNode {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -63,7 +63,7 @@ export function RecoverySingleColumnContentWrapper({
 export function RecoveryTwoColumnContentWrapper({
   children,
   footerDetails,
-}: TwoColumnContentWrapperProps): JSX.Element {
+}: TwoColumnContentWrapperProps): ReactNode {
   const [leftChild, rightChild] = children
   return (
     <Flex
@@ -86,7 +86,7 @@ export function RecoveryTwoColumnContentWrapper({
 export function RecoveryODDOneDesktopTwoColumnContentWrapper({
   children: [leftOrSingleElement, optionallyShownRightElement],
   footerDetails,
-}: OneOrTwoColumnContentWrapperProps): JSX.Element {
+}: OneOrTwoColumnContentWrapperProps): ReactNode {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}

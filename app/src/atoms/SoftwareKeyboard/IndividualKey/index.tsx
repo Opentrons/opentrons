@@ -6,7 +6,7 @@ import {
 } from '../constants'
 import { useSoftwareKeyboardControl } from '../utils/useSoftwareKeyboardControl'
 
-import type { MutableRefObject } from 'react'
+import type { MutableRefObject, ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { SoftwareKeyboardControlOptions } from '../utils/useSoftwareKeyboardControl'
 
@@ -30,7 +30,7 @@ export function IndividualKey({
   inputElementRef,
   keyText,
   debug = false,
-}: IndividualKeyProps): JSX.Element {
+}: IndividualKeyProps): ReactNode {
   const numericalKeyboard = {
     layout: {
       default: [`${keyText}`],

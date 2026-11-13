@@ -35,7 +35,7 @@ interface AnnotatedGroupProps {
   // rendered after sub-commands when analysis failed inside this annotation group
   trailingErrorsFooter?: ReactNode | null
 }
-export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
+export function AnnotatedGroup(props: AnnotatedGroupProps): ReactNode {
   const {
     subCommands,
     annotationType,

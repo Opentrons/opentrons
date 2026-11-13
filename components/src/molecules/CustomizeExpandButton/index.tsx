@@ -14,6 +14,7 @@ import type {
   ChangeEventHandler,
   MemoExoticComponent,
   MouseEvent,
+  ReactNode,
 } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { StyleProps } from '../../primitives'
@@ -47,7 +48,7 @@ interface CustomizeExpandButtonProps extends StyleProps {
 //  used for helix and as a child button to ListButtonAccordion
 export function CustomizeExpandButtonComponent(
   props: CustomizeExpandButtonProps
-): JSX.Element {
+): ReactNode {
   const {
     buttonText,
     buttonValue,

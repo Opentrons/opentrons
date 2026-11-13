@@ -39,6 +39,7 @@ import {
 import styles from './tiptrackingfield.module.css'
 import { getNumPickups } from './utils'
 
+import type { ReactNode } from 'react'
 import type {
   NozzleConfigurationStyle,
   PrimaryNozzleConfigurationStyle,
@@ -53,7 +54,7 @@ interface TipTrackingFieldProps {
   formData: FormData
 }
 
-export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
+export function TipTrackingField(props: TipTrackingFieldProps): ReactNode {
   const { propsForFields, formData } = props
   const { t } = useTranslation(['form', 'tip_selection'])
   const [showTipSelectionModal, setShowTipSelectionModal] =

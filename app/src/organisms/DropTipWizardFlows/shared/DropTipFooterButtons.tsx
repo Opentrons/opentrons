@@ -13,6 +13,8 @@ import {
 
 import { SmallButton, TextOnlyButton } from '../../../atoms/buttons'
 
+import type { ReactNode } from 'react'
+
 interface DropTipFooterButtonsProps {
   primaryBtnOnClick: () => void
   primaryBtnTextOverride?: string
@@ -24,7 +26,7 @@ interface DropTipFooterButtonsProps {
 
 export function DropTipFooterButtons(
   props: DropTipFooterButtonsProps
-): JSX.Element {
+): ReactNode {
   return (
     <Flex width="100%" height="100%" alignItems={ALIGN_FLEX_END}>
       <Flex
@@ -58,7 +60,7 @@ function DropTipPrimaryBtn({
   primaryBtnTextOverride,
   primaryBtnDisabled,
   primaryBtnStyle,
-}: DropTipFooterButtonsProps): JSX.Element {
+}: DropTipFooterButtonsProps): ReactNode {
   const { t } = useTranslation('drop_tip_wizard')
 
   return (

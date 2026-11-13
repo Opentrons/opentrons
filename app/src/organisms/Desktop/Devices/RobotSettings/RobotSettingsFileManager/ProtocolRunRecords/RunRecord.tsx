@@ -17,6 +17,7 @@ import { useRunFileCount } from '../hooks/useRunFileCount'
 import styles from './protocolrunrecords.module.css'
 import { RunRecordDrawer } from './RunRecordDrawer'
 
+import type { ReactNode } from 'react'
 import type { RunData } from '@opentrons/api-client'
 
 interface RunRecordProps {
@@ -31,7 +32,7 @@ export function RunRecord({
   isSelected,
   isDeleting,
   onToggle,
-}: RunRecordProps): JSX.Element {
+}: RunRecordProps): ReactNode {
   const { t } = useTranslation('device_details')
   const protocols = useAllProtocolsQuery()
   const numFiles = useRunFileCount(run)

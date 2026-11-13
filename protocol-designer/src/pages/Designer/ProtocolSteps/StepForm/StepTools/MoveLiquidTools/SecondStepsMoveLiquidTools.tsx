@@ -61,7 +61,7 @@ import { FLOW_RATE } from '../ByVolumeBuilderModal/types'
 import { MultiInputField } from './MultiInputField'
 import { ResetSettingsField } from './ResetSettingsField'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { LiquidHandlingPropertyByVolume } from '@opentrons/shared-data'
 import type { FormData, StepFieldName } from '/protocol-designer/form-types'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
@@ -86,7 +86,7 @@ export const SecondStepsMoveLiquidTools = ({
   tab,
   setTab,
   setShowFormErrors,
-}: SecondStepsMoveLiquidToolsProps): JSX.Element => {
+}: SecondStepsMoveLiquidToolsProps): ReactNode => {
   const { t, i18n } = useTranslation(['protocol_steps', 'form', 'tooltip'])
   const toolsComponentRef = useRef<HTMLDivElement | null>(null)
   const pipetteEntities = useSelector(getPipetteEntities)

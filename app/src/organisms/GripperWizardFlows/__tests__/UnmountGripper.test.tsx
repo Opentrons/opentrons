@@ -35,6 +35,7 @@ describe('UnmountGripper', () => {
         goBack={mockGoBack}
         errorMessage={null}
         setErrorMessage={mockSetErrorMessage}
+        selectedSlot="B2"
         {...props}
       />,
       { i18nInstance: i18n }

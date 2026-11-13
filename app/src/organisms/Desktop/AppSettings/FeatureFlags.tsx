@@ -16,10 +16,11 @@ import { ToggleButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
 import * as Config from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { DevInternalFlag } from '/app/redux/config/types'
 import type { Dispatch } from '/app/redux/types'
 
-export function FeatureFlags(): JSX.Element {
+export function FeatureFlags(): ReactNode {
   const { t } = useTranslation('app_settings')
   const devInternalFlags = useSelector(Config.getFeatureFlags)
   const dispatch = useDispatch<Dispatch>()

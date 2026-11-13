@@ -8,7 +8,7 @@ import styles from './protocolsetupoffsets.module.css'
 import { SetupOffsetsHeader } from './SetupOffsetsHeader'
 import { SetupOffsetsTable } from './SetupOffsetsTable'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { Run } from '@opentrons/api-client'
 import type { UseLPCFlowsResult } from '/app/organisms/LabwarePositionCheck'
 import type { SetupScreens } from '../types'
@@ -24,7 +24,7 @@ export interface ProtocolSetupOffsetsProps {
 
 export function ProtocolSetupOffsets(
   props: ProtocolSetupOffsetsProps
-): JSX.Element {
+): ReactNode {
   const { lpcDisabledReason, lpcLaunchProps } = props
   const { showLPC, lpcProps, launchLPC } = lpcLaunchProps
   const { t } = useTranslation('protocol_setup')

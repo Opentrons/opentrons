@@ -16,6 +16,8 @@ import {
 import screenImage from '/app/assets/images/on-device-display/odd_abstract@x2.png'
 import { MediumButton } from '/app/atoms/buttons'
 
+import type { ReactNode } from 'react'
+
 const IMAGE_ALT = 'finish setting up a robot'
 
 interface ConfirmRobotNameProps {
@@ -24,7 +26,7 @@ interface ConfirmRobotNameProps {
 
 export function ConfirmRobotName({
   robotName,
-}: ConfirmRobotNameProps): JSX.Element {
+}: ConfirmRobotNameProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const navigate = useNavigate()
 

@@ -37,7 +37,6 @@ import type { DroppedItem, SharedControlsType } from '../types'
 interface LabwareControlsProps extends SharedControlsType {
   labwareOnDeck: LabwareOnDeck
   setHoveredLabware: (labware?: LabwareOnDeck | null) => void
-  setDraggedLabware: (labware?: LabwareOnDeck | null) => void
   swapBlocked: boolean
   allModules: ModuleOnDeck[]
 }
@@ -49,7 +48,6 @@ export const LabwareControls = (
     labwareOnDeck,
     slotPosition,
     setHoveredLabware,
-    setDraggedLabware,
     swapBlocked,
     hover,
     setHover,
@@ -125,11 +123,8 @@ export const LabwareControls = (
 
   useEffect(
     () => {
-      if (draggedLabware != null) {
-        setDraggedLabware(draggedLabware?.labwareOnDeck)
-      } else {
+      if (draggedLabware == null) {
         setHoveredLabware(null)
-        setDraggedLabware(null)
       }
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.

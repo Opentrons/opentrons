@@ -17,9 +17,10 @@ import {
   toggleAnalyticsOptedIn,
 } from '/app/redux/analytics'
 
+import type { ReactNode } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
 
-export function PrivacySettings(): JSX.Element {
+export function PrivacySettings(): ReactNode {
   const { t } = useTranslation('branded')
   const dispatch = useDispatch<Dispatch>()
   const analyticsOptedIn = useSelector((s: State) => getAnalyticsOptedIn(s))

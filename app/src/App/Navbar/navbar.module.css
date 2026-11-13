@@ -7,7 +7,7 @@
   align-items: center;
   justify-content: space-between;
   background-color: var(--black-90);
-  font-size: var(--font-size-h3);
+  font-size: var(--font-size-14);
   font-weight: 400;
   line-height: var(--line-height-20);
 }

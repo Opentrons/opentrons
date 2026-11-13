@@ -18,6 +18,7 @@ import {
 
 import { FLOWS } from './constants'
 
+import type { ReactNode } from 'react'
 import type { PipetteWizardFlow } from './types'
 
 interface ExitModalProps {
@@ -28,7 +29,7 @@ interface ExitModalProps {
   isOnDevice: boolean
 }
 
-export function ExitModal(props: ExitModalProps): JSX.Element {
+export function ExitModal(props: ExitModalProps): ReactNode {
   const { goBack, proceed, flowType, isOnDevice, isRobotMoving } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
 

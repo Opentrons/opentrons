@@ -77,7 +77,7 @@ interface TextAreaFieldProps extends NativeTextareaProps {
 export const TextAreaField = forwardRef<
   HTMLTextAreaElement,
   TextAreaFieldProps
->((props, ref): JSX.Element => {
+>((props, ref): ReactNode => {
   const {
     label,
     error,

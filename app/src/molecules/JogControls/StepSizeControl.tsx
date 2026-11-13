@@ -21,6 +21,7 @@ import { TouchControlButton } from '/app/atoms/buttons/TouchControlButton'
 
 import { ControlContainer } from './ControlContainer'
 
+import type { ReactNode } from 'react'
 import type { StepSize } from './types'
 
 const JUMP_SIZE_SUBTITLE = '- / +'
@@ -59,7 +60,7 @@ function StepSizeButtons({
   currentStepSize,
   setCurrentStepSize,
   isOnDevice,
-}: StepSizeControlProps): JSX.Element {
+}: StepSizeControlProps): ReactNode {
   const { t } = useTranslation('robot_calibration')
   return (
     <>
@@ -79,7 +80,7 @@ function StepSizeButtons({
   )
 }
 
-export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
+export function StepSizeControl(props: StepSizeControlProps): ReactNode {
   const { stepSizes, currentStepSize, setCurrentStepSize, isOnDevice } = props
   const { t } = useTranslation(['robot_calibration'])
 
@@ -130,7 +131,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
   )
 }
 
-export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
+export function TouchStepSizeControl(props: StepSizeControlProps): ReactNode {
   const { t } = useTranslation('robot_calibration')
   return (
     <Flex

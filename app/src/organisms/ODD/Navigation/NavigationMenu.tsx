@@ -25,7 +25,7 @@ import { useLights } from '/app/resources/devices'
 import { RestartRobotConfirmationModal } from './RestartRobotConfirmationModal'
 import { ShutdownRobotConfirmationModal } from './ShutdownRobotConfirmationModal'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 
 interface NavigationMenuProps {
   onClick: MouseEventHandler
@@ -33,7 +33,7 @@ interface NavigationMenuProps {
   setShowNavMenu: (showNavMenu: boolean) => void
 }
 
-export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
+export function NavigationMenu(props: NavigationMenuProps): ReactNode {
   const { onClick, robotName, setShowNavMenu } = props
   const { t, i18n } = useTranslation(['devices_landing', 'robot_controls'])
   const { lightsOn, toggleLights } = useLights()

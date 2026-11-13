@@ -14,7 +14,7 @@ import {
 
 import { TertiaryButton } from '/app/atoms/buttons'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 
 interface DisplayRobotNameProps {
   robotName: string
@@ -29,7 +29,7 @@ export function DisplayRobotName({
   robotName,
   updateIsExpanded,
   isRobotBusy,
-}: DisplayRobotNameProps): JSX.Element {
+}: DisplayRobotNameProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = () => {

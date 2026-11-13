@@ -2,9 +2,10 @@ import { useTranslation } from 'react-i18next'
 
 import { Banner, LegacyStyledText, SPACING } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { IconProps } from '@opentrons/components'
 
-export function ProtocolStatusBanner(): JSX.Element {
+export function ProtocolStatusBanner(): ReactNode {
   const { t } = useTranslation('protocol_list')
 
   const alertIcon: IconProps = { name: 'ot-alert' }

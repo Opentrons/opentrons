@@ -14,12 +14,14 @@ import {
 import { ToggleButton } from '/app/atoms/buttons'
 import { useLEDLights } from '/app/resources/robot-settings'
 
+import type { ReactNode } from 'react'
+
 interface EnableStatusLightProps {
   isEstopNotDisengaged: boolean
 }
 export function EnableStatusLight({
   isEstopNotDisengaged,
-}: EnableStatusLightProps): JSX.Element {
+}: EnableStatusLightProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const { lightsEnabled, toggleLights } = useLEDLights()
 

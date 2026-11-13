@@ -208,7 +208,6 @@ jobs:
       - name: 'bundle ${{matrix.variant}} frontend'
         env:
           OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
-          OT_APP_INTERCOM_ID: ${{ secrets.OT_APP_INTERCOM_ID }}
           OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
           OT_BUILD_TARGET: ${{ matrix.target }}
           OT_SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
@@ -222,7 +221,6 @@ jobs:
         timeout-minutes: 60
         env:
           OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
-          OT_APP_INTERCOM_ID: ${{ secrets.OT_APP_INTERCOM_ID }}
           WINDOWS_SIGN: ${{ format('{0}', contains(needs.determine-build-type.outputs.type, 'release')) }}
           SM_CODE_SIGNING_CERT_SHA1_HASH: ${{secrets.SM_CODE_SIGNING_CERT_SHA1_HASH_V3}}
           SM_KEYPAIR_ALIAS: ${{secrets.SM_KEYPAIR_ALIAS_V3}}

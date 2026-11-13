@@ -7,9 +7,10 @@ import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 
 import { useLabwareDropdownOptions } from '../../../utils'
 
+import type { ReactNode } from 'react'
 import type { FieldProps } from '../types'
 
-export function LabwareField(props: FieldProps): JSX.Element {
+export function LabwareField(props: FieldProps): ReactNode {
   const { name } = props
   const { i18n, t } = useTranslation(['protocol_steps', 'application'])
   const disposalOptions = useSelector(getDisposalOptions)

@@ -1,6 +1,7 @@
 import styles from './timelinescrubber.module.css'
 import { TrackSlider } from './TrackSlider'
 
+import type { ReactNode } from 'react'
 import type { TrackData } from './TrackSlider'
 
 export interface TimelineScrubberProps {
@@ -11,7 +12,7 @@ export interface TimelineScrubberProps {
 export function TimelineScrubber({
   tracks,
   onTrackChange,
-}: TimelineScrubberProps): JSX.Element {
+}: TimelineScrubberProps): ReactNode {
   const handleValueChange = (id: string, newValue: number): void => {
     const updatedTrack = { id, value: newValue }
     onTrackChange(updatedTrack)

@@ -6,7 +6,6 @@ from contextlib import contextmanager, suppress
 from pathlib import Path
 from traceback import TracebackException, format_exception_only
 from typing import (
-    TYPE_CHECKING,
     Annotated,
     Awaitable,
     Callable,
@@ -35,12 +34,12 @@ from opentrons.config import (
     feature_flags as ff,
 )
 from opentrons.hardware_control import (
-    API,
     HardwareControlAPI,
     ThreadManagedHardware,
     ThreadManager,
 )
 from opentrons.hardware_control.modules import AbstractModule
+from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.simulator_setup import load_simulator_thread_manager
 from opentrons.hardware_control.types import (
     DoorState,
@@ -91,10 +90,6 @@ from robot_server.service.pyro_utils.resource_utilities import (
     get_pyro_resource,
     register_hardware_state_store_to_pyro_resource,
 )
-
-if TYPE_CHECKING:
-    from opentrons.hardware_control.ot3api import OT3API
-
 
 PostInitCallback = Tuple[
     Callable[[AppState, HardwareControlAPI, "HardwareStateStore"], Awaitable[None]],
@@ -528,19 +523,11 @@ def get_ot3_hardware(
     )
 
 
-def get_ot2_hardware(
-    thread_manager: Annotated[ThreadManagedHardware, Depends(get_hardware_resource)],
-) -> "API":
+def get_ot2_hardware() -> HardwareControlAPI:
     """Get an OT2 hardware controller."""
-    if not isinstance(
-        # If this isn't a thread manager, it's an Async Pyro object and this is on OT-3
-        thread_manager,
-        ThreadManager,
-    ) or not thread_manager.wraps_instance(API):
-        raise NotSupportedOnFlex(
-            detail="This route is only available on an OT-2."
-        ).as_error(status.HTTP_403_FORBIDDEN)
-    return cast(API, thread_manager.wrapped())
+    raise NotSupportedOnFlex(
+        detail="This route is only available on an OT-2."
+    ).as_error(status.HTTP_403_FORBIDDEN)
 
 
 async def get_firmware_update_manager(

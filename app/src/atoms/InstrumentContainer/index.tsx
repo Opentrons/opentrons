@@ -6,6 +6,8 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 interface InstrumentContainerProps {
   displayName: string
   id?: string
@@ -13,7 +15,7 @@ interface InstrumentContainerProps {
 
 export const InstrumentContainer = (
   props: InstrumentContainerProps
-): JSX.Element => {
+): ReactNode => {
   const { displayName, id } = props
 
   return (

@@ -6,11 +6,12 @@ import {
 } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { DropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
 import { DT_ROUTES } from '/app/organisms/DropTipWizardFlows/constants'
-import { mockPipetteInfo } from '/app/resources/instruments/__fixtures__'
 
 import { mockRecoveryContentProps } from '../../__fixtures__'
 import { clickButtonLabeled } from '../../__tests__/util'
@@ -29,7 +30,7 @@ const { DROP_TIP_FLOWS, RETRY_NEW_TIPS, MANUAL_FILL_AND_RETRY_NEW_TIPS } =
   RECOVERY_MAP
 
 const MOCK_ACTUAL_PIPETTE = {
-  ...mockPipetteInfo.pipetteSpecs,
+  ...fixtureP10Single,
   model: 'model',
   tipLength: {
     value: 20,

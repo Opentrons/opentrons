@@ -10,6 +10,7 @@ import {
 import { PROFILE_STEP } from './constants'
 import styles from './vacuumprofile.module.css'
 
+import type { ReactNode } from 'react'
 import type { PROFILE_CYCLE } from './constants'
 
 export interface PresavedVacuumHeaderProps {
@@ -22,7 +23,7 @@ export interface PresavedVacuumHeaderProps {
 
 export function PresavedVacuumHeader(
   props: PresavedVacuumHeaderProps
-): JSX.Element {
+): ReactNode {
   const { displayIndex, variant, onDelete, onSave, showActions = true } = props
   const { t } = useTranslation('protocol_steps')
 

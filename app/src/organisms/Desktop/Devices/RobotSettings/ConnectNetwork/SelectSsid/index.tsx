@@ -7,7 +7,7 @@ import { SelectField } from '/app/atoms/SelectField'
 import { NetworkActionLabel, NetworkOptionLabel } from './NetworkOptionLabel'
 
 import type { TFunction } from 'i18next'
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type { SelectOptionOrGroup } from '@opentrons/components'
 import type { WifiNetwork } from '../types'
 
@@ -41,7 +41,7 @@ const formatOptions = (
   return options
 }
 
-export function SelectSsid(props: SelectSsidProps): JSX.Element {
+export function SelectSsid(props: SelectSsidProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const { list, value, onConnect, onJoinOther, isRobotBusy } = props
 

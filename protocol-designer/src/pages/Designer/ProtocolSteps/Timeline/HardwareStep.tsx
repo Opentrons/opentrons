@@ -28,13 +28,14 @@ import {
 
 import { PX_SIDEBAR_MIN_WIDTH_FOR_ICON } from './ConnectedStepContainer'
 
+import type { ReactNode } from 'react'
 import type { ThunkDispatch } from '/protocol-designer/types'
 
 interface HardwareStepProps {
   sidebarWidth: number
 }
 
-export function HardwareStep(props: HardwareStepProps): JSX.Element {
+export function HardwareStep(props: HardwareStepProps): ReactNode {
   const { t } = useTranslation('protocol_steps')
   const { sidebarWidth } = props
   const dispatch = useDispatch<ThunkDispatch<any>>()

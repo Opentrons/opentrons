@@ -138,5 +138,20 @@ stages:
       json:
         data:
           id: !anystr
+          status: stop-requested
+          current: true
+  - name: Wait for run 4 to complete
+    max_retries: 10
+    delay_after: 0.2
+    request:
+      url: '{ot2_server_base_url}/runs/{fourth_run_id}'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          id: !anystr
           status: stopped
           current: true

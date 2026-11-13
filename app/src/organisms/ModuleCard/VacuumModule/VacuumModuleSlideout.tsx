@@ -27,6 +27,7 @@ import { parseGaugePressureValue } from './utils/parseGaugePressureValue'
 import { sanitizeGaugePressureInput } from './utils/sanitizeGaugePressureInput'
 import styles from './vacuummodule.module.css'
 
+import type { ReactNode } from 'react'
 import type { VacuumMode, VacuumModule } from '@opentrons/api-client'
 
 interface VacuumModuleSlideoutProps {
@@ -37,7 +38,7 @@ interface VacuumModuleSlideoutProps {
 
 export function VacuumModuleSlideout(
   props: VacuumModuleSlideoutProps
-): JSX.Element {
+): ReactNode {
   const { module, onCloseClick, isExpanded } = props
   const { moduleModel } = module
   const { t } = useTranslation('device_details')
@@ -110,7 +111,11 @@ export function VacuumModuleSlideout(
           <div className={styles.vacuum_module_slideout_mode_radio_container}>
             <RadioButton
               buttonValue="pressure"
-              buttonLabel={t('pressure')}
+              buttonLabel={t('pressure_radio_button_label')}
+              buttonSubLabel={{
+                label: t('pressure_sub_text'),
+                align: 'vertical',
+              }}
               onChange={() => {
                 setModeType('pressure')
               }}
@@ -119,7 +124,11 @@ export function VacuumModuleSlideout(
             />
             <RadioButton
               buttonValue="power"
-              buttonLabel={t('power')}
+              buttonLabel={t('power_radio_button_label')}
+              buttonSubLabel={{
+                label: t('power_sub_text'),
+                align: 'vertical',
+              }}
               onChange={() => {
                 setModeType('power')
               }}
@@ -128,7 +137,7 @@ export function VacuumModuleSlideout(
             />
           </div>
         </div>
-        <Divider marginY={SPACING.spacing16} />
+        {modeType != null && <Divider marginY={SPACING.spacing16} />}
         {/* pressure or power input */}
         <div
           className={

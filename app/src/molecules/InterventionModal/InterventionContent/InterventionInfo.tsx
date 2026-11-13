@@ -19,6 +19,7 @@ import {
 
 import { Divider } from '/app/atoms/structure/Divider'
 
+import type { ReactNode } from 'react'
 import type { RobotInfoLabelProps } from '@opentrons/components'
 
 export interface BaseInterventionInfo {
@@ -44,7 +45,7 @@ export interface InterventionInfoStackedProps extends BaseInterventionInfo {
 export type InterventionInfoProps =
   InterventionInfoDefaultProps | InterventionInfoStackedProps
 
-export function InterventionInfo(props: InterventionInfoProps): JSX.Element {
+export function InterventionInfo(props: InterventionInfoProps): ReactNode {
   const content = buildContent(props)
 
   return (

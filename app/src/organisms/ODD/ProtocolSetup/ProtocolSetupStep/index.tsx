@@ -5,6 +5,8 @@ import { Icon, StyledText, truncateString } from '@opentrons/components'
 import { useToaster } from '../../../ToasterOven'
 import styles from './protocolsetupstep.module.css'
 
+import type { ReactNode } from 'react'
+
 const CSV_FILE_MAX_LENGTH = 18 // truncated text + three dots
 
 export type ProtocolSetupStepStatus =
@@ -55,7 +57,7 @@ export function ProtocolSetupStep({
   description,
   hasRightIcon = true,
   hasLeftIcon = true,
-}: ProtocolSetupStepProps): JSX.Element {
+}: ProtocolSetupStepProps): ReactNode {
   const isInteractionDisabled = interactionDisabled || disabled
   const { makeSnackbar } = useToaster()
 

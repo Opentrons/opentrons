@@ -6,6 +6,8 @@ import { Box } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
 import styles from './styles.module.css'
 
+import type { ReactNode } from 'react'
+
 export interface ReleaseNotesProps {
   isOEMMode: boolean
   source?: string | null
@@ -13,7 +15,7 @@ export interface ReleaseNotesProps {
 
 const DEFAULT_RELEASE_NOTES = 'We recommend upgrading to the latest version.'
 
-export function ReleaseNotes(props: ReleaseNotesProps): JSX.Element {
+export function ReleaseNotes(props: ReleaseNotesProps): ReactNode {
   const { source, isOEMMode } = props
 
   return (
@@ -39,27 +41,27 @@ export function ReleaseNotes(props: ReleaseNotesProps): JSX.Element {
   )
 }
 
-function ExternalLink(props: JSX.IntrinsicAttributes): JSX.Element {
+function ExternalLink(props: JSX.IntrinsicAttributes): ReactNode {
   return <a {...props} target="_blank" rel="noopener noreferrer" />
 }
 
-function ParagraphText(props: JSX.IntrinsicAttributes): JSX.Element {
+function ParagraphText(props: JSX.IntrinsicAttributes): ReactNode {
   return <LegacyStyledText {...props} forwardedAs="p" />
 }
 
-function HeaderText(props: JSX.IntrinsicAttributes): JSX.Element {
+function HeaderText(props: JSX.IntrinsicAttributes): ReactNode {
   return <LegacyStyledText {...props} forwardedAs="h3" />
 }
 
-function ListItemText(props: JSX.IntrinsicAttributes): JSX.Element {
+function ListItemText(props: JSX.IntrinsicAttributes): ReactNode {
   return <LegacyStyledText {...props} forwardedAs="li" />
 }
 
-function UnnumberedListText(props: JSX.IntrinsicAttributes): JSX.Element {
+function UnnumberedListText(props: JSX.IntrinsicAttributes): ReactNode {
   return <LegacyStyledText {...props} forwardedAs="ul" />
 }
 
-function HorizontalRule(): JSX.Element {
+function HorizontalRule(): ReactNode {
   return (
     <Box
       borderBottom={`1px solid ${COLORS.grey30}`}

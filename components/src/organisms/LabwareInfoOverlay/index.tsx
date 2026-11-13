@@ -9,6 +9,7 @@ import { Icon } from '../../icons'
 import { DIRECTION_COLUMN, DISPLAY_FLEX, JUSTIFY_FLEX_END } from '../../styles'
 import styles from './labwareinfooverlay.module.css'
 
+import type { ReactNode } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
 interface LabwareInfoProps {
@@ -48,7 +49,7 @@ interface LabwareInfoOverlayProps {
 }
 export const LabwareInfoOverlay = (
   props: LabwareInfoOverlayProps
-): JSX.Element => {
+): ReactNode => {
   const {
     definition,
     labwareId,

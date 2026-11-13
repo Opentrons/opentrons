@@ -27,7 +27,7 @@ import { removeOpentronsPhrases } from '/protocol-designer/utils'
 import { useKitchen } from '../Kitchen/useKitchen'
 
 import type { ThunkDispatch } from 'redux-thunk'
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 import type { BaseState } from '/protocol-designer/types'
 
@@ -44,7 +44,7 @@ interface SelectPipetteTipsProps {
 
 const MAX_TIPRACKS_ALLOWED = 3
 
-export function SelectPipetteTips(props: SelectPipetteTipsProps): JSX.Element {
+export function SelectPipetteTips(props: SelectPipetteTipsProps): ReactNode {
   const {
     robotType,
     tiprackOptions,

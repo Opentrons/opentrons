@@ -22,11 +22,12 @@ import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import { WelcomeModal } from './WelcomeModal'
 
+import type { ReactNode } from 'react'
 import type { RunData } from '@opentrons/api-client'
 
 export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8
 
-export function RobotDashboard(): JSX.Element {
+export function RobotDashboard(): ReactNode {
   const { t } = useTranslation('device_details')
   const { data: allRunsQueryData, error: allRunsQueryError } =
     useNotifyAllRunsQuery()

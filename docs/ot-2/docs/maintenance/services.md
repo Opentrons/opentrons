@@ -11,7 +11,6 @@ Opentrons offers two levels of service, Opentrons Care and Opentrons Care Plus, 
 
 In addition, Opentrons Care Plus includes on-site visits for:
 
-- Installation.
 - Yearly preventative maintenance.
 - Repairs, as needed.
 

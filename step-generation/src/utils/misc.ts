@@ -51,13 +51,16 @@ import {
   FAKE_HOPPER_LOCATION_MAP,
   HOPPER_FAKE_LOCATIONS,
   HOPPER_STACKER_LOCATION,
+  MAX_STACKABLE_VACUUM_SPACERS,
   STAGING_AREA_SLOTS,
+  VACUUM_DOCK_DISPLAY_LOCATION,
   VACUUM_DOCK_LOCATION,
   VACUUM_SPACER_LOAD_NAMES,
   ZERO_OFFSET,
 } from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
 import { OFF_DECK, reduceCommandCreators, uuid } from './index'
+import { formatPyStr } from './pythonFormat'
 
 import type {
   ActiveNozzleNumber,
@@ -91,6 +94,7 @@ import type {
   PathOption,
   PipetteEntity,
   RobotState,
+  RuntimeParameters,
   SourceAndDest,
   StagingAreaEntities,
   TrashBinEntities,
@@ -105,6 +109,77 @@ export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
 
 export function getIsVacuumSpacer(def: LabwareDefinition2): boolean {
   return VACUUM_SPACER_LOAD_NAMES.includes(def.parameters.loadName)
+}
+
+export function getIsStackableVacuumSpacer(def: LabwareDefinition2): boolean {
+  return (def.parameters.quirks ?? []).includes('vacuumSpacer')
+}
+
+export function getIsVacuumSpacerSeat(def: LabwareDefinition2): boolean {
+  return (def.parameters.quirks ?? []).includes('vacuumSpacerSeat')
+}
+
+export const getStackableVacuumSpacerLoadNamesInStack = (
+  stack: string[],
+  labwareById: Record<string, { def: LabwareDefinition2 }>
+): string[] => {
+  return stack
+    .filter(
+      id => id in labwareById && getIsStackableVacuumSpacer(labwareById[id].def)
+    )
+    .map(id => labwareById[id].def.parameters.loadName)
+}
+
+export const getCanPlaceStackableVacuumSpacer = (
+  movingDef: LabwareDefinition2,
+  stack: string[],
+  labwareById: Record<string, { def: LabwareDefinition2 }>
+): { isCompatible: boolean; isAboveStackLimit: boolean } => {
+  if (!getIsStackableVacuumSpacer(movingDef)) {
+    return { isCompatible: false, isAboveStackLimit: false }
+  }
+
+  if (stack.length === 0) {
+    return { isCompatible: true, isAboveStackLimit: false }
+  }
+
+  const spacerLoadNames = getStackableVacuumSpacerLoadNamesInStack(
+    stack,
+    labwareById
+  )
+
+  const topLabwareId = getTopLocationInStack(stack)
+  if (!(topLabwareId in labwareById)) {
+    return { isCompatible: true, isAboveStackLimit: false }
+  }
+
+  const topLabwareDef = labwareById[topLabwareId].def
+  if (
+    !getIsStackableVacuumSpacer(topLabwareDef) ||
+    getIsVacuumSpacerSeat(topLabwareDef)
+  ) {
+    return { isCompatible: false, isAboveStackLimit: false }
+  }
+
+  const movingLoadName = movingDef.parameters.loadName
+  const topLoadName = topLabwareDef.parameters.loadName
+  const alreadyPresent = spacerLoadNames.includes(movingLoadName)
+  const isExceedingMax = spacerLoadNames.length >= MAX_STACKABLE_VACUUM_SPACERS
+  const isCompatibleParent =
+    movingDef.compatibleParentLabware?.includes(topLoadName) ?? false
+  const hasStackingOffset =
+    topLoadName in (movingDef.stackingOffsetWithLabware ?? {})
+  const listedOnParent = isCompatibleParent || hasStackingOffset
+  const isStackLimited = alreadyPresent || isExceedingMax
+
+  return {
+    isCompatible: listedOnParent && !isStackLimited,
+    isAboveStackLimit: isStackLimited,
+  }
+}
+
+const getIsVacuumCollar = (def: LabwareDefinition2): boolean => {
+  return (def.parameters.quirks ?? []).includes('vacuumModuleDock')
 }
 
 type trashOrLabware = 'wasteChute' | 'trashBin' | 'labware' | null
@@ -913,6 +988,13 @@ export const getSlotInLocationStack = (
   }
 }
 
+export const getModuleLocationSlot = (moduleSlot: string): string => {
+  if (moduleSlot === VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA) {
+    return VACUUM_DOCK_DISPLAY_LOCATION
+  }
+  return moduleSlot
+}
+
 export const getTopLocationInStack = (stack?: string[]): string => {
   if (stack == null) {
     console.error('expected to find stack but could not')
@@ -1106,43 +1188,65 @@ export const getIsLabwareCompatibleWithStack = (
     const isLidRole = allowedRoles.includes('lid')
 
     const isVacuumSpacer = getIsVacuumSpacer(topLabwareEntity.def)
+    const isOccupiedByCollar = stack.some(
+      entityId =>
+        entityId in labwareEntities &&
+        getIsVacuumCollar(labwareEntities[entityId].def)
+    )
     const movingLabwareIsCollar =
       movingLabwareEntity.def.parameters.quirks?.includes('vacuumModuleDock') ??
       false
-
-    isCompatible =
-      // filter plates can go on any non-lid, non-tiprack, non-filter-plate labware
-      ((movingLabwareEntity.def.parameters.quirks?.includes('filterPlate') ??
-        false) &&
+    const movingIsStackableVacuumSpacer = getIsStackableVacuumSpacer(
+      movingLabwareEntity.def
+    )
+    const vacuumSpacerPlacement = movingIsStackableVacuumSpacer
+      ? getCanPlaceStackableVacuumSpacer(
+          movingLabwareEntity.def,
+          stack,
+          labwareEntities
+        )
+      : null
+    if (vacuumSpacerPlacement != null) {
+      isAboveStackLimit = vacuumSpacerPlacement.isAboveStackLimit
+      isCompatible = vacuumSpacerPlacement.isCompatible
+    } else {
+      const movingDef = movingLabwareEntity.def
+      const topDef = topLabwareEntity.def
+      const isMovingFilterPlate =
+        movingDef.parameters.quirks?.includes('filterPlate') ?? false
+      const isTopFilterPlate =
+        topDef.parameters.quirks?.includes('filterPlate') ?? false
+      const providesStackingDefault =
+        topDef.parameters.quirks?.includes('providesStackingDefault') ?? false
+      const canPlaceFilterPlate =
+        isMovingFilterPlate &&
         !isLidRole &&
         !isLabwareOnSlotTiprack &&
-        !(
-          topLabwareEntity.def.parameters.quirks?.includes('filterPlate') ??
-          false
-        )) ||
-      // vacuum spacer: same rules as the main module area — only collars and filter plates
-      (isVacuumSpacer && movingLabwareIsCollar) ||
-      // any labware can go onto an adapter that provides a stacking default (spacers excluded above)
-      ((topLabwareEntity.def.parameters.quirks?.includes(
-        'providesStackingDefault'
-      ) ??
-        false) &&
-        !isVacuumSpacer) ||
-      // check compatible labware key
-      movingLabwareEntity.def.compatibleParentLabware?.some(
-        loadName => loadName === loadNameToCheck
-      ) ||
-      // check stacking offset map for legacy compatibility
-      Object.keys(movingLabwareEntity.def.stackingOffsetWithLabware ?? {}).some(
-        lw => lw === loadNameToCheck
-      ) ||
-      (isUniversalLid &&
+        !isTopFilterPlate
+      const canPlaceCollar = !isOccupiedByCollar && movingLabwareIsCollar
+      const canPlaceOnStackingDefault =
+        providesStackingDefault && !isVacuumSpacer
+      const isCompatibleByParentKey =
+        movingDef.compatibleParentLabware?.includes(loadNameToCheck) ?? false
+      const hasStackingOffset =
+        loadNameToCheck in (movingDef.stackingOffsetWithLabware ?? {})
+      const isToughUniversalLid =
+        topDef.parameters.loadName === 'opentrons_tough_universal_lid'
+      const canPlaceUniversalLid =
+        isUniversalLid &&
         !isLabwareOnSlotTuberack &&
         !isLabwareOnSlotAluminumBlock &&
         !isLabwareOnSlotTiprack &&
-        (topLabwareEntity.def.parameters.loadName ===
-          'opentrons_tough_universal_lid' ||
-          !isLidRole))
+        (isToughUniversalLid || !isLidRole)
+
+      isCompatible =
+        canPlaceFilterPlate ||
+        canPlaceCollar ||
+        canPlaceOnStackingDefault ||
+        isCompatibleByParentKey ||
+        hasStackingOffset ||
+        canPlaceUniversalLid
+    }
 
     // check compatibility with module
   } else if (topIdInStack in moduleEntities) {
@@ -1657,4 +1761,146 @@ export const getIsInPipettableLocation = (location: string): boolean => {
     GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
     ...COLUMN_4_SLOTS,
   ].some(badLocation => location === badLocation)
+}
+
+/**
+ * Numbers pass through. Strings are runtime parameter variable names, and only
+ * float/int parameters resolve — `type` narrows `default` to `number`.
+ */
+export function resolveNumericRuntimeValue(
+  value: number | string,
+  runtimeParameters: RuntimeParameters
+): number | null {
+  if (typeof value === 'number') {
+    return value
+  }
+
+  const parameter = runtimeParameters[value]
+  if (
+    parameter != null &&
+    (parameter.type === 'float' || parameter.type === 'int')
+  ) {
+    return parameter.default
+  }
+
+  return null
+}
+
+/**
+ * A string id is literal unless it names a runtime parameter. Only string
+ * parameters resolve — `type` narrows `default` to `string`. Any other
+ * parameter type is invalid.
+ */
+export function resolveStringRuntimeValue(
+  value: string,
+  runtimeParameters: RuntimeParameters
+): string | null {
+  const parameter = runtimeParameters[value]
+  if (parameter == null) {
+    return value
+  }
+  if (parameter.type === 'string') {
+    return parameter.default
+  }
+
+  return null
+}
+
+/**
+ * Booleans pass through. Strings are runtime parameter variable names, and only
+ * boolean parameters resolve — `type` narrows `default` to `boolean`.
+ */
+export function resolveBooleanRuntimeValue(
+  value: boolean | string,
+  runtimeParameters: RuntimeParameters
+): boolean | null {
+  if (typeof value === 'boolean') {
+    return value
+  }
+
+  const parameter = runtimeParameters[value]
+  if (parameter != null && parameter.type === 'boolean') {
+    return parameter.default
+  }
+
+  return null
+}
+
+export function resolveAllowedRuntimeValue(
+  value: string,
+  allowed: readonly string[],
+  runtimeParameters: RuntimeParameters
+): string | null {
+  const resolved = resolveStringRuntimeValue(value, runtimeParameters)
+  if (resolved == null || !allowed.includes(resolved)) {
+    return null
+  }
+  return resolved
+}
+
+export function pythonRuntimeString(
+  raw: string,
+  resolved: string,
+  runtimeParameters: RuntimeParameters
+): string {
+  if (runtimeParameters[raw] != null) {
+    return raw
+  }
+  return formatPyStr(resolved)
+}
+
+export function resolveRuntimeWellLocation(
+  location:
+    | {
+        origin?: string
+        offset?: {
+          x?: number | string
+          y?: number | string
+          z?: number | string
+        }
+      }
+    | undefined,
+  runtimeParameters: RuntimeParameters
+): {
+  location:
+    | {
+        origin?: string
+        offset?: { x?: number; y?: number; z?: number }
+      }
+    | undefined
+  invalidParameterNames: string[]
+} {
+  if (location == null) {
+    return { location: undefined, invalidParameterNames: [] }
+  }
+  const invalidParameterNames: string[] = []
+  const resolvedOrigin =
+    location.origin == null
+      ? undefined
+      : resolveStringRuntimeValue(location.origin, runtimeParameters)
+  if (location.origin != null && resolvedOrigin == null) {
+    invalidParameterNames.push(location.origin)
+  }
+  const offset: { x?: number; y?: number; z?: number } = {}
+  if (location.offset != null) {
+    for (const axis of ['x', 'y', 'z'] as const) {
+      const value = location.offset[axis]
+      if (value == null) {
+        continue
+      }
+      const resolved = resolveNumericRuntimeValue(value, runtimeParameters)
+      if (resolved == null) {
+        invalidParameterNames.push(String(value))
+      } else {
+        offset[axis] = resolved
+      }
+    }
+  }
+  return {
+    location: {
+      ...(resolvedOrigin != null ? { origin: resolvedOrigin } : {}),
+      ...(location.offset != null ? { offset } : {}),
+    },
+    invalidParameterNames,
+  }
 }

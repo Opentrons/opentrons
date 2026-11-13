@@ -8,7 +8,7 @@ import {
 import { getAllWellContentsAtFrame } from '../utils/getAllWellContentsAtFrame'
 import { getMissingTips } from '../utils/getMissingTips'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
 import type { LabwareDefinition2, Liquid } from '@opentrons/shared-data'
 import type { RobotState } from '@opentrons/step-generation'
@@ -24,7 +24,7 @@ interface LabwareOnDeckProps {
   setHoveredSlot: Dispatch<SetStateAction<string | null>>
 }
 
-export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
+export function LabwareOnDeck(props: LabwareOnDeckProps): ReactNode {
   const {
     labwareDef,
     labwareId,

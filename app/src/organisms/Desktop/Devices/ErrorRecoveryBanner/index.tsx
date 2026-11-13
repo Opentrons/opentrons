@@ -12,6 +12,7 @@ import {
 import { getUserId } from '/app/redux/config'
 import { useClientDataRecovery } from '/app/resources/client_data'
 
+import type { ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
 import type { RecoveryIntent } from '/app/resources/client_data'
 
@@ -41,7 +42,7 @@ export interface ErrorRecoveryBannerProps extends StyleProps {
 export function ErrorRecoveryBanner({
   recoveryIntent,
   ...styleProps
-}: ErrorRecoveryBannerProps): JSX.Element {
+}: ErrorRecoveryBannerProps): ReactNode {
   const { t } = useTranslation(['error_recovery', 'shared'])
 
   const buildTitleText = (): string => {

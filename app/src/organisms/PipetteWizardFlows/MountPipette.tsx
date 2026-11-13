@@ -4,9 +4,9 @@ import {
   Banner,
   Flex,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SIZE_1,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import {
   SINGLE_MOUNT_PIPETTES,
@@ -17,7 +17,7 @@ import { Skeleton } from '/app/atoms/Skeleton'
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
 import { CheckPipetteButton } from './CheckPipetteButton'
-import { BODY_STYLE, SECTIONS } from './constants'
+import { SECTIONS } from './constants'
 import { getPipetteAnimations, getPipetteAnimations96 } from './utils'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
@@ -29,7 +29,7 @@ interface MountPipetteProps extends PipetteWizardStepProps {
 }
 const BACKGROUND_SIZE = '47rem'
 
-export const MountPipette = (props: MountPipetteProps): JSX.Element => {
+export const MountPipette = (props: MountPipetteProps): ReactNode => {
   const {
     proceed,
     goBack,
@@ -64,11 +64,14 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
   } else {
     bodyText = (
       <>
-        <LegacyStyledText css={BODY_STYLE}>
+        <StyledText
+          desktopStyle="bodyDefaultRegular"
+          oddStyle="bodyTextRegular"
+        >
           {isSingleMountPipette
             ? t('align_the_connector')
             : t('hold_pipette_carefully')}
-        </LegacyStyledText>
+        </StyledText>
         {!isSingleMountPipette ? (
           <Banner
             type="warning"
@@ -92,14 +95,19 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
             backgroundSize={BACKGROUND_SIZE}
           />
         ) : (
-          i18n.format(
-            t(
-              isSingleMountPipette
-                ? 'connect_and_secure_pipette'
-                : 'connect_96_channel'
-            ),
-            'capitalize'
-          )
+          <StyledText
+            desktopStyle="headingSmallBold"
+            oddStyle="level4HeaderSemiBold"
+          >
+            {i18n.format(
+              t(
+                isSingleMountPipette
+                  ? 'connect_and_secure_pipette'
+                  : 'connect_96_channel'
+              ),
+              'capitalize'
+            )}
+          </StyledText>
         )
       }
       rightHandBody={

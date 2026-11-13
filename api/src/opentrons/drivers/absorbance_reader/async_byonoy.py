@@ -14,13 +14,13 @@ from .hid_protocol import (
     MeasurementConfig,
     SlotStateNames,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import (
     ABSMeasurementMode,
     AbsorbanceReaderDeviceState,
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderPlatePresence,
 )
+from opentrons.drivers.usb.types import USBPort
 from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnectedError
 
 SN_PARSER = re.compile(r'ATTRS{serial}=="(?P<serial>.+?)"')

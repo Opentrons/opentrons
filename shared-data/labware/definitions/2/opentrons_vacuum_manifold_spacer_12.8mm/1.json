@@ -1,0 +1,83 @@
+{
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": []
+  },
+  "wells": {},
+  "groups": [
+    {
+      "wells": [],
+      "metadata": {}
+    }
+  ],
+  "version": 1,
+  "metadata": {
+    "tags": [],
+    "displayName": "Opentrons Vacuum Manifold Spacer 12.8 mm",
+    "displayCategory": "adapter",
+    "displayVolumeUnits": "µL"
+  },
+  "ordering": [],
+  "namespace": "opentrons",
+  "dimensions": {
+    "xDimension": 128.0,
+    "yDimension": 86.0,
+    "zDimension": 18.3
+  },
+  "parameters": {
+    "format": "96Standard",
+    "quirks": [
+      "providesStackingDefault",
+      "gripperIncompatible",
+      "vacuumSpacer",
+      "vacuumSpacerSeat"
+    ],
+    "isTiprack": false,
+    "isDeckSlotCompatible": false,
+    "isMagneticModuleCompatible": false,
+    "isMovableAdapter": false,
+    "loadName": "opentrons_vacuum_manifold_spacer_12.8mm"
+  },
+  "stackLimit": 1,
+  "allowedRoles": ["adapter"],
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  },
+  "compatibleParentLabware": [
+    "opentrons_vacuum_manifold_spacer_3.2mm",
+    "opentrons_vacuum_manifold_spacer_5.2mm",
+    "opentrons_vacuum_manifold_spacer_7.25mm"
+  ],
+  "stackingOffsetWithLabware": {
+    "default": {
+      "x": 0,
+      "y": 0,
+      "z": 5.5
+    },
+    "opentrons_vacuum_manifold_spacer_3.2mm": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "opentrons_vacuum_manifold_spacer_5.2mm": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "opentrons_vacuum_manifold_spacer_7.25mm": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "stackingOffsetWithModule": {
+    "vacuumModuleV1": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  }
+}

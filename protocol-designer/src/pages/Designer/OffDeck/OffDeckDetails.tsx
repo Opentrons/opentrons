@@ -36,6 +36,7 @@ import { SlotOverflowMenu } from '../DeckSetup/SlotOverflowMenu'
 import { HighlightOffDeckSlot } from './HighlightOffDeckSlot'
 import { OffDeckControls } from './OffDeckControls'
 
+import type { ReactNode } from 'react'
 import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'
 import type { DeckSetupTerminalIdType } from '../types'
 
@@ -45,7 +46,7 @@ const ZERO_SLOT_POSITION: CoordinateTuple = [0, 0, 0]
 interface OffDeckDetailsProps extends DeckSetupTerminalIdType {
   addLabware: (id: string | null) => void
 }
-export function OffDeckDetails(props: OffDeckDetailsProps): JSX.Element {
+export function OffDeckDetails(props: OffDeckDetailsProps): ReactNode {
   const { addLabware, terminalItemId } = props
   const { t, i18n } = useTranslation('starting_deck_state')
   const [hoverSlot, setHoverSlot] = useState<DeckSlotId | null>(null)

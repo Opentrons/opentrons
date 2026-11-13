@@ -26,6 +26,7 @@ import {
 } from './utils'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,
@@ -44,7 +45,7 @@ interface PipetteNozzleSelectorProps {
 
 export function PipetteNozzleSelector(
   props: PipetteNozzleSelectorProps
-): JSX.Element {
+): ReactNode {
   const { pipetteSpecs, propsForFields, robotType } = props
   const { channels, displayName } = pipetteSpecs
   const { t } = useTranslation('protocol_steps')

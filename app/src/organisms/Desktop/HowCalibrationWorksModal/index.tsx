@@ -21,6 +21,8 @@ import RobotCalHelpImage from '/app/assets/images/robot_calibration_help.png'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { Divider } from '/app/atoms/structure'
 
+import type { ReactNode } from 'react'
+
 const ROBOT_CAL_HELP_ARTICLE =
   'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
 interface HowCalibrationWorksModalProps {
@@ -29,7 +31,7 @@ interface HowCalibrationWorksModalProps {
 
 export function HowCalibrationWorksModal({
   onCloseClick,
-}: HowCalibrationWorksModalProps): JSX.Element {
+}: HowCalibrationWorksModalProps): ReactNode {
   const { t } = useTranslation(['protocol_setup', 'shared'])
   return createPortal(
     <Modal
@@ -123,7 +125,7 @@ interface CalibrationStepsProps {
 function CalibrationSteps({
   description,
   steps,
-}: CalibrationStepsProps): JSX.Element {
+}: CalibrationStepsProps): ReactNode {
   return (
     <Box marginTop={SPACING.spacing4}>
       <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing8}>

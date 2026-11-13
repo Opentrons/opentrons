@@ -8,7 +8,6 @@ from ..execution_manager import ExecutionManager
 from . import mod_abc, types, update
 from opentrons.config import IS_ROBOT
 from opentrons.drivers.asyncio.communication.errors import UnhandledGcode
-from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.thermocycler import (
     DEFAULT_COMMAND_RETRIES,
     AbstractThermocyclerDriver,
@@ -17,6 +16,7 @@ from opentrons.drivers.thermocycler import (
     ThermocyclerDriverV2,
 )
 from opentrons.drivers.types import PlateTemperature, Temperature, ThermocyclerLidStatus
+from opentrons.drivers.usb.types import USBPort
 from opentrons.hardware_control.modules.lid_temp_status import LidTemperatureStatus
 from opentrons.hardware_control.modules.plate_temp_status import PlateTemperatureStatus
 from opentrons.hardware_control.modules.retry import retry_module_init

@@ -5,30 +5,26 @@ import { COLORS, StyledText } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
-import { DEFAULT_MIN_PASSWORD_LENGTH } from '/app/resources/auth'
 import {
+  DEFAULT_MIN_PASSWORD_LENGTH,
+  DEFAULT_PASSWORD_COMPLEXITY_DISABLED_SETTINGS,
+  DEFAULT_PASSWORD_COMPLEXITY_SETTINGS,
+  hasPasswordComplexityIncreased,
   isValidPasswordComplexityMinimumLength,
   MAX_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
-} from '/app/resources/auth/helpers'
+  MIN_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
+  settingsAreEqual,
+} from '/app/resources/auth'
 
 import { ChildNavigation } from '../../ChildNavigation'
 import styles from './compliance_ready_settings.module.css'
-import {
-  DEFAULT_PASSWORD_COMPLEXITY_DISABLED_SETTINGS,
-  DEFAULT_PASSWORD_COMPLEXITY_SETTINGS,
-  MIN_PASSWORD_COMPLEXITY_MINIMUM_LENGTH,
-} from './constants'
 import { NumericSettingPage } from './NumericSettingPage'
 import { SettingsListButton } from './SettingsListButton'
 import { ToggleSetting } from './ToggleSetting'
 
 import type { ReactNode } from 'react'
 import type { AuthSettingsData } from '@opentrons/api-client'
-
-type PasswordComplexitySettings = Pick<
-  AuthSettingsData,
-  'passwordComplexityMinimumLength' | 'passwordComplexitySpecialCharacters'
->
+import type { PasswordComplexitySettings } from '/app/resources/auth'
 
 export function PasswordComplexity({
   onClickBack,
@@ -217,33 +213,5 @@ export function PasswordComplexity({
         </div>
       </div>
     </>
-  )
-}
-
-function hasPasswordComplexityIncreased(
-  oldSettings: PasswordComplexitySettings,
-  newSettings: PasswordComplexitySettings
-): boolean {
-  const settingsEqual = settingsAreEqual(oldSettings, newSettings)
-  const newSettingsEnabled =
-    (!oldSettings.passwordComplexityMinimumLength &&
-      !!newSettings.passwordComplexityMinimumLength) ||
-    (!oldSettings.passwordComplexitySpecialCharacters &&
-      !!newSettings.passwordComplexitySpecialCharacters)
-  const lengthIncreased =
-    (oldSettings.passwordComplexityMinimumLength ?? 0) <
-    (newSettings.passwordComplexityMinimumLength ?? 0)
-  return !settingsEqual && (newSettingsEnabled || lengthIncreased)
-}
-
-function settingsAreEqual(
-  oldSettings: PasswordComplexitySettings,
-  newSettings: PasswordComplexitySettings
-): boolean {
-  return (
-    oldSettings.passwordComplexityMinimumLength ===
-      newSettings.passwordComplexityMinimumLength &&
-    oldSettings.passwordComplexitySpecialCharacters ===
-      newSettings.passwordComplexitySpecialCharacters
   )
 }

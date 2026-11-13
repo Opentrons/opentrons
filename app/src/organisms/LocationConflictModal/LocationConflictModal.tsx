@@ -54,6 +54,7 @@ import { ChooseModuleToConfigureModal } from './ChooseModuleToConfigureModal'
 import { patchDeckConfigForRequiredFixture } from './patchDeckConfigForRequiredFixture'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type {
   CutoutConfig,
   CutoutFixtureId,
@@ -75,7 +76,7 @@ interface LocationConflictModalProps {
 
 export const LocationConflictModal = (
   props: LocationConflictModalProps
-): JSX.Element => {
+): ReactNode => {
   const {
     onCloseClick,
     cutoutId,

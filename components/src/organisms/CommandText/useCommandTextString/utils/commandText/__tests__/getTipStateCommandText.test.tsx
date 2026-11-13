@@ -7,6 +7,8 @@ import { renderWithProviders } from '../../../../../../testing/utils'
 import { getLabwareName } from '../../getLabwareName'
 import { getTipStateCommandText } from '../getTipStateCommandText'
 
+import type { ReactNode } from 'react'
+
 vi.mock('@opentrons/shared-data')
 vi.mock('../../getLabwareName')
 
@@ -21,7 +23,7 @@ const baseCommandData = {
   },
 } as any
 
-function TestWrapper({ command }: { command: any }): JSX.Element {
+function TestWrapper({ command }: { command: any }): ReactNode {
   const { t } = useTranslation('protocol_command_text')
   const text = getTipStateCommandText({
     command,

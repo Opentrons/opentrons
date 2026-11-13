@@ -5,7 +5,7 @@ from datetime import datetime
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons.hardware_control import API
+from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import EstopState, EstopStateNotification
 from opentrons.protocol_engine import (
     StateSummary,
@@ -36,13 +36,13 @@ async def subject(decoy: Decoy) -> MaintenanceRunOrchestratorStore:
     """Get a MaintenanceRunOrchestratorStore test subject."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    hardware_api = decoy.mock(cls=API)
+    hardware_api = decoy.mock(cls=OT3API)
     return MaintenanceRunOrchestratorStore(
         hardware_api=hardware_api,
         # Arbitrary choice of robot and deck type. Tests where these matter should
         # construct their own MaintenanceRunOrchestratorStore.
-        robot_type="OT-2 Standard",
-        deck_type=pe_types.DeckType.OT2_SHORT_TRASH,
+        robot_type="OT-3 Standard",
+        deck_type=pe_types.DeckType.OT3_STANDARD,
     )
 
 
@@ -67,15 +67,15 @@ def test_run_created_at_raises(subject: MaintenanceRunOrchestratorStore) -> None
         subject.current_run_created_at
 
 
-@pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
 @pytest.mark.parametrize("deck_type", pe_types.DeckType)
 async def test_create_engine_uses_robot_and_deck_type(
-    decoy: Decoy, robot_type: RobotType, deck_type: pe_types.DeckType
+    decoy: Decoy, deck_type: pe_types.DeckType
 ) -> None:
     """It should create ProtocolEngines with the given robot and deck type."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    hardware_api = decoy.mock(cls=API)
+    robot_type: RobotType = "OT-3 Standard"
+    hardware_api = decoy.mock(cls=OT3API)
     subject = MaintenanceRunOrchestratorStore(
         hardware_api=hardware_api,
         robot_type=robot_type,
@@ -99,7 +99,7 @@ async def test_create_engine_with_labware_offsets(
     """It should create an engine for a run with labware offsets."""
     labware_offset = pe_types.LegacyLabwareOffsetCreate(
         definitionUri="namespace/load_name/version",
-        location=pe_types.LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_5),
+        location=pe_types.LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_C2),
         vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
     )
 
@@ -115,10 +115,12 @@ async def test_create_engine_with_labware_offsets(
             id=matchers.IsA(str),
             createdAt=matchers.IsA(datetime),
             definitionUri="namespace/load_name/version",
-            location=pe_types.LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_5),
+            location=pe_types.LegacyLabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_C2
+            ),
             locationSequence=[
                 pe_types.OnAddressableAreaOffsetLocationSequenceComponent(
-                    addressableAreaName="5"
+                    addressableAreaName="C2"
                 )
             ],
             vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),

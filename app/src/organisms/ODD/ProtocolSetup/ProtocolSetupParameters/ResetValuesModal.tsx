@@ -13,6 +13,7 @@ import {
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 
+import type { ReactNode } from 'react'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
@@ -26,7 +27,7 @@ export function ResetValuesModal({
   runTimeParametersOverrides,
   setRunTimeParametersOverrides,
   handleGoBack,
-}: ResetValuesModalProps): JSX.Element {
+}: ResetValuesModalProps): ReactNode {
   const { t } = useTranslation(['protocol_setup', 'shared'])
 
   const modalHeader: OddModalHeaderBaseProps = {

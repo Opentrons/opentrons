@@ -10,6 +10,8 @@ import {
   Tag,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 interface StepFormStatusProps {
   label: string
   value: string
@@ -21,7 +23,7 @@ interface StepFormStatusProps {
  *
  * For proper DOM hierarchy, must be nested within a `StepFormStatusList.`
  */
-export function StepFormStatus(props: StepFormStatusProps): JSX.Element {
+export function StepFormStatus(props: StepFormStatusProps): ReactNode {
   const { label, value } = props
   return (
     <Flex

@@ -25,7 +25,7 @@ export interface PillProps {
 /**
  * Colored Pill containing text or other contents
  */
-export function Pill(props: PillProps): JSX.Element {
+export function Pill(props: PillProps): ReactNode {
   const className = cx(styles.pill, props.className, {
     [styles.invert_text]: props.invertTextColor,
   })

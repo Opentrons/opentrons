@@ -18,6 +18,7 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 import { InterventionModal } from '/app/molecules/InterventionModal'
 import { useIsFlex } from '/app/redux-resources/robots'
 
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 
 export interface IncompatibleModuleDesktopModalBodyProps {
@@ -28,7 +29,7 @@ export interface IncompatibleModuleDesktopModalBodyProps {
 export function IncompatibleModuleDesktopModalBody({
   modules,
   robotName,
-}: IncompatibleModuleDesktopModalBodyProps): JSX.Element {
+}: IncompatibleModuleDesktopModalBodyProps): ReactNode {
   const { t } = useTranslation('incompatible_modules')
   const isFlex = useIsFlex(robotName)
   const displayName = isFlex ? 'Flex' : 'OT-2'

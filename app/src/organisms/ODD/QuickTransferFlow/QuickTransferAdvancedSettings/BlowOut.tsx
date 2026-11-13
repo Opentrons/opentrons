@@ -32,16 +32,16 @@ import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { i18n } from '/app/i18n'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
+import { parseNumericalInput } from '/app/resources/utils/parseNumericalInput'
 
 import { ACTIONS } from '../constants'
 import { getMaxUiFlowRate, getPipetteName } from '../utils'
 import { getExtractTiprackTypeFromURI } from '../utils/getExtractTiprackTypeFromURI'
 
-import type { Dispatch } from 'react'
+import type { Dispatch, ReactNode } from 'react'
 import type {
   CutoutConfig,
   DeckConfiguration,
@@ -119,7 +119,7 @@ export const useBlowOutLocationOptions = (
   return blowOutLocationItems
 }
 
-export function BlowOut(props: BlowOutProps): JSX.Element {
+export function BlowOut(props: BlowOutProps): ReactNode {
   const { onBack, state, dispatch } = props
   const { t } = useTranslation('quick_transfer')
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()

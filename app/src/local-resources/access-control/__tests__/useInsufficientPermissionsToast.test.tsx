@@ -2,7 +2,7 @@ import { I18nextProvider } from 'react-i18next'
 import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { WARNING_TOAST } from '@opentrons/components'
+import { WARNING_TOAST, Z_INDEX } from '@opentrons/components'
 
 import { i18n } from '/app/i18n'
 // eslint-disable-next-line opentrons/no-imports-across-applications
@@ -49,7 +49,7 @@ describe('useInsufficientPermissionsToast', () => {
         closeButton: true,
         disableTimeout: true,
         heading: 'Additional permissions required',
-        zIndex: 10002,
+        zIndex: Z_INDEX.LOGIN_TOASTS,
       })
     )
   })

@@ -14,7 +14,7 @@ import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { StyledText } from '../StyledText'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { IconProps } from '../../icons'
 import type { StyleProps } from '../../primitives'
 
@@ -62,9 +62,7 @@ const INLINE_NOTIFICATION_PROPS_BY_TYPE: Record<
   },
 }
 
-export function InlineNotification(
-  props: InlineNotificationProps
-): JSX.Element {
+export function InlineNotification(props: InlineNotificationProps): ReactNode {
   const {
     heading,
     hug = false,

@@ -54,7 +54,7 @@ import {
 import { LabwareMapView } from './LabwareMapView'
 import { SetupLabwareStackView } from './SetupLabwareStackView'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { UseQueryResult } from 'react-query'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
 import type {
@@ -82,7 +82,7 @@ export function ProtocolSetupLabware({
   setSetupScreen,
   isConfirmed,
   setIsConfirmed,
-}: ProtocolSetupLabwareProps): JSX.Element {
+}: ProtocolSetupLabwareProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
   const [showMapView, setShowMapView] = useState<boolean>(true)
   const [selectedLabwareStack, setSelectedLabwareStack] = useState<
@@ -288,7 +288,7 @@ interface LabwareLatchProps {
 function LabwareLatch({
   matchedHeaterShaker,
   refetchModules,
-}: LabwareLatchProps): JSX.Element {
+}: LabwareLatchProps): ReactNode {
   const { t } = useTranslation(['heater_shaker', 'protocol_setup'])
   const documentationState = useDocumentationState()
   const { createLiveCommand, isLoading: isLiveCommandLoading } =

@@ -11,6 +11,7 @@ import {
 
 import { Command, CommandIndex } from '../Command'
 
+import type { ReactNode } from 'react'
 import type { CommandTextData } from '@opentrons/components'
 import type {
   LabwareDefinition,
@@ -68,7 +69,7 @@ const commandAndState = (
 
 export function CategorizedStepContent(
   props: CategorizedStepContentProps
-): JSX.Element {
+): ReactNode {
   const maxIndexLength = Math.max(
     ...[
       props.topCategoryCommand?.index ?? 0,

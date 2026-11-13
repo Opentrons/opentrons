@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getAuditInputPatch,
-  getAuthInputPatch,
   getFieldValuesFromSettings,
+  getInputPatch,
 } from '../complianceReadySettingsHelper'
 
 import type {
@@ -11,7 +11,6 @@ import type {
   AuthSettingsData,
   RobotServerAccessControlSettingsData,
 } from '@opentrons/api-client'
-import type { FieldValues } from '../complianceReadySettingsTypes'
 
 const AUTH_SETTINGS: AuthSettingsData = {
   maxNumberOfLoginAttempts: 5,
@@ -44,18 +43,36 @@ const BASE_FIELD_VALUES = getFieldValuesFromSettings(
 describe('getFieldValuesFromSettings', () => {
   it('should map auth settings to form field values', () => {
     expect(BASE_FIELD_VALUES).toMatchObject({
-      idleLogout: '3',
-      passwordResetTime: '90',
+      maxNumberOfLoginAttempts: 5,
+      idleLogout: 3,
+      passwordResetTime: 90,
+      passwordComplexityMinimumLength: 8,
       passwordResetEnabled: true,
       passwordComplexityEnabled: true,
     })
   })
 
-  it('should map idleLogout seconds to fractional minutes', () => {
+  it('should round idleLogout seconds to the nearest minute', () => {
     expect(
       getFieldValuesFromSettings({ ...AUTH_SETTINGS, idleLogout: 90 })
     ).toMatchObject({
-      idleLogout: '1.5',
+      idleLogout: 2,
+    })
+  })
+
+  it('should map missing numeric settings to null', () => {
+    expect(
+      getFieldValuesFromSettings({
+        ...AUTH_SETTINGS,
+        idleLogout: null,
+        passwordResetTime: null,
+        maxNumberOfLoginAttempts: null,
+      })
+    ).toMatchObject({
+      idleLogout: null,
+      passwordResetTime: null,
+      maxNumberOfLoginAttempts: null,
+      passwordResetEnabled: false,
     })
   })
 
@@ -75,133 +92,57 @@ describe('getFieldValuesFromSettings', () => {
   it('should map audit server settings to form field values', () => {
     expect(BASE_FIELD_VALUES).toMatchObject({
       requireReasonForInteraction: true,
-      minLengthOfReasonForInteraction: '10',
+      minLengthOfReasonForInteraction: 10,
     })
   })
 })
 
-describe('getAuthInputPatch', () => {
+describe('getInputPatch', () => {
   it('should patch maxNumberOfLoginAttempts input', () => {
-    expect(
-      getAuthInputPatch('maxNumberOfLoginAttempts', '3', BASE_FIELD_VALUES)
-    ).toEqual({ data: { maxNumberOfLoginAttempts: 3 } })
-  })
-
-  it('should not patch maxNumberOfLoginAttempts when value is invalid', () => {
-    expect(
-      getAuthInputPatch('maxNumberOfLoginAttempts', '0', BASE_FIELD_VALUES)
-    ).toBeNull()
-    expect(
-      getAuthInputPatch('maxNumberOfLoginAttempts', '6', BASE_FIELD_VALUES)
-    ).toBeNull()
-    expect(
-      getAuthInputPatch('maxNumberOfLoginAttempts', '3.5', BASE_FIELD_VALUES)
-    ).toBeNull()
+    expect(getInputPatch('maxNumberOfLoginAttempts', 3)).toEqual({
+      data: { maxNumberOfLoginAttempts: 3 },
+    })
   })
 
   it('should patch idleLogout input with minute conversion', () => {
-    expect(getAuthInputPatch('idleLogout', '5', BASE_FIELD_VALUES)).toEqual({
+    expect(getInputPatch('idleLogout', 5)).toEqual({
       data: { idleLogout: 300 },
     })
-    expect(getAuthInputPatch('idleLogout', '1.5', BASE_FIELD_VALUES)).toEqual({
-      data: { idleLogout: 90 },
-    })
-  })
-
-  it('should not patch idleLogout when value is not greater than zero', () => {
-    expect(getAuthInputPatch('idleLogout', '', BASE_FIELD_VALUES)).toBeNull()
-    expect(getAuthInputPatch('idleLogout', '0', BASE_FIELD_VALUES)).toBeNull()
-    expect(getAuthInputPatch('idleLogout', '-1', BASE_FIELD_VALUES)).toBeNull()
-    expect(getAuthInputPatch('idleLogout', 'abc', BASE_FIELD_VALUES)).toBeNull()
-  })
-
-  it('should return null when input value is empty', () => {
-    expect(
-      getAuthInputPatch('passwordResetTime', '', BASE_FIELD_VALUES)
-    ).toBeNull()
-  })
-
-  it('should not patch passwordResetTime when value is below the minimum', () => {
-    expect(
-      getAuthInputPatch('passwordResetTime', '0', BASE_FIELD_VALUES)
-    ).toBeNull()
-    expect(
-      getAuthInputPatch('passwordResetTime', '-1', BASE_FIELD_VALUES)
-    ).toBeNull()
-    expect(
-      getAuthInputPatch('passwordResetTime', '0.5', BASE_FIELD_VALUES)
-    ).toBeNull()
-    expect(
-      getAuthInputPatch('passwordResetTime', 'abc', BASE_FIELD_VALUES)
-    ).toBeNull()
   })
 
   it('should patch passwordResetTime with day conversion', () => {
-    expect(
-      getAuthInputPatch('passwordResetTime', '1', BASE_FIELD_VALUES)
-    ).toEqual({ data: { passwordResetTime: 1 * 24 * 60 * 60 } })
-    expect(
-      getAuthInputPatch('passwordResetTime', '30', BASE_FIELD_VALUES)
-    ).toEqual({ data: { passwordResetTime: 30 * 24 * 60 * 60 } })
-  })
-  it('should patch passwordComplexityMinimumLength when value is valid', () => {
-    expect(
-      getAuthInputPatch(
-        'passwordComplexityMinimumLength',
-        '12',
-        BASE_FIELD_VALUES
-      )
-    ).toEqual({ data: { passwordComplexityMinimumLength: 12 } })
-    expect(
-      getAuthInputPatch(
-        'passwordComplexityMinimumLength',
-        '256',
-        BASE_FIELD_VALUES
-      )
-    ).toEqual({ data: { passwordComplexityMinimumLength: 256 } })
+    expect(getInputPatch('passwordResetTime', 1)).toEqual({
+      data: { passwordResetTime: 1 * 24 * 60 * 60 },
+    })
+    expect(getInputPatch('passwordResetTime', 30)).toEqual({
+      data: { passwordResetTime: 30 * 24 * 60 * 60 },
+    })
   })
 
-  it('should not patch passwordComplexityMinimumLength when value is invalid', () => {
+  it('should patch passwordComplexityMinimumLength', () => {
+    expect(getInputPatch('passwordComplexityMinimumLength', 12)).toEqual({
+      data: { passwordComplexityMinimumLength: 12 },
+    })
+    expect(getInputPatch('passwordComplexityMinimumLength', 256)).toEqual({
+      data: { passwordComplexityMinimumLength: 256 },
+    })
+  })
+
+  it('should return null for settings that are not numeric inputs', () => {
     expect(
-      getAuthInputPatch(
-        'passwordComplexityMinimumLength',
-        '',
-        BASE_FIELD_VALUES
-      )
-    ).toBeNull()
-    expect(
-      getAuthInputPatch(
-        'passwordComplexityMinimumLength',
-        '0',
-        BASE_FIELD_VALUES
-      )
-    ).toBeNull()
-    expect(
-      getAuthInputPatch(
-        'passwordComplexityMinimumLength',
-        '257',
-        BASE_FIELD_VALUES
-      )
-    ).toBeNull()
-    expect(
-      getAuthInputPatch(
-        'passwordComplexityMinimumLength',
-        '8.5',
-        BASE_FIELD_VALUES
-      )
+      getInputPatch('requireAdminCredsWhenUpdatingRobotSoftware', 1)
     ).toBeNull()
   })
 })
 
 describe('getAuditInputPatch', () => {
-  it('should not patch minLengthOfReasonForInteraction when parent is off', () => {
-    const fieldValues: FieldValues = {
-      ...BASE_FIELD_VALUES,
-      requireReasonForInteraction: false,
-    }
+  it('should patch minLengthOfReasonForInteraction', () => {
+    expect(getAuditInputPatch('minLengthOfReasonForInteraction', 10)).toEqual({
+      data: { minLengthOfReasonForInteraction: 10 },
+    })
+  })
 
-    expect(
-      getAuditInputPatch('minLengthOfReasonForInteraction', '10', fieldValues)
-    ).toBeNull()
+  it('should return null for settings that are not numeric inputs', () => {
+    expect(getAuditInputPatch('requireReasonForInteraction', 10)).toBeNull()
   })
 })

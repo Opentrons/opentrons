@@ -21,6 +21,7 @@ import { SmallModalChildren } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { UseLongPressResult } from '@opentrons/components'
 import type { Dispatch } from '/app/redux/types'
 
@@ -36,7 +37,7 @@ export function LongPressModal({
   protocolId,
   setShowDeleteConfirmationModal,
   setTargetProtocolId,
-}: LongPressModalProps): JSX.Element {
+}: LongPressModalProps): ReactNode {
   const navigate = useNavigate()
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const { i18n, t } = useTranslation(['protocol_info', 'shared'])

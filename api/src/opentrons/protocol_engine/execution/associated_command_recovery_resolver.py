@@ -12,6 +12,7 @@ from ..errors import ErrorOccurrence
 from ..types import ModuleModel
 
 if TYPE_CHECKING:
+    from ..commands.command_unions import CommandCreate
     from ..resources import ModelUtils
     from ..state.state import StateView
 
@@ -44,4 +45,13 @@ class AssociatedCommandRecoveryResolver(Protocol):
         model_utils: ModelUtils,
     ) -> CommandDefinedErrorData | None:
         """Map the error to defined command error data for the associated command."""
+        ...
+
+    def create_retry(self, command: Command, *, task_id: str) -> CommandCreate | None:
+        """Return a new originating command request for a waitForTasks fixit.
+
+        The request must use ``task_id`` so the following waitForTasks can wait
+        on the new background task. Return None if this resolver does not own
+        ``command``.
+        """
         ...

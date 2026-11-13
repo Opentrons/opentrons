@@ -15,13 +15,15 @@ import { HandleEnter } from '/protocol-designer/components/atoms'
 
 import { getMainPagePortalEl } from '../Portal'
 
+import type { ReactNode } from 'react'
+
 interface ConfirmDeleteEntityInUseModalProps {
   onClose: () => void
   onConfirm: () => void
 }
 export function ConfirmDeleteEntityInUseModal(
   props: ConfirmDeleteEntityInUseModalProps
-): JSX.Element {
+): ReactNode {
   const { onClose, onConfirm } = props
   const { t } = useTranslation(['onboarding', 'shared'])
 

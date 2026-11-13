@@ -24,6 +24,7 @@ from typing import (
     Union,
 )
 
+from opentrons_shared_data.errors.exceptions import UnsupportedHardwareCommand
 from opentrons_shared_data.labware.labware_definition import (
     labware_definition_type_adapter,
 )
@@ -31,9 +32,6 @@ from opentrons_shared_data.robot.types import RobotType
 
 from .util import entrypoint_util
 from opentrons import __version__, protocol_api, should_use_ot3
-from opentrons.hardware_control import (
-    API as OT2API,
-)
 from opentrons.hardware_control import (
     ThreadManagedHardware,
     ThreadManager,
@@ -727,10 +725,7 @@ def _get_global_hardware_controller(robot_type: RobotType) -> ThreadManagedHardw
                 feature_flags=HardwareFeatureFlags.build_from_ff(),
             )
         else:
-            _THREAD_MANAGED_HW = ThreadManager(
-                OT2API.build_hardware_controller,
-                feature_flags=HardwareFeatureFlags.build_from_ff(),
-            )
+            raise UnsupportedHardwareCommand(message="execute is not supported on OT-2")
 
     return _THREAD_MANAGED_HW
 

@@ -8,6 +8,7 @@ import { RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 import { LegacyStyledText } from '../StyledText'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { ReactNode } from 'react'
 import type { IconName } from '../../icons'
 import type { StyleProps } from '../../primitives'
 
@@ -81,7 +82,7 @@ const CHIP_PROPS_BY_TYPE: Record<
   },
 }
 
-export function Chip(props: ChipProps): JSX.Element {
+export function Chip(props: ChipProps): ReactNode {
   const {
     background,
     iconName,

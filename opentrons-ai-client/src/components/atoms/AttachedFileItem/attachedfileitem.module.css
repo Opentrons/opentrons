@@ -59,7 +59,7 @@
 .file_extension {
   color: #000;
   font-family: 'Reddit Mono', monospace;
-  font-size: var(--font-size-p);
+  font-size: var(--font-size-13);
   font-style: normal;
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-20);
@@ -77,7 +77,7 @@
 
 .file_name {
   overflow: hidden;
-  font-size: var(--font-size-p);
+  font-size: var(--font-size-13);
   font-style: normal;
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-16);
@@ -86,7 +86,7 @@
 }
 
 .file_details {
-  font-size: var(--font-size-p);
+  font-size: var(--font-size-13);
   font-style: normal;
   font-weight: var(--font-weight-semi-bold);
   line-height: var(--line-height-16);

@@ -20,16 +20,11 @@ import {
 import FLEX_PNG from '/app/assets/images/FLEX.png'
 import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
 import { ToggleButton } from '/app/atoms/buttons'
-import {
-  useIsRobotBusy,
-  useIsRobotViewable,
-  useRobot,
-} from '/app/redux-resources/robots'
+import { useIsRobotViewable, useRobot } from '/app/redux-resources/robots'
 import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'
 import { useIsRobotOutOfStorage, useLights } from '/app/resources/devices'
 
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
-import { CalibrationStatusBanner } from './CalibrationStatusBanner'
 import {
   ErrorRecoveryBanner,
   useErrorRecoveryBanner,
@@ -58,8 +53,6 @@ export function RobotOverview({
   ])
 
   const { showRecoveryBanner, recoveryIntent } = useErrorRecoveryBanner()
-
-  const isRobotBusy = useIsRobotBusy({ poll: true })
 
   const robot = useRobot(robotName)
   const robotModel = useSelector((state: State) =>
@@ -173,9 +166,6 @@ export function RobotOverview({
           </Box>
         </Flex>
       </Flex>
-      {robotModel === 'OT-2' && !isRobotBusy && isRobotViewable ? (
-        <CalibrationStatusBanner robotName={robotName} />
-      ) : null}
     </>
   ) : null
 }

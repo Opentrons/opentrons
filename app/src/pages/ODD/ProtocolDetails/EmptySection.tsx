@@ -13,11 +13,13 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 interface EmptySectionProps {
   section: 'hardware' | 'labware' | 'liquids' | 'parameters'
 }
 
-export const EmptySection = (props: EmptySectionProps): JSX.Element => {
+export const EmptySection = (props: EmptySectionProps): ReactNode => {
   const { section } = props
   const { t, i18n } = useTranslation('protocol_details')
 

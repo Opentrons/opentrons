@@ -4,6 +4,7 @@ import { RobotInfoLabel } from '@opentrons/components'
 
 import styles from './tipdisposalslot.module.css'
 
+import type { ReactNode } from 'react'
 import type { RobotState } from '@opentrons/step-generation'
 
 interface TipDisposalSlotProps {
@@ -14,7 +15,7 @@ interface TipDisposalSlotProps {
 export function TipDisposalSlot({
   robotState,
   disposalType,
-}: TipDisposalSlotProps): JSX.Element {
+}: TipDisposalSlotProps): ReactNode {
   const { t } = useTranslation('protocol_visualization')
   // temporary commenting out for Rs 9.0.0
   // const totalEmptyTips = Object.values(tipState.tipracks).reduce(

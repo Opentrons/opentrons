@@ -24,7 +24,7 @@
 
 .chip_overlay {
   position: absolute;
-  z-index: 10;
+  z-index: var(--z-index-details);
   top: 16px;
   left: 16px;
 }

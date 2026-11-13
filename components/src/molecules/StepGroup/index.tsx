@@ -22,7 +22,7 @@ interface StepGroupProps {
   titleColor?: string
 }
 
-export function StepGroup(props: StepGroupProps): JSX.Element {
+export function StepGroup(props: StepGroupProps): ReactNode {
   const {
     title,
     isExpand,

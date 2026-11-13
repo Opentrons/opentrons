@@ -16,6 +16,7 @@ import {
 import { ModuleCalibrationOverflowMenu } from './ModuleCalibrationOverflowMenu'
 import { formatLastCalibrated } from './utils'
 
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { FormattedPipetteOffsetCalibration } from '..'
 
@@ -31,7 +32,7 @@ export function ModuleCalibrationItems({
   formattedPipetteOffsetCalibrations,
   robotName,
   isRobotBusy,
-}: ModuleCalibrationItemsProps): JSX.Element {
+}: ModuleCalibrationItemsProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   return (

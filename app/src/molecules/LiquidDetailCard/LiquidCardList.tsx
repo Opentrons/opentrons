@@ -8,7 +8,7 @@ import { getIsOnDevice } from '/app/redux/config'
 
 import { LiquidDetailCard } from './LiquidDetailCard'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   LabwareByLiquidId,
   LabwareDefinition,
@@ -29,7 +29,7 @@ const HIDE_SCROLLBAR = css`
   }
 `
 
-export const LiquidCardList = (props: LiquidCardListProps): JSX.Element => {
+export const LiquidCardList = (props: LiquidCardListProps): ReactNode => {
   const {
     selectedLabwareDefinition,
     selectedLiquidId,

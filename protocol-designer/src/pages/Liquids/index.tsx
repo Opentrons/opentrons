@@ -11,7 +11,9 @@ import {
 import { LiquidsOverflowMenu } from '../../components/organisms/LiquidsOverflowMenu'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 
-export function Liquids(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function Liquids(): ReactNode {
   const navigate = useNavigate()
   const selectedLabware = useSelector(
     labwareIngredSelectors.getSelectedLabwareId

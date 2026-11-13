@@ -2,13 +2,13 @@ import { forwardRef } from 'react'
 
 import { isntStyleProp, styleProps } from './style-props'
 
-import type { ComponentProps, FC } from 'react'
+import type { ComponentProps, FC, ReactNode } from 'react'
 import type { StyleProps } from './types'
 
 const FlexComponent = forwardRef<
   HTMLDivElement,
   ComponentProps<'div'> & StyleProps
->((props, ref): JSX.Element => {
+>((props, ref): ReactNode => {
   const { style, ...rest } = props
 
   const stylePropsStyles = styleProps(props)

@@ -1,6 +1,8 @@
 import { COLORS } from '../../helix-design-system'
 
-export function FixedBase(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function FixedBase(): ReactNode {
   return (
     <g id="fixedBase">
       <path
@@ -19,7 +21,7 @@ export function FixedBase(): JSX.Element {
 interface FixedTrashProps {
   highlight?: boolean
 }
-export function FixedTrash(props: FixedTrashProps): JSX.Element {
+export function FixedTrash(props: FixedTrashProps): ReactNode {
   const { highlight = false } = props
   return (
     <g id="fixedTrash">
@@ -35,7 +37,7 @@ export function FixedTrash(props: FixedTrashProps): JSX.Element {
     </g>
   )
 }
-export function DoorStops(): JSX.Element {
+export function DoorStops(): ReactNode {
   return (
     <g id="doorStops">
       <path
@@ -51,7 +53,7 @@ export function DoorStops(): JSX.Element {
   )
 }
 
-export function MetalFrame(): JSX.Element {
+export function MetalFrame(): ReactNode {
   return (
     <g id="metalFrame">
       <path
@@ -67,7 +69,7 @@ export function MetalFrame(): JSX.Element {
   )
 }
 
-export function RemovableDeckOutline(): JSX.Element {
+export function RemovableDeckOutline(): ReactNode {
   return (
     <g id="removableDeckOutline">
       <path
@@ -83,7 +85,7 @@ export function RemovableDeckOutline(): JSX.Element {
   )
 }
 
-export function SlotRidges(): JSX.Element {
+export function SlotRidges(): ReactNode {
   return (
     <g id="slotRidges">
       <path
@@ -97,7 +99,7 @@ export function SlotRidges(): JSX.Element {
     </g>
   )
 }
-export function SlotNumbers(): JSX.Element {
+export function SlotNumbers(): ReactNode {
   return (
     <g id="slotNumbers">
       <path
@@ -113,7 +115,7 @@ export function SlotNumbers(): JSX.Element {
     </g>
   )
 }
-export function CalibrationMarkings(): JSX.Element {
+export function CalibrationMarkings(): ReactNode {
   return (
     <g id="calibrationMarkings">
       <path
@@ -128,7 +130,7 @@ export function CalibrationMarkings(): JSX.Element {
     </g>
   )
 }
-export function RemovalHandle(): JSX.Element {
+export function RemovalHandle(): ReactNode {
   return (
     <g id="removalHandle">
       <path
@@ -143,7 +145,7 @@ export function RemovalHandle(): JSX.Element {
     </g>
   )
 }
-export function ScrewHoles(): JSX.Element {
+export function ScrewHoles(): ReactNode {
   return (
     <g id="screwHoles">
       <path

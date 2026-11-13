@@ -17,6 +17,8 @@ import {
 
 import { MediumButton } from '/app/atoms/buttons'
 
+import type { ReactNode } from 'react'
+
 interface DisplayConnectionStatusProps {
   isConnected: boolean
   setShowNetworkDetailsModal: (showNetworkDetailsModal: boolean) => void
@@ -25,7 +27,7 @@ interface DisplayConnectionStatusProps {
 export function DisplayConnectionStatus({
   isConnected,
   setShowNetworkDetailsModal,
-}: DisplayConnectionStatusProps): JSX.Element {
+}: DisplayConnectionStatusProps): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const navigate = useNavigate()
 

@@ -14,6 +14,7 @@ import {
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 
+import type { ReactNode } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface AlternativeSecurityTypeModalProps {
@@ -24,7 +25,7 @@ interface AlternativeSecurityTypeModalProps {
 
 export function AlternativeSecurityTypeModal({
   setShowAlternativeSecurityTypeModal,
-}: AlternativeSecurityTypeModalProps): JSX.Element {
+}: AlternativeSecurityTypeModalProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'branded'])
   const navigate = useNavigate()
   const modalHeader: OddModalHeaderBaseProps = {

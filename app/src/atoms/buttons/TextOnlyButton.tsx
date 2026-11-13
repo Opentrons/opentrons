@@ -37,7 +37,7 @@ export function TextOnlyButton({
   buttonText,
   disabled = false,
   ...styleProps
-}: TextOnlyButtonProps): JSX.Element {
+}: TextOnlyButtonProps): ReactNode {
   return (
     <Btn onClick={onClick} disabled={disabled} {...styleProps}>
       <StyledText

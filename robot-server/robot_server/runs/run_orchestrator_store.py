@@ -40,6 +40,9 @@ from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
     CameraSettings,
 )
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_engine.resources.file_provider import FileProvider
 from opentrons.protocol_engine.state.commands import (
     CommandAnnotationsSlice,
@@ -184,21 +187,9 @@ async def construct_run_result(
     Of note, in order to prevent copies of the data appearing in both the robot-server and
     the protocol process the commands are deleted to preserve memory.
     """
-    command_length = await run_coordinator.get_length()
-    commands: List[Command] = []
-    while command_length > 0:
-        latest_commands = await run_coordinator.get_command_slice(
-            cursor=max(0, command_length - 100),
-            length=100,
-            include_fixit_commands=True,
-        )
-        await run_coordinator.delete_command_slice_end(100)
-        commands[:0] = latest_commands.commands
-        command_length -= len(latest_commands.commands)
-
     return RunResult(
         state_summary=await run_coordinator.get_state_summary(),
-        commands=commands,
+        commands=[],
         parameters=await run_coordinator.get_run_time_parameters(),
         command_annotations=await run_coordinator.get_all_command_annotations(),
         command_preconditions=await run_coordinator.get_preconditions(),
@@ -215,6 +206,7 @@ class RunOrchestratorStore:
         deck_type: DeckType,
         run_process_pyro_provider: RunProcessPyroProvider,
         access_control_status: bool,
+        command_store_provider: CommandStoreProvider,
     ) -> None:
         """Initialize a run orchestrator storage interface.
 
@@ -226,6 +218,7 @@ class RunOrchestratorStore:
             run_process_pyro_provider: If in protocol subprocess mode, provides
                 the run process proxy when running a protocol.
             access_control_status: Status of the Auth-Server access control enablement.
+            command_store_provider: Provider interface for the persistence commands store.
         """
         self._hardware_api = hardware_api
         self._robot_type = robot_type
@@ -247,6 +240,7 @@ class RunOrchestratorStore:
         self._flex_stacker_substate: Optional[Mapping[str, FlexStackerSubState]] = None
         self._access_control_mode = access_control_status
         self._run_result: Optional[RunResult] = None
+        self._command_store_provider = command_store_provider
 
     @property
     def run_coordinator(self) -> Union[RunOrchestrator, DirectedRunProcess]:
@@ -367,6 +361,7 @@ class RunOrchestratorStore:
             a new one may not be created.
         """
         self._run_result = None
+        self._command_store_provider.set_run_id(run_id)
         if feature_flags.protocol_subprocess_enabled():
             return await self.create_pyro(
                 run_id=run_id,
@@ -402,6 +397,7 @@ class RunOrchestratorStore:
             camera_provider=camera_provider,
             notify_publishers=notify_publishers,
             updates_callback=self.update_engine_status_callback,
+            command_store_provider=self._command_store_provider,
         )
 
         orchestrator = RunOrchestrator.build_orchestrator(

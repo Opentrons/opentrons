@@ -7,7 +7,6 @@ from typing import Callable, Dict, Optional
 from typing_extensions import Final
 
 from opentrons.config import IS_ROBOT
-from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.temp_deck import (
     DEFAULT_COMMAND_RETRIES,
     AbstractTempDeckDriver,
@@ -15,6 +14,7 @@ from opentrons.drivers.temp_deck import (
     TempDeckDriver,
 )
 from opentrons.drivers.types import Temperature
+from opentrons.drivers.usb.types import USBPort
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.modules import errors, mod_abc, types, update
 from opentrons.hardware_control.modules.retry import retry_module_init
