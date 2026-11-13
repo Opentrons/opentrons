@@ -10,14 +10,14 @@ import {
   DIRECTION_COLUMN,
   Flex,
   InputField,
-  LegacyStyledText,
   PrimaryButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { Slideout } from '/app/atoms/Slideout'
+import { Slideout } from '/app/components/desktop/Slideout'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { ANALYTICS_RENAME_ROBOT, useTrackEvent } from '/app/redux/analytics'
@@ -26,6 +26,7 @@ import {
   getReachableRobots,
   getUnreachableRobots,
   removeRobot,
+  renameRobot,
   startDiscovery,
 } from '/app/redux/discovery'
 
@@ -137,14 +138,11 @@ export function RenameRobotSlideout({
   const documentationState = useDocumentationState()
   const { updateRobotName } = useUpdateRobotNameMutation(documentationState, {
     onSuccess: (data: UpdatedRobotName) => {
-      // TODO: 6/10/2022 kj for the robot name, we need to use GET: /server/name
-      // data.name != null && navigate(`/devices/${data.name}/robot-settings`)
-      // TODO 6/9/2022 kj this is a temporary fix to avoid the issue
-      // https://github.com/Opentrons/opentrons/issues/10709
-      data.name != null && navigate('/devices')
-      dispatch(removeRobot(previousRobotName))
-      // TODO(jj  07/15/2026): preserve ip address in hostsByIp during removal, to prevent having to search for the robot again
-      dispatch(startDiscovery())
+      if (data.name != null) {
+        dispatch(renameRobot(previousRobotName, data.name))
+        dispatch(startDiscovery())
+        navigate(`/devices`)
+      }
     },
     onError: (error: Error) => {
       // TODO kj 5/25/2022: when a user lost connection while the user is renaming a robot,
@@ -186,9 +184,9 @@ export function RenameRobotSlideout({
             {t('rename_robot_prefer_usb_connection')}
           </Banner>
         )}
-        <LegacyStyledText forwardedAs="p">
+        <StyledText forwardedAs="p">
           {t('rename_robot_input_limitation_detail')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing4}>
           <Controller
             control={control}
@@ -208,13 +206,13 @@ export function RenameRobotSlideout({
               />
             )}
           />
-          <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
+          <StyledText forwardedAs="label" color={COLORS.grey50}>
             {t('characters_max')}
-          </LegacyStyledText>
+          </StyledText>
           {errors.newRobotName != null ? (
-            <LegacyStyledText forwardedAs="label" color={COLORS.red50}>
+            <StyledText forwardedAs="label" color={COLORS.red50}>
               {errors.newRobotName.message}
-            </LegacyStyledText>
+            </StyledText>
           ) : null}
         </Flex>
       </Flex>

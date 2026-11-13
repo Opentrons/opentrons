@@ -1,5 +1,4 @@
 import {
-  useAllSessionsQuery,
   useCurrentAllSubsystemUpdatesQuery,
   useEstopQuery,
   useHost,
@@ -27,7 +26,6 @@ export function useIsRobotBusy(
     refetchInterval: poll ? ROBOT_STATUS_POLL_MS : false,
   })
   const isMaintenanceRunExisting = maintenanceRunData?.data?.id != null
-  const allSessionsQueryResponse = useAllSessionsQuery(queryOptions)
   const host = useHost()
   const robotName = host?.robotName
   const isFlex = useIsFlex(robotName ?? '')
@@ -48,8 +46,6 @@ export function useIsRobotBusy(
   return (
     robotHasCurrentRun ||
     isMaintenanceRunExisting ||
-    (allSessionsQueryResponse?.data?.data != null &&
-      allSessionsQueryResponse?.data?.data?.length !== 0) ||
     (isFlex &&
       estopStatus?.data.status !== 'disengaged' &&
       estopError == null) ||

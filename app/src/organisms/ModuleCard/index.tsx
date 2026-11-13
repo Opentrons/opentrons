@@ -40,8 +40,9 @@ import {
 } from '@opentrons/shared-data'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useRequireAdminForUpdates } from '/app/local-resources/access-control/useRequireAdminForUpdates'
+import { isUpdatesWritePermissionError } from '/app/local-resources/access-control/utils'
 import { useModuleUSBPort } from '/app/local-resources/modules'
-import { UpdateBanner } from '/app/molecules/UpdateBanner'
 import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsFlex } from '/app/redux-resources/robots'
@@ -52,11 +53,7 @@ import { getModuleTooHot } from '/app/transformations/modules'
 
 import { AboutModuleSlideout } from './AboutModuleSlideout'
 import { AbsorbanceReaderData } from './AbsorbanceReaderData'
-import {
-  MODULE_INFO_DETAIL_TEXT_STYLE,
-  MODULE_INFO_HEADER_TEXT_STYLE,
-  MODULE_INFO_SUB_CONTAINER_STYLE,
-} from './constants'
+import { MODULE_INFO_SUB_CONTAINER_STYLE } from './constants'
 import { ErrorInfo } from './ErrorInfo'
 import { FirmwareUpdateFailedModal } from './FirmwareUpdateFailedModal'
 import { FlexStackerModuleData } from './FlexStackerModuleData'
@@ -71,6 +68,7 @@ import { TemperatureModuleSlideout } from './TemperatureModuleSlideout'
 import { TestShakeSlideout } from './TestShakeSlideout'
 import { ThermocyclerModuleData } from './ThermocyclerModuleData'
 import { ThermocyclerModuleSlideout } from './ThermocyclerModuleSlideout'
+import { UpdateBanner } from './UpdateBanner'
 import {
   getModuleCalibrationRequired,
   getModuleCardImage,
@@ -142,6 +140,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   const { parseModuleUSBPort } = useModuleUSBPort()
   const { makeToast } = useToaster()
   const documentationState = useDocumentationState()
+  const { ensureCanUpdate } = useRequireAdminForUpdates(robotName)
   const {
     mutateAsync: updateModuleAsync,
     isLoading: isPending,
@@ -156,9 +155,21 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
     !Boolean(updatePipetteFWRequired)
 
   const handleFirmwareUpdateClick = (): void => {
-    void updateModuleAsync(module.serialNumber).then(() => {
-      makeToast(t('firmware_updated_successfully') as string, SUCCESS_TOAST)
-    })
+    if (!ensureCanUpdate()) {
+      return
+    }
+    void updateModuleAsync(module.serialNumber)
+      .then(() => {
+        makeToast(t('firmware_updated_successfully') as string, SUCCESS_TOAST)
+      })
+      .catch((updateError: unknown) => {
+        if (
+          isDocumentedMutationError(updateError) ||
+          isUpdatesWritePermissionError(updateError)
+        ) {
+          resetUpdateModule()
+        }
+      })
   }
 
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
@@ -177,7 +188,10 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   )
 
   const showFirmwareUpdateFailed =
-    isError && error != null && !isDocumentedMutationError(error)
+    isError &&
+    error != null &&
+    !isDocumentedMutationError(error) &&
+    !isUpdatesWritePermissionError(error)
 
   const hideBanners =
     isPending || isRunRunning || ongoingSubsystemUpdate != null
@@ -410,8 +424,9 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             ) : (
               <Flex css={MODULE_INFO_SUB_CONTAINER_STYLE}>
                 <StyledText
+                  forwardedAs="h3"
+                  color={COLORS.grey60}
                   textTransform={TYPOGRAPHY.textTransformUppercase}
-                  css={MODULE_INFO_HEADER_TEXT_STYLE}
                   data-testid={`module_card_usb_port_${module.serialNumber}`}
                 >
                   {module.moduleType !== THERMOCYCLER_MODULE_TYPE &&
@@ -431,7 +446,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                       color={COLORS.grey60}
                     />
                   </Flex>
-                  <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE}>
+                  <StyledText forwardedAs="h3">
                     {getModuleDisplayName(module.moduleModel)}
                   </StyledText>
                 </Flex>

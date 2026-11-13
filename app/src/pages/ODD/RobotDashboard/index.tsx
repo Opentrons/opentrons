@@ -6,12 +6,12 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Navigation } from '/app/organisms/ODD/Navigation'
+import { Navigation } from '/app/components/ODD/headers/Navigation'
 import {
   EmptyRecentRun,
   RecentRunProtocolCarousel,
@@ -89,13 +89,13 @@ export function RobotDashboard(): ReactNode {
       contents = (
         <>
           {hasStandardProtocols ? (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.grey60}
             >
               {t('run_again')}
-            </LegacyStyledText>
+            </StyledText>
           ) : null}
           <RecentRunProtocolCarousel
             recentRunsOfUniqueProtocols={recentRunsOfUniqueProtocols}

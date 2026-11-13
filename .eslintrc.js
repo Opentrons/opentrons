@@ -38,7 +38,7 @@ module.exports = {
     'react-hooks/exhaustive-deps': [
       'error',
       {
-        additionalHooks: '(useDrag|useDrop)',
+        additionalHooks: '^(useDrag|useDrop)$',
       },
     ],
     'no-extra-boolean-cast': 'off',
@@ -220,6 +220,7 @@ module.exports = {
         'opentrons/no-imports-across-applications': 'error',
         'opentrons/no-margins-in-css': 'warn',
         'opentrons/no-margins-inline': 'warn',
+        'opentrons/no-hardcoded-z-index': 'error',
       },
     },
     {

@@ -1,5 +1,6 @@
 """Tests for robot_server.runs.run_store."""
 
+import json
 import warnings
 from datetime import datetime, timezone
 from pathlib import Path
@@ -11,9 +12,9 @@ from decoy import Decoy
 from sqlalchemy.engine import Engine
 
 from opentrons.protocol_engine import (
-    CommandSlice,
     EngineStatus,
     ErrorOccurrence,
+    JsonCommandSlice,
     Liquid,
     StateSummary,
 )
@@ -386,7 +387,10 @@ async def test_update_run_state(
     )
     assert run_summary_result == state_summary
     assert parameters_result == run_time_parameters
-    assert commands_result.commands == protocol_commands
+    assert commands_result.commands == [
+        command.model_dump_json(by_alias=True, exclude_none=True)
+        for command in protocol_commands
+    ]
     mock_runs_publisher.publish_runs_advise_refetch.assert_called_once_with(
         run_id="run-id"
     )
@@ -1184,10 +1188,13 @@ def test_get_command_slice(
         include_fixit_commands=True,
     )
 
-    assert result == CommandSlice(
+    assert result == JsonCommandSlice(
         cursor=0,
         total_length=len(protocol_commands),
-        commands=protocol_commands,
+        commands=[
+            command.model_dump_json(by_alias=True, exclude_none=True)
+            for command in protocol_commands
+        ],
     )
 
 
@@ -1240,7 +1247,7 @@ def test_get_commands_slice_clamping(
     assert result.cursor == expected_cursor
     assert result.total_length == len(protocol_commands)
     assert [
-        result_command.id for result_command in result.commands
+        json.loads(result_command)["id"] for result_command in result.commands
     ] == expected_command_ids
 
 
@@ -1256,7 +1263,7 @@ def test_get_run_command_slice_none(subject: RunStore) -> None:
     result = subject.get_commands_slice(
         run_id="run-id", length=999, cursor=None, include_fixit_commands=True
     )
-    assert result == CommandSlice(commands=[], cursor=0, total_length=0)
+    assert result == JsonCommandSlice(commands=[], cursor=0, total_length=0)
 
 
 def test_get_commands_slice_run_not_found(subject: RunStore) -> None:
@@ -1302,7 +1309,7 @@ def test_get_commands_slice_no_fixit_commands(
 
     assert result.cursor == 0
     assert result.total_length == 3
-    assert [result_command.id for result_command in result.commands] == [
+    assert [json.loads(result_command)["id"] for result_command in result.commands] == [
         "pause-1",
         "pause-2",
         "pause-3",

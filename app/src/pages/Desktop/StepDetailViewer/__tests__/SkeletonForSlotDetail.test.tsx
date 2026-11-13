@@ -2,11 +2,11 @@ import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { Skeleton } from '/app/atoms/Skeleton'
+import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
 
 import { SkeletonForSlotDetail } from '../SkeletonForSlotDetail'
 
-vi.mock('/app/atoms/Skeleton')
+vi.mock('/app/components/adhoc/shared/Skeleton')
 
 const render = () => {
   return renderWithProviders(<SkeletonForSlotDetail />)

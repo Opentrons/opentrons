@@ -36,6 +36,7 @@
   "complete_protocol_to_download": "完成协议以下载运行日志",
   "confirm_camera_preferences": "确认摄像头设置",
   "confirm_camera_preferences_desc": "确认您摄像头设置，以便在运行设置期间查看实时监控。",
+  "connect_to_network_for_live_camera": "请连接 Wi-Fi 或以太网以访问实时摄像头",
   "csv_available_download": "与此运行相关的所有文件都可以在设备的最近运行界面上找到。",
   "current_step": "步骤",
   "current_step_pause": "当前步骤 - 用户暂停",

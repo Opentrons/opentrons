@@ -1,0 +1,49 @@
+.accordion_container {
+  display: flex;
+  overflow: visible;
+  width: 100%;
+  flex-direction: column;
+  background-color: var(--transparent);
+  pointer-events: none;
+  transform: translateY(calc(100% - var(--spacing-48)));
+  transition: transform 0.2s ease-in-out;
+}
+
+.accordion_container_open {
+  transform: translateY(0);
+}
+
+.accordion_header {
+  display: flex;
+  width: 100%;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: flex-end;
+  background-color: var(--transparent);
+}
+
+.chevron_button {
+  display: flex;
+  width: 3rem;
+  height: 3rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background-color: var(--grey-35);
+  color: var(--black-90);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.accordion_body {
+  overflow: visible;
+  width: 100%;
+  background-color: var(--grey-35);
+  pointer-events: auto;
+  transition: display 0.2s ease-in-out allow-discrete;
+}
+
+.accordion_body_closed {
+  display: none;
+}

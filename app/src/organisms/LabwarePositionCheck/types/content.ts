@@ -1,10 +1,10 @@
 import type { UseLPCCommandsResult } from '/app/organisms/LabwarePositionCheck/hooks'
 import type { UseLPCHeaderCommandsResult } from '/app/organisms/LabwarePositionCheck/hooks/useLPCCommands/useLPCHeaderCommands'
-import type { LPCWizardFlexProps } from '/app/organisms/LabwarePositionCheck/LPCWizardFlex'
+import type { LPCFlowsProps } from '/app/organisms/LabwarePositionCheck/LPCFlows'
 import type { LPCStep } from '/app/redux/protocol-runs'
 
 export type LPCWizardContentProps = Pick<
-  LPCWizardFlexProps,
+  LPCFlowsProps,
   'runId' | 'analytics'
 > & {
   proceedStep: (toStep?: LPCStep) => void

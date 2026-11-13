@@ -3,18 +3,17 @@ import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
+import { PipetteRecalibrationWarning } from '/app/components/desktop/cards/PipetteCard/PipetteRecalibrationWarning'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 
-import { usePipetteOffsetCalibrations } from '../Devices/hooks'
-import { PipetteRecalibrationWarning } from '../Devices/PipetteCard/PipetteRecalibrationWarning'
 import { PipetteOffsetCalibrationItems } from './CalibrationDetails/PipetteOffsetCalibrationItems'
 
 import type { ReactNode } from 'react'
@@ -37,7 +36,6 @@ export function RobotSettingsPipetteOffsetCalibration({
   const { data: instrumentsData } = useInstrumentsQuery({
     enabled: isFlex,
   })
-  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()
   const attachedPipettesFromInstrumentsQuery =
     useAttachedPipettesFromInstrumentsQuery()
   const ot3AttachedLeftPipetteOffsetCal =
@@ -46,12 +44,9 @@ export function RobotSettingsPipetteOffsetCalibration({
     attachedPipettesFromInstrumentsQuery.right?.data?.calibratedOffset ?? null
 
   let showPipetteOffsetCalItems = false
-  if (!isFlex && pipetteOffsetCalibrations != null) {
-    showPipetteOffsetCalItems = true
-  } else if (
-    isFlex &&
-    (ot3AttachedLeftPipetteOffsetCal != null ||
-      ot3AttachedRightPipetteOffsetCal != null)
+  if (
+    ot3AttachedLeftPipetteOffsetCal != null ||
+    ot3AttachedRightPipetteOffsetCal != null
   ) {
     showPipetteOffsetCalItems = true
   }
@@ -62,18 +57,15 @@ export function RobotSettingsPipetteOffsetCalibration({
       paddingY={SPACING.spacing24}
       gridGap={SPACING.spacing8}
     >
-      <LegacyStyledText
-        forwardedAs="h3"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <StyledText forwardedAs="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {isFlex
           ? t('pipette_calibrations_title')
           : t('pipette_offset_calibrations_title')}
-      </LegacyStyledText>
+      </StyledText>
       {isFlex ? (
-        <LegacyStyledText forwardedAs="p">
+        <StyledText forwardedAs="p">
           {t('pipette_calibrations_description')}
-        </LegacyStyledText>
+        </StyledText>
       ) : null}
       {getShowPipetteCalibrationWarning(instrumentsData) && (
         <PipetteRecalibrationWarning />
@@ -87,9 +79,9 @@ export function RobotSettingsPipetteOffsetCalibration({
           }
         />
       ) : (
-        <LegacyStyledText forwardedAs="label" marginTop={SPACING.spacing8}>
+        <StyledText forwardedAs="label" marginTop={SPACING.spacing8}>
           {t('no_pipette_attached')}
-        </LegacyStyledText>
+        </StyledText>
       )}
     </Flex>
   )

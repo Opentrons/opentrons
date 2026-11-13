@@ -18,7 +18,9 @@ import {
   VACUUM_MODULE_V1,
 } from '@opentrons/shared-data'
 import {
+  getIsStackableVacuumSpacer,
   getIsVacuumSpacer,
+  getIsVacuumSpacerSeat,
   getSlotInLocationStack,
 } from '@opentrons/step-generation'
 
@@ -191,13 +193,14 @@ export const getLabwareIsRecommended = (
   // For vacuum module, show different labware based on whether module has labware
   if (moduleType === VACUUM_MODULE_TYPE) {
     if (moduleHasLabware) {
-      // Show collars, wellplates, and filter plates when module already has labware
+      // Show collars, wellplates, filter plates, and stackable spacers when module already has labware
       return (
         def.parameters.loadName === 'opentrons_vacuum_manifold_collar_tall' ||
         def.parameters.loadName === 'opentrons_vacuum_manifold_collar_short' ||
         def.parameters.loadName ===
           'opentrons_96_wellplate_200ul_pcr_full_skirt' ||
-        (def.parameters.quirks ?? []).includes('filterPlate')
+        (def.parameters.quirks ?? []).includes('filterPlate') ||
+        (def.parameters.quirks ?? []).includes('vacuumSpacer')
       )
     } else {
       // Show spacer and wellplate for empty module
@@ -223,19 +226,28 @@ export const getLabwareCompatibleWithAdapter = (
     return []
   }
 
-  // vacuum spacers expose the same recommended well plates as the bare module
+  // vacuum spacers expose recommended well plates plus other stackable spacers
   const adapterDef = Object.values(defs).find(
     d => d.parameters.loadName === adapterLoadName
   )
   if (adapterDef != null && getIsVacuumSpacer(adapterDef)) {
     const vacuumRecommended = RECOMMENDED_LABWARE_BY_MODULE[VACUUM_MODULE_TYPE]
+    const parentLoadName = adapterDef.parameters.loadName
     return Object.entries(defs)
-      .filter(
-        ([, def]) =>
+      .filter(([, def]) => {
+        const isRecommendedPlate =
           vacuumRecommended.includes(def.parameters.loadName) &&
           !getIsVacuumSpacer(def) &&
           !getIsVacuumCollar(def)
-      )
+        const canStackOnThisSpacer =
+          getIsStackableVacuumSpacer(adapterDef) &&
+          getIsStackableVacuumSpacer(def) &&
+          def.parameters.loadName !== parentLoadName &&
+          !getIsVacuumSpacerSeat(adapterDef) &&
+          (def.compatibleParentLabware?.includes(parentLoadName) === true ||
+            def.stackingOffsetWithLabware?.[parentLoadName] != null)
+        return isRecommendedPlate || canStackOnThisSpacer
+      })
       .map(([uri]) => uri)
   }
 

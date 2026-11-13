@@ -1,26 +1,13 @@
 import { Trans, useTranslation } from 'react-i18next'
 
-import {
-  ALIGN_CENTER,
-  ALIGN_FLEX_END,
-  COLORS,
-  Flex,
-  JUSTIFY_FLEX_END,
-  LegacyStyledText,
-  PrimaryButton,
-  SPACING,
-} from '@opentrons/components'
+import { SPACING, StyledText } from '@opentrons/components'
 import { LEFT } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-import {
-  SimpleWizardBody,
-  SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
+import { SimpleWizardInProgressBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { WizardBodyText } from '/app/components/adhoc/shared/wizards/WizardBodyText'
 
-import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
+import { FLOWS, SECTIONS } from './constants'
 import { getPipetteAnimations96 } from './utils'
 
 import type { PipetteWizardStepProps } from './types'
@@ -34,23 +21,9 @@ export const MountingPlate = (
     proceed,
     flowType,
     chainRunCommands,
-    errorMessage,
-    setShowErrorMessage,
-    isDoorOpenError,
-    setIsDoorOpenError,
-    dismissDoorOpenError,
-    isOnDevice,
+    handleCommandError,
   } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
-
-  const handleCommandError = (error: Error): void => {
-    if (isMaintenanceDoorOpenError(error)) {
-      setIsDoorOpenError(true)
-      setShowErrorMessage(t('door_is_open') as string)
-    } else {
-      setShowErrorMessage(error.message)
-    }
-  }
 
   const handleAttachMountingPlate = (): void => {
     chainRunCommands?.(
@@ -78,47 +51,20 @@ export const MountingPlate = (
   if (isRobotMoving) {
     return <SimpleWizardInProgressBody description={t('stand_back')} />
   }
-  return errorMessage != null ? (
-    isDoorOpenError ? (
-      <SimpleWizardBody
-        isSuccess={false}
-        iconColor={COLORS.red50}
-        header={t('door_is_open')}
-        subHeader={t('close_door_and_try_again')}
-      >
-        <Flex
-          width="100%"
-          justifyContent={JUSTIFY_FLEX_END}
-          alignItems={Boolean(isOnDevice) ? ALIGN_CENTER : ALIGN_FLEX_END}
-          gridGap={SPACING.spacing8}
-        >
-          {Boolean(isOnDevice) ? (
-            <SmallButton
-              buttonText={t('try_again')}
-              onClick={dismissDoorOpenError}
-            />
-          ) : (
-            <PrimaryButton onClick={dismissDoorOpenError}>
-              {t('try_again')}
-            </PrimaryButton>
-          )}
-        </Flex>
-      </SimpleWizardBody>
-    ) : (
-      <SimpleWizardBody
-        iconColor={COLORS.red50}
-        header={t('shared:error_encountered')}
-        isSuccess={false}
-        subHeader={errorMessage}
-      />
-    )
-  ) : (
+  return (
     <GenericWizardTile
-      header={t(
-        flowType === FLOWS.ATTACH
-          ? 'attach_mounting_plate'
-          : 'unscrew_and_detach'
-      )}
+      header={
+        <StyledText
+          desktopStyle="headingSmallBold"
+          oddStyle="level4HeaderSemiBold"
+        >
+          {t(
+            flowType === FLOWS.ATTACH
+              ? 'attach_mounting_plate'
+              : 'unscrew_and_detach'
+          )}
+        </StyledText>
+      }
       rightHandBody={getPipetteAnimations96({
         section: SECTIONS.MOUNTING_PLATE,
         flowType,
@@ -129,18 +75,13 @@ export const MountingPlate = (
             t={t}
             i18nKey="attach_mounting_plate_instructions"
             components={{
-              block: (
-                <LegacyStyledText
-                  css={BODY_STYLE}
-                  marginBottom={SPACING.spacing16}
-                />
-              ),
+              block: <WizardBodyText marginBottom={SPACING.spacing16} />,
             }}
           />
         ) : (
-          <LegacyStyledText css={BODY_STYLE}>
+          <WizardBodyText>
             {t('detach_mounting_plate_instructions')}
-          </LegacyStyledText>
+          </WizardBodyText>
         )
       }
       proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}

@@ -8,12 +8,12 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { MediumButton } from '/app/atoms/buttons'
+import { MediumButton } from '/app/components/ODD/buttons'
 
 import type { ReactNode } from 'react'
 
@@ -59,7 +59,7 @@ export function FailedToConnect({
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
           >
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h3"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginTop={SPACING.spacing40}
@@ -67,11 +67,11 @@ export function FailedToConnect({
               {isInvalidPassword
                 ? t('incorrect_password_for_ssid', { ssid: selectedSsid })
                 : t('failed_to_connect_to_ssid', { ssid: selectedSsid })}
-            </LegacyStyledText>
+            </StyledText>
             {!isInvalidPassword && errorMessage != null && (
-              <LegacyStyledText marginTop={SPACING.spacing16}>
+              <StyledText marginTop={SPACING.spacing16}>
                 {errorMessage}
-              </LegacyStyledText>
+              </StyledText>
             )}
           </Flex>
         </Flex>

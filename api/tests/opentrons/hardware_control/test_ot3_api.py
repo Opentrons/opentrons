@@ -101,8 +101,8 @@ from opentrons.hardware_control.modules import (
     VacuumModule,
 )
 from opentrons.hardware_control.motion_utilities import target_position_from_plunger
+from opentrons.hardware_control.ot3_calibration import DeckCalibration
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.robot_calibration import DeckCalibration
 from opentrons.hardware_control.types import (
     Axis,
     CriticalPoint,
@@ -112,6 +112,7 @@ from opentrons.hardware_control.types import (
     GripperProbe,
     InstrumentProbeType,
     OT3AxisKind,
+    OT3AxisMap,
     OT3Mount,
     SubSystem,
     TipStateType,
@@ -2846,3 +2847,21 @@ async def test_critical_point_for(
         decoy.verify(mock_gripper.get_critical_point(None))
     else:
         decoy.verify(mock_pipette.critical_point_for(OT3Mount.from_mount(mount)))
+
+
+@pytest.mark.parametrize(
+    "axis_currents",
+    [{Axis.X: 1.0, Axis.Y: 2.0, Axis.Z: 3.0}, {Axis.P_L: 0.5, Axis.P_R: 0.6}],
+)
+async def test_debug_set_active_current(
+    axis_currents: OT3AxisMap[float],
+    hardware_backend: OT3Simulator,
+    ot3_hardware: ThreadManager[OT3API],
+) -> None:
+    with patch.object(
+        hardware_backend,
+        "set_active_current",
+        AsyncMock(spec=hardware_backend.set_active_current),
+    ) as mock_set_current:
+        await ot3_hardware.debug_set_active_current(axis_currents)
+        mock_set_current.assert_called_once_with(axis_currents)

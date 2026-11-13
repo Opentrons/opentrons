@@ -20,8 +20,6 @@ from opentrons_shared_data.robot.types import RobotType
 from .protocols.api_support.labware_like import LabwareLike
 
 if TYPE_CHECKING:
-    from .protocol_api._types import OffDeckType
-    from .protocol_api.core.legacy.module_geometry import ModuleGeometry
     from .protocol_api.labware import Labware, Well
     from .protocol_api.module_contexts import ModuleContext
 
@@ -107,18 +105,6 @@ class _HasXYZ(Protocol):
     def z(self) -> float: ...
 
 
-LocationLabware = Union[
-    "Labware",
-    "Well",
-    str,
-    "ModuleGeometry",
-    LabwareLike,
-    None,
-    "OffDeckType",
-    "ModuleContext",
-]
-
-
 class MeniscusTrackingTarget(enum.Enum):
     START = "start"
     END = "end"
@@ -162,7 +148,6 @@ class Location:
             "Labware",
             "Well",
             str,
-            "ModuleGeometry",
             LabwareLike,
             None,
             "ModuleContext",
@@ -246,10 +231,6 @@ class Mount(enum.Enum):
 
     def __str__(self) -> str:
         return self.name
-
-    @classmethod
-    def ot2_mounts(cls) -> List["Mount"]:
-        return [Mount.LEFT, Mount.RIGHT]
 
     @classmethod
     def string_to_mount(cls, mount: str) -> "Mount":

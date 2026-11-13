@@ -1,23 +1,12 @@
 import logging
 from typing import Any, Optional
 
-from opentrons_shared_data.labware.types import (
-    LabwareDefinition2 as LabwareDefinition2Dict,
-)
 from opentrons_shared_data.protocol.types import (
     BlowoutLocation,
     LiquidHandlingCommand,
 )
 
 from opentrons import types
-from opentrons.calibration_storage.helpers import uri_from_definition
-from opentrons.calibration_storage.types import TipLengthCalNotFound
-from opentrons.hardware_control.dev_types import PipetteDict
-
-# TODO (lc 09-26-2022) We should conditionally import ot2 or ot3 calibration
-from opentrons.hardware_control.instruments.ot2 import (
-    instrument_calibration as instr_cal,
-)
 from opentrons.protocol_api.labware import Labware
 from opentrons.protocols.api_support.types import APIVersion
 
@@ -28,15 +17,7 @@ def validate_blowout_location(
     blowout_location: Optional[Any],
 ) -> None:
     """Validate the blowout location."""
-    if blowout_location and api_version < APIVersion(2, 8):
-        raise ValueError(
-            "Cannot specify blowout location when using api"
-            + " version below 2.8, current version is {api_version}".format(
-                api_version=api_version
-            )
-        )
-
-    elif liquid_handling_command == "consolidate" and blowout_location == "source well":
+    if liquid_handling_command == "consolidate" and blowout_location == "source well":
         raise ValueError("blowout location for consolidate cannot be source well")
     elif (
         liquid_handling_command == "distribute"
@@ -53,23 +34,6 @@ def validate_blowout_location(
             + " 'destination well', or 'trash'"
             + f" but it is {blowout_location}"
         )
-
-
-def tip_length_for(
-    pipette: PipetteDict, tip_rack_definition: LabwareDefinition2Dict
-) -> float:
-    """Get the tip length, including overlap, for a tip from this rack"""
-    try:
-        return instr_cal.load_tip_length_for_pipette(
-            pipette["pipette_id"], tip_rack_definition
-        ).tip_length
-    except TipLengthCalNotFound:
-        tip_overlap = pipette["tip_overlap"].get(
-            uri_from_definition(tip_rack_definition),
-            pipette["tip_overlap"]["default"],
-        )
-        tip_length = tip_rack_definition["parameters"]["tipLength"]
-        return tip_length - tip_overlap
 
 
 VALID_PIP_TIPRACK_VOL = {

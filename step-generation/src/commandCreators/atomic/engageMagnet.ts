@@ -1,25 +1,45 @@
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 
 import * as errorCreators from '../../errorCreators'
-import { uuid } from '../../utils'
+import {
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
+  uuid,
+} from '../../utils'
 
-import type { EngageMagnetParams } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+import type {
+  CommandCreator,
+  CommandCreatorError,
+  EngageMagnetStepGenArgs,
+} from '../../types'
 
 /** Engage magnet of specified magnetic module to given engage height. */
-export const engageMagnet: CommandCreator<EngageMagnetParams> = (
+export const engageMagnet: CommandCreator<EngageMagnetStepGenArgs> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { moduleId, height } = args
-  const { moduleEntities } = invariantContext
-  const commandType = 'magneticModule/engage'
-
-  if (moduleId === null) {
-    return {
-      errors: [errorCreators.missingModuleError()],
-    }
+  const { moduleEntities, runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
+  const height = resolveNumericRuntimeValue(args.height, runtimeParameters)
+  const errors: CommandCreatorError[] = []
+  if (moduleId == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: args.moduleId })
+    )
+  }
+  if (typeof args.height === 'string' && height == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: args.height })
+    )
+  }
+  if (errors.length > 0 || moduleId == null || height == null) {
+    console.error(
+      `engageMagnet: arg resolved to null (moduleId=${String(
+        moduleId
+      )}, height=${String(height)})`
+    )
+    return { errors }
   }
 
   if (moduleEntities[moduleId]?.type !== MAGNETIC_MODULE_TYPE) {
@@ -33,7 +53,7 @@ export const engageMagnet: CommandCreator<EngageMagnetParams> = (
   return {
     commands: [
       {
-        commandType,
+        commandType: 'magneticModule/engage',
         key: uuid(),
         params: {
           moduleId,
@@ -41,6 +61,6 @@ export const engageMagnet: CommandCreator<EngageMagnetParams> = (
         },
       },
     ],
-    python: `${pythonName}.engage(height_from_base=${height})`,
+    python: `${pythonName}.engage(height_from_base=${args.height})`,
   }
 }

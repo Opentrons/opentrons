@@ -40,6 +40,7 @@
   "edit_quantity": "Edit quantity",
   "edit_slot": "Edit slot",
   "enter_integer": "Enter an integer value greater than 0",
+  "filterPlate": "Filter Plate",
   "gen1_gen2_different_units": "Switching between GEN1 and GEN2 Magnetic Modules will clear all non-default engage heights from existing magnet steps in your protocol. GEN1 and GEN2 Magnetic Modules do not use the same units.",
   "gripper_required_for_plate_reader": "Gripper required to add absorbance reader",
   "heater_shaker_adjacent": "A Heater-Shaker is adjacent to this slot. Modules cannot be placed next to a Heater-Shaker",

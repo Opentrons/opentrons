@@ -8,10 +8,9 @@ import {
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { ProtocolCard } from '/app/components/ODD/cards/ProtocolCard'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
-
-import { ProtocolCard } from '../ProtocolCard'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'

@@ -5,9 +5,8 @@ import {
   AnimationVideo,
   COLORS,
   Flex,
-  LegacyStyledText,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { EXTENSION } from '@opentrons/shared-data'
 
@@ -16,11 +15,11 @@ import calibratingRearJaw from '/app/assets/videos/gripper-wizards/CALIBRATING_R
 import movePinFrontToRear from '/app/assets/videos/gripper-wizards/PIN_FROM_FRONT_TO_REAR_JAW.webm'
 import movePinRearToStorage from '/app/assets/videos/gripper-wizards/PIN_FROM_REAR_TO_STORAGE.webm'
 import movePinStorageToFront from '/app/assets/videos/gripper-wizards/PIN_FROM_STORAGE_TO_FRONT_JAW.webm'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
+} from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
 
 import {
   MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
@@ -31,7 +30,109 @@ import {
 import type { ReactNode } from 'react'
 import type { Vector3D } from '@opentrons/shared-data'
 import type { CreateMaintenanceCommand } from '/app/resources/runs'
+import type { CalibrationDeckSlot } from '../PipetteWizardFlows/types'
 import type { GripperWizardStepProps, MovePinStep } from './types'
+
+interface CalibrateGripperJawParams {
+  maintenanceRunId: string
+  createRunCommand: CreateMaintenanceCommand
+  setErrorMessage: (message: string | null) => void
+  proceed: () => void
+  jaw: 'front' | 'rear'
+  selectedSlot: CalibrationDeckSlot
+  frontJawOffset: Vector3D | null
+  setFrontJawOffset: (offset: Vector3D) => void
+}
+
+export function calibrateGripperJaw({
+  maintenanceRunId,
+  createRunCommand,
+  setErrorMessage,
+  proceed,
+  jaw,
+  selectedSlot,
+  frontJawOffset,
+  setFrontJawOffset,
+}: CalibrateGripperJawParams): void {
+  createRunCommand({
+    maintenanceRunId,
+    command: {
+      commandType: 'home' as const,
+      params: {
+        axes: ['extensionZ', 'extensionJaw'],
+      },
+    },
+    waitUntilComplete: true,
+  })
+    .then(({ data }) => {
+      if (data.status === 'failed') {
+        setErrorMessage(data.error?.detail ?? null)
+      }
+      createRunCommand({
+        maintenanceRunId,
+        command: {
+          commandType: 'home' as const,
+          params: {
+            skipIfMountPositionOk: 'extension',
+          },
+        },
+        waitUntilComplete: true,
+      })
+        .then(({ data }) => {
+          createRunCommand({
+            maintenanceRunId,
+            command: {
+              commandType: 'calibration/calibrateGripper' as const,
+              params:
+                jaw === 'rear' && frontJawOffset != null
+                  ? {
+                      jaw,
+                      otherJawOffset: frontJawOffset,
+                      slot: selectedSlot,
+                    }
+                  : { jaw, slot: selectedSlot },
+            },
+            waitUntilComplete: true,
+          })
+            .then(({ data }) => {
+              if (data.status === 'failed') {
+                setErrorMessage(data.error?.detail ?? null)
+              }
+              if (jaw === 'front' && data?.result?.jawOffset != null) {
+                setFrontJawOffset(data.result.jawOffset as Vector3D)
+              }
+              createRunCommand({
+                maintenanceRunId,
+                command: {
+                  commandType: 'calibration/moveToMaintenancePosition' as const,
+                  params: {
+                    mount: EXTENSION,
+                  },
+                },
+                waitUntilComplete: true,
+              })
+                .then(({ data }) => {
+                  if (data.status === 'failed') {
+                    setErrorMessage(data.error?.detail ?? null)
+                  }
+                  proceed()
+                })
+                .catch((error: Error) => {
+                  setErrorMessage(error.message)
+                })
+            })
+            .catch((error: Error) => {
+              setErrorMessage(error.message)
+            })
+        })
+        .catch((error: Error) => {
+          setErrorMessage(error.message)
+        })
+    })
+    .catch((error: Error) => {
+      setErrorMessage(error.message)
+    })
+}
 
 interface MovePinProps extends GripperWizardStepProps, MovePinStep {
   setFrontJawOffset: (offset: Vector3D) => void
@@ -53,89 +154,27 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     errorMessage,
     setErrorMessage,
     isExiting,
+    selectedSlot,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
 
   const handleOnClick = (): void => {
-    if (movement === REMOVE_PIN_FROM_REAR_JAW) {
+    if (
+      movement === REMOVE_PIN_FROM_REAR_JAW ||
+      movement === MOVE_PIN_TO_FRONT_JAW
+    ) {
       proceed()
     } else if (maintenanceRunId != null) {
-      const jaw = movement === MOVE_PIN_TO_FRONT_JAW ? 'front' : 'rear'
-      createRunCommand({
+      calibrateGripperJaw({
         maintenanceRunId,
-        command: {
-          commandType: 'home' as const,
-          params: {
-            axes: ['extensionZ', 'extensionJaw'],
-          },
-        },
-        waitUntilComplete: true,
+        createRunCommand,
+        setErrorMessage,
+        proceed,
+        jaw: 'rear',
+        selectedSlot,
+        frontJawOffset,
+        setFrontJawOffset,
       })
-        .then(({ data }) => {
-          if (data.status === 'failed') {
-            setErrorMessage(data.error?.detail ?? null)
-          }
-          createRunCommand({
-            maintenanceRunId,
-            command: {
-              commandType: 'home' as const,
-              params: {
-                skipIfMountPositionOk: 'extension',
-              },
-            },
-            waitUntilComplete: true,
-          })
-            .then(({ data }) => {
-              createRunCommand({
-                maintenanceRunId,
-                command: {
-                  commandType: 'calibration/calibrateGripper' as const,
-                  params:
-                    jaw === 'rear' && frontJawOffset != null
-                      ? { jaw, otherJawOffset: frontJawOffset }
-                      : { jaw },
-                },
-                waitUntilComplete: true,
-              })
-                .then(({ data }) => {
-                  if (data.status === 'failed') {
-                    setErrorMessage(data.error?.detail ?? null)
-                  }
-                  if (jaw === 'front' && data?.result?.jawOffset != null) {
-                    setFrontJawOffset(data.result.jawOffset as Vector3D)
-                  }
-                  createRunCommand({
-                    maintenanceRunId,
-                    command: {
-                      commandType:
-                        'calibration/moveToMaintenancePosition' as const,
-                      params: {
-                        mount: EXTENSION,
-                      },
-                    },
-                    waitUntilComplete: true,
-                  })
-                    .then(({ data }) => {
-                      if (data.status === 'failed') {
-                        setErrorMessage(data.error?.detail ?? null)
-                      }
-                      proceed()
-                    })
-                    .catch(error => {
-                      setErrorMessage(error.message as string)
-                    })
-                })
-                .catch(error => {
-                  setErrorMessage(error.message as string)
-                })
-            })
-            .catch(error => {
-              setErrorMessage(error.message as string)
-            })
-        })
-        .catch(error => {
-          setErrorMessage(error.message as string)
-        })
     }
   }
   const infoByMovement: {
@@ -165,7 +204,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       ),
       header: t('insert_pin_into_front_jaw'),
       body: t('move_pin_from_storage_to_front_jaw'),
-      buttonText: t('begin_calibration'),
+      buttonText: t('continue'),
       prepImage: (
         <AnimationVideo
           css={css`
@@ -245,7 +284,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
         }
         body={
           errorMessage == null && !isExiting
-            ? t('calibration_pin_touching', { slot: 'C2' })
+            ? t('calibration_pin_touching', { slot: selectedSlot })
             : null
         }
         alternativeSpinner={
@@ -266,11 +305,16 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
           i18nKey={'return_pin_error'}
           values={{ error: errorMessage }}
           components={{
-            block: <LegacyStyledText forwardedAs="p" />,
+            block: (
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                oddStyle="bodyTextRegular"
+              />
+            ),
             bold: (
-              <LegacyStyledText
-                forwardedAs="p"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              <StyledText
+                desktopStyle="bodyDefaultSemiBold"
+                oddStyle="bodyTextSemiBold"
               />
             ),
           }}
@@ -279,9 +323,23 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     />
   ) : (
     <GenericWizardTile
-      header={header}
+      header={
+        <StyledText
+          desktopStyle="headingSmallBold"
+          oddStyle="level4HeaderSemiBold"
+        >
+          {header}
+        </StyledText>
+      }
       rightHandBody={prepImage}
-      bodyText={<LegacyStyledText forwardedAs="p">{body}</LegacyStyledText>}
+      bodyText={
+        <StyledText
+          desktopStyle="bodyDefaultRegular"
+          oddStyle="bodyTextRegular"
+        >
+          {body}
+        </StyledText>
+      }
       proceedButtonText={buttonText}
       proceed={handleOnClick}
       proceedIsDisabled={maintenanceRunId == null}

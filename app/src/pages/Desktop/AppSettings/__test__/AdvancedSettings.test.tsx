@@ -6,9 +6,9 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
   AdditionalCustomLabwareSourceFolder,
-  AuditLogFolder,
   ClearUnavailableRobots,
   EnableDevTools,
+  LogFolder,
   OverridePathToPython,
   PreventRobotCaching,
   ShowHeaterShakerAttachmentModal,
@@ -61,7 +61,7 @@ describe('AdvancedSettings', () => {
     vi.mocked(AdditionalCustomLabwareSourceFolder).mockReturnValue(
       <div>mock AdditionalCustomLabwareSourceFolder</div>
     )
-    vi.mocked(AuditLogFolder).mockReturnValue(<div>mock AuditLogFolder</div>)
+    vi.mocked(LogFolder).mockReturnValue(<div>mock LogFolder</div>)
   })
 
   afterEach(() => {
@@ -78,9 +78,9 @@ describe('AdvancedSettings', () => {
     screen.getByText('mock AdditionalCustomLabwareSourceFolder')
   })
 
-  it('should render mock AuditLogFolder section', () => {
+  it('should render mock LogFolder section', () => {
     render()
-    screen.getByText('mock AuditLogFolder')
+    screen.getByText('mock LogFolder')
   })
 
   it('should render mock robot caching section', () => {

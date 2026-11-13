@@ -63,7 +63,7 @@
   "waste_chute": "外置垃圾槽",
   "wavelengths": "波长",
   "well_dimension": "{{number}} mm",
-  "well_name": "孔位 {{wellName}}",
+  "well_name": "孔 {{wellName}}",
   "well_view": "孔位视图",
   "well_volume": "{{volume}} µL"
 }

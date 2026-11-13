@@ -5,28 +5,31 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons/SmallButton'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useHomePipettes } from '/app/local-resources/instruments'
-import { OddModal } from '/app/molecules/OddModal'
 
 import { DropTipWizardFlows, useDropTipWizardFlows } from '.'
 
 import type { ReactNode } from 'react'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 import type { UseHomePipettesProps } from '/app/local-resources/instruments'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { PipetteWithTip } from '/app/resources/instruments'
 import type { PipetteDetails } from '/app/resources/maintenance_runs'
 
-type TipsAttachedModalProps = Pick<UseHomePipettesProps, 'onSuccess'> & {
+type TipsAttachedModalProps = Pick<
+  UseHomePipettesProps,
+  'onSuccess' | 'onError'
+> & {
   aPipetteWithTip: PipetteWithTip
   robotName: string | null
-  setTipStatusResolved: (onEmpty?: () => void) => Promise<void>
+  onTipsHandled: (didSkip: boolean) => void
 }
 
 export const handleTipsAttachedModal = (
@@ -39,25 +42,19 @@ export const handleTipsAttachedModal = (
 
 const TipsAttachedModal = NiceModal.create(
   (props: TipsAttachedModalProps): ReactNode => {
-    const {
-      aPipetteWithTip,
-      robotName,
-      setTipStatusResolved,
-      ...homePipetteProps
-    } = props
+    const { aPipetteWithTip, robotName, onTipsHandled, ...homePipetteProps } =
+      props
     const { t } = useTranslation(['drop_tip_wizard'])
     const modal = useModal()
 
     const { mount, specs } = aPipetteWithTip
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     const { showDTWiz, disableDTWiz, enableDTWiz } = useDropTipWizardFlows()
     const { homePipettes, isHoming } = useHomePipettes({
       ...homePipetteProps,
       pipetteInfo: buildPipetteDetails(aPipetteWithTip),
       onSuccess: () => {
         modal.remove()
-        void setTipStatusResolved()
+        onTipsHandled(true)
       },
     })
 
@@ -76,29 +73,32 @@ const TipsAttachedModal = NiceModal.create(
 
       if (!isTakeover) {
         modal.remove()
-        void setTipStatusResolved()
+        onTipsHandled(false)
       }
     }
 
     const is96Channel = specs.channels === 96
-    const displayMountText = is96Channel ? '96-Channel' : (mount as string)
 
     return (
       <ApiHostProvider robotName={robotName}>
         <OddModal header={tipsAttachedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-            <LegacyStyledText forwardedAs="p">
+            <StyledText forwardedAs="p">
               <Trans
                 t={t}
-                i18nKey="liquid_damages_this_pipette"
+                i18nKey={
+                  is96Channel
+                    ? 'liquid_damages_pipette'
+                    : 'liquid_damages_this_pipette'
+                }
                 values={{
-                  mount: displayMountText,
+                  mount,
                 }}
                 components={{
                   mount: <strong />,
                 }}
               />
-            </LegacyStyledText>
+            </StyledText>
             <Flex gridGap={SPACING.spacing8}>
               <SmallButton
                 flex="1"

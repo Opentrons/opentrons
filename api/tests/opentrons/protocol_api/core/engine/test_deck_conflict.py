@@ -7,7 +7,6 @@ import pytest
 from decoy import Decoy, matchers
 
 from opentrons_shared_data.labware.types import LabwareUri
-from opentrons_shared_data.robot.types import RobotType
 
 from ... import versions_at_or_above, versions_below
 from opentrons.hardware_control import CriticalPoint
@@ -98,23 +97,14 @@ def mock_sync_client(decoy: Decoy) -> SyncClient:
 @pytest.fixture
 def mock_state_view(
     decoy: Decoy,
-    robot_type: RobotType,
-    deck_type: DeckType,
 ) -> StateView:
     """Return a mock in the shape of a StateView."""
     mock_state_view = decoy.mock(cls=StateView)
-    config = Config(robot_type=robot_type, deck_type=deck_type)
+    config = Config(robot_type="OT-3 Standard", deck_type=DeckType.OT3_STANDARD)
     decoy.when(mock_state_view.config).then_return(config)
     return mock_state_view
 
 
-@pytest.mark.parametrize(
-    ("robot_type", "deck_type"),
-    [
-        ("OT-2 Standard", DeckType.OT2_STANDARD),
-        ("OT-3 Standard", DeckType.OT3_STANDARD),
-    ],
-)
 def test_maps_labware_on_deck(decoy: Decoy, mock_state_view: StateView) -> None:
     """It should correcly map a labware that's loaded directly into a deck slot."""
     decoy.when(
@@ -166,13 +156,6 @@ def test_maps_labware_on_deck(decoy: Decoy, mock_state_view: StateView) -> None:
     )
 
 
-@pytest.mark.parametrize(
-    ("robot_type", "deck_type"),
-    [
-        ("OT-2 Standard", DeckType.OT2_STANDARD),
-        ("OT-3 Standard", DeckType.OT3_STANDARD),
-    ],
-)
 def test_maps_module_without_labware(decoy: Decoy, mock_state_view: StateView) -> None:
     """It should correctly map a module with no labware loaded atop it."""
     decoy.when(mock_state_view.labware.get_id_by_module("module-id")).then_raise(
@@ -217,13 +200,6 @@ def test_maps_module_without_labware(decoy: Decoy, mock_state_view: StateView) -
     )
 
 
-@pytest.mark.parametrize(
-    ("robot_type", "deck_type"),
-    [
-        ("OT-2 Standard", DeckType.OT2_STANDARD),
-        ("OT-3 Standard", DeckType.OT3_STANDARD),
-    ],
-)
 def test_maps_module_with_labware(decoy: Decoy, mock_state_view: StateView) -> None:
     """It should correctly map a module with a labware loaded atop it.
 
@@ -271,13 +247,6 @@ def test_maps_module_with_labware(decoy: Decoy, mock_state_view: StateView) -> N
     )
 
 
-@pytest.mark.parametrize(
-    ("robot_type", "deck_type"),
-    [
-        ("OT-2 Standard", DeckType.OT2_STANDARD),
-        ("OT-3 Standard", DeckType.OT3_STANDARD),
-    ],
-)
 @pytest.mark.parametrize("module_model", ModuleModel)
 def test_maps_different_module_models(
     decoy: Decoy, mock_state_view: StateView, module_model: ModuleModel
@@ -357,13 +326,6 @@ def test_maps_different_module_models(
     )
 
 
-@pytest.mark.parametrize(
-    ("robot_type", "deck_type"),
-    [
-        ("OT-2 Standard", DeckType.OT2_STANDARD),
-        ("OT-3 Standard", DeckType.OT3_STANDARD),
-    ],
-)
 def test_maps_trash_bins(
     decoy: Decoy,
     mock_state_view: StateView,
@@ -559,15 +521,7 @@ def occupancy_check_new_item(
     ["labware"],
     indirect=True,
 )
-@pytest.mark.parametrize(
-    ("robot_type", "deck_type"),
-    [
-        ("OT-2 Standard", DeckType.OT2_STANDARD),
-        ("OT-3 Standard", DeckType.OT3_STANDARD),
-    ],
-)
 def test_maps_default_single_occupancy(
-    decoy: Decoy,
     mock_state_view: StateView,
     occupancy_check_state_setup1: dict[str, Any],
     occupancy_check_state_setup2: dict[str, Any],
@@ -601,12 +555,6 @@ def test_maps_default_single_occupancy(
     "occupancy_check_new_item",
     ["labware"],
     indirect=True,
-)
-@pytest.mark.parametrize(
-    ("robot_type", "deck_type"),
-    [
-        ("OT-3 Standard", DeckType.OT3_STANDARD),
-    ],
 )
 def test_maps_allows_stacker_labware_double_occupancy(
     decoy: Decoy,
@@ -657,12 +605,6 @@ def test_maps_allows_stacker_labware_double_occupancy(
     ["labware"],
     indirect=True,
 )
-@pytest.mark.parametrize(
-    ("robot_type", "deck_type"),
-    [
-        ("OT-3 Standard", DeckType.OT3_STANDARD),
-    ],
-)
 def test_maps_prevents_stacker_non_labware_double_occupancy(
     decoy: Decoy,
     mock_state_view: StateView,
@@ -701,10 +643,6 @@ module = LoadedModule(
 )
 
 
-@pytest.mark.parametrize(
-    ("robot_type", "deck_type"),
-    [("OT-3 Standard", DeckType.OT3_STANDARD)],
-)
 @pytest.mark.parametrize(
     ["pipette_bounds", "expected_raise", "y_value"],
     [
@@ -842,7 +780,7 @@ def test_deck_conflict_raises_for_bad_pipette_move(
     ).then_return(DeckSlotName.SLOT_C2)
 
     decoy.when(
-        mock_state_view.geometry.get_well_position(
+        mock_state_view.instrument_interface.get_well_position(
             labware_id="destination-labware-id",
             well_name="A2",
             well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
@@ -985,10 +923,6 @@ def test_deck_conflict_raises_for_bad_pipette_move(
         )
 
 
-@pytest.mark.parametrize(
-    ("robot_type", "deck_type"),
-    [("OT-3 Standard", DeckType.OT3_STANDARD)],
-)
 def test_deck_conflict_raises_for_collision_with_tc_lid(
     decoy: Decoy,
     mock_state_view: StateView,
@@ -1014,7 +948,7 @@ def test_deck_conflict_raises_for_collision_with_tc_lid(
     ).then_return(DeckSlotName.SLOT_C2)
 
     decoy.when(
-        mock_state_view.geometry.get_well_position(
+        mock_state_view.instrument_interface.get_well_position(
             labware_id="destination-labware-id",
             well_name="A2",
             well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
@@ -1095,10 +1029,6 @@ def test_deck_conflict_raises_for_collision_with_tc_lid(
 
 
 @pytest.mark.parametrize(
-    ("robot_type", "deck_type"),
-    [("OT-3 Standard", DeckType.OT3_STANDARD)],
-)
-@pytest.mark.parametrize(
     ["destination_well_point", "expected_raise"],
     [
         (
@@ -1160,7 +1090,7 @@ def test_deck_conflict_raises_for_out_of_bounds_96_channel_move(
     ).then_return(DeckSlotName.SLOT_C2)
 
     decoy.when(
-        mock_state_view.geometry.get_well_position(
+        mock_state_view.instrument_interface.get_well_position(
             labware_id="destination-labware-id",
             well_name="A2",
             well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
@@ -1235,10 +1165,6 @@ pipette_movement_specs: List[PipetteMovementSpec] = [
 
 
 @pytest.mark.parametrize(
-    ("robot_type", "deck_type"),
-    [("OT-3 Standard", DeckType.OT3_STANDARD)],
-)
-@pytest.mark.parametrize(
     argnames=PipetteMovementSpec._fields,
     argvalues=pipette_movement_specs,
 )
@@ -1282,12 +1208,6 @@ def test_valid_96_pipette_movement_for_tiprack_and_adapter(
         )
 
 
-@pytest.mark.parametrize(
-    ("robot_type", "deck_type"),
-    [
-        ("OT-3 Standard", DeckType.OT3_STANDARD),
-    ],
-)
 @pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 28)))
 def test_check_safe_for_pipette_movement_partial_tip_version_gate_above(
     decoy: Decoy,
@@ -1300,7 +1220,7 @@ def test_check_safe_for_pipette_movement_partial_tip_version_gate_above(
     ).then_return(True)
 
     decoy.when(
-        mock_state_view.geometry.get_checked_tip_drop_location(
+        mock_state_view.instrument_interface.get_checked_tip_drop_location(
             pipette_id="pipette-id",
             labware_id="destination-labware-id",
             well_location=DropTipWellLocation(),
@@ -1309,7 +1229,7 @@ def test_check_safe_for_pipette_movement_partial_tip_version_gate_above(
     ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)))
 
     decoy.when(
-        mock_state_view.geometry.get_well_position(
+        mock_state_view.instrument_interface.get_well_position(
             labware_id="destination-labware-id",
             well_name="A2",
             well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
@@ -1435,12 +1355,6 @@ def test_check_safe_for_pipette_movement_partial_tip_version_gate_above(
 
 
 @pytest.mark.parametrize(
-    ("robot_type", "deck_type"),
-    [
-        ("OT-3 Standard", DeckType.OT3_STANDARD),
-    ],
-)
-@pytest.mark.parametrize(
     "api_version", versions_below(APIVersion(2, 28), flex_only=True)
 )
 def test_check_safe_for_pipette_movement_partial_tip_version_gate_below(
@@ -1454,7 +1368,7 @@ def test_check_safe_for_pipette_movement_partial_tip_version_gate_below(
     ).then_return(True)
 
     decoy.when(
-        mock_state_view.geometry.get_checked_tip_drop_location(
+        mock_state_view.instrument_interface.get_checked_tip_drop_location(
             pipette_id="pipette-id",
             labware_id="destination-labware-id",
             well_location=DropTipWellLocation(),
@@ -1463,7 +1377,7 @@ def test_check_safe_for_pipette_movement_partial_tip_version_gate_below(
     ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)))
 
     decoy.when(
-        mock_state_view.geometry.get_well_position(
+        mock_state_view.instrument_interface.get_well_position(
             labware_id="destination-labware-id",
             well_name="A2",
             well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),

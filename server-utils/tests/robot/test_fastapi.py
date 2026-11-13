@@ -64,6 +64,9 @@ def test_install_and_get_robot_client_via_dependency() -> None:
         async def get_current_run_log(self) -> RobotCurrentRunLog:
             raise NotImplementedError
 
+        async def enable_pyro_subprocess_flags(self) -> None:
+            raise NotImplementedError
+
     stub_client = StubClient()
 
     app = fastapi.FastAPI()

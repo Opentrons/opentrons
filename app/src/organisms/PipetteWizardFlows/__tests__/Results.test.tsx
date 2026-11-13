@@ -45,15 +45,13 @@ describe('Results', () => {
       maintenanceRunId: RUN_ID_1,
       attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       errorMessage: null,
-      setShowErrorMessage: vi.fn(),
-      isDoorOpenError: false,
-      setIsDoorOpenError: vi.fn(),
-      dismissDoorOpenError: vi.fn(),
+      handleCommandError: vi.fn(),
       flowType: FLOWS.CALIBRATE,
       handleCleanUpAndClose: vi.fn(),
       currentStepIndex: 2,
       totalStepCount: 6,
       isOnDevice: false,
+      selectedSlot: 'B2',
       isFetching: false,
       setFetching: vi.fn(),
       hasCalData: false,
@@ -120,7 +118,7 @@ describe('Results', () => {
     )
     await waitFor(() => expect(props.proceed).toHaveBeenCalled())
   })
-  it('calls setShowErrorMessage when chainRunCommands fails', async () => {
+  it('calls handleCommandError when chainRunCommands fails', async () => {
     props = {
       ...props,
       chainRunCommands: vi
@@ -150,7 +148,9 @@ describe('Results', () => {
       ],
       false
     )
-    await waitFor(() => expect(props.setShowErrorMessage).toHaveBeenCalled())
+    await waitFor(() => {
+      expect(props.handleCommandError).toHaveBeenCalledWith(expect.any(Error))
+    })
   })
   it('renders the correct information when pipette wizard is a fail for attach flow', async () => {
     props = {

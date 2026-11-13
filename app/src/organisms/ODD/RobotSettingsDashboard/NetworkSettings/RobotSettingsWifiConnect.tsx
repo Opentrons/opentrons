@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 
 import { ConnectingNetwork, FailedToConnect } from '../../NetworkSettings'
 
@@ -65,7 +65,7 @@ export function RobotSettingsWifiConnect({
       </Flex>
     )
   } else if (isError && error != null) {
-    const isInvalidPassword = error.response?.status === 401
+    const isInvalidPassword = error.response?.status === 400
     const errorMessage =
       error.message != null && error.message.length > 0 ? error.message : null
     return (

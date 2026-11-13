@@ -5,16 +5,19 @@ import { Link } from 'react-router-dom'
 import {
   Icon,
   InlineNotification,
-  LegacyStyledText,
+  StyledText,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  useLogLevelQuery,
+  usePostLogLevelMutation,
   useRobotSettingsQuery,
   useUpdateRobotSettingMutation,
 } from '@opentrons/react-api-client'
 
+import { Navigation } from '/app/components/ODD/headers/Navigation'
 import { LANGUAGES, US_ENGLISH_DISPLAY_NAME } from '/app/i18n'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
   OnOffToggle,
   RobotSettingButton,
@@ -32,7 +35,10 @@ import {
 } from '/app/redux/config'
 import { getLocalRobot, getRobotApiVersion } from '/app/redux/discovery'
 import { UNREACHABLE } from '/app/redux/discovery/constants'
-import { getRobotUpdateAvailable } from '/app/redux/robot-update'
+import {
+  getRobotUpdateAvailable,
+  isRobotSoftwareUpdateAvailable,
+} from '/app/redux/robot-update'
 import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 import { useNetworkConnection } from '/app/resources/networking'
@@ -64,6 +70,8 @@ export function RobotSettingsList(props: RobotSettingsListProps): ReactNode {
   const documentationState = useDocumentationState()
   const { updateRobotSetting } =
     useUpdateRobotSettingMutation(documentationState)
+  const robotLogLevel = useLogLevelQuery()
+  const { postLogLevel } = usePostLogLevelMutation(documentationState)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const networkConnection = useNetworkConnection(robotName)
@@ -83,7 +91,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): ReactNode {
       ? getRobotUpdateAvailable(state, localRobot)
       : null
   })
-  const isUpdateAvailable = robotUpdateType === 'upgrade'
+  const isUpdateAvailable = isRobotSoftwareUpdateAvailable(robotUpdateType)
   const devToolsOn = useSelector(getDevtoolsEnabled)
   const { lightsEnabled, toggleLights } = useLEDLights()
   const { sensorsDisabled, toggleSensors } = useDisableStackerSensors()
@@ -108,6 +116,14 @@ export function RobotSettingsList(props: RobotSettingsListProps): ReactNode {
       message: `User toggled devtools to ${newDevToolsOn ? 'on' : 'off'}`,
     })
   )
+  const DEBUG_LEVELS = ['info', 'debug']
+  const debugLogsEnabled = DEBUG_LEVELS.includes(
+    robotLogLevel?.data?.log_level ?? 'unknown'
+  )
+
+  const handleToggleDebugLogs = (newValue: boolean): void => {
+    postLogLevel(newValue ? 'debug' : 'warning')
+  }
 
   return (
     <div className={styles.main_content}>
@@ -324,6 +340,16 @@ export function RobotSettingsList(props: RobotSettingsListProps): ReactNode {
           iconName="update-channel"
         />
         <RobotSettingButton
+          settingName={t('debug_logging')}
+          dataTestId="RobotSettingButton_enable_debug_logging"
+          settingInfo={t('debug_logging_description')}
+          rightElement={<OnOffToggle isOn={debugLogsEnabled} />}
+          onClick={() => {
+            handleToggleDebugLogs(!debugLogsEnabled)
+          }}
+          iconName="compliance"
+        />
+        <RobotSettingButton
           settingName={t('app_settings:enable_dev_tools')}
           dataTestId="RobotSettingButton_enable_dev_tools"
           settingInfo={t('dev_tools_description')}
@@ -333,6 +359,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): ReactNode {
             handleToggleDevtools(!devToolsOn)
           }}
         />
+
         {devToolsOn ? <FeatureFlags /> : null}
       </div>
     </div>
@@ -360,12 +387,12 @@ function FeatureFlags(): ReactNode {
               color="#171717"
             />
             <div className={styles.feature_flag_text_content}>
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="h4"
-                className={styles.feature_flag_title}
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
                 {t(`__dev_internal__${flag}`)}
-              </LegacyStyledText>
+              </StyledText>
             </div>
           </div>
           <OnOffToggle isOn={Boolean(devInternalFlags?.[flag])} />

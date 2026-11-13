@@ -3,7 +3,7 @@
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, NamedTuple, Optional
+from typing import Any, List, NamedTuple, Optional
 
 import pytest
 from decoy import Decoy
@@ -406,6 +406,7 @@ async def test_update_adds_rtp_values_to_completed_store(
             liquids=[],
             liquidClasses=[],
         ),
+        result=AnalysisResult.OK.value,
     )
 
     mock_completed_store = decoy.mock(cls=CompletedAnalysisStore)
@@ -525,11 +526,14 @@ async def test_update_infers_status_from_errors(
     subject.add_pending(
         protocol_id="protocol-id", analysis_id="analysis-id", run_time_parameters=[]
     )
+    commands_list: list[dict[str, Any]] = []
+    for command in commands:
+        commands_list.append(command.model_dump(by_alias=True))
     await subject.update(
         analysis_id="analysis-id",
         robot_type="OT-2 Standard",
         run_time_parameters=[],
-        commands=commands,
+        commands=commands_list,
         errors=errors,
         labware=[],
         modules=[],
@@ -588,6 +592,7 @@ async def test_save_initialization_failed_analysis(
             liquids=[],
             liquidClasses=[],
         ),
+        result=AnalysisResult.NOT_OK.value,
     )
 
     mock_completed_store = decoy.mock(cls=CompletedAnalysisStore)

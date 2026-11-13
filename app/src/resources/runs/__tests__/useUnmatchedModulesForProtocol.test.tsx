@@ -1,6 +1,5 @@
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { mockTemperatureModule } from '@opentrons/api-client'
 
@@ -42,22 +41,22 @@ const mockTemperatureModuleDef = {
 }
 describe('useModuleMatchResults', () => {
   beforeEach(() => {
-    when(vi.mocked(useRobot))
+    vi.when(vi.mocked(useRobot))
       .calledWith(mockConnectedRobot.name)
       .thenReturn(mockConnectedRobot)
-    when(vi.mocked(useModuleRenderInfoForProtocolById))
+    vi.when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith('1')
       .thenReturn({})
 
-    when(vi.mocked(useAttachedModules))
+    vi.when(vi.mocked(useAttachedModules))
       .calledWith()
       .thenReturn([mockTemperatureModule])
   })
 
   it('should return no missing Module Ids if all connecting modules are present', () => {
-    when(vi.mocked(useAttachedModules)).calledWith().thenReturn([])
+    vi.when(vi.mocked(useAttachedModules)).calledWith().thenReturn([])
     const moduleId = 'fakeMagBlockId'
-    when(vi.mocked(useModuleRenderInfoForProtocolById))
+    vi.when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith('1')
       .thenReturn({
         [moduleId]: {
@@ -85,7 +84,7 @@ describe('useModuleMatchResults', () => {
   })
   it('should return 1 missing moduleId if requested model not attached', () => {
     const moduleId = 'fakeMagModuleId'
-    when(vi.mocked(useModuleRenderInfoForProtocolById))
+    vi.when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith('1')
       .thenReturn({
         [moduleId]: {
@@ -103,7 +102,7 @@ describe('useModuleMatchResults', () => {
           conflictedFixture: null,
         },
       })
-    when(vi.mocked(useAttachedModules)).calledWith().thenReturn([])
+    vi.when(vi.mocked(useAttachedModules)).calledWith().thenReturn([])
 
     const { result } = renderHook(() =>
       useUnmatchedModulesForProtocol(mockConnectedRobot.name, '1')
@@ -113,7 +112,7 @@ describe('useModuleMatchResults', () => {
   })
   it('should return no missing moduleId if compatible model is attached', () => {
     const moduleId = 'someTempModule'
-    when(vi.mocked(useModuleRenderInfoForProtocolById))
+    vi.when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith('1')
       .thenReturn({
         [moduleId]: {
@@ -140,7 +139,7 @@ describe('useModuleMatchResults', () => {
   })
   it('should return one missing moduleId if nocompatible model is attached', () => {
     const moduleId = 'someTempModule'
-    when(vi.mocked(useModuleRenderInfoForProtocolById))
+    vi.when(vi.mocked(useModuleRenderInfoForProtocolById))
       .calledWith('1')
       .thenReturn({
         [moduleId]: {

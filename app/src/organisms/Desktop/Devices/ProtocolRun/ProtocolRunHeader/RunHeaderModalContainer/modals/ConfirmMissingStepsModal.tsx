@@ -10,12 +10,12 @@ import {
   Flex,
   Icon,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   Modal,
   PrimaryButton,
   SecondaryButton,
   SIZE_1,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -61,9 +61,9 @@ export const ConfirmMissingStepsModal = (
       onClose={onCloseClick}
     >
       <Flex flexDirection={DIRECTION_COLUMN} fontSize={TYPOGRAPHY.fontSizeP}>
-        <LegacyStyledText paddingBottom={SPACING.spacing4}>
+        <StyledText paddingBottom={SPACING.spacing4}>
           {buildMissingStepsCopy()}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}

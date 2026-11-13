@@ -30,6 +30,7 @@ import type {
   VACUUM_MODULE_TYPE,
   VacuumRunProfileParams,
   Width,
+  WithRuntimeParameterStrings,
 } from '@opentrons/shared-data'
 import type {
   AUTOMATIC,
@@ -302,19 +303,43 @@ export interface Ingredients {
   [liquidId: string]: Ingredient
 }
 
-export type Choices = number[] | string[]
-
-export interface RuntimeParameter {
+interface RuntimeParameterBase {
   variableName: string
   displayName: string
-  type: 'boolean' | 'string' | 'float' | 'int' | 'csv'
-  default: string | number | boolean
-  minimum?: number
-  maximum?: number
-  choices?: Choices
-  unit?: string
   description?: string
 }
+
+export interface NumericRuntimeParameter extends RuntimeParameterBase {
+  type: 'float' | 'int'
+  default: number
+  minimum?: number
+  maximum?: number
+  choices?: number[]
+  unit?: string
+}
+
+export interface BooleanRuntimeParameter extends RuntimeParameterBase {
+  type: 'boolean'
+  default: boolean
+}
+
+export interface StringRuntimeParameter extends RuntimeParameterBase {
+  type: 'string'
+  default: string
+  choices?: string[]
+}
+
+export interface CsvRuntimeParameter extends RuntimeParameterBase {
+  type: 'csv'
+  default: string
+}
+
+export type RuntimeParameter =
+  | NumericRuntimeParameter
+  | BooleanRuntimeParameter
+  | StringRuntimeParameter
+  | CsvRuntimeParameter
+
 export interface RuntimeParameters {
   [variableName: string]: RuntimeParameter
 }
@@ -604,27 +629,31 @@ export type MixArgs = CommonArgs & {
   primaryNozzle: PrimaryNozzleConfigurationStyle
 }
 
-export type PauseArgs = CommonArgs & {
-  commandCreatorFnName: 'delay'
-  message?: string
-  seconds?: number
-  pauseTemperature?: number | null
-  meta:
-    | {
-        hours?: number
-        minutes?: number
-        seconds?: number
-      }
-    | null
-    | undefined
-}
+export type PauseArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    commandCreatorFnName: 'delay'
+    message?: string
+    seconds?: number
+    pauseTemperature?: number | null
+    meta:
+      | {
+          hours?: number
+          minutes?: number
+          seconds?: number
+        }
+      | null
+      | undefined
+  }
+>
 
-export interface WaitForTemperatureArgs extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'waitForTemperature'
-  celsius: number
-  message?: string
-}
+export type WaitForTemperatureArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    moduleId: string
+    commandCreatorFnName: 'waitForTemperature'
+    celsius: number
+    message?: string
+  }
+>
 
 export interface WaitForModuleTaskArgs extends CommonArgs {
   commandCreatorFnName: 'waitForModuleTask'
@@ -638,31 +667,39 @@ export interface WaitForModuleTaskArgs extends CommonArgs {
   moduleId: string
 }
 
-export type EngageMagnetArgs = CommonArgs & {
-  height: number
-  moduleId: string
-  commandCreatorFnName: 'engageMagnet'
-  message?: string
-}
+export type EngageMagnetArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    height: number
+    moduleId: string
+    commandCreatorFnName: 'engageMagnet'
+    message?: string
+  }
+>
 
-export type DisengageMagnetArgs = CommonArgs & {
-  moduleId: string
-  commandCreatorFnName: 'disengageMagnet'
-  message?: string
-}
+export type DisengageMagnetArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    moduleId: string
+    commandCreatorFnName: 'disengageMagnet'
+    message?: string
+  }
+>
 
-export interface SetTemperatureArgs extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'setTemperature'
-  celsius: number
-  message?: string
-}
+export type SetTemperatureArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    moduleId: string
+    commandCreatorFnName: 'setTemperature'
+    celsius: number
+    message?: string
+  }
+>
 
-export interface DeactivateTemperatureArgs extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'deactivateTemperature'
-  message?: string
-}
+export type DeactivateTemperatureArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    moduleId: string
+    commandCreatorFnName: 'deactivateTemperature'
+    message?: string
+  }
+>
 
 export type SetShakeSpeedArgs = ShakeSpeedParams & {
   moduleId: string
@@ -749,76 +786,96 @@ export interface ThermocyclerStateStepArgs extends CommonArgs {
   message?: string
 }
 
-export interface AbsorbanceReaderInitializeArgs extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'absorbanceReaderInitialize'
-  measureMode: 'single' | 'multi'
-  sampleWavelengths: number[]
-  referenceWavelength?: number | null
-  message?: string
-}
+export type AbsorbanceReaderInitializeArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    moduleId: string
+    commandCreatorFnName: 'absorbanceReaderInitialize'
+    measureMode: 'single' | 'multi'
+    sampleWavelengths: number[]
+    referenceWavelength?: number | null
+    message?: string
+  }
+>
 
-export interface AbsorbanceReaderReadArgs extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'absorbanceReaderRead'
-  fileName: string | null
-  message?: string
-}
+export type AbsorbanceReaderReadArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    moduleId: string
+    commandCreatorFnName: 'absorbanceReaderRead'
+    fileName: string | null
+    message?: string
+  }
+>
 
-export interface AbsorbanceReaderLidArgs extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'absorbanceReaderOpenLid' | 'absorbanceReaderCloseLid'
-  message?: string
-}
+export type AbsorbanceReaderLidArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    moduleId: string
+    commandCreatorFnName: 'absorbanceReaderOpenLid' | 'absorbanceReaderCloseLid'
+    message?: string
+  }
+>
 
 export type AbsorbanceReaderArgs =
   | AbsorbanceReaderInitializeArgs
   | AbsorbanceReaderReadArgs
   | AbsorbanceReaderLidArgs
 
-export interface MoveLabwareArgs extends CommonArgs {
-  commandCreatorFnName: 'moveLabware'
-  labwareId: string
-  newLocation: LabwareLocation
-  strategy: LabwareMovementStrategy
-}
+export type MoveLabwareArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    commandCreatorFnName: 'moveLabware'
+    labwareId: string
+    newLocation: LabwareLocation
+    strategy: LabwareMovementStrategy
+  }
+>
 
-export interface CommentArgs extends CommonArgs {
-  commandCreatorFnName: 'comment'
-  message: string
-}
+export type CommentArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    commandCreatorFnName: 'comment'
+    message: string
+  }
+>
 
-export interface CaptureImageArgs extends CommonArgs {
-  commandCreatorFnName: 'captureImage'
-  homeBefore: boolean
-  fileName: string
-  resolution: [Width, Height]
-  zoom: number
-  contrast: number
-  brightness: number
-  saturation: number
-}
+export type CaptureImageArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    commandCreatorFnName: 'captureImage'
+    homeBefore: boolean | string
+    fileName: string
+    resolution: [Width | string, Height | string]
+    zoom: number | string
+    contrast: number | string
+    brightness: number | string
+    saturation: number | string
+  }
+>
 
-export interface FlexStackerEmptyArgs extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'flexStackerEmpty'
-  interventionMessage: string | null
-}
-export interface FlexStackerFillItemsArgs extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'flexStackerFillItems'
-  fillLabwareUri: string | null
-  fillLabwareIds: string[]
-  interventionMessage: string | null
-}
-export interface FlexStackerStoreArgs extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'flexStackerStore'
-}
-export interface FlexStackerRetrieveArgs extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'flexStackerRetrieve'
-}
+export type FlexStackerEmptyArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    moduleId: string
+    commandCreatorFnName: 'flexStackerEmpty'
+    interventionMessage: string | null
+  }
+>
+export type FlexStackerFillItemsArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    moduleId: string
+    commandCreatorFnName: 'flexStackerFillItems'
+    fillLabwareUri: string | null
+    fillLabwareIds: string[]
+    interventionMessage: string | null
+  }
+>
+export type FlexStackerStoreArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    moduleId: string
+    commandCreatorFnName: 'flexStackerStore'
+  }
+>
+export type FlexStackerRetrieveArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    moduleId: string
+    commandCreatorFnName: 'flexStackerRetrieve'
+  }
+>
 
 export interface VacuumPumpAdvancedArgs {
   duration?: number
@@ -839,34 +896,44 @@ export interface VacuumPumpPowerArgs
   percentPower: number
 }
 
-export interface VacuumCloseVentSetPumpPressureArgs
-  extends CommonArgs, VacuumPumpAdvancedArgs {
-  moduleId: string
-  commandCreatorFnName: 'vacuumCloseVentSetPumpPressure'
-  gaugePressure: number
-}
+export type VacuumCloseVentSetPumpPressureArgs = WithRuntimeParameterStrings<
+  CommonArgs &
+    VacuumPumpAdvancedArgs & {
+      moduleId: string
+      commandCreatorFnName: 'vacuumCloseVentSetPumpPressure'
+      gaugePressure: number
+    }
+>
 
-export interface VacuumCloseVentSetPumpPowerArgs
-  extends CommonArgs, VacuumPumpAdvancedArgs {
-  moduleId: string
-  commandCreatorFnName: 'vacuumCloseVentSetPumpPower'
-  percentPower: number
-}
+export type VacuumCloseVentSetPumpPowerArgs = WithRuntimeParameterStrings<
+  CommonArgs &
+    VacuumPumpAdvancedArgs & {
+      moduleId: string
+      commandCreatorFnName: 'vacuumCloseVentSetPumpPower'
+      percentPower: number
+    }
+>
 
-export interface VacuumOpenVentArgs extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'vacuumOpenVent'
-}
+export type VacuumOpenVentArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    moduleId: string
+    commandCreatorFnName: 'vacuumOpenVent'
+  }
+>
 
-export interface VacuumCloseVentArgs extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'vacuumCloseVent'
-}
+export type VacuumCloseVentArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    moduleId: string
+    commandCreatorFnName: 'vacuumCloseVent'
+  }
+>
 
-export interface VacuumStopPumpArgs extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'vacuumStopPump'
-}
+export type VacuumStopPumpArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    moduleId: string
+    commandCreatorFnName: 'vacuumStopPump'
+  }
+>
 
 export interface VacuumPressureData {
   mode: typeof VACUUM_MODE_PRESSURE
@@ -904,12 +971,14 @@ export interface VacuumStartRunProfileArgs extends CommonArgs {
   ventAfter: boolean
 }
 
-export interface VacuumCloseVentStartProfileArgs extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'vacuumCloseVentStartProfile'
-  profile: VacuumRunProfileParams['steps']
-  ventAfter: boolean
-}
+export type VacuumCloseVentStartProfileArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    moduleId: string
+    commandCreatorFnName: 'vacuumCloseVentStartProfile'
+    profile: VacuumRunProfileParams['steps']
+    ventAfter: boolean
+  }
+>
 
 export type VacuumArgs =
   | VacuumPumpArgs
@@ -1053,6 +1122,7 @@ export type ErrorType =
   | 'HOPPER_FULL'
   | 'INCOMPLETE_PICKUP'
   | 'INSUFFICIENT_TIPS'
+  | 'INVALID_RUNTIME_PARAMETER'
   | 'INVALID_SLOT'
   | 'INVALID_WAIT_CONDITION'
   | 'LABWARE_DISCARDED_IN_TRASH'
@@ -1194,3 +1264,255 @@ export type UnsafePipetteMovementReason =
 
 export type PipetteMovementSafetyStatus =
   { isSafe: true } | { isSafe: false; reason: UnsafePipetteMovementReason }
+
+export interface ModuleStepGenArgs {
+  moduleId: string
+}
+
+export interface AbsorbanceReaderInitializeStepGenArgs {
+  moduleId: string
+  measureMode: string
+  sampleWavelengths: Array<number | string>
+  referenceWavelength?: number | string
+}
+
+export interface AbsorbanceReaderReadStepGenArgs {
+  moduleId: string
+  fileName?: string | null
+}
+
+export interface ThermocyclerSetTargetBlockTemperatureStepGenArgs {
+  moduleId: string
+  celsius: number | string
+}
+
+export interface ThermocyclerSetTargetLidTemperatureStepGenArgs {
+  moduleId: string
+  celsius: number | string
+}
+
+export interface ThermocyclerProfileStepStepGenArgs {
+  celsius: number | string
+  holdSeconds: number | string
+}
+
+export interface ThermocyclerProfileCycleStepGenArgs {
+  steps: ThermocyclerProfileStepStepGenArgs[]
+  repetitions: number | string
+}
+
+export interface ThermocyclerStartRunExtendedProfileStepGenArgs {
+  moduleId: string
+  profileElements: Array<
+    ThermocyclerProfileCycleStepGenArgs | ThermocyclerProfileStepStepGenArgs
+  >
+  blockMaxVolumeUl?: number | string
+  taskId?: string | null
+}
+
+export interface ConfigureForVolumeStepGenArgs {
+  pipetteId: string
+  volume: number | string
+}
+
+export interface ConfigureNozzleLayoutStepGenArgs {
+  pipetteId: string
+  configurationParams: {
+    style: string
+    primaryNozzle?: string
+    backLeftNozzle?: string
+  }
+}
+
+export interface VacuumSetPumpPowerStepGenArgs {
+  moduleId: string
+  percentPower: number | string
+  duration?: number | string
+  ventAfter?: boolean | string
+}
+
+export interface VacuumSetPumpPressureStepGenArgs {
+  moduleId: string
+  gaugePressure: number | string
+  duration?: number | string
+  ventAfter?: boolean | string
+}
+
+export interface VacuumStartRunProfileStepGenArgs {
+  moduleId: string
+  profile: VacuumRunProfileParams['steps']
+  ventAfter: boolean | string
+}
+
+export interface WaitForTemperatureStepGenArgs {
+  moduleId: string
+  celsius: number | string
+}
+
+export interface EngageMagnetStepGenArgs extends ModuleStepGenArgs {
+  height: number | string
+}
+
+export interface HeaterShakerSetTargetShakeSpeedStepGenArgs {
+  moduleId: string
+  rpm: number | string
+}
+
+interface RuntimeWellLocation {
+  origin?: string
+  offset?: {
+    x?: number | string
+    y?: number | string
+    z?: number | string
+  }
+}
+
+export interface LiquidProbeStepGenArgs {
+  pipetteId: string
+  labwareId: string
+  wellName: string
+  wellLocation?: RuntimeWellLocation
+}
+
+export type TryLiquidProbeStepGenArgs = LiquidProbeStepGenArgs
+
+export interface TouchTipStepGenArgs {
+  pipetteId: string
+  labwareId: string
+  wellName: string
+  zOffsetFromTop: number | string
+  speed?: number | string
+  mmFromEdge?: number | string
+}
+
+export interface PrepareToAspirateStepGenArgs {
+  pipetteId: string
+}
+
+export interface PickUpTipStepGenArgs {
+  pipetteId: string
+  labwareId: string
+  wellName: string
+  primaryNozzle: string
+  nozzles: string
+  tipTrackingOption?: string
+}
+
+export interface DropTipStepGenArgs {
+  pipette: string
+  wellName?: string
+  dropTipLocation?: string
+  isReturnTip?: boolean | string
+}
+
+export interface DispenseWhileTrackingStepGenArgs {
+  pipetteId: string
+  volume: number | string
+  flowRate: number | string
+  labwareId: string
+  wellName: string
+  trackFromLocation: RuntimeWellLocation
+  trackToLocation: RuntimeWellLocation
+  pushOut?: number | string
+}
+
+export interface DispenseInPlaceStepGenArgs {
+  pipetteId: string
+  volume: number | string
+  flowRate: number | string
+  pushOut?: number | string
+  correctionVolume?: number | string
+  isAirGap?: boolean | string
+}
+
+export interface BlowOutInWellStepGenArgs {
+  pipetteId: string
+  labwareId: string
+  wellName: string
+  flowRate: number | string
+  wellLocation?: RuntimeWellLocation
+}
+
+export interface BlowOutInPlaceStepGenArgs {
+  pipetteId: string
+  flowRate: number | string
+}
+
+export interface DropTipInPlaceStepGenArgs {
+  pipetteId: string
+  homeAfter?: boolean | string
+}
+
+export interface AspirateWhileTrackingStepGenArgs {
+  pipetteId: string
+  volume: number | string
+  flowRate: number | string
+  labwareId: string
+  wellName: string
+  trackFromLocation: RuntimeWellLocation
+  trackToLocation: RuntimeWellLocation
+}
+
+export interface AspirateInPlaceStepGenArgs {
+  pipetteId: string
+  volume: number | string
+  flowRate: number | string
+  correctionVolume?: number | string
+}
+
+export interface SetTemperatureStepGenArgs extends ModuleStepGenArgs {
+  celsius: number | string
+}
+
+export interface MoveRelativeStepGenArgs {
+  pipetteId: string
+  axis: string
+  distance: number | string
+}
+
+export interface MoveToCoordinatesStepGenArgs {
+  pipetteId: string
+  coordinates: {
+    x: number | string
+    y: number | string
+    z: number | string
+  }
+  minimumZHeight?: number | string
+  forceDirect?: boolean | string
+}
+
+export interface MoveToAddressableAreaForDropTipStepGenArgs {
+  pipetteId: string
+  addressableAreaName: string
+  offset?: {
+    x: number | string
+    y: number | string
+    z: number | string
+  }
+  alternateDropLocation?: boolean | string
+  speed?: number | string
+  minimumZHeight?: number | string
+  forceDirect?: boolean | string
+  ignoreTipConfiguration?: boolean | string
+}
+
+export interface MoveToWellStepGenArgs {
+  pipetteId: string
+  labwareId: string
+  wellName: string
+  wellLocation?: RuntimeWellLocation
+  minimumZHeight?: number | string
+  forceDirect?: boolean | string
+  speed?: number | string
+}
+
+export interface MoveLabwareStepGenArgs {
+  labwareId: string
+  strategy: string
+  newLocation:
+    | string
+    | { slotName: string }
+    | { moduleId: string }
+    | { labwareId: string }
+    | { addressableAreaName: string }
+}

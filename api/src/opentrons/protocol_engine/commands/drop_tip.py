@@ -121,18 +121,22 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, _ExecuteReturn]):
         home_after = params.homeAfter
 
         if params.alternateDropLocation:
-            well_location = self._state_view.geometry.get_next_tip_drop_location(
-                labware_id=labware_id,
-                well_name=well_name,
-                pipette_id=pipette_id,
+            well_location = (
+                self._state_view.instrument_interface.get_next_tip_drop_location(
+                    labware_id=labware_id,
+                    well_name=well_name,
+                    pipette_id=pipette_id,
+                )
             )
         else:
             well_location = params.wellLocation
 
-        tip_drop_location = self._state_view.geometry.get_checked_tip_drop_location(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_location=well_location,
+        tip_drop_location = (
+            self._state_view.instrument_interface.get_checked_tip_drop_location(
+                pipette_id=pipette_id,
+                labware_id=labware_id,
+                well_location=well_location,
+            )
         )
 
         is_tip_rack = self._state_view.labware.get_definition(

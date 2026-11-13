@@ -25,9 +25,8 @@ import {
 } from '@opentrons/components'
 
 import { getModalPortalEl } from '/app/App/portal'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { LPC_HREF } from '/app/local-resources/offsets'
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { getIsOnDevice } from '/app/redux/config'
 import {
   HANDLE_LW_SUBSTEP,
@@ -38,9 +37,8 @@ import {
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { ReactNode } from 'react'
+import type { ChildNavigationProps } from '/app/components/ODD/headers/ChildNavigation'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import type { ChildNavigationProps } from '/app/organisms/ODD/ChildNavigation'
 
 interface LPCContentContainerTertiaryBtnProps {
   onClick: () => void
@@ -95,14 +93,13 @@ export function LPCContentContainer(
   const step = useSelector(selectCurrentStep(runId))
   const isOnDevice = useSelector(getIsOnDevice)
   const showDesktopFooter = !commandUtils.isRobotMoving
+  const canSafelyMoveOnExit =
+    commandUtils.errorMessage == null && !commandUtils.isDoorOpenError
 
   const handleExit = (): void => {
-    if (step === LPC_STEP.HANDLE_LABWARE && commandUtils.errorMessage == null) {
+    if (step === LPC_STEP.HANDLE_LABWARE && canSafelyMoveOnExit) {
       commandUtils.headerCommands.handleNavToDetachProbe()
-    } else if (
-      step === LPC_STEP.DETACH_PROBE &&
-      commandUtils.errorMessage == null
-    ) {
+    } else if (step === LPC_STEP.DETACH_PROBE && canSafelyMoveOnExit) {
       commandUtils.headerCommands.handleCloseAndHome()
     } else {
       void commandUtils.handleCloseNoHome()
@@ -176,7 +173,8 @@ function DesktopFooterContent({
   const showHelpLink =
     step !== LPC_STEP.LPC_COMPLETE &&
     currentSubstep !== HANDLE_LW_SUBSTEP.EDIT_OFFSET_SUCCESS &&
-    commandUtils.errorMessage == null
+    commandUtils.errorMessage == null &&
+    !commandUtils.isDoorOpenError
 
   return (
     <Flex css={DESKTOP_FOOTER_CONTENT_CONTAINER}>

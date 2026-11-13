@@ -15,18 +15,18 @@ import {
   InlineNotification,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { InterventionModal as InterventionModalMolecule } from '/app/components/ODD/modals/InterventionModal'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { isTerminatingRunStatus } from '/app/local-resources/runs/utils'
-import { InterventionModal as InterventionModalMolecule } from '/app/molecules/InterventionModal'
-import { OddModal } from '/app/molecules/OddModal'
 import { useRobotType } from '/app/redux-resources/robots'
 import { getIsOnDevice } from '/app/redux/config'
 
@@ -241,9 +241,7 @@ export function InterventionModal({
     </OddModal>
   ) : (
     <InterventionModalMolecule
-      iconHeading={
-        <LegacyStyledText forwardedAs="h1">{headerTitle}</LegacyStyledText>
-      }
+      iconHeading={<StyledText forwardedAs="h1">{headerTitle}</StyledText>}
       iconName={iconName}
       type="intervention-required"
       iconSize={iconSize}

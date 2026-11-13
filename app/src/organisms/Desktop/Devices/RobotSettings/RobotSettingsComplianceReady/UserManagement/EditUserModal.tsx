@@ -18,10 +18,8 @@ import { logOut, useUsernameForRobot } from '/app/redux/robot-auth'
 import { getUsernameValidationError } from '/app/resources/auth/getUsernameValidationError'
 import { mapAuthUserMutationError } from '/app/resources/auth/mapAuthUserMutationError'
 
-import {
-  MANAGEABLE_USER_ACCOUNT_TYPES,
-  USERNAME_MAX_LENGTH,
-} from '../userAccount/constants'
+import { USERNAME_MAX_LENGTH } from '../../../../../../resources/auth/helpers'
+import { MANAGEABLE_USER_ACCOUNT_TYPES } from '../userAccount/constants'
 import styles from '../userAccount/userAccountForm.module.css'
 import { UserAccountIdentityFormFields } from '../userAccount/UserAccountIdentityFormFields'
 
@@ -106,14 +104,15 @@ export function EditUserModal({
     const didChangeRole = data.accountType !== user.accountType
     const submittedTrimmedUsername = data.username.trim()
     const submittedTrimmedFullName = data.fullName.trim()
+    const didChangeUsername = submittedTrimmedUsername !== user.username
+    const shouldLogOut =
+      loggedInUsername === user.username && (didChangeUsername || didChangeRole)
 
     const updatePromise = updateUser({
       username: user.username,
       request: {
         data: {
-          ...(submittedTrimmedUsername !== user.username
-            ? { username: submittedTrimmedUsername }
-            : {}),
+          ...(didChangeUsername ? { username: submittedTrimmedUsername } : {}),
           ...(submittedTrimmedFullName !== user.fullName
             ? { fullName: submittedTrimmedFullName }
             : {}),
@@ -125,7 +124,7 @@ export function EditUserModal({
       .then(() => {
         onUserUpdated?.()
         handleClose()
-        if (didChangeRole && loggedInUsername === user.username) {
+        if (shouldLogOut) {
           dispatch(logOut({ robotName }))
         }
       })

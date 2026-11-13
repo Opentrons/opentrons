@@ -6,13 +6,13 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import screenImage from '/app/assets/images/on-device-display/welcome_background.png'
-import { MediumButton } from '/app/atoms/buttons'
+import { MediumButton } from '/app/components/ODD/buttons'
 
 import type { ReactNode } from 'react'
 
@@ -31,22 +31,19 @@ export function Welcome(): ReactNode {
     >
       <img alt={IMAGE_ALT} src={screenImage} width="904px" height="189px" />
       <Flex justifyContent={JUSTIFY_CENTER}>
-        <LegacyStyledText
-          forwardedAs="h2"
-          fontWeight={TYPOGRAPHY.fontWeightBold}
-        >
+        <StyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('branded:welcome_title')}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER}>
-        <LegacyStyledText
+        <StyledText
           as="h4"
           color={COLORS.grey60}
           textAlign={TYPOGRAPHY.textAlignCenter}
           width="39.875rem"
         >
           {t('welcome_description')}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginTop="1.75rem">
         <MediumButton

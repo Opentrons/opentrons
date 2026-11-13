@@ -7,7 +7,7 @@
 
 .handle {
   position: absolute;
-  z-index: 10;
+  z-index: var(--z-index-details);
   top: 0;
   bottom: 0;
   width: 0.5rem;

@@ -135,6 +135,7 @@ export type AuditLogAction =
   | 'detach_gripper'
   | 'recalibrate_gripper'
   | 'lpc_flow'
+  | 'jog_pipette'
   | 'drop_tips'
   | 'end_calibration'
   | 'add_module'
@@ -200,6 +201,7 @@ export type AuditLogAction =
   | 'toggle_analytics'
   | 'download_log_period'
   | 'unlock_user'
+  | 'set_log_level'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.

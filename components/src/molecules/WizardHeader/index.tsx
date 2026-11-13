@@ -1,5 +1,4 @@
 import { StepMeter, StyledText } from '../../atoms'
-import { grey60 } from '../../helix-design-system/colors'
 import { Box, Btn, Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_ROW } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
@@ -16,6 +15,7 @@ interface WizardHeaderProps {
   currentStep?: number | null
   exitDisabled?: boolean
   hideStepText?: boolean
+  isExiting?: boolean
 }
 
 export const WizardHeader = (props: WizardHeaderProps): ReactNode => {
@@ -49,9 +49,9 @@ export const WizardHeader = (props: WizardHeaderProps): ReactNode => {
           totalSteps != null &&
           currentStep > 0 ? (
             <StyledText
+              className={styles.step_text}
               desktopStyle="bodyDefaultRegular"
               oddStyle="bodyTextSemiBold"
-              color={grey60}
             >
               {`Step ${currentStep} / ${totalSteps}`}
             </StyledText>

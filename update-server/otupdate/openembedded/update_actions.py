@@ -19,6 +19,7 @@ from otupdate.common.file_actions import (
     unzip_update,
     verify_signature,
 )
+from otupdate.common.session import UpdateCancelled
 from otupdate.common.update_actions import Partition, UpdateActionsInterface
 
 UPDATE_PKG_OE = ["system-update.zip"]
@@ -122,6 +123,7 @@ class RootFSInterface:
                 while True:
                     chunk = fsrc.read(chunk_size)
                     total_size += len(chunk)
+                    progress_callback(0)
                     if len(chunk) != chunk_size:
                         break
 
@@ -144,6 +146,8 @@ class RootFSInterface:
                     if len(chunk) != chunk_size:
                         break
             return True, ""
+        except UpdateCancelled:
+            raise
         except Exception:
             LOG.exception("RootFSInterface::write_update exception reading")
             return False, "Unknown error"

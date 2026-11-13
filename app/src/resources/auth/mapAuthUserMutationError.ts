@@ -114,7 +114,9 @@ export function mapSetNewPasswordError(error: unknown, t: TFunction): string {
       ns: 'access_control',
     })
   } else if (errorId === 'passwordPreviouslyUsed') {
-    return t('desktop_password_previously_used')
+    return t('desktop_password_previously_used', {
+      ns: 'device_settings',
+    })
   } else {
     return t('set_new_password_error_update_failed', {
       ns: 'access_control',

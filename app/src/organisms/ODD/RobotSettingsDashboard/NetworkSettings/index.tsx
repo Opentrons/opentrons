@@ -11,12 +11,12 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 
 import type { ComponentProps, ReactNode } from 'react'
 import type { ChipType, IconName } from '@opentrons/components'
@@ -127,23 +127,21 @@ function NetworkSettingButton({
           <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing24}>
             <Icon name={iconName} size="3rem" />
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
-              <LegacyStyledText
-                fontSize={TYPOGRAPHY.fontSize28}
-                lineHeight={TYPOGRAPHY.lineHeight36}
+              <StyledText
+                forwardedAs="h4"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 textAlign={TYPOGRAPHY.textAlignLeft}
               >
                 {buttonTitle}
-              </LegacyStyledText>
+              </StyledText>
               {networkName != null ? (
-                <LegacyStyledText
-                  fontSize={TYPOGRAPHY.fontSize28}
-                  lineHeight={TYPOGRAPHY.lineHeight36}
+                <StyledText
+                  forwardedAs="h4"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   color={COLORS.grey60}
                 >
                   {networkName}
-                </LegacyStyledText>
+                </StyledText>
               ) : null}
             </Flex>
           </Flex>

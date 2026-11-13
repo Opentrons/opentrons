@@ -5,7 +5,7 @@ from typing import List, NamedTuple, Optional
 import pytest
 
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.labware.labware_definition import (
     AxisAlignedBoundingBox3D,
     Dimensions,
@@ -47,6 +47,7 @@ from opentrons.protocol_engine.types import (
     AddressableOffsetVector,
     AreaType,
     DeckSlotLocation,
+    DeckType,
     LabwareLocation,
     LabwareMovementOffsetData,
     LabwareOffsetVector,
@@ -58,10 +59,6 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.protocol_engine.types import (
     Dimensions as AddressableAreaDimensions,
-)
-from opentrons.protocols.api_support.deck_type import (
-    STANDARD_OT2_DECK,
-    STANDARD_OT3_DECK,
 )
 from opentrons.types import DeckSlotName, Point
 
@@ -613,7 +610,7 @@ _ADDRESSABLE_AREA_WITH_FLEX_TIP_RACK_LID = AddressableArea(
 class ModuleOverlapSpec(NamedTuple):
     """Spec data to test module overlap behavior."""
 
-    spec_deck_definition: DeckDefinitionV5
+    spec_deck_definition: DeckDefinitionV6
     module_definition: ModuleDefinition
     child_definition: LabwareDefinition2
     module_parent_to_child_offset: Point
@@ -656,7 +653,7 @@ class GripperOffsetSpec(NamedTuple):
     stackup_lw_info_top_to_bottom: List[tuple[LabwareDefinition, object]]
     underlying_ancestor_definition: object
     slot_name: DeckSlotName
-    deck_definition: DeckDefinitionV5
+    deck_definition: DeckDefinitionV6
     module_parent_to_child_offset: Optional[Point]
     expected_pick_up_offset: Point
     expected_drop_offset: Point
@@ -664,7 +661,7 @@ class GripperOffsetSpec(NamedTuple):
 
 MODULE_OVERLAP_SPECS: List[ModuleOverlapSpec] = [
     ModuleOverlapSpec(
-        spec_deck_definition=load_deck(STANDARD_OT2_DECK, 5),
+        spec_deck_definition=load_deck(DeckType.OT3_STANDARD, 6),
         module_definition=_MODULE_DEF_TEMP_V2,
         child_definition=_LW_V2_WITH_MODULE_STACKING,
         module_parent_to_child_offset=Point(x=450, y=550, z=650),
@@ -672,15 +669,7 @@ MODULE_OVERLAP_SPECS: List[ModuleOverlapSpec] = [
         expected_total_offset=Point(x=550, y=700, z=850),
     ),
     ModuleOverlapSpec(
-        spec_deck_definition=load_deck(STANDARD_OT2_DECK, 5),
-        module_definition=_MODULE_DEF_TC_V2,
-        child_definition=_LW_V2,
-        module_parent_to_child_offset=Point(x=450, y=550, z=650),
-        labware_location=ModuleLocation(moduleId="module-1"),
-        expected_total_offset=Point(x=600, y=800, z=989.3),
-    ),
-    ModuleOverlapSpec(
-        spec_deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        spec_deck_definition=load_deck(DeckType.OT3_STANDARD, 6),
         module_definition=_MODULE_DEF_TC_V2,
         child_definition=_LW_V2,
         module_parent_to_child_offset=Point(x=450, y=550, z=650),
@@ -688,7 +677,7 @@ MODULE_OVERLAP_SPECS: List[ModuleOverlapSpec] = [
         expected_total_offset=Point(x=600, y=800, z=1000),
     ),
     ModuleOverlapSpec(
-        spec_deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        spec_deck_definition=load_deck(DeckType.OT3_STANDARD, 6),
         module_definition=_MODULE_DEF_TC_V2,
         child_definition=_LW_V2_WITH_MODULE_STACKING,
         module_parent_to_child_offset=Point(x=450, y=550, z=650),
@@ -839,7 +828,7 @@ GRIPPER_OFFSET_SPECS: List[GripperOffsetSpec] = [
         ],
         underlying_ancestor_definition=_ADDRESSABLE_AREA,
         slot_name=DeckSlotName.SLOT_3,
-        deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        deck_definition=load_deck(DeckType.OT3_STANDARD, 6),
         module_parent_to_child_offset=None,
         expected_pick_up_offset=Point(x=0, y=0, z=0),
         expected_drop_offset=Point(x=0, y=0, z=-0.75),
@@ -850,7 +839,7 @@ GRIPPER_OFFSET_SPECS: List[GripperOffsetSpec] = [
         ],
         underlying_ancestor_definition=_MODULE_DEF_WITH_GRIPPER_OFFSETS,
         slot_name=DeckSlotName.SLOT_A1,
-        deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        deck_definition=load_deck(DeckType.OT3_STANDARD, 6),
         module_parent_to_child_offset=Point(x=0, y=0, z=0),
         expected_pick_up_offset=Point(x=11, y=22, z=33),
         expected_drop_offset=Point(x=33, y=22, z=11),
@@ -865,7 +854,7 @@ GRIPPER_OFFSET_SPECS: List[GripperOffsetSpec] = [
         ],
         underlying_ancestor_definition=_ADDRESSABLE_AREA,
         slot_name=DeckSlotName.SLOT_1,
-        deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        deck_definition=load_deck(DeckType.OT3_STANDARD, 6),
         module_parent_to_child_offset=None,
         expected_pick_up_offset=Point(x=10, y=20, z=30),
         expected_drop_offset=Point(x=40, y=50, z=59.25),
@@ -880,7 +869,7 @@ GRIPPER_OFFSET_SPECS: List[GripperOffsetSpec] = [
         ],
         underlying_ancestor_definition=_MODULE_DEF_WITH_GRIPPER_OFFSETS,
         slot_name=DeckSlotName.SLOT_C1,
-        deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        deck_definition=load_deck(DeckType.OT3_STANDARD, 6),
         module_parent_to_child_offset=Point(x=0, y=0, z=0),
         expected_pick_up_offset=Point(x=111, y=222, z=333),
         expected_drop_offset=Point(x=333, y=222, z=111),
@@ -892,7 +881,7 @@ GRIPPER_OFFSET_SPECS: List[GripperOffsetSpec] = [
         ],
         underlying_ancestor_definition=_MODULE_DEF_TC_V2,
         slot_name=DeckSlotName.SLOT_B1,
-        deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        deck_definition=load_deck(DeckType.OT3_STANDARD, 6),
         module_parent_to_child_offset=Point(x=0, y=0, z=0),
         expected_pick_up_offset=Point(x=5, y=10, z=15),
         expected_drop_offset=Point(x=5, y=10, z=15),
@@ -903,7 +892,7 @@ GRIPPER_OFFSET_SPECS: List[GripperOffsetSpec] = [
         ],
         underlying_ancestor_definition=_ADDRESSABLE_AREA,
         slot_name=DeckSlotName.SLOT_3,
-        deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        deck_definition=load_deck(DeckType.OT3_STANDARD, 6),
         module_parent_to_child_offset=None,
         expected_pick_up_offset=Point(x=7, y=14, z=21),
         expected_drop_offset=Point(x=28, y=35, z=41.25),
@@ -918,7 +907,7 @@ GRIPPER_OFFSET_SPECS: List[GripperOffsetSpec] = [
         ],
         underlying_ancestor_definition=_ADDRESSABLE_AREA,
         slot_name=DeckSlotName.SLOT_1,
-        deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        deck_definition=load_deck(DeckType.OT3_STANDARD, 6),
         module_parent_to_child_offset=None,
         expected_pick_up_offset=Point(x=15.0, y=25.0, z=35.0),
         expected_drop_offset=Point(x=45.0, y=55.0, z=64.25),
@@ -931,7 +920,7 @@ GRIPPER_OFFSET_SPECS: List[GripperOffsetSpec] = [
     argvalues=MODULE_OVERLAP_SPECS,
 )
 def test_get_parent_placement_origin_to_lw_origin_with_module(
-    spec_deck_definition: DeckDefinitionV5,
+    spec_deck_definition: DeckDefinitionV6,
     module_definition: ModuleDefinition,
     child_definition: LabwareDefinition2,
     module_parent_to_child_offset: Point,
@@ -976,7 +965,7 @@ def test_get_parent_placement_origin_to_lw_origin_with_labware(
         underlying_ancestor_definition=_ADDRESSABLE_AREA,
         slot_name=DeckSlotName.SLOT_A1,
         module_parent_to_child_offset=None,
-        deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        deck_definition=load_deck(DeckType.OT3_STANDARD, 6),
     )
 
     assert result == expected_total_offset
@@ -1001,7 +990,7 @@ def test_get_parent_placement_origin_to_lw_origin_with_addressable_area(
         underlying_ancestor_definition=addressable_area,
         slot_name=DeckSlotName.SLOT_A1,
         module_parent_to_child_offset=None,
-        deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        deck_definition=load_deck(DeckType.OT3_STANDARD, 6),
     )
 
     assert result == expected_total_offset
@@ -1028,7 +1017,7 @@ def test_get_parent_placement_origin_to_lw_origin_v3_definitions_non_lw(
         underlying_ancestor_definition=parent_definition,
         slot_name=slot_name,
         module_parent_to_child_offset=None,
-        deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        deck_definition=load_deck(DeckType.OT3_STANDARD, 6),
     )
 
     assert result == expected_total_offset
@@ -1059,7 +1048,7 @@ def test_get_parent_placement_origin_to_lw_origin_v3_definitions(
         underlying_ancestor_definition=underlying_ancestor_definition,
         slot_name=slot_name,
         module_parent_to_child_offset=None,
-        deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+        deck_definition=load_deck(DeckType.OT3_STANDARD, 6),
     )
 
     assert result == expected_total_offset
@@ -1067,7 +1056,7 @@ def test_get_parent_placement_origin_to_lw_origin_v3_definitions(
 
 def test_v3_child_on_v2_parent_labware() -> None:
     """Test that v3 labware can stack on v2 labware correctly."""
-    deck_def = load_deck(STANDARD_OT3_DECK, 5)
+    deck_def = load_deck(DeckType.OT3_STANDARD, 6)
 
     # Top-most labware case
     result = get_stackup_origin_to_labware_origin(
@@ -1111,7 +1100,7 @@ def test_gripper_offsets_for_pickup(
     stackup_lw_info_top_to_bottom: List[tuple[LabwareDefinition, LabwareLocation]],
     underlying_ancestor_definition: LabwareStackupAncestorDefinition,
     slot_name: DeckSlotName,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
     module_parent_to_child_offset: Optional[Point],
     expected_pick_up_offset: Point,
     expected_drop_offset: Point,
@@ -1149,7 +1138,7 @@ def test_gripper_offsets_for_drop(
     stackup_lw_info_top_to_bottom: List[tuple[LabwareDefinition, LabwareLocation]],
     underlying_ancestor_definition: LabwareStackupAncestorDefinition,
     slot_name: DeckSlotName,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
     module_parent_to_child_offset: Optional[Point],
     expected_drop_offset: Point,
     expected_pick_up_offset: Point,
@@ -1181,7 +1170,7 @@ def test_gripper_offsets_for_drop(
 
 def test_gripper_offsets_stacked_labware_with_module() -> None:
     """Test labware on adapter on module with slot-specific offsets."""
-    deck_def = load_deck(STANDARD_OT3_DECK, 5)
+    deck_def = load_deck(DeckType.OT3_STANDARD, 6)
 
     stackup_lw_info: list[tuple[LabwareDefinition, LabwareLocation]] = [
         (_LW_V2, OnLabwareLocation(labwareId="adapter-id")),
@@ -1231,7 +1220,7 @@ def test_gripper_offsets_stacked_labware_with_module() -> None:
 
 def test_gripper_offsets_fallback_to_default() -> None:
     """Test that gripper offsets fall back to default when slot-specific not available."""
-    deck_def = load_deck(STANDARD_OT3_DECK, 5)
+    deck_def = load_deck(DeckType.OT3_STANDARD, 6)
 
     stackup_lw_info: list[tuple[LabwareDefinition, LabwareLocation]] = [
         (_LW_V2, OnLabwareLocation(labwareId="adapter-id")),
@@ -1287,5 +1276,5 @@ def test_hs_flat_adapter_center_slot_raises_error() -> None:
             underlying_ancestor_definition=_ADDRESSABLE_AREA,
             slot_name=DeckSlotName.SLOT_A2,
             module_parent_to_child_offset=None,
-            deck_definition=load_deck(STANDARD_OT3_DECK, 5),
+            deck_definition=load_deck(DeckType.OT3_STANDARD, 6),
         )

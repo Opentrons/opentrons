@@ -1,11 +1,14 @@
 import { MemoryRouter } from 'react-router-dom'
 import { act, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
-import { useHost } from '@opentrons/react-api-client'
+import {
+  useHost,
+  useLogLevelQuery,
+  usePostLogLevelMutation,
+} from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -19,34 +22,26 @@ import {
 import { Troubleshooting } from '../Troubleshooting'
 
 import type { ComponentProps } from 'react'
-import type { HostConfig } from '@opentrons/api-client'
+import type { HostConfig, LogLevels } from '@opentrons/api-client'
 import type { ToasterContextType } from '/app/organisms/ToasterOven/ToasterContext'
 
-const mockJSZip = vi.hoisted(() => ({
-  file: vi.fn(),
-  generateAsync: vi.fn(),
-}))
-
-const mockSaveAs = vi.hoisted(() => vi.fn())
-const MockJSZip = vi.hoisted(
-  () =>
-    function MockJSZip(): typeof mockJSZip {
-      return mockJSZip
-    }
+const mockSaveLogs = vi.hoisted(() =>
+  vi.fn().mockResolvedValue({
+    directory: '/tmp',
+    succeededPaths: ['/logs/api.log'],
+  })
 )
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/organisms/ToasterOven')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux-resources/robots')
-vi.mock('file-saver', () => ({
-  saveAs: mockSaveAs,
+vi.mock('/app/local-resources/files/fileSaveCanceledError', () => ({
+  isFileSaveCanceledError: vi.fn(),
 }))
-vi.mock('jszip', () => {
-  return {
-    default: MockJSZip,
-  }
-})
+vi.mock('/app/redux/shell/remote', () => ({
+  saveLogs: mockSaveLogs,
+}))
 
 const ROBOT_NAME = 'otie'
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
@@ -64,21 +59,43 @@ const render = (props: ComponentProps<typeof Troubleshooting>) => {
 
 describe('RobotSettings Troubleshooting', () => {
   let props: ComponentProps<typeof Troubleshooting>
+  let logLevel: LogLevels = 'warning'
+  const mockChangeLogLevel: ReturnType<
+    typeof usePostLogLevelMutation
+  >['postLogLevel'] = async newLevel => {
+    logLevel = newLevel
+    return newLevel
+  }
+
   beforeEach(() => {
-    mockJSZip.file.mockClear()
-    mockJSZip.generateAsync.mockClear()
-    mockJSZip.generateAsync.mockResolvedValue(new Blob())
-    mockSaveAs.mockClear()
+    mockSaveLogs.mockClear()
+    mockSaveLogs.mockResolvedValue({
+      directory: '/tmp',
+      succeededPaths: ['/logs/api.log'],
+    })
     MOCK_MAKE_TOAST.mockClear()
     MOCK_MAKE_TOAST.mockReturnValue('mock-toast-id')
     MOCK_EAT_TOAST.mockClear()
-
+    vi.when(useLogLevelQuery)
+      .calledWith()
+      .thenReturn({ status: 'success', data: { log_level: logLevel } } as any)
+    vi.when(usePostLogLevelMutation)
+      .calledWith(expect.anything())
+      .thenReturn({ postLogLevel: mockChangeLogLevel } as any)
     props = {
       robotName: ROBOT_NAME,
     }
-    when(useRobot).calledWith(ROBOT_NAME).thenReturn(mockConnectableRobot)
-    when(useHost).calledWith().thenReturn(HOST_CONFIG)
-    when(useToaster)
+    vi.when(useRobot)
+      .calledWith(ROBOT_NAME)
+      .thenReturn({
+        ...mockConnectableRobot,
+        health: {
+          ...mockConnectableRobot.health!,
+          logs: ['/logs/api.log'],
+        },
+      } as typeof mockConnectableRobot)
+    vi.when(useHost).calledWith().thenReturn(HOST_CONFIG)
+    vi.when(useToaster)
       .calledWith()
       .thenReturn({
         makeToast: MOCK_MAKE_TOAST,
@@ -88,12 +105,12 @@ describe('RobotSettings Troubleshooting', () => {
   it('should render title, description, and button', () => {
     render(props)
     screen.getByText('Troubleshooting')
-    screen.getByTestId('RobotSettings_Troubleshooting')
+    screen.getByTestId('RobotSettings_Troubleshooting_Download')
     screen.getByRole('button', { name: 'Download logs' })
   })
 
   it('should be disabled when logs are not available', () => {
-    when(useRobot).calledWith('otie').thenReturn(mockUnreachableRobot)
+    vi.when(useRobot).calledWith('otie').thenReturn(mockUnreachableRobot)
     render(props)
     const downloadLogsButton = screen.getByRole('button', {
       name: 'Download logs',
@@ -129,10 +146,13 @@ describe('RobotSettings Troubleshooting', () => {
 
     await waitFor(
       () => {
-        expect(mockSaveAs).toHaveBeenCalledWith(
-          expect.any(Blob),
-          'otie_logs.zip'
-        )
+        expect(mockSaveLogs).toHaveBeenCalledWith({
+          name: 'otie_logs.zip',
+          paths: ['/logs/api.log'],
+          hostname: 'localhost',
+          port: null,
+          destination: undefined,
+        })
       },
       { timeout: 3000 }
     )

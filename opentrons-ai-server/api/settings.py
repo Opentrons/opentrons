@@ -30,9 +30,10 @@ class Settings(BaseSettings):
     log_level: str = "info"
     service_name: str = "local-ai-api"
     openai_model_name: str = "gpt-4-1106-preview"
-    anthropic_model_name: str = "claude-sonnet-5"
+    # Production default: Sonnet 5.5 (`claude-sonnet-5-5`). Prefer over `claude-sonnet-5` for capability and cost.
+    anthropic_model_name: str = "claude-sonnet-5-5"
     anthropic_max_tokens: str = "64000"
-    model_helper: str = "claude-sonnet-5"
+    model_helper: str = "claude-sonnet-5-5"
     model: str = "claude"
     auth0_domain: str = "opentrons-dev.us.auth0.com"
     auth0_api_audience: str = "sandbox-ai-api"

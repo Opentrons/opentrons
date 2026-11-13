@@ -27,6 +27,9 @@ from opentrons.protocol_engine.execution.error_recovery_hardware_state_synchroni
     ErrorRecoveryHardwareStateSynchronizer,
 )
 from opentrons.protocol_engine.resources.camera_provider import CameraProvider
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_engine.resources.labware_data_provider import (
     LabwareDataProvider,
 )
@@ -43,13 +46,16 @@ async def create_protocol_engine(
     deck_configuration: typing.Optional[DeckConfigurationType] = None,
     file_provider: typing.Optional[FileProvider] = None,
     camera_provider: typing.Optional[CameraProvider] = None,
-    notify_publishers: typing.Optional[typing.Callable[[], None]] = None,
+    notify_publishers: typing.Optional[
+        typing.Callable[[], typing.Awaitable[None]]
+    ] = None,
     updates_callback: typing.Optional[
-        typing.Callable[[list[EngineEventNotification]], None]
+        typing.Callable[[list[EngineEventNotification]], typing.Awaitable[None]]
     ] = None,
     proxy_of_callback_for_handling_door_events: typing.Optional[
         HardwareEventHandler
     ] = None,
+    command_store_provider: typing.Optional[CommandStoreProvider] = None,
 ) -> ProtocolEngine:
     """Create a ProtocolEngine instance.
 
@@ -65,7 +71,11 @@ async def create_protocol_engine(
         notify_publishers: Notifies robot server publishers of internal state change.
         updates_callback: Notified robot server of specific Protocol Engine events.
         proxy_of_callback_for_handling_door_events: Optional remote callback for door events, used when in subprocess mode.
+        command_store_provider: Provider interface for the presistence Run Store.
     """
+    if command_store_provider is None:
+        command_store_provider = CommandStoreProvider()
+
     deck_data = DeckDataProvider(config.deck_type)
     deck_definition = await deck_data.get_deck_definition()
     deck_fixed_labware = await deck_data.get_deck_fixed_labware(
@@ -86,6 +96,7 @@ async def create_protocol_engine(
         deck_configuration=deck_configuration,
         notify_publishers=notify_publishers,
         updates_callback=updates_callback,
+        command_store_provider=command_store_provider,
     )
     model_utils = ModelUtils()
     hardware_state_synchronizer = ErrorRecoveryHardwareStateSynchronizer(
@@ -112,6 +123,9 @@ async def create_protocol_engine(
     file_provider = file_provider or FileProvider()
     camera_provider = camera_provider or CameraProvider()
 
+    notify_and_update_task = asyncio.create_task(
+        state_store.notify_and_update_callbacks()
+    )
     pe = ProtocolEngine(
         hardware_api=hardware_api,
         state_store=state_store,
@@ -124,6 +138,7 @@ async def create_protocol_engine(
         file_provider=file_provider,
         camera_provider=camera_provider,
         associated_command_error_recovery=associated_command_error_recovery,
+        notify_and_update_task=notify_and_update_task,
     )
 
     # todo(mm, 2024-11-08): This is a quick hack to support the absorbance reader, which

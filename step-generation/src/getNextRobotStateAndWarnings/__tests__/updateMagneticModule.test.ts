@@ -18,6 +18,14 @@ import type { InvariantContext, RobotState } from '../../types'
 const forEngageMagnet = makeImmutableStateUpdater(_forEngageMagnet)
 const forDisengageMagnet = makeImmutableStateUpdater(_forDisengageMagnet)
 const moduleId = 'magneticModuleId'
+const selectedModuleParameters: InvariantContext['runtimeParameters'] = {
+  selected_module: {
+    variableName: 'selected_module',
+    displayName: 'Selected module',
+    type: 'string',
+    default: moduleId,
+  },
+}
 let invariantContext: InvariantContext
 let disengagedRobotState: RobotState
 let engagedRobotState: RobotState
@@ -70,6 +78,22 @@ describe('forEngageMagnet', () => {
       warnings: [],
     })
   })
+  it('engages magnetic module from runtime parameters', () => {
+    invariantContext.runtimeParameters = selectedModuleParameters
+    const params = {
+      moduleId: 'selected_module',
+      height: 10,
+    }
+    const result = forEngageMagnet(
+      params,
+      invariantContext,
+      disengagedRobotState
+    )
+    expect(result).toEqual({
+      robotState: engagedRobotState,
+      warnings: [],
+    })
+  })
 })
 describe('forDisengageMagnet', () => {
   it('unengages magnetic module when it was engaged', () => {
@@ -94,6 +118,21 @@ describe('forDisengageMagnet', () => {
       params,
       invariantContext,
       disengagedRobotState
+    )
+    expect(result).toEqual({
+      robotState: disengagedRobotState,
+      warnings: [],
+    })
+  })
+  it('unengages magnetic module from runtime parameters', () => {
+    invariantContext.runtimeParameters = selectedModuleParameters
+    const params = {
+      moduleId: 'selected_module',
+    }
+    const result = forDisengageMagnet(
+      params,
+      invariantContext,
+      engagedRobotState
     )
     expect(result).toEqual({
       robotState: disengagedRobotState,

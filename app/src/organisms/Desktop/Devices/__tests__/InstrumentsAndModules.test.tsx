@@ -1,6 +1,5 @@
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -8,10 +7,12 @@ import { mockMagneticModule } from '@opentrons/api-client'
 import {
   useInstrumentsQuery,
   useModulesQuery,
-  usePipettesQuery,
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { GripperCard } from '/app/components/desktop/cards/GripperCard'
+import { FlexPipetteCard } from '/app/components/desktop/cards/PipetteCard/FlexPipetteCard'
+import { PipetteRecalibrationWarning } from '/app/components/desktop/cards/PipetteCard/PipetteRecalibrationWarning'
 import { i18n } from '/app/i18n'
 import { ModuleCard } from '/app/organisms/ModuleCard'
 import { useIsFlex } from '/app/redux-resources/robots'
@@ -19,10 +20,7 @@ import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstop
 import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 
-import { GripperCard } from '../GripperCard'
 import { InstrumentsAndModules } from '../InstrumentsAndModules'
-import { FlexPipetteCard } from '../PipetteCard/FlexPipetteCard'
-import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
 
 import type { ComponentProps } from 'react'
 import type * as Components from '@opentrons/components'
@@ -35,10 +33,10 @@ vi.mock('@opentrons/components', async importOriginal => {
   }
 })
 vi.mock('@opentrons/react-api-client')
-vi.mock('../GripperCard')
+vi.mock('/app/components/desktop/cards/GripperCard')
 vi.mock('/app/organisms/ModuleCard')
-vi.mock('../PipetteCard/FlexPipetteCard')
-vi.mock('../PipetteCard/PipetteRecalibrationWarning')
+vi.mock('/app/components/desktop/cards/PipetteCard/FlexPipetteCard')
+vi.mock('/app/components/desktop/cards/PipetteCard/PipetteRecalibrationWarning')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux-resources/robots')
 vi.mock('/app/transformations/instruments')
@@ -71,8 +69,8 @@ describe('InstrumentsAndModules', () => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: { data: [] },
     } as any)
-    when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(false)
-    when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
+    vi.when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(false)
+    vi.when(useIsEstopNotDisengaged).calledWith(ROBOT_NAME).thenReturn(false)
   })
 
   afterEach(() => {
@@ -91,17 +89,11 @@ describe('InstrumentsAndModules', () => {
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [mockMagneticModule] },
     } as any)
-    vi.mocked(usePipettesQuery).mockReturnValue({
-      data: {
-        left: null,
-        right: null,
-      },
-    } as any)
     render(props)
     expect(vi.mocked(ModuleCard)).toHaveBeenCalled()
   })
   it('renders gripper and flex pipette cards when a robot is Flex', () => {
-    when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
 
     render(props)
     expect(vi.mocked(GripperCard)).toHaveBeenCalled()
@@ -115,7 +107,7 @@ describe('InstrumentsAndModules', () => {
     )
   })
   it('renders 1 pipette card when a 96 channel is attached', () => {
-    when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
     vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: {
         data: [
@@ -141,7 +133,7 @@ describe('InstrumentsAndModules', () => {
     expect(vi.mocked(PipetteRecalibrationWarning)).toHaveBeenCalled()
   })
   it('fetches instruments and modules on short poll for flex', () => {
-    when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
+    vi.when(useIsFlex).calledWith(ROBOT_NAME).thenReturn(true)
     render(props)
     expect(useModulesQuery).toHaveBeenCalledWith({ refetchInterval: 5000 })
     expect(useInstrumentsQuery).toHaveBeenCalledWith({

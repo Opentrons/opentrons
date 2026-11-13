@@ -8,8 +8,8 @@ import {
   Flex,
   InlineNotification,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -18,8 +18,8 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { TouchFloatingActionButton } from '/app/atoms/buttons'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { TouchFloatingActionButton } from '/app/components/ODD/buttons'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { useAttachedModules } from '/app/resources/modules'
@@ -162,13 +162,11 @@ export function ProtocolSetupModulesAndDeck({
                 lineHeight={TYPOGRAPHY.lineHeight28}
                 paddingX={SPACING.spacing24}
               >
-                <LegacyStyledText flex="3.5 0 0">
+                <StyledText flex="3.5 0 0">
                   {i18n.format(t('deck_hardware'), 'titleCase')}
-                </LegacyStyledText>
-                <LegacyStyledText flex="2 0 0">
-                  {t('location')}
-                </LegacyStyledText>
-                <LegacyStyledText flex="4 0 0"> {t('status')}</LegacyStyledText>
+                </StyledText>
+                <StyledText flex="2 0 0">{t('location')}</StyledText>
+                <StyledText flex="4 0 0"> {t('status')}</StyledText>
               </Flex>
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
                 {hasModules ? (

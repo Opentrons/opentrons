@@ -1,16 +1,10 @@
 """Wrappers for Protocol API v2 execution pipeline."""
 
 import asyncio
-from typing import Dict, Iterable, Optional, cast
+from typing import Optional
 
 from anyio import to_thread
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.labware.types import (
-    LabwareDefinition as LabwareDefinitionTypedDict,
-)
-
-from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import (
@@ -20,7 +14,6 @@ from opentrons.protocol_api import (
     create_protocol_context,
 )
 from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
-from opentrons.protocol_api.core.legacy.load_info import LoadInfo
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_engine.types import (
     CSVRuntimeParamPaths,
@@ -30,8 +23,7 @@ from opentrons.protocol_reader import ProtocolFileRole, ProtocolSource
 from opentrons.protocols.execution.execute import run_protocol
 from opentrons.protocols.execution.execute_python import exec_add_parameters
 from opentrons.protocols.parse import PythonParseMode, parse
-from opentrons.protocols.types import Protocol, PythonProtocol
-from opentrons.util.broker import Broker
+from opentrons.protocols.types import PythonProtocol
 
 # The earliest Python Protocol API version ("apiLevel") where the protocol's simulation
 # and execution will be handled by Protocol Engine, rather than the previous direct hardware calls from protocol api.
@@ -42,31 +34,17 @@ from opentrons.util.broker import Broker
 LEGACY_PYTHON_API_VERSION_CUTOFF = ENGINE_CORE_API_VERSION
 
 
-# The earliest JSON protocol schema version where the protocol is executed directly by
-# Protocol Engine, rather than going through Python Protocol API v2.
-LEGACY_JSON_SCHEMA_VERSION_CUTOFF = 6
-
-
 class PythonAndLegacyFileReader:
     """Interface to read Protocol API v2 protocols prior to execution."""
 
     @staticmethod
     def read(
         protocol_source: ProtocolSource,
-        labware_definitions: Iterable[LabwareDefinition],
         python_parse_mode: PythonParseMode,
-    ) -> Protocol:
+    ) -> PythonProtocol:
         """Read a PAPIv2 protocol into a data structure."""
         protocol_file_path = protocol_source.main_file
         protocol_contents = protocol_file_path.read_text(encoding="utf-8")
-        extra_labware: Dict[str, LabwareDefinitionTypedDict] = {
-            uri_from_details(
-                namespace=lw.namespace,
-                load_name=lw.parameters.loadName,
-                version=lw.version,
-            ): cast(LabwareDefinitionTypedDict, lw.model_dump(exclude_none=True))
-            for lw in labware_definitions
-        }
         data_file_paths = [
             data_file.path
             for data_file in protocol_source.files
@@ -76,7 +54,6 @@ class PythonAndLegacyFileReader:
         return parse(
             protocol_file=protocol_contents,
             filename=protocol_file_path.name,
-            extra_labware=extra_labware,
             extra_data={
                 data_path.name: data_path.read_bytes() for data_path in data_file_paths
             },
@@ -86,8 +63,6 @@ class PythonAndLegacyFileReader:
 
 class ProtocolContextCreator:
     """Interface to construct Protocol API v2 contexts."""
-
-    _USE_SIMULATING_CORE = False
 
     def __init__(
         self,
@@ -107,19 +82,10 @@ class ProtocolContextCreator:
 
     def create(
         self,
-        protocol: Protocol,
+        protocol: PythonProtocol,
         broker: Optional[LegacyBroker],
-        equipment_broker: Optional[Broker[LoadInfo]],
     ) -> ProtocolContext:
         """Create a Protocol API v2 context."""
-        extra_labware = (
-            protocol.extra_labware if isinstance(protocol, PythonProtocol) else None
-        )
-
-        bundled_data = (
-            protocol.bundled_data if isinstance(protocol, PythonProtocol) else None
-        )
-
         return create_protocol_context(
             api_version=protocol.api_level,
             hardware_api=self._hardware_api,
@@ -127,21 +93,8 @@ class ProtocolContextCreator:
             protocol_engine=self._protocol_engine,
             protocol_engine_loop=asyncio.get_running_loop(),
             broker=broker,
-            equipment_broker=equipment_broker,
-            extra_labware=extra_labware,
-            use_simulating_core=self._USE_SIMULATING_CORE,
-            bundled_data=bundled_data,
+            bundled_data=protocol.bundled_data,
         )
-
-
-class SimulatingContextCreator(ProtocolContextCreator):
-    """Interface to construct PAPIv2 contexts using simulating implementations.
-
-    Avoids some calls to the hardware API for performance.
-    See `opentrons.protocols.context.simulator`.
-    """
-
-    _USE_SIMULATING_CORE = True
 
 
 class PythonProtocolExecutor:
@@ -149,7 +102,7 @@ class PythonProtocolExecutor:
 
     @staticmethod
     async def execute(
-        protocol: Protocol,
+        protocol: PythonProtocol,
         context: ProtocolContext,
         run_time_parameters_with_overrides: Optional[Parameters],
     ) -> None:

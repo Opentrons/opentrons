@@ -1,11 +1,12 @@
 import { useDispatch } from 'react-redux'
-import { screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__'
 import { EditOffset } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
+import { getIsOnDevice } from '/app/redux/config'
 import {
   goBackEditOffsetSubstep,
   HANDLE_LW_SUBSTEP,
@@ -16,6 +17,7 @@ import {
   selectSelectedLwOverview,
   selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
   selectStepInfo,
+  setFinalPosition,
 } from '/app/redux/protocol-runs'
 
 import type { Mock } from 'vitest'
@@ -37,6 +39,9 @@ vi.mock(
     CheckLabware: (props: any) => (
       <div data-testid="mock-check-labware" data-header={props.contentHeader}>
         Mock Check Labware
+        <button onClick={props.handleAddConfirmedWorkingVector}>
+          Confirm offset
+        </button>
       </div>
     ),
   })
@@ -50,10 +55,16 @@ vi.mock(
         data-header={props.contentHeader}
       >
         Mock Desktop Offset Success
+        <button onClick={props.handleAddConfirmedWorkingVector}>
+          Continue
+        </button>
       </div>
     ),
   })
 )
+vi.mock('/app/redux/config', () => ({
+  getIsOnDevice: vi.fn(),
+}))
 vi.mock('react-redux', async () => {
   const actual = await vi.importActual('react-redux')
   return {
@@ -102,13 +113,32 @@ const render = (props: ComponentProps<typeof EditOffset>) => {
 describe('EditOffset', () => {
   let props: ComponentProps<typeof EditOffset>
   let mockDispatch: Mock
+  let mockToggleRobotMoving: Mock
+  let mockHandleConfirmLwFinalPosition: Mock
+  let mockHandlePostConfirmCleanup: Mock
+
+  const mockPosition = { x: 10, y: 20, z: 30 }
+  const mockOffsetLocationDetails = {
+    location: 'test-location',
+    slot: '1',
+  }
+  const mockSetFinalPositionAction = { type: 'SET_FINAL_POSITION' }
 
   beforeEach(() => {
     mockDispatch = vi.fn()
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
+    mockToggleRobotMoving = vi.fn().mockResolvedValue(undefined)
+    mockHandleConfirmLwFinalPosition = vi.fn().mockResolvedValue(mockPosition)
+    mockHandlePostConfirmCleanup = vi.fn().mockResolvedValue(undefined)
 
     props = {
       ...mockLPCContentProps,
+      commandUtils: {
+        ...mockLPCContentProps.commandUtils,
+        toggleRobotMoving: mockToggleRobotMoving,
+        handleConfirmLwFinalPosition: mockHandleConfirmLwFinalPosition,
+        handlePostConfirmCleanup: mockHandlePostConfirmCleanup,
+      },
     }
 
     vi.mocked(selectStepInfo).mockImplementation(
@@ -143,6 +173,10 @@ describe('EditOffset', () => {
     vi.mocked(proceedEditOffsetSubstep).mockReturnValue({
       type: 'PROCEED_HANDLE_LW_SUBSTEP',
     } as any)
+    vi.mocked(setFinalPosition).mockReturnValue(
+      mockSetFinalPositionAction as any
+    )
+    vi.mocked(getIsOnDevice).mockReturnValue(false)
   })
 
   describe('content header selection', () => {
@@ -258,6 +292,48 @@ describe('EditOffset', () => {
       const { container } = render(props)
 
       expect(container.textContent).toBe('')
+    })
+  })
+
+  describe('confirm working vector', () => {
+    beforeEach(() => {
+      vi.mocked(selectCurrentSubstep).mockImplementation(
+        () => () => HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW
+      )
+    })
+
+    it('commits the captured pose before post-confirm cleanup', async () => {
+      render(props)
+
+      fireEvent.click(screen.getByRole('button', { name: 'Confirm offset' }))
+
+      await waitFor(() => {
+        expect(mockDispatch).toHaveBeenCalledWith(mockSetFinalPositionAction)
+      })
+      expect(setFinalPosition).toHaveBeenCalledWith(props.runId, false, {
+        labwareUri: 'test-labware-uri',
+        location: mockOffsetLocationDetails,
+        position: mockPosition,
+      })
+      expect(mockHandlePostConfirmCleanup).toHaveBeenCalled()
+      await waitFor(() => {
+        expect(proceedEditOffsetSubstep).toHaveBeenCalledWith(props.runId)
+      })
+    })
+
+    it('keeps the committed pose when cleanup fails', async () => {
+      mockHandlePostConfirmCleanup.mockRejectedValueOnce(new Error('door open'))
+
+      render(props)
+
+      fireEvent.click(screen.getByRole('button', { name: 'Confirm offset' }))
+
+      await waitFor(() => {
+        expect(mockDispatch).toHaveBeenCalledWith(mockSetFinalPositionAction)
+      })
+      expect(mockDispatch).not.toHaveBeenCalledWith({
+        type: 'PROCEED_HANDLE_LW_SUBSTEP',
+      })
     })
   })
 })

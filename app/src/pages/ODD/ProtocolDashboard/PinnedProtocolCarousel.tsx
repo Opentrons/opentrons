@@ -7,17 +7,16 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import { PinnedProtocol } from '/app/components/ODD/cards/PinnedProtocol'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
-
-import { PinnedProtocol } from './PinnedProtocol'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { ProtocolResource } from '@opentrons/shared-data'
-import type { CardSizeType } from './PinnedProtocol'
+import type { CardSizeType } from '/app/components/ODD/cards/PinnedProtocol'
 
 interface PinnedProtocolCarouselProps {
   pinnedProtocols: ProtocolResource[]
-  longPress: Dispatch<SetStateAction<boolean>>
+  longPress?: Dispatch<SetStateAction<boolean>>
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
   setTargetProtocolId: (targetProtocolId: string) => void
   isRequiredCSV?: boolean
@@ -28,7 +27,6 @@ export function PinnedProtocolCarousel(
 ): ReactNode {
   const {
     pinnedProtocols,
-    longPress,
     setShowDeleteConfirmationModal,
     setTargetProtocolId,
     isRequiredCSV = false,
@@ -59,7 +57,6 @@ export function PinnedProtocolCarousel(
               key={protocol.key}
               lastRun={lastRun}
               protocol={protocol}
-              longPress={longPress}
               setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
               setTargetProtocolId={setTargetProtocolId}
               isRequiredCSV={isRequiredCSV}

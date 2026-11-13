@@ -1,34 +1,25 @@
-import re
-import string
-
 from auth_server.users.credential_characters import (
-    CREDENTIAL_ALLOWED_CHARACTERS,
-    CREDENTIAL_ALLOWED_PATTERN,
     CREDENTIAL_SPECIAL_CHARACTERS,
     has_only_allowed_credential_characters,
+    temp_password_characters,
 )
+from auth_server.users.software_keyboard_characters import SOFTWARE_KEYBOARD_SYMBOLS
 
 
-def test_special_characters_match_python_punctuation() -> None:
-    assert CREDENTIAL_SPECIAL_CHARACTERS == string.punctuation
+def test_special_characters_match_software_keyboard_symbols() -> None:
+    assert CREDENTIAL_SPECIAL_CHARACTERS == SOFTWARE_KEYBOARD_SYMBOLS
+    assert "`" not in CREDENTIAL_SPECIAL_CHARACTERS
 
 
-def test_allowed_characters_are_letters_digits_and_punctuation() -> None:
-    assert CREDENTIAL_ALLOWED_CHARACTERS == (
-        string.ascii_letters + string.digits + string.punctuation
-    )
+def test_temp_password_characters_are_ascii_only() -> None:
+    chars = temp_password_characters()
+    assert all(c.isascii() for c in chars)
+    assert " " not in chars
+    assert all(c in chars for c in SOFTWARE_KEYBOARD_SYMBOLS)
 
 
-def test_pattern_accepts_every_allowed_character() -> None:
-    pattern = re.compile(CREDENTIAL_ALLOWED_PATTERN)
-    for character in CREDENTIAL_ALLOWED_CHARACTERS:
-        assert pattern.fullmatch(character)
-
-
-def test_rejects_spaces_and_other_whitespace() -> None:
-    assert not has_only_allowed_credential_characters("pass word")
+def test_password_allowlist_accepts_spaces_and_hanzi() -> None:
+    assert has_only_allowed_credential_characters("pass word")
+    assert has_only_allowed_credential_characters("你hao!")
     assert not has_only_allowed_credential_characters("pass\tword")
-
-
-def test_accepts_typical_username_or_password() -> None:
     assert has_only_allowed_credential_characters("Ada_Lovelace-1!")

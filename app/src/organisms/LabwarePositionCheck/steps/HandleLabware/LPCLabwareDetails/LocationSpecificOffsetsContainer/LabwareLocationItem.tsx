@@ -4,7 +4,7 @@ import { css } from 'styled-components'
 
 import { BORDERS, COLORS, Flex, RESPONSIVENESS } from '@opentrons/components'
 
-import { MultiDeckLabelTagBtns } from '/app/molecules/MultiDeckLabelTagBtns'
+import { MultiDeckLabelTagBtns } from '/app/components/adhoc/shared/MultiDeckLabelTagBtns'
 import { LabwareOffsetsDeckInfoLabels } from '/app/organisms/LabwareOffsetsDeckInfoLabels'
 import { useLPCSnackbars } from '/app/organisms/LabwarePositionCheck/hooks'
 import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'

@@ -303,8 +303,10 @@ class HardwareTipHandler(TipHandler):
         """See documentation on abstract base class."""
         hw_mount = self._get_hw_mount(pipette_id)
 
-        nominal_tip_geometry = self._state_view.geometry.get_nominal_tip_geometry(
-            pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
+        nominal_tip_geometry = (
+            self._state_view.instrument_interface.get_nominal_tip_geometry(
+                pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
+            )
         )
 
         actual_tip_length = await self._labware_data_provider.get_calibrated_tip_length(
@@ -457,10 +459,12 @@ class VirtualTipHandler(TipHandler):
         - Fetch nominal tip geometry
         - Check that there's no tip currently attached
         """
-        nominal_tip_geometry = self._state_view.geometry.get_nominal_tip_geometry(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
+        nominal_tip_geometry = (
+            self._state_view.instrument_interface.get_nominal_tip_geometry(
+                pipette_id=pipette_id,
+                labware_id=labware_id,
+                well_name=well_name,
+            )
         )
 
         self._state_view.pipettes.validate_tip_state(

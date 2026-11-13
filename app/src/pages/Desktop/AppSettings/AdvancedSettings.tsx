@@ -1,12 +1,12 @@
 import { SPACING } from '@opentrons/components'
 
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 import {
   AdditionalCustomLabwareSourceFolder,
-  AuditLogFolder,
   ClearUnavailableRobots,
   EnableDevTools,
   IncludeProtocolSourceInRunDownload,
+  LogFolder,
   OverridePathToPython,
   PreventRobotCaching,
   ShowHeaterShakerAttachmentModal,
@@ -25,7 +25,7 @@ export function AdvancedSettings(): ReactNode {
       <Divider marginY={SPACING.spacing24} />
       <AdditionalCustomLabwareSourceFolder />
       <Divider marginY={SPACING.spacing24} />
-      <AuditLogFolder />
+      <LogFolder />
       <Divider marginY={SPACING.spacing24} />
       <IncludeProtocolSourceInRunDownload />
       <Divider marginY={SPACING.spacing24} />

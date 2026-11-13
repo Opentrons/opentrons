@@ -49,6 +49,7 @@
   "if_issue_persists_call_support": "If the issue persists, cancel the run and reach out to Opentrons support",
   "image_capture_window_title": "Opentrons Image at {{step}} at {{timestamp}}.jpeg",
   "ip_description_second": "Opentrons recommends working with your network administrator to assign a static IP address to the robot.",
+  "issue_persists_contact_support": "Contact support@opentrons.com for further assistance.",
   "labware_offsets_conflict_description": "Your Flex's stored labware offsets were updated after the last protocol run on <strong>{{timestamp}}</strong>. Which offsets do you want to use to run this protocol again?",
   "language_preference_description": "The Opentrons App matches your system language unless you select another language below. You can change the language later in the app settings.",
   "learn_uninstalling": "Learn more about uninstalling the Opentrons App",

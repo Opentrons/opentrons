@@ -1,6 +1,6 @@
 .container {
   position: absolute;
-  z-index: 10;
+  z-index: var(--z-index-menus);
   top: -0.25rem;
   right: 0;
   cursor: pointer;

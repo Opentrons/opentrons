@@ -9,8 +9,8 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP,
 } from '@opentrons/components'
@@ -60,10 +60,11 @@ const TableDatum = styled('td')`
 export const Liquids = (props: { protocolId: string }): ReactNode => {
   const { protocolId } = props
   const { data: protocolData } = useProtocolQuery(protocolId)
+  const analysisId = last(protocolData?.data.analysisSummaries)?.id ?? null
   const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
-    last(protocolData?.data.analysisSummaries)?.id ?? null,
-    { enabled: protocolData != null }
+    analysisId,
+    { enabled: protocolData != null && analysisId != null }
   )
   const liquidsInOrder = parseLiquidsInLoadOrder(
     mostRecentAnalysis!.liquids ?? [],
@@ -106,12 +107,12 @@ export const Liquids = (props: { protocolId: string }): ReactNode => {
                     />
                   </Flex>
                   <Flex flexDirection={DIRECTION_COLUMN}>
-                    <LegacyStyledText forwardedAs="p">
+                    <StyledText forwardedAs="p">
                       {i18n.format(liquid.displayName, 'titleCase')}
-                    </LegacyStyledText>
-                    <LegacyStyledText forwardedAs="p" color={COLORS.grey60}>
+                    </StyledText>
+                    <StyledText forwardedAs="p" color={COLORS.grey60}>
                       {i18n.format(liquid.description, 'titleCase')}
-                    </LegacyStyledText>
+                    </StyledText>
                   </Flex>
                 </Flex>
               </TableDatum>

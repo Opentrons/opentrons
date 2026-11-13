@@ -2,16 +2,11 @@ import { useEffect, useRef } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import {
-  ALIGN_CENTER,
-  ALIGN_FLEX_END,
   Banner,
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_FLEX_END,
-  LegacyStyledText,
-  PrimaryButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
@@ -20,19 +15,14 @@ import {
   WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
+import { SimpleWizardInProgressBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { WizardBodyText } from '/app/components/adhoc/shared/wizards/WizardBodyText'
+import { WizardRequiredEquipmentList } from '/app/components/adhoc/shared/wizards/WizardRequiredEquipmentList'
 import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
 import { usePipetteNameSpecs } from '/app/local-resources/instruments'
-import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-import {
-  SimpleWizardBody,
-  SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
-import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
 
 import {
-  BODY_STYLE,
   CALIBRATION_PROBE,
   FLOWS,
   HEX_SCREWDRIVER,
@@ -40,20 +30,16 @@ import {
   NINETY_SIX_CHANNEL_PIPETTE,
   PIPETTE,
 } from './constants'
-import { getIsGantryEmpty, isWasteChuteOnDeck } from './utils'
+import { getIsGantryEmpty } from './utils'
 
 import type { AxiosError } from 'axios'
-import type { UseMutateFunction, UseQueryResult } from 'react-query'
+import type { UseMutateFunction } from 'react-query'
 import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
 } from '@opentrons/api-client'
 import type { DocumentationState } from '@opentrons/react-api-client'
-import type {
-  CreateCommand,
-  DeckConfiguration,
-  LoadedPipette,
-} from '@opentrons/shared-data'
+import type { CreateCommand, LoadedPipette } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
 interface BeforeBeginningProps extends PipetteWizardStepProps {
@@ -65,7 +51,6 @@ interface BeforeBeginningProps extends PipetteWizardStepProps {
   >
   isCreateLoading: boolean
   createdMaintenanceRunId: string | null
-  deckConfig: UseQueryResult<DeckConfiguration>
   requiredPipette?: LoadedPipette
   documentationState: DocumentationState
 }
@@ -81,29 +66,15 @@ export const BeforeBeginning = (
     isCreateLoading,
     mount,
     isRobotMoving,
-    errorMessage,
-    setShowErrorMessage,
-    isDoorOpenError,
-    setIsDoorOpenError,
-    dismissDoorOpenError,
     selectedPipette,
+    handleCommandError,
     isOnDevice,
     requiredPipette,
     maintenanceRunId,
     createdMaintenanceRunId,
-    deckConfig,
     documentationState,
   } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-
-  const handleCommandError = (error: Error): void => {
-    if (isMaintenanceDoorOpenError(error)) {
-      setIsDoorOpenError(true)
-      setShowErrorMessage(t('door_is_open') as string)
-    } else {
-      setShowErrorMessage(error.message)
-    }
-  }
 
   const hasSentCreateMaintenanceRun = useRef(false)
   useEffect(() => {
@@ -147,12 +118,6 @@ export const BeforeBeginning = (
   switch (flowType) {
     case FLOWS.CALIBRATE: {
       bodyTranslationKey = 'remove_labware_to_get_started'
-      if (
-        selectedPipette === NINETY_SIX_CHANNEL &&
-        isWasteChuteOnDeck(deckConfig)
-      ) {
-        equipmentList.push(hexScrewdriverWithSubtitle)
-      }
       break
     }
     case FLOWS.ATTACH: {
@@ -283,43 +248,16 @@ export const BeforeBeginning = (
     return <SimpleWizardInProgressBody description={t('stand_back')} />
   }
 
-  return errorMessage != null ? (
-    isDoorOpenError ? (
-      <SimpleWizardBody
-        isSuccess={false}
-        iconColor={COLORS.red50}
-        header={t('door_is_open')}
-        subHeader={t('close_door_and_try_again')}
-      >
-        <Flex
-          width="100%"
-          justifyContent={JUSTIFY_FLEX_END}
-          alignItems={Boolean(isOnDevice) ? ALIGN_CENTER : ALIGN_FLEX_END}
-          gridGap={SPACING.spacing8}
-        >
-          {Boolean(isOnDevice) ? (
-            <SmallButton
-              buttonText={t('try_again')}
-              onClick={dismissDoorOpenError}
-            />
-          ) : (
-            <PrimaryButton onClick={dismissDoorOpenError}>
-              {t('try_again')}
-            </PrimaryButton>
-          )}
-        </Flex>
-      </SimpleWizardBody>
-    ) : (
-      <SimpleWizardBody
-        isSuccess={false}
-        iconColor={COLORS.red50}
-        header={t('shared:error_encountered')}
-        subHeader={errorMessage}
-      />
-    )
-  ) : (
+  return (
     <GenericWizardTile
-      header={t('before_you_begin')}
+      header={
+        <StyledText
+          desktopStyle="headingSmallBold"
+          oddStyle="level4HeaderSemiBold"
+        >
+          {t('before_you_begin')}
+        </StyledText>
+      }
       rightHandBody={rightHandBody}
       bodyText={
         <>
@@ -328,7 +266,7 @@ export const BeforeBeginning = (
               t={t}
               i18nKey={bodyTranslationKey}
               components={{
-                block: <LegacyStyledText css={BODY_STYLE} />,
+                block: <WizardBodyText />,
               }}
             />
             {selectedPipette === NINETY_SIX_CHANNEL &&

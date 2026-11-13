@@ -21,12 +21,22 @@ const url = `${config.url.protocol}//${urlPath}`
 
 const WINDOW_OPTS = {
   show: false,
-  useContentSize: true,
   width: config.width,
   minWidth: config.minWidth,
   height: config.height,
-  minHeight: config.minHeight,
-  frame: false, // hide menubar
+  // for reasons that currently escape me, we have to have a 20px
+  // vertical margin available here even if the height target is set
+  // to exactly what we want. when running, the app is in fact 600px
+  // tall anyway.
+  minHeight: config.minHeight - 20,
+  // this wide variety of arguments is required to get a truly kiosk-style
+  // window with no chrome or border decorations of any kind
+  useContentSize: false,
+  frame: false,
+  hasShadow: false,
+  roundedCorners: false,
+  titleBarStyle: 'hidden',
+  titleBarOverlay: false,
   // allow webPreferences to be set at launchtime from config
   webPreferences: Object.assign(
     {
@@ -41,7 +51,7 @@ const WINDOW_OPTS = {
     },
     config.webPreferences
   ),
-}
+} as const
 
 const READY_POLL_INTERVAL_MS = 1500
 
@@ -77,9 +87,6 @@ export function waitForBackendAndShowMainWindow(
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.send('window-type', 'odd-main')
   })
-
-  // prevent fullscreen for safe
-  mainWindow.setFullScreen(false)
 
   // prevent Electron shortcuts that Desktop app shows in menu
   mainWindow.webContents.on('before-input-event', (event, input) => {
@@ -122,18 +129,26 @@ export function waitForBackendAndShowMainWindow(
   })
 
   _NODE_ENV_ !== 'development' &&
-    setTimeout(function () {
-      systemd
-        .getIsBackendReady()
-        .then((isReady: boolean) => {
-          dispatch(sendReadyStatus(isReady))
-          if (!isReady) {
-            waitForBackendAndShowMainWindow(dispatch, mainWindow)
-          }
-        })
-        .catch(e => {
-          log.debug('Could not get status of backend services', { e })
-          waitForBackendAndShowMainWindow(dispatch, mainWindow)
-        })
+    setTimeout(() => {
+      void waitForBackendSendReady(dispatch)
     }, READY_POLL_INTERVAL_MS)
+}
+
+async function waitForBackendSendReady(dispatch: Dispatch): Promise<void> {
+  systemd
+    .getIsBackendReady()
+    .then((isReady: boolean) => {
+      dispatch(sendReadyStatus(isReady))
+      if (!isReady) {
+        setTimeout(() => {
+          void waitForBackendSendReady(dispatch)
+        }, READY_POLL_INTERVAL_MS)
+      }
+    })
+    .catch(e => {
+      log.debug('Could not get status of backend services', { e })
+      setTimeout(() => {
+        void waitForBackendSendReady(dispatch)
+      }, READY_POLL_INTERVAL_MS)
+    })
 }

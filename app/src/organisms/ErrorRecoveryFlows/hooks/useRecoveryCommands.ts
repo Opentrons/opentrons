@@ -121,8 +121,10 @@ export function useRecoveryCommands({
     documentationState,
     actionsToDocument,
     addActionToDocument,
-    resumeAndHandleErrorPolicyDocState,
-    clearResumeAndHandleErrorPolicyDocreport,
+    retryThenResumeDocState,
+    clearRetryThenResumeDocreport,
+    skipThenResumeDocState,
+    clearSkipThenResumeDocreport,
   } = useErrorRecoveryDocumentation({
     ignoreErrors,
     recoverySessionKey: unvalidatedFailedCommand?.id ?? null,
@@ -130,18 +132,21 @@ export function useRecoveryCommands({
 
   const { proceedToRouteAndStep, handleMotionRouting, stashedMapRef } =
     routeUpdateActions
+  const { mutateAsync: resumeAfterRetry } = useResumeRunFromRecoveryMutation(
+    retryThenResumeDocState
+  )
   const { mutateAsync: resumeRunFromRecovery } =
-    useResumeRunFromRecoveryMutation(resumeAndHandleErrorPolicyDocState)
+    useResumeRunFromRecoveryMutation(skipThenResumeDocState)
   const { mutateAsync: resumeRunFromRecoveryAssumingFalsePositive } =
     useResumeRunFromRecoveryAssumingFalsePositiveMutation(
-      resumeAndHandleErrorPolicyDocState
+      skipThenResumeDocState
     )
   const { stopRun } = useStopRunMutation(documentationState)
 
-  const updateErrorRecoveryPolicy = useUpdateRecoveryPolicyWithStrategy(
-    runId,
-    resumeAndHandleErrorPolicyDocState
-  )
+  const updateErrorRecoveryPolicyAfterRetry =
+    useUpdateRecoveryPolicyWithStrategy(runId, retryThenResumeDocState)
+  const updateErrorRecoveryPolicyAfterSkip =
+    useUpdateRecoveryPolicyWithStrategy(runId, skipThenResumeDocState)
   const currentRecoveryPolicy = useErrorRecoveryPolicy(runId)?.data?.data
   const { chainRunCommands } = useChainRunCommands(
     runId,
@@ -154,8 +159,17 @@ export function useRecoveryCommands({
 
   const { chainRunCommands: chainRetryRunCommands } = useChainRunCommands(
     runId,
-    documentationState,
-    [...actionsToDocument, 'retry_action'],
+    retryThenResumeDocState,
+    ['retry_action'],
+    addActionToDocument,
+    unvalidatedFailedCommand?.id,
+    currentRecoveryPolicy
+  )
+
+  const { chainRunCommands: chainSkipPrepRunCommands } = useChainRunCommands(
+    runId,
+    skipThenResumeDocState,
+    actionsToDocument,
     addActionToDocument,
     unvalidatedFailedCommand?.id,
     currentRecoveryPolicy
@@ -394,7 +408,11 @@ export function useRecoveryCommands({
   // Only send the finalized error policy to the server during a terminal recovery command that does not terminate the run.
   // If the request to update the policy fails, route to the error modal.
   const handleIgnoringErrorKind = useCallback(
-    (): Promise<void> => {
+    (
+      updateErrorRecoveryPolicy: ReturnType<
+        typeof useUpdateRecoveryPolicyWithStrategy
+      >
+    ): Promise<void> => {
       if (ignoreErrors) {
         if (unvalidatedFailedCommand?.error != null) {
           const ifMatch: IfMatchType = isAssumeFalsePositiveResumeKind(
@@ -441,8 +459,8 @@ export function useRecoveryCommands({
 
   const resumeRun = useCallback(
     (): void => {
-      void handleIgnoringErrorKind()
-        .then(() => resumeRunFromRecovery(runId))
+      void handleIgnoringErrorKind(updateErrorRecoveryPolicyAfterRetry)
+        .then(() => resumeAfterRetry(runId))
         .then(() => {
           analytics.reportActionSelectedResult(
             selectedRecoveryOption,
@@ -452,7 +470,7 @@ export function useRecoveryCommands({
         })
         .catch((error: unknown) => {
           // Allow a retry to re-prompt; policy may have already succeeded.
-          clearResumeAndHandleErrorPolicyDocreport()
+          clearRetryThenResumeDocreport()
           if (isDocumentedMutationError(error)) {
             return handleMotionRouting(false)
           }
@@ -465,12 +483,13 @@ export function useRecoveryCommands({
     [
       runId,
       ignoreErrors,
-      resumeRunFromRecovery,
+      resumeAfterRetry,
       handleIgnoringErrorKind,
       selectedRecoveryOption,
       makeSuccessToast,
       handleMotionRouting,
-      clearResumeAndHandleErrorPolicyDocreport,
+      clearRetryThenResumeDocreport,
+      updateErrorRecoveryPolicyAfterRetry,
     ]
   )
 
@@ -515,7 +534,7 @@ export function useRecoveryCommands({
 
   const skipFailedCommand = useCallback(
     (): void => {
-      void handleIgnoringErrorKind()
+      void handleIgnoringErrorKind(updateErrorRecoveryPolicyAfterSkip)
         .then(() => handleResumeAction())
         .then(() => {
           analytics.reportActionSelectedResult(
@@ -526,7 +545,7 @@ export function useRecoveryCommands({
         })
         .catch((error: unknown) => {
           // Allow a retry to re-prompt; policy may have already succeeded.
-          clearResumeAndHandleErrorPolicyDocreport()
+          clearSkipThenResumeDocreport()
           if (isDocumentedMutationError(error)) {
             return handleMotionRouting(false)
           }
@@ -544,7 +563,8 @@ export function useRecoveryCommands({
       selectedRecoveryOption,
       makeSuccessToast,
       handleMotionRouting,
-      clearResumeAndHandleErrorPolicyDocreport,
+      clearSkipThenResumeDocreport,
+      updateErrorRecoveryPolicyAfterSkip,
     ]
   )
 
@@ -611,12 +631,20 @@ export function useRecoveryCommands({
           new Error('Invalid use of manual retrieve command')
         )
       } else {
-        return chainRunRecoveryCommands([manualRetrieveCommand])
+        return chainRunRecoveryCommands(
+          [manualRetrieveCommand],
+          false,
+          chainSkipPrepRunCommands
+        )
       }
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [chainRunRecoveryCommands, unvalidatedFailedCommand]
+    [
+      chainRunRecoveryCommands,
+      chainSkipPrepRunCommands,
+      unvalidatedFailedCommand,
+    ]
   )
 
   const manualStore = useCallback(
@@ -627,12 +655,20 @@ export function useRecoveryCommands({
           new Error('Invalid use of manual store command')
         )
       } else {
-        return chainRunRecoveryCommands([manualStoreCommand])
+        return chainRunRecoveryCommands(
+          [manualStoreCommand],
+          false,
+          chainSkipPrepRunCommands
+        )
       }
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [chainRunRecoveryCommands, unvalidatedFailedCommand]
+    [
+      chainRunRecoveryCommands,
+      chainSkipPrepRunCommands,
+      unvalidatedFailedCommand,
+    ]
   )
 
   const moveLabwareWithoutPause = useCallback(
@@ -645,12 +681,20 @@ export function useRecoveryCommands({
           new Error('Invalid use of MoveLabware command')
         )
       } else {
-        return chainRunRecoveryCommands([moveLabwareCmd])
+        return chainRunRecoveryCommands(
+          [moveLabwareCmd],
+          false,
+          chainSkipPrepRunCommands
+        )
       }
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [chainRunRecoveryCommands, unvalidatedFailedCommand]
+    [
+      chainRunRecoveryCommands,
+      chainSkipPrepRunCommands,
+      unvalidatedFailedCommand,
+    ]
   )
 
   return {

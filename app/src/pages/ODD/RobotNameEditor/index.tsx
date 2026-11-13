@@ -14,23 +14,23 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   POSITION_ABSOLUTE,
   POSITION_FIXED,
   POSITION_RELATIVE,
   SPACING,
   StepMeter,
-  TouchInputField,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useUpdateRobotNameMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
 import {
   AlphanumericKeyboard,
   getInvalidCharForKeyboard,
-} from '/app/atoms/SoftwareKeyboard'
+} from '/app/components/ODD/keyboard'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ConfirmRobotName } from '/app/organisms/ODD/NameRobot/ConfirmRobotName'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
@@ -41,6 +41,7 @@ import {
   getReachableRobots,
   getUnreachableRobots,
   removeRobot,
+  renameRobot,
 } from '/app/redux/discovery'
 
 import type { ReactNode } from 'react'
@@ -159,7 +160,7 @@ export function RobotNameEditor(): ReactNode {
             setRobotNameConfirmation(data.name)
           }
           if (previousName != null) {
-            dispatch(removeRobot(previousName))
+            dispatch(renameRobot(previousName, data.name))
           }
         }
       },
@@ -221,14 +222,14 @@ export function RobotNameEditor(): ReactNode {
                 </Btn>
               </Flex>
               <Flex marginLeft={isUnboxingFlowOngoing ? '0' : '4rem'}>
-                <LegacyStyledText
+                <StyledText
                   forwardedAs="h2"
                   fontWeight={TYPOGRAPHY.fontWeightBold}
                 >
                   {isUnboxingFlowOngoing
                     ? t('name_your_robot')
                     : t('rename_robot')}
-                </LegacyStyledText>
+                </StyledText>
               </Flex>
               <Flex position={POSITION_ABSOLUTE} right="0">
                 {Boolean(isNaming) ? (
@@ -262,14 +263,14 @@ export function RobotNameEditor(): ReactNode {
               width="100%"
             >
               {isUnboxingFlowOngoing ? (
-                <LegacyStyledText
+                <StyledText
                   forwardedAs="h4"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   color={COLORS.grey60}
                   marginBottom={SPACING.spacing24}
                 >
                   {t('name_your_robot_description')}
-                </LegacyStyledText>
+                </StyledText>
               ) : null}
               <Controller
                 control={control}
@@ -293,21 +294,21 @@ export function RobotNameEditor(): ReactNode {
                 )}
               />
             </Flex>
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               color={COLORS.grey60}
               fontWeight={TYPOGRAPHY.fontWeightRegular}
             >
               {t('name_rule_description')}
-            </LegacyStyledText>
+            </StyledText>
             {errors.newRobotName != null ? (
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="p"
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
                 color={COLORS.red50}
               >
                 {errors.newRobotName.message}
-              </LegacyStyledText>
+              </StyledText>
             ) : null}
           </Flex>
 

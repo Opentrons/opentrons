@@ -6,7 +6,7 @@ implementation detail.
 
 import pytest
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.labware.labware_definition import (
     ContainedSpace,
     ContainmentShape,
@@ -38,7 +38,7 @@ def _dummy_command() -> commands.Command:
     return commands.Comment.model_construct()  # type: ignore[call-arg]
 
 
-def test_get_labware(ot3_standard_deck_def: DeckDefinitionV5) -> None:
+def test_get_labware(ot3_standard_deck_def: DeckDefinitionV6) -> None:
     """It should get a loaded labware."""
     subject = LabwareStore(deck_definition=ot3_standard_deck_def, deck_fixed_labware=[])
 
@@ -74,7 +74,7 @@ def test_get_labware(ot3_standard_deck_def: DeckDefinitionV5) -> None:
     )
 
 
-def test_raise_if_not_tip_rack(ot3_standard_deck_def: DeckDefinitionV5) -> None:
+def test_raise_if_not_tip_rack(ot3_standard_deck_def: DeckDefinitionV6) -> None:
     """It should raise if the labware is not a tip rack."""
     subject = LabwareStore(deck_definition=ot3_standard_deck_def, deck_fixed_labware=[])
     subject_view = LabwareView(subject.state)
@@ -121,7 +121,7 @@ def test_raise_if_not_tip_rack(ot3_standard_deck_def: DeckDefinitionV5) -> None:
         subject_view.raise_if_not_tip_rack("labware-id")
 
 
-def test_raise_if_wells_are_invalid(ot3_standard_deck_def: DeckDefinitionV5) -> None:
+def test_raise_if_wells_are_invalid(ot3_standard_deck_def: DeckDefinitionV6) -> None:
     """It should raise if the wells given do not exist for that labware."""
     subject = LabwareStore(deck_definition=ot3_standard_deck_def, deck_fixed_labware=[])
     subject_view = LabwareView(subject.state)
@@ -165,7 +165,7 @@ def test_raise_if_wells_are_invalid(ot3_standard_deck_def: DeckDefinitionV5) -> 
 
 
 def test_raise_if_labware_is_contained_ignores_off_deck_labware(
-    ot3_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> None:
     """Unrelated labware staged off-deck should not block each other's moves."""
     subject = LabwareStore(deck_definition=ot3_standard_deck_def, deck_fixed_labware=[])
@@ -214,7 +214,7 @@ def test_raise_if_labware_is_contained_ignores_off_deck_labware(
     assert subject_view.raise_if_labware_is_contained("plate-id") is True
 
 
-def test_get_is_column_labware(ot3_standard_deck_def: DeckDefinitionV5) -> None:
+def test_get_is_column_labware(ot3_standard_deck_def: DeckDefinitionV6) -> None:
     """It should return True if the labware is made up of multiple column wide wells, and False otherwise."""
     subject = LabwareStore(deck_definition=ot3_standard_deck_def, deck_fixed_labware=[])
     subject_view = LabwareView(subject.state)
@@ -288,7 +288,7 @@ def test_get_is_column_labware(ot3_standard_deck_def: DeckDefinitionV5) -> None:
     assert not subject_view.get_is_column_labware("multi-well-id")
 
 
-def test_get_is_row_labware(ot3_standard_deck_def: DeckDefinitionV5) -> None:
+def test_get_is_row_labware(ot3_standard_deck_def: DeckDefinitionV6) -> None:
     """It should return True if the labware is made up of multiple row wide wells, and False otherwise."""
     subject = LabwareStore(deck_definition=ot3_standard_deck_def, deck_fixed_labware=[])
     subject_view = LabwareView(subject.state)

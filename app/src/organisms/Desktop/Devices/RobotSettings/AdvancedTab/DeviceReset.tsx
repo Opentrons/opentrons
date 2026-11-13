@@ -5,13 +5,13 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
   SPACING_AUTO,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '/app/atoms/buttons'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 
 import type { MouseEventHandler, ReactNode } from 'react'
 
@@ -38,15 +38,14 @@ export function DeviceReset({
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.pSemiBold}
+        <StyledText
+          forwardedAs="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing4}
         >
           {t('device_reset')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
-          {t('device_reset_description')}
-        </LegacyStyledText>
+        </StyledText>
+        <StyledText forwardedAs="p">{t('device_reset_description')}</StyledText>
       </Box>
       <TertiaryButton
         marginLeft={SPACING_AUTO}

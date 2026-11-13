@@ -13,6 +13,7 @@ import {
   useHoverTooltip,
   useMenuHandleClickOutside,
   useOnClickOutside,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
@@ -84,7 +85,7 @@ export function ModuleCalibrationOverflowMenu({
       {showOverflowMenu ? (
         <Flex
           ref={OverflowMenuRef}
-          zIndex="5"
+          zIndex={Z_INDEX.MENUS}
           borderRadius="4px 4px 0px 0px"
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}

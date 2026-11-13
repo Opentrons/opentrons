@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import head from 'lodash/head'
 
 import { useRunCurrentState } from '@opentrons/react-api-client'
@@ -8,7 +8,7 @@ import { ERROR_KINDS } from '/app/organisms/ErrorRecoveryFlows/constants'
 import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
 import { useTipAttachmentStatus } from '/app/resources/instruments'
 
-import type { Instruments, PipetteData, Run } from '@opentrons/api-client'
+import type { Mount, PipetteData } from '@opentrons/api-client'
 import type { ERUtilsProps } from '/app/organisms/ErrorRecoveryFlows/hooks/useERUtils'
 import type {
   PipetteWithTip,
@@ -19,8 +19,6 @@ interface UseRecoveryTipStatusProps {
   runId: string
   failedCommand: ERUtilsProps['failedCommand']
   failedPipetteInfo: PipetteData | null
-  attachedInstruments?: Instruments
-  runRecord?: Run
 }
 
 export type RecoveryTipStatusUtils = TipAttachmentStatusResult & {
@@ -35,13 +33,24 @@ export function useRecoveryTipStatus(
   props: UseRecoveryTipStatusProps
 ): RecoveryTipStatusUtils {
   const [isLoadingTipStatus, setIsLoadingTipStatus] = useState(false)
-  const [failedCommandPipette, setFailedCommandPipette] =
+  const [currentPipette, setCurrentPipetteState] =
     useState<PipetteWithTip | null>(null)
+  const currentPipetteRef = useRef<PipetteWithTip | null>(null)
+  const skippedMountsRef = useRef<Mount[]>([])
 
-  const tipAttachmentStatusUtils = useTipAttachmentStatus({
-    ...props,
-    runRecord: props.runRecord ?? null,
-  })
+  const tipAttachmentStatusUtils = useTipAttachmentStatus()
+
+  const setCurrentPipette = (pipette: PipetteWithTip | null): void => {
+    currentPipetteRef.current = pipette
+    setCurrentPipetteState(pipette)
+  }
+
+  const skipCurrentPipette = (): void => {
+    const mount = currentPipetteRef.current?.mount
+    if (mount != null && !skippedMountsRef.current.includes(mount)) {
+      skippedMountsRef.current = [...skippedMountsRef.current, mount]
+    }
+  }
 
   const determineTipStatusWithLoading = (): Promise<PipetteWithTip[]> => {
     const { determineTipStatus } = tipAttachmentStatusUtils
@@ -49,33 +58,40 @@ export function useRecoveryTipStatus(
     setIsLoadingTipStatus(true)
 
     return determineTipStatus().then(pipettesWithTip => {
-      // In cases in which determineTipStatus doesn't think a tip could be attached to any pipette, supply the pipette
-      // involved in the failed command, if any.
-      let failedCommandPipettes: PipetteWithTip[]
+      const remaining = pipettesWithTip.filter(
+        pipette => !skippedMountsRef.current.includes(pipette.mount)
+      )
       const specs =
         failedPipetteInfo != null
           ? getPipetteModelSpecs(failedPipetteInfo.instrumentModel)
           : null
-
-      if (
-        pipettesWithTip.length === 0 &&
+      const failedMountSkipped =
         failedPipetteInfo != null &&
-        specs != null
-      ) {
-        const currentPipette: PipetteWithTip = {
-          mount: failedPipetteInfo.mount,
-          specs,
-        }
+        skippedMountsRef.current.includes(failedPipetteInfo.mount)
 
-        failedCommandPipettes = [currentPipette]
+      // In cases in which determineTipStatus doesn't think a tip could be attached to any pipette, supply the pipette
+      // involved in the failed command, if any, unless the user already skipped that mount.
+      let pipettesToShow: PipetteWithTip[]
+      if (
+        remaining.length === 0 &&
+        failedPipetteInfo != null &&
+        specs != null &&
+        !failedMountSkipped
+      ) {
+        pipettesToShow = [
+          {
+            mount: failedPipetteInfo.mount,
+            specs,
+          },
+        ]
       } else {
-        failedCommandPipettes = pipettesWithTip
+        pipettesToShow = remaining
       }
 
       setIsLoadingTipStatus(false)
-      setFailedCommandPipette(head(failedCommandPipettes) ?? null)
+      setCurrentPipette(head(pipettesToShow) ?? null)
 
-      return Promise.resolve(pipettesWithTip)
+      return Promise.resolve(remaining)
     })
   }
 
@@ -94,8 +110,9 @@ export function useRecoveryTipStatus(
 
   return {
     ...tipAttachmentStatusUtils,
-    aPipetteWithTip: failedCommandPipette,
+    aPipetteWithTip: currentPipette,
     determineTipStatus: determineTipStatusWithLoading,
+    skipCurrentPipette,
     isLoadingTipStatus,
     runId: props.runId,
     gripperErrorFirstPipetteWithTip,

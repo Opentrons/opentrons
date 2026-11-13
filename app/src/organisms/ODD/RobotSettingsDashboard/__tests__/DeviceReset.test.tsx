@@ -50,7 +50,7 @@ describe('DeviceReset', () => {
     screen.getByText('Clears information about past runs of all protocols.')
     screen.getByText('Clear all stored data')
     screen.getByText(
-      'Clears calibrations, protocols, and all settings except robot name and network settings.'
+      'Clears calibrations, protocols, and all settings. You’ll have to redo initial setup before using the robot again.'
     )
     expect(
       screen.queryByText('authorized') // as in "SSH authorized keys"

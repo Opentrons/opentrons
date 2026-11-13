@@ -11,6 +11,12 @@
     var(--spacing-60);
   margin-top: 7.5rem;
   gap: var(--spacing-24);
+  transform: translateY(0);
+  transition: transform 0.2s ease-in-out;
+}
+
+.content_container_keyboard_closed {
+  transform: translateY(50px);
 }
 
 .form_inner_container {
@@ -40,12 +46,12 @@
 
 .overlay {
   position: fixed;
-  z-index: 10001;
+  z-index: var(--z-index-login-modal);
   background-color: var(--white);
   inset: 0;
 }
 
 /* Sit below the documentation overlay (z-index 1000) while choosing a new password. */
 .overlay_below_documentation {
-  z-index: 999;
+  z-index: calc(var(--z-index-compliance-modals) - 1);
 }

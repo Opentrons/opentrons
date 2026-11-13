@@ -8,22 +8,22 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useConditionalConfirm,
 } from '@opentrons/components'
 import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
-import { MediumButton, SmallButton } from '/app/atoms/buttons'
+import { MediumButton, SmallButton } from '/app/components/ODD/buttons'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { OddModal } from '/app/molecules/OddModal'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { useResetRobotConfigMutation } from '/app/resources/devices/hooks/useResetRobotConfigMutation'
 
 import type { ReactNode } from 'react'
 import type { ResetConfigRequest } from '@opentrons/api-client'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 import type { SetSettingOption } from './types'
 
 interface LabelProps {
@@ -232,19 +232,19 @@ export function DeviceReset({
                   isSelected={isOptionSelected}
                 >
                   <Flex flexDirection={DIRECTION_COLUMN}>
-                    <LegacyStyledText
+                    <StyledText
                       forwardedAs="p"
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     >
                       {optionText}
-                    </LegacyStyledText>
+                    </StyledText>
                     {subText != null ? (
-                      <LegacyStyledText
+                      <StyledText
                         forwardedAs="p"
                         color={isOptionSelected ? COLORS.white : COLORS.grey60}
                       >
                         {subText}
-                      </LegacyStyledText>
+                      </StyledText>
                     ) : null}
                   </Flex>
                 </OptionLabel>
@@ -281,13 +281,13 @@ export function DeviceReset({
             isSelected={isEveryOptionSelected(resetOptions)}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
                 {t('clear_all_stored_data')}
-              </LegacyStyledText>
-              <LegacyStyledText
+              </StyledText>
+              <StyledText
                 forwardedAs="p"
                 color={
                   isEveryOptionSelected(resetOptions)
@@ -296,7 +296,7 @@ export function DeviceReset({
                 }
               >
                 {t('clear_all_stored_data_description')}
-              </LegacyStyledText>
+              </StyledText>
             </Flex>
           </OptionLabel>
         </Flex>
@@ -340,9 +340,9 @@ export const ConfirmClearDataModal = ({
           gridGap={SPACING.spacing12}
           paddingBottom={SPACING.spacing32}
         >
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {t('confirm_device_reset_description')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}

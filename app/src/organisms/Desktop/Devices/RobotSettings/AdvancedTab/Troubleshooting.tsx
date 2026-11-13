@@ -1,23 +1,25 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  ALIGN_CENTER,
   ALIGN_END,
-  Box,
   ERROR_TOAST,
-  Flex,
   INFO_TOAST,
-  JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
-  SPACING,
   SPACING_AUTO,
   SUCCESS_TOAST,
-  TYPOGRAPHY,
 } from '@opentrons/components'
+import {
+  useLogLevelQuery,
+  usePostLogLevelMutation,
+} from '@opentrons/react-api-client'
 
-import { TertiaryButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useDownloadRobotLogs } from '/app/resources/devices/hooks'
+
+import styles from './troubleshooting.module.css'
 
 import type { MouseEventHandler, ReactNode } from 'react'
 import type { IconProps } from '@opentrons/components'
@@ -36,8 +38,11 @@ export function Troubleshooting({
     status: downloadLogsStatus,
     canDownload,
   } = useDownloadRobotLogs(robotName)
+  const documentationState = useDocumentationState()
+  const robotLogLevel = useLogLevelQuery()
+  const { postLogLevel } = usePostLogLevelMutation(documentationState)
 
-  const handleClick: MouseEventHandler<HTMLButtonElement> = () => {
+  const handleClickDownload: MouseEventHandler<HTMLButtonElement> = () => {
     if (downloadLogsStatus !== 'loading') {
       const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
       const toastId = makeToast(t('downloading_logs') as string, INFO_TOAST, {
@@ -52,7 +57,9 @@ export function Troubleshooting({
           )
         })
         .catch((e: Error) => {
-          makeToast(e.message, ERROR_TOAST, { closeButton: true })
+          if (!isFileSaveCanceledError(e)) {
+            makeToast(e.message, ERROR_TOAST, { closeButton: true })
+          }
         })
         .finally(() => {
           eatToast(toastId)
@@ -60,36 +67,56 @@ export function Troubleshooting({
     }
   }
 
+  const DEBUG_LEVELS = ['info', 'debug']
+  const debugLogsEnabled = DEBUG_LEVELS.includes(
+    robotLogLevel?.data?.log_level ?? 'unknown'
+  )
+
+  const handleClickDebugLogs: MouseEventHandler<Element> = () => {
+    postLogLevel(debugLogsEnabled ? 'warning' : 'debug')
+  }
+
   return (
-    <Flex
-      alignItems={ALIGN_CENTER}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      marginTop={SPACING.spacing24}
-    >
-      <Box width="70%">
-        <LegacyStyledText
-          forwardedAs="h3"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacing20}
-        >
-          {t('troubleshooting')}
-        </LegacyStyledText>
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          data-testid="RobotSettings_Troubleshooting"
+    <div className={styles.section_container}>
+      <h3 className={styles.header}>{t('troubleshooting')}</h3>
+      <div className={styles.option_row}>
+        <p
+          data-testid="RobotSettings_Troubleshooting_Download"
+          className={styles.option_name}
         >
           {t('download_logs')}
-        </LegacyStyledText>
-      </Box>
-      <TertiaryButton
-        disabled={!canDownload || downloadLogsStatus === 'loading'}
-        marginLeft={SPACING_AUTO}
-        onClick={handleClick}
-        alignSelf={ALIGN_END}
-      >
-        {t('download_logs')}
-      </TertiaryButton>
-    </Flex>
+        </p>
+        <TertiaryButton
+          disabled={!canDownload || downloadLogsStatus === 'loading'}
+          marginLeft={SPACING_AUTO}
+          onClick={handleClickDownload}
+          alignSelf={ALIGN_END}
+        >
+          {t('download_logs')}
+        </TertiaryButton>
+      </div>
+      <div className={styles.option_row}>
+        <div className={styles.option_name_container}>
+          <p
+            data-testid="RobotSettings_Troubleshooting_LogLevel_Title"
+            className={styles.option_name}
+          >
+            {t('debug_logging')}
+          </p>
+          <p
+            data-testid="RobotSettings_Troubleshooting_LogLevel_description"
+            className={styles.option_description}
+          >
+            {t('debug_logging_description')}
+          </p>
+        </div>
+        <ToggleButton
+          label="debug_logs_enabled"
+          toggledOn={debugLogsEnabled}
+          onClick={handleClickDebugLogs}
+          disabled={robotLogLevel.isLoading || robotLogLevel.isError}
+        />
+      </div>
+    </div>
   )
 }

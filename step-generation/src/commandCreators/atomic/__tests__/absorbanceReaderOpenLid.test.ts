@@ -100,4 +100,56 @@ describe('absorbanceReaderOpenLid', () => {
       type: 'ABSORBANCE_READER_NO_GRIPPER',
     })
   })
+  it('resolves moduleId when it is a string runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: moduleId,
+      },
+    }
+    const result = absorbanceReaderOpenLid(
+      {
+        moduleId: 'selected_module',
+      },
+      invariantContext,
+      robotState
+    )
+    expect(result).toEqual({
+      commands: [
+        {
+          commandType: 'absorbanceReader/openLid',
+          key: expect.any(String),
+          params: {
+            moduleId,
+          },
+        },
+      ],
+      python: 'mock_absorbance_plate_reader_1.open_lid()',
+    })
+  })
+  it('returns error if moduleId is not a string runtime parameter', () => {
+    invariantContext.runtimeParameters = {
+      mock_rtp: {
+        variableName: 'mock_rtp',
+        displayName: 'mock rtp',
+        type: 'boolean',
+        default: false,
+      },
+    }
+    const result = absorbanceReaderOpenLid(
+      {
+        moduleId: 'mock_rtp',
+      },
+      invariantContext,
+      robotState
+    )
+    expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+    ])
+  })
 })

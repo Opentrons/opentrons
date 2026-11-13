@@ -9,13 +9,13 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { OddModal } from '/app/molecules/OddModal'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { NOT_CONFIGURED } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 
 import type { ReactNode } from 'react'
@@ -58,19 +58,16 @@ export function OpenDoorAlertModal(props: OpenDoorModalProps): ReactNode {
           alignItems={ALIGN_CENTER}
           width="100%"
         >
-          <LegacyStyledText
-            forwardedAs="h4"
-            fontWeight={TYPOGRAPHY.fontWeightBold}
-          >
+          <StyledText forwardedAs="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {doorHeader}
-          </LegacyStyledText>
-          <LegacyStyledText
+          </StyledText>
+          <StyledText
             forwardedAs="p"
             textAlign={TYPOGRAPHY.textAlignCenter}
             color={COLORS.grey60}
           >
             {doorText}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       </Flex>
     </OddModal>,

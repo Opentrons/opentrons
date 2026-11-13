@@ -15,12 +15,9 @@ from opentrons.protocol_engine import DeckType, LegacyLabwareOffsetLocation, Mod
 from opentrons.protocol_engine.labware_offset_standardization import (
     legacy_offset_location_to_offset_location_sequence,
 )
-from opentrons.protocols.api_support.deck_type import (
-    guess_from_global_config as guess_deck_type_from_global_config,
-)
 from opentrons.types import DeckSlotName
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from server_utils.persistence.folder_migrator import Migration
 
 from ._util import copy_contents
@@ -55,9 +52,7 @@ class Migration9to10(Migration):  # noqa: D101
 
 def _upmigrate_stored_offsets(connection: sqlalchemy.engine.Connection) -> None:
     # grab the deck def. middlewares aren't up yet so we can't use the nice version
-    deck_definition = load_deck(
-        DeckType(guess_deck_type_from_global_config()), version=5
-    )
+    deck_definition = load_deck(DeckType.OT3_STANDARD, version=6)
 
     offsets = connection.execute(sqlalchemy.select(schema_09.labware_offset_table))
 
@@ -89,7 +84,7 @@ def _v9_offset_to_v10_offset(v9_offset: sqlalchemy.engine.Row) -> dict[str, obje
 
 
 def _v9_offset_to_v10_offset_locations(
-    v9_offset: sqlalchemy.engine.Row, v10_id: int, deck_definition: DeckDefinitionV5
+    v9_offset: sqlalchemy.engine.Row, v10_id: int, deck_definition: DeckDefinitionV6
 ) -> list[dict[str, object]]:
     location_sequence = legacy_offset_location_to_offset_location_sequence(
         LegacyLabwareOffsetLocation(

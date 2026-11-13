@@ -7,13 +7,12 @@ import {
   DIRECTION_COLUMN,
   ERROR_TOAST,
   Flex,
-  LegacyStyledText,
   Link,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { useLogger } from '/app/logger'
-import { UploadInput } from '/app/molecules/UploadInput'
+import { UploadInput } from '/app/components/desktop/UploadInput'
 import { useToaster } from '/app/organisms/ToasterOven'
 import {
   ANALYTICS_IMPORT_PROTOCOL_TO_APP,
@@ -37,14 +36,15 @@ export function ProtocolUploadInput(
 ): JSX.Element | null {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
-  const logger = useLogger(new URL('', import.meta.url).pathname)
   const trackEvent = useTrackEvent()
   const { makeToast } = useToaster()
 
   const handleUpload = (file: File): Promise<void> => {
     return remote.getFilePathFrom(file).then(filePath => {
       if (filePath == null) {
-        logger.warn('Failed to upload file, path not found')
+        console.warn(
+          '[app/src/organisms/Desktop/ProtocolsLanding/ProtocolUploadInput.tsx]: Failed to upload file, path not found'
+        )
       }
       if (isValidProtocolFileName(file.name)) {
         dispatch(addProtocol(filePath))
@@ -73,7 +73,7 @@ export function ProtocolUploadInput(
         }}
         uploadText={t('valid_file_types')}
         dragAndDropText={
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             <Trans
               t={t}
               i18nKey="shared:drag_and_drop"
@@ -81,7 +81,7 @@ export function ProtocolUploadInput(
                 a: <Link color={COLORS.blue55} role="button" />,
               }}
             />
-          </LegacyStyledText>
+          </StyledText>
         }
       />
     </Flex>

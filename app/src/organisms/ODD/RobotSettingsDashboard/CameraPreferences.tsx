@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next'
 
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useCameraUsageSettings } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 import { CameraSettings } from '/app/organisms/ODD/CameraSettings'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import type { ReactNode } from 'react'
 import type { SetSettingOption } from '/app/organisms/ODD/RobotSettingsDashboard'

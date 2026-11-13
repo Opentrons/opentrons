@@ -8,8 +8,8 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -32,13 +32,13 @@ export function EmptyFile(): ReactNode {
       gridGap={SPACING.spacing32}
     >
       <Icon name="ot-alert" size="3rem" data-testid="EmptyFile_icon" />
-      <LegacyStyledText
+      <StyledText
         fontSize={TYPOGRAPHY.fontSize28}
         lineHeight={TYPOGRAPHY.lineHeight36}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       >
         {t('no_files_found')}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }

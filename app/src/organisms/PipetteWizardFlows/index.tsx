@@ -22,14 +22,24 @@ import {
   useDeleteMaintenanceRunMutation,
   useHost,
 } from '@opentrons/react-api-client'
-import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
+import {
+  LEFT,
+  NINETY_SIX_CHANNEL,
+  RIGHT,
+  WASTE_CHUTE_FIXTURES,
+} from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { SmallButton } from '/app/atoms/buttons'
+import { getWizardHeaderExit } from '/app/components/adhoc/shared/wizards/getWizardHeaderExit'
+import { SimpleWizardBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
-import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils'
-import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
+import {
+  isMaintenanceDoorOpenError,
+  isMovementError,
+  isTipPresenceError,
+} from '/app/local-resources/maintenance_runs/utils'
 import { getIsOnDevice } from '/app/redux/config'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
@@ -41,10 +51,9 @@ import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { AttachProbe } from './AttachProbe'
-import { AttachWasteChute } from './AttachWasteChute'
 import { BeforeBeginning } from './BeforeBeginning'
 import { Carriage } from './Carriage'
-import { FLOWS, SECTIONS } from './constants'
+import { DEFAULT_CALIBRATION_SLOT, FLOWS, SECTIONS } from './constants'
 import { DetachPipette } from './DetachPipette'
 import { DetachProbe } from './DetachProbe'
 import { ExitModal } from './ExitModal'
@@ -53,9 +62,12 @@ import { getPipetteWizardStepsForProtocol } from './getPipetteWizardStepsForProt
 import { usePipetteFlowWizardHeaderText } from './hooks'
 import { MountingPlate } from './MountingPlate'
 import { MountPipette } from './MountPipette'
-import { RemoveWasteChute } from './RemoveWasteChute'
+import { MovementErrorModal } from './MovementErrorModal'
+import { ProbeNotAttached } from './ProbeNotAttached'
 import { Results } from './Results'
+import { SelectCalibrationSlot } from './SelectCalibrationSlot'
 import { UnskippableModal } from './UnskippableModal'
+import { startCalibrationOnClick } from './utils'
 
 import type { ReactNode } from 'react'
 import type { CommandData } from '@opentrons/api-client'
@@ -68,7 +80,13 @@ import type {
   LoadedPipette,
   PipetteMount,
 } from '@opentrons/shared-data'
-import type { PipetteWizardFlow, SelectablePipettes } from './types'
+import type {
+  CalibrationDeckSlot,
+  PipetteWizardFlow,
+  PipetteWizardStep,
+  PipetteWizardStepProps,
+  SelectablePipettes,
+} from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
 
@@ -81,6 +99,8 @@ interface PipetteWizardFlowsProps {
   pipetteInfo?: LoadedPipette[]
   initialDocstate?: DocumentationState
 }
+
+type PipetteFlowsError = 'movement' | 'tip_presence' | 'door_open' | 'generic'
 
 export const PipetteWizardFlows = (
   props: PipetteWizardFlowsProps
@@ -95,7 +115,6 @@ export const PipetteWizardFlows = (
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('pipette_wizard_flows')
-  const deckConfig = useNotifyDeckConfigurationQuery()
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
   // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -106,6 +125,29 @@ export const PipetteWizardFlows = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
+  const [selectedSlot, setSelectedSlot] = useState<CalibrationDeckSlot>(
+    DEFAULT_CALIBRATION_SLOT
+  )
+  const { data: deckConfig = [] } = useNotifyDeckConfigurationQuery()
+  const is96Channel =
+    selectedPipette === NINETY_SIX_CHANNEL ||
+    attachedPipettes[mount]?.data.channels === 96 ||
+    attachedPipettes[LEFT]?.data.channels === 96 ||
+    (memoizedPipetteInfo?.some(
+      pipette =>
+        pipette.pipetteName === 'p1000_96' || pipette.pipetteName === 'p200_96'
+    ) ??
+      false)
+  const isWasteChuteOnDeck = deckConfig.some(cc =>
+    WASTE_CHUTE_FIXTURES.includes(cc.cutoutFixtureId)
+  )
+  const forceB2 = is96Channel && isWasteChuteOnDeck
+
+  useEffect(() => {
+    if (forceB2) {
+      setSelectedSlot(DEFAULT_CALIBRATION_SLOT)
+    }
+  }, [forceB2])
 
   const pipetteWizardSteps = useMemo(
     () =>
@@ -115,18 +157,17 @@ export const PipetteWizardFlows = (
             mount,
             selectedPipette,
             isGantryEmpty,
-            attachedPipettes,
-            deckConfig
+            !forceB2
           )
         : getPipetteWizardStepsForProtocol(
             attachedPipettes,
             memoizedPipetteInfo,
             mount,
-            deckConfig
+            !forceB2
           ),
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [forceB2]
   )
   const requiredPipette = memoizedPipetteInfo?.find(
     pipette => pipette.mount === mount
@@ -158,12 +199,12 @@ export const PipetteWizardFlows = (
   const [createdMaintenanceRunId, setCreatedMaintenanceRunId] = useState<
     string | null
   >(null)
-  const [errorMessage, setShowErrorMessage] = useState<null | string>(null)
-  const [isDoorOpenError, setIsDoorOpenError] = useState<boolean>(false)
-  const dismissDoorOpenError = (): void => {
-    setShowErrorMessage(null)
-    setIsDoorOpenError(false)
+  const [errorMessage, setErrorMessage] = useState<null | string>(null)
+  const [isExiting, setIsExiting] = useState<boolean>(false)
+  const dismissError = (): void => {
+    setErrorMessage(null)
   }
+
   // we should start checking for run deletion only after the maintenance run is created
   // and the useCurrentRun poll has returned that created id
   const [
@@ -201,6 +242,54 @@ export const PipetteWizardFlows = (
     refetchInterval: RUN_REFETCH_INTERVAL,
     enabled: createdMaintenanceRunId != null,
   })
+
+  const doorOpenErrorMessage = useMemo(() => '' + t('door_is_open'), [t])
+  const tipPresenceErrorMessage = useMemo(
+    () => '' + t('unable_to_detect_probe'),
+    [t]
+  )
+  const movementErrorMessage = useMemo(
+    () => '' + t('pipette_attachment_error'),
+    [t]
+  )
+
+  const handleCommandError = (error: Error): void => {
+    if (isMaintenanceDoorOpenError(error)) {
+      setErrorMessage(doorOpenErrorMessage)
+    } else if (isTipPresenceError(error)) {
+      setErrorMessage(tipPresenceErrorMessage)
+    } else if (isMovementError(error)) {
+      setErrorMessage(movementErrorMessage)
+    } else {
+      setErrorMessage(error.message)
+    }
+  }
+
+  const errorType: PipetteFlowsError | null = useMemo(() => {
+    switch (errorMessage) {
+      case doorOpenErrorMessage:
+        return 'door_open'
+      case tipPresenceErrorMessage:
+        return 'tip_presence'
+      case movementErrorMessage:
+        return 'movement'
+      case null:
+        return null
+      default:
+        return 'generic'
+    }
+  }, [
+    errorMessage,
+    doorOpenErrorMessage,
+    tipPresenceErrorMessage,
+    movementErrorMessage,
+  ])
+
+  const isFatalError =
+    (errorType === null || errorType === 'generic') &&
+    ((isExiting && errorMessage != null) ||
+      maintenanceRunData?.data.status === RUN_STATUS_FAILED ||
+      (errorMessage != null && createdMaintenanceRunId == null))
 
   const maintenanceRunAction: DocumentedAction = useMemo(() => {
     return {
@@ -254,8 +343,8 @@ export const PipetteWizardFlows = (
           if (isDocumentedMutationError(error)) {
             return
           }
-          setShowErrorMessage(
-            error instanceof Error ? error.message : String(error)
+          handleCommandError(
+            error instanceof Error ? error : new Error(String(error))
           )
         },
       },
@@ -284,7 +373,6 @@ export const PipetteWizardFlows = (
     closeFlow,
   ])
 
-  const [isExiting, setIsExiting] = useState<boolean>(false)
   const proceed = (): void => {
     if (!isCommandMutationLoading) {
       setCurrentStepIndex(
@@ -327,18 +415,25 @@ export const PipetteWizardFlows = (
         [{ commandType: 'home' as const, params: {} }],
         false
       )
-        .catch(error => {
-          if (isMaintenanceDoorOpenError(error)) {
-            setIsDoorOpenError(true)
-            setShowErrorMessage(t('door_is_open') as string)
-          } else {
-            setIsExiting(true)
-            setShowErrorMessage(error.message as string)
-          }
+        .catch((error: Error) => {
+          handleCommandError(error)
         })
         .finally(() => {
           handleClose()
         })
+    }
+  }
+
+  const handleCloseWithoutHome = (): void => {
+    if (maintenanceRunData?.data.id == null) {
+      handleClose()
+    } else {
+      deleteMaintenanceRun(maintenanceRunData.data.id, {
+        onSettled: () => {
+          onComplete?.()
+          closeFlow()
+        },
+      })
     }
   }
   const {
@@ -365,21 +460,7 @@ export const PipetteWizardFlows = (
     maintenanceRunData?.data.id === createdMaintenanceRunId
       ? createdMaintenanceRunId
       : undefined
-  const calibrateBaseProps = {
-    chainRunCommands: chainMaintenanceRunCommands,
-    isRobotMoving: isCommandMutationLoading || isDeleteLoading,
-    proceed,
-    maintenanceRunId,
-    goBack,
-    attachedPipettes,
-    setShowErrorMessage,
-    errorMessage,
-    isDoorOpenError,
-    setIsDoorOpenError,
-    dismissDoorOpenError,
-    selectedPipette,
-    isOnDevice,
-  }
+
   const is96ChannelUnskippableStep =
     currentStep?.section === SECTIONS.CARRIAGE ||
     currentStep?.section === SECTIONS.MOUNTING_PLATE ||
@@ -407,17 +488,38 @@ export const PipetteWizardFlows = (
     return null
   }
 
-  const isFatalError =
-    !isDoorOpenError &&
-    ((isExiting && errorMessage != null) ||
-      maintenanceRunData?.data.status === RUN_STATUS_FAILED ||
-      (errorMessage != null && createdMaintenanceRunId == null))
+  // purposefully does not include flowType and mount, as these are passed in via the currentStep
+  // flowType and mount might change depending on the step within a flow
+  const calibrateBaseProps: Omit<
+    PipetteWizardStepProps,
+    keyof PipetteWizardStep
+  > = {
+    chainRunCommands: chainMaintenanceRunCommands,
+    isRobotMoving: isCommandMutationLoading || isDeleteLoading,
+    proceed,
+    maintenanceRunId,
+    goBack,
+    attachedPipettes,
+    errorMessage,
+    selectedPipette,
+    isOnDevice,
+    handleCommandError,
+    selectedSlot,
+  }
 
-  let onExit: () => void
+  const startCalibration = startCalibrationOnClick(
+    { ...calibrateBaseProps, ...currentStep },
+    attachedPipettes[mount]?.serialNumber ?? ''
+  )
+
+  let onExit: (() => void) | undefined
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   // These flows often have custom error messaging, so this fallback modal is shown only in specific circumstances.
   if (isFatalError) {
-    modalContent = (
+    onExit = confirmExit
+    modalContent = showConfirmExit ? (
+      exitModal
+    ) : (
       <SimpleWizardBody
         isSuccess={false}
         iconColor={COLORS.red50}
@@ -425,8 +527,11 @@ export const PipetteWizardFlows = (
         subHeader={errorMessage ?? undefined}
       />
     )
-  } else if (isDoorOpenError) {
-    modalContent = (
+  } else if (errorType === 'door_open') {
+    onExit = confirmExit
+    modalContent = showConfirmExit ? (
+      exitModal
+    ) : (
       <SimpleWizardBody
         isSuccess={false}
         iconColor={COLORS.red50}
@@ -440,17 +545,43 @@ export const PipetteWizardFlows = (
           gridGap={SPACING.spacing8}
         >
           {Boolean(isOnDevice) ? (
-            <SmallButton
-              buttonText={t('try_again')}
-              onClick={dismissDoorOpenError}
-            />
+            <SmallButton buttonText={t('try_again')} onClick={dismissError} />
           ) : (
-            <PrimaryButton onClick={dismissDoorOpenError}>
+            <PrimaryButton onClick={dismissError}>
               {t('try_again')}
             </PrimaryButton>
           )}
         </Flex>
       </SimpleWizardBody>
+    )
+  } else if (errorType === 'tip_presence') {
+    onExit = confirmExit
+    modalContent = showConfirmExit ? (
+      exitModal
+    ) : (
+      <ProbeNotAttached
+        handleOnClick={() => {
+          dismissError()
+          startCalibration()
+        }}
+        dismissError={dismissError}
+        isOnDevice={isOnDevice ?? false}
+      />
+    )
+  } else if (errorType === 'movement') {
+    onExit = confirmExit
+    modalContent = showConfirmExit ? exitModal : <MovementErrorModal t={t} />
+  } else if (errorMessage != null) {
+    onExit = confirmExit
+    modalContent = showConfirmExit ? (
+      exitModal
+    ) : (
+      <SimpleWizardBody
+        isSuccess={false}
+        iconColor={COLORS.red50}
+        header={t('shared:error_encountered')}
+        subHeader={errorMessage}
+      />
     )
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
     onExit = handleCleanUpAndClose
@@ -461,9 +592,27 @@ export const PipetteWizardFlows = (
         createMaintenanceRun={createTargetedMaintenanceRun}
         createdMaintenanceRunId={createdMaintenanceRunId}
         isCreateLoading={isCreateLoading}
-        deckConfig={deckConfig}
         requiredPipette={requiredPipette}
         documentationState={commandDocState}
+      />
+    )
+  } else if (currentStep.section === SECTIONS.SELECT_SLOT) {
+    onExit = confirmExit
+    modalContent = showConfirmExit ? (
+      exitModal
+    ) : calibrateBaseProps.isRobotMoving ? (
+      <AttachProbe
+        {...currentStep}
+        {...calibrateBaseProps}
+        isExiting={isExiting}
+      />
+    ) : (
+      <SelectCalibrationSlot
+        header={t('select_deck_slot')}
+        selectedSlot={selectedSlot}
+        setSelectedSlot={setSelectedSlot}
+        proceed={startCalibration}
+        isOnDevice={isOnDevice}
       />
     )
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {
@@ -474,8 +623,9 @@ export const PipetteWizardFlows = (
       <AttachProbe
         {...currentStep}
         {...calibrateBaseProps}
+        proceed={forceB2 ? startCalibration : proceed}
         isExiting={isExiting}
-        deckConfig={deckConfig}
+        showWasteChuteWarning={forceB2}
       />
     )
   } else if (currentStep.section === SECTIONS.DETACH_PROBE) {
@@ -528,6 +678,7 @@ export const PipetteWizardFlows = (
         description={t('firmware_updating')}
         proceedDescription={t('firmware_up_to_date')}
         isOnDevice={isOnDevice}
+        onUnauthorized={handleClose}
       />
     )
   } else if (currentStep.section === SECTIONS.DETACH_PIPETTE) {
@@ -556,28 +707,18 @@ export const PipetteWizardFlows = (
     ) : (
       <MountingPlate {...currentStep} {...calibrateBaseProps} />
     )
-  } else if (currentStep.section === SECTIONS.REMOVE_WASTE_CHUTE) {
-    onExit = confirmExit
-    modalContent = showConfirmExit ? (
-      exitModal
-    ) : (
-      <RemoveWasteChute {...currentStep} {...calibrateBaseProps} />
-    )
-  } else if (currentStep.section === SECTIONS.ATTACH_WASTE_CHUTE) {
-    onExit = confirmExit
-    modalContent = showConfirmExit ? (
-      exitModal
-    ) : (
-      <AttachWasteChute {...currentStep} {...calibrateBaseProps} />
-    )
   }
-  const buildWizardOnExit = (): (() => void) => {
-    if (isFatalError || showConfirmExit) {
-      return handleCleanUpAndClose
-    } else {
-      return onExit
-    }
-  }
+  const isError = isFatalError || errorMessage != null
+  const idleOnExit = showConfirmExit ? handleCleanUpAndClose : onExit
+  const { onExit: headerOnExit, exitDisabled } = getWizardHeaderExit({
+    isError,
+    isBusy:
+      currentStep.section === SECTIONS.FIRMWARE_UPDATE ||
+      isCommandMutationLoading ||
+      isFetchingPipettes,
+    onExitError: handleCloseWithoutHome,
+    onExitIdle: idleOnExit ?? handleCleanUpAndClose,
+  })
 
   const progressBarForCalError =
     currentStep.section === SECTIONS.DETACH_PROBE && errorMessage != null
@@ -586,11 +727,11 @@ export const PipetteWizardFlows = (
     <WizardHeader
       title={memoizedWizardTitle}
       currentStep={
-        progressBarForCalError ? currentStepIndex - 1 : currentStepIndex
+        progressBarForCalError ? currentStepIndex : currentStepIndex + 1
       }
-      totalSteps={totalStepCount}
-      onExit={buildWizardOnExit()}
-      exitDisabled={isCommandMutationLoading || isFetchingPipettes}
+      totalSteps={totalStepCount + 1}
+      onExit={headerOnExit}
+      exitDisabled={exitDisabled}
     />
   )
 

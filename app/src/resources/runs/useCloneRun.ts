@@ -18,6 +18,12 @@ import { useNotifyRunQuery } from './useNotifyRunQuery'
 
 import type { LabwareOffset, Run } from '@opentrons/api-client'
 
+export interface UseCloneRunOptions {
+  onSuccess?: (createRunResponse: Run) => unknown
+  onError?: (error: unknown) => void
+  triggerAnalysis?: boolean
+}
+
 interface UseCloneRunResult {
   cloneRun: (options?: { onError?: (error: unknown) => void }) => void
   isLoadingRun: boolean
@@ -26,9 +32,9 @@ interface UseCloneRunResult {
 
 export function useCloneRun(
   runId: string | null,
-  onSuccessCallback?: (createRunResponse: Run) => unknown,
-  triggerAnalysis: boolean = false
+  options: UseCloneRunOptions = {}
 ): UseCloneRunResult {
+  const { onSuccess, onError, triggerAnalysis = false } = options
   const host = useHost()
   const queryClient = useQueryClient()
   const { data: runRecord, isLoading: isLoadingRun } = useNotifyRunQuery(runId)
@@ -44,8 +50,11 @@ export function useCloneRun(
             console.error(`error invalidating protocol query: ${e.message}`)
           })
         // The onSuccess callback is not awaited until query invalidation, because currently, in every instance this
-        // onSuccessCallback is utilized, we only use it for navigating. We may need to revisit this.
-        onSuccessCallback?.(response)
+        // onSuccess is utilized, we only use it for navigating. We may need to revisit this.
+        onSuccess?.(response)
+      },
+      onError: error => {
+        onError?.(error)
       },
     }
   )

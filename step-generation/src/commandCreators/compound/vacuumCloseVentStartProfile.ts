@@ -14,7 +14,6 @@ export const vacuumCloseVentStartProfile: CommandCreator<
     [
       curryCommandCreator(vacuumCloseVent, {
         moduleId: args.moduleId,
-        commandCreatorFnName: 'vacuumCloseVent',
       }),
       curryCommandCreator(vacuumStartRunProfile, {
         ...args,

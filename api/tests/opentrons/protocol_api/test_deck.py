@@ -6,7 +6,7 @@ from typing import Dict, cast
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
+from opentrons_shared_data.deck.types import DeckDefinitionV6, SlotDefV3
 
 from opentrons.motion_planning import adjacent_slots_getters as mock_adjacent_slots
 from opentrons.protocol_api import (
@@ -21,15 +21,14 @@ from opentrons.protocol_api.core.common import LabwareCore, ModuleCore, Protocol
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
 from opentrons.protocol_api.deck import CalibrationPosition
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import DeckSlotName, Point
 
 
 @pytest.fixture
-def deck_definition() -> DeckDefinitionV5:
+def deck_definition() -> DeckDefinitionV6:
     """Get a deck definition value object."""
     return cast(
-        DeckDefinitionV5,
+        DeckDefinitionV6,
         {
             "locations": {"addressableAreas": [], "calibrationPoints": []},
             "cutoutFixtures": {},
@@ -84,7 +83,7 @@ def staging_slot_definitions_by_name() -> Dict[str, SlotDefV3]:
 @pytest.fixture
 def subject(
     decoy: Decoy,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
     mock_protocol_core: ProtocolCore,
     mock_core_map: LoadedCoreMap,
     api_version: APIVersion,
@@ -197,15 +196,6 @@ def test_delitem_aliases_to_move_labware(
             drop_offset=None,
         )
     )
-
-
-@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
-def test_delitem_raises_on_api_2_14(
-    subject: Deck,
-) -> None:
-    """It should raise on apiLevel 2.14."""
-    with pytest.raises(APIVersionError):
-        del subject[1]
 
 
 def test_delitem_noops_if_slot_is_empty(

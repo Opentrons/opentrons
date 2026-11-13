@@ -8,20 +8,20 @@ import {
   COLORS,
   Flex,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   PrimaryButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { useModulesQuery } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import { useGetModulesNeedingSetupThatCanCurrentlyBeSetUp } from '/app/App/hooks/useGetModulesNeedingSetup'
-import { SmallButton } from '/app/atoms/buttons'
-import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
+} from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 
 import { EQUIPMENT_POLL_MS } from '../DoorOpenControl/constants'
 import { useIsDoorOpen } from '../DoorOpenControl/useIsDoorOpen'
@@ -39,6 +39,7 @@ import { SelectModule } from './SelectModule'
 import { Success } from './Success'
 import { UpdateFirmware } from './UpdateFirmware'
 import { useModuleSetupWizard } from './useModuleSetupWizard'
+import { VerifyVacuumInstall } from './VerifyVacuumInstall'
 
 import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
@@ -64,7 +65,7 @@ export function ModuleWizardFlows(
     onComplete,
   } = props
 
-  const { t } = useTranslation('module_wizard_flows')
+  const { t, i18n } = useTranslation('module_wizard_flows')
 
   const {
     currentStep,
@@ -72,6 +73,7 @@ export function ModuleWizardFlows(
     totalStepCount,
     createMaintenanceRun,
     handleCleanUpAndClose,
+    handleCloseWithoutHome,
     wizardFlowBaseProps,
     buildFlowForSelectedModule,
     patchModuleAfterUpdate,
@@ -175,6 +177,8 @@ export function ModuleWizardFlows(
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
         isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
         handleCleanUpAndClose={handleCleanUpAndClose}
+        handleCloseWithoutHome={handleCloseWithoutHome}
+        isError
         currentStepIndex={currentStepIndex}
         totalStepCount={totalStepCount}
       >
@@ -194,12 +198,12 @@ export function ModuleWizardFlows(
           >
             {wizardFlowBaseProps.isOnDevice ? (
               <SmallButton
-                buttonText={t('try_again')}
+                buttonText={i18n.format(t('try_again'), 'capitalize')}
                 onClick={wizardFlowBaseProps.dismissDoorOpenError}
               />
             ) : (
               <PrimaryButton onClick={wizardFlowBaseProps.dismissDoorOpenError}>
-                {t('try_again')}
+                {i18n.format(t('try_again'), 'capitalize')}
               </PrimaryButton>
             )}
           </Flex>
@@ -212,6 +216,8 @@ export function ModuleWizardFlows(
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
         isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
         handleCleanUpAndClose={handleCleanUpAndClose}
+        handleCloseWithoutHome={handleCloseWithoutHome}
+        isError
         currentStepIndex={currentStepIndex}
         totalStepCount={totalStepCount}
       >
@@ -225,7 +231,7 @@ export function ModuleWizardFlows(
               i18nKey="branded:module_setup_failed"
               values={{ error: wizardFlowBaseProps.errorMessage }}
               components={{
-                block: <LegacyStyledText forwardedAs="p" />,
+                block: <StyledText forwardedAs="p" />,
               }}
             />
           }
@@ -438,6 +444,26 @@ export function ModuleWizardFlows(
             attachedModule={wizardFlowBaseProps.attachedModule}
             attachedPipette={wizardFlowBaseProps.attachedPipette}
             patchModuleAfterUpdate={patchModuleAfterUpdate}
+            robotName={robotName}
+          />
+        </ModuleWizardScreen>
+      )
+    case SECTIONS.VERIFY_VACUUM:
+      return (
+        <ModuleWizardScreen
+          isRobotMoving={wizardFlowBaseProps.isRobotMoving}
+          isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
+          handleCleanUpAndClose={handleCleanUpAndClose}
+          currentStepIndex={currentStepIndex}
+          totalStepCount={totalStepCount}
+        >
+          <VerifyVacuumInstall
+            {...currentStep}
+            {...wizardFlowBaseProps}
+            deckConfig={deckConfig}
+            attachedModule={wizardFlowBaseProps.attachedModule}
+            attachedModules={attachedModules}
+            attachedPipette={wizardFlowBaseProps.attachedPipette}
           />
         </ModuleWizardScreen>
       )

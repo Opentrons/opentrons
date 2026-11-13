@@ -12,7 +12,6 @@ export function getMoveLabwareCommandText({
   allRunDefs,
   t,
   commandTextData,
-  robotType,
 }: HandlesCommands<MoveLabwareRunTimeCommand>): string {
   const { labwareId, newLocation, strategy } = command.params
   let oldDisplayLocation = null
@@ -23,7 +22,6 @@ export function getMoveLabwareCommandText({
   ) {
     oldDisplayLocation = getLabwareDisplayLocation({
       location: command.result.originLocationSequence,
-      robotType,
       allRunDefs,
       loadedLabwares: commandTextData?.labware ?? [],
       loadedModules: commandTextData?.modules ?? [],
@@ -31,7 +29,6 @@ export function getMoveLabwareCommandText({
     })
     newDisplayLocation = getLabwareDisplayLocation({
       location: command.result.immediateDestinationLocationSequence,
-      robotType,
       allRunDefs,
       loadedLabwares: commandTextData?.labware ?? [],
       loadedModules: commandTextData?.modules ?? [],
@@ -49,7 +46,6 @@ export function getMoveLabwareCommandText({
 
     oldDisplayLocation = getLabwareDisplayLocation({
       location: oldLocation?.location,
-      robotType,
       allRunDefs,
       loadedLabwares: commandTextData?.labware ?? [],
       loadedModules: commandTextData?.modules ?? [],
@@ -57,7 +53,6 @@ export function getMoveLabwareCommandText({
     })
     newDisplayLocation = getLabwareDisplayLocation({
       location: newLocation,
-      robotType,
       allRunDefs,
       loadedLabwares: commandTextData?.labware ?? [],
       loadedModules: commandTextData?.modules ?? [],

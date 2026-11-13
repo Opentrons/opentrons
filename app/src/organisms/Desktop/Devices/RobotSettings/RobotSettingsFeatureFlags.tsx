@@ -3,8 +3,8 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -12,7 +12,7 @@ import {
   useUpdateRobotSettingMutation,
 } from '@opentrons/react-api-client'
 
-import { ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
 import type { MouseEventHandler, ReactNode } from 'react'
@@ -70,13 +70,14 @@ export function FeatureFlagToggle({
       marginBottom={SPACING.spacing16}
     >
       <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.pSemiBold}
+        <StyledText
+          forwardedAs="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing4}
         >
           {title}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">{description}</LegacyStyledText>
+        </StyledText>
+        <StyledText forwardedAs="p">{description}</StyledText>
       </Box>
       <ToggleButton
         label={title}

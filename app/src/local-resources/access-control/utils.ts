@@ -5,9 +5,11 @@ import type {
   DocumentationState,
 } from '@opentrons/react-api-client'
 
-const PROTOCOLS_WRITE_SCOPE = 'protocols.write'
+const UPDATES_WRITE_SCOPE = 'updates.write'
 
 const MAX_ERROR_DETAIL_LENGTH = 255
+
+const RUN_SIGNOFF_REQUIRED = 'RunSignoffRequired'
 
 /** Admin and service accounts share the same privileged robot permissions. */
 export function isAdminEquivalentAccountType(
@@ -47,38 +49,39 @@ export function isForbiddenError(error: unknown): error is AxiosError {
   return isAxiosError(error) && error.response?.status === 403
 }
 
-export function getAuditLogDeleteErrorMessage(
-  error: unknown,
-  permissionErrorMessage: string,
-  generalErrorMessage: string
-): string {
-  if (isForbiddenError(error)) {
-    return permissionErrorMessage
-  }
-  return generalErrorMessage
-}
-
-export function isProtocolWritePermissionError(error: unknown): boolean {
+/**
+ * True for a 403 from the robot's authorization layer, i.e. the logged-in
+ * account lacks a required scope. Other 403s (e.g. action forbidden while a
+ * run is active) do not include requiredScopes.
+ */
+export function isInsufficientScopeError(error: unknown): boolean {
   if (!isForbiddenError(error)) {
     return false
   }
   const requiredScopes = (
     error.response?.data as { requiredScopes?: unknown } | undefined
   )?.requiredScopes
-  return (
-    Array.isArray(requiredScopes) &&
-    requiredScopes.includes(PROTOCOLS_WRITE_SCOPE)
-  )
+  return Array.isArray(requiredScopes)
+}
+
+export function isRunSignoffRequiredError(error: unknown): boolean {
+  if (!isAxiosError(error)) {
+    return false
+  }
+  const errorId = (
+    error.response?.data as { errors?: Array<{ id?: unknown }> } | undefined
+  )?.errors?.[0]?.id
+  return errorId === RUN_SIGNOFF_REQUIRED
+}
+
+export function isUpdatesWritePermissionError(error: unknown): boolean {
+  return isForbiddenMissingScope(error, UPDATES_WRITE_SCOPE)
 }
 
 export function getProtocolOrRunCreationErrorMessage(
   error: unknown,
-  generalErrorMessage: string,
-  permissionErrorMessage: string
+  generalErrorMessage: string
 ): string {
-  if (isProtocolWritePermissionError(error)) {
-    return permissionErrorMessage
-  }
   if (isAxiosError(error)) {
     const detail = (
       error.response?.data as
@@ -91,6 +94,16 @@ export function getProtocolOrRunCreationErrorMessage(
     }
   }
   return generalErrorMessage
+}
+
+function isForbiddenMissingScope(error: unknown, scope: string): boolean {
+  if (!isForbiddenError(error)) {
+    return false
+  }
+  const requiredScopes = (
+    error.response?.data as { requiredScopes?: unknown } | undefined
+  )?.requiredScopes
+  return Array.isArray(requiredScopes) && requiredScopes.includes(scope)
 }
 
 function isAxiosError(error: unknown): error is AxiosError {

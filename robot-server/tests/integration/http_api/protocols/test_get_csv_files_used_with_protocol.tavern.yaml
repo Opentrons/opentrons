@@ -60,7 +60,6 @@ stages:
         json:
           protocol_id: data.id
           analysis_id: data.analysisSummaries[0].id
-          run_time_parameters_data1: data.analysisSummaries[0].runTimeParameters
       strict:
         json:off
       status_code: 201
@@ -69,14 +68,7 @@ stages:
           analysisSummaries:
             - id: !anystr
               status: pending
-              runTimeParameters:
-                - displayName: Liquid handling CSV file
-                  variableName: liq_handling_csv_file
-                  description: A CSV file that contains wells to use for pipetting
-                  type: csv_file
-                  file:
-                    id: '{data_file_1_id}'
-                    name: 'test.csv'
+              runTimeParameters: []
 
   - name: Wait until analysis is completed
     max_retries: 5
@@ -100,6 +92,25 @@ stages:
           protocolKind: !anything
           metadata: !anything
         links: !anything
+
+  - name: Check that the completed analysis includes the CSV file parameter
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id}'
+    response:
+      strict:
+        - json:off
+      json:
+        data:
+          id: '{analysis_id}'
+          status: completed
+          runTimeParameters:
+            - displayName: Liquid handling CSV file
+              variableName: liq_handling_csv_file
+              description: A CSV file that contains wells to use for pipetting
+              type: csv_file
+              file:
+                id: '{data_file_1_id}'
+                name: 'test.csv'
 
   - name: Start a new analysis with a different CSV file
     request:
@@ -111,6 +122,9 @@ stages:
           runTimeParameterFiles:
             liq_handling_csv_file: '{data_file_3_id}'
     response:
+      save:
+        json:
+          analysis_id2: data[1].id
       strict:
         - json:off
       status_code: 201
@@ -120,14 +134,7 @@ stages:
             status: completed
           - id: !anystr
             status: pending
-            runTimeParameters:
-              - displayName: Liquid handling CSV file
-                variableName: liq_handling_csv_file
-                description: A CSV file that contains wells to use for pipetting
-                type: csv_file
-                file:
-                  id: '{data_file_3_id}'
-                  name: 'sample_plates.csv'
+            runTimeParameters: []
 
   - name: Wait until analysis is completed
     max_retries: 5
@@ -143,7 +150,7 @@ stages:
             - id: '{analysis_id}'
               status: completed
               result: ok
-            - id: !anystr
+            - id: '{analysis_id2}'
               status: completed
               result: ok
           id: !anything
@@ -154,6 +161,25 @@ stages:
           protocolKind: !anything
           metadata: !anything
         links: !anything
+
+  - name: Check that the reanalysis includes the new CSV file parameter
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id2}'
+    response:
+      strict:
+        - json:off
+      json:
+        data:
+          id: '{analysis_id2}'
+          status: completed
+          runTimeParameters:
+            - displayName: Liquid handling CSV file
+              variableName: liq_handling_csv_file
+              description: A CSV file that contains wells to use for pipetting
+              type: csv_file
+              file:
+                id: '{data_file_3_id}'
+                name: 'sample_plates.csv'
 
   - name: Create a run from the protocol and a CSV file
     request:

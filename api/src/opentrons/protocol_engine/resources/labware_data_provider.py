@@ -14,12 +14,6 @@ from opentrons_shared_data.labware.labware_definition import (
     labware_definition_type_adapter,
 )
 
-from opentrons.calibration_storage.types import TipLengthCalNotFound
-
-# TODO (lc 09-26-2022) We should conditionally import ot2 or ot3 calibration
-from opentrons.hardware_control.instruments.ot2 import (
-    instrument_calibration as instr_cal,
-)
 from opentrons.protocols.labware import get_labware_definition
 
 log = logging.getLogger(__name__)
@@ -92,16 +86,5 @@ class LabwareDataProvider:
                 f" has schema 3, so tip length calibration is currently unsupported."
                 f" Using nominal fallback of {nominal_fallback}."
             )
-            return nominal_fallback
-        else:
-            try:
-                return instr_cal.load_tip_length_for_pipette(
-                    pipette_serial, labware_definition
-                ).tip_length
-            except TipLengthCalNotFound as e:
-                message = (
-                    f"No calibrated tip length found for {pipette_serial},"
-                    f" using nominal fallback value of {nominal_fallback}"
-                )
-                log.debug(message, exc_info=e)
-                return nominal_fallback
+
+        return nominal_fallback

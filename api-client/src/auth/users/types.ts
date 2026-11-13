@@ -1,11 +1,15 @@
 export type AuthUserAccountType = 'admin' | 'user' | 'auditor' | 'service'
 
+export type UserLoginStatusReason = 'temporaryPassword' | 'passwordExpired'
+
 export interface AuthUser {
   username: string
   fullName: string
   accountType: AuthUserAccountType
   locked: boolean
   resetPassword: boolean
+  /** Present when the server knows why a password change is required. */
+  passwordResetReason?: UserLoginStatusReason | null
 }
 
 export interface AuthUserResponse {
@@ -30,6 +34,14 @@ export interface AuthUsersResponse {
   }
 }
 
+export interface UserLoginStatus {
+  reason: UserLoginStatusReason | null
+}
+
+export interface UserLoginStatusResponse {
+  data: UserLoginStatus
+}
+
 export interface CreateUserRequest {
   data: {
     username: string
@@ -44,6 +56,12 @@ export interface UpdateSelfRequest {
     username?: string
     fullName?: string
     password?: string
+  }
+}
+
+export interface ValidateSelfPasswordRequest {
+  data: {
+    password: string
   }
 }
 

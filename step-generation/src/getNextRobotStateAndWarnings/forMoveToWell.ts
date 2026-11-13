@@ -1,12 +1,34 @@
-import type { MoveToWellParams } from '@opentrons/shared-data'
-import type { InvariantContext, RobotStateAndWarnings } from '../types'
+import { resolveStringRuntimeValue } from '../utils'
+
+import type {
+  InvariantContext,
+  MoveToWellStepGenArgs,
+  RobotStateAndWarnings,
+} from '../types'
 
 export function forMoveToWell(
-  params: MoveToWellParams,
+  params: MoveToWellStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
-  const { pipetteId, labwareId, wellName } = params
+  const { runtimeParameters } = invariantContext
+  const pipetteId = resolveStringRuntimeValue(
+    params.pipetteId,
+    runtimeParameters
+  )
+  const labwareId = resolveStringRuntimeValue(
+    params.labwareId,
+    runtimeParameters
+  )
+  const wellName = resolveStringRuntimeValue(params.wellName, runtimeParameters)
+  if (pipetteId == null || labwareId == null || wellName == null) {
+    console.error(
+      `forMoveToWell: arg resolved to null (pipetteId=${String(
+        pipetteId
+      )}, labwareId=${String(labwareId)}, wellName=${String(wellName)})`
+    )
+    return
+  }
   const { robotState } = robotStateAndWarnings
   robotState.pipettes[pipetteId] = {
     ...robotState.pipettes[pipetteId],

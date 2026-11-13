@@ -233,7 +233,7 @@ async def test_create_play_action_to_start(
         mock_run_store.update_run_state(
             run_id=run_id,
             summary=engine_state_summary,
-            commands=protocol_commands,
+            commands=None,
             command_annotations=command_annotations,
             run_time_parameters=run_time_parameters,
         ),

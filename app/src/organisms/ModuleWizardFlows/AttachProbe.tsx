@@ -1,25 +1,18 @@
 import { Trans, useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
 
-import {
-  AnimationVideo,
-  Banner,
-  Flex,
-  LegacyStyledText,
-  RESPONSIVENESS,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { AnimationVideo, Banner, Flex, SPACING } from '@opentrons/components'
 import { LEFT, WASTE_CHUTE_FIXTURES } from '@opentrons/shared-data'
 
 import attachProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_1.webm'
 import attachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_8.webm'
 import attachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_Probe_96.webm'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
+import { SimpleWizardInProgressBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { WizardBodyText } from '/app/components/adhoc/shared/wizards/WizardBodyText'
 import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
-import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
 import { getFixtureIdByCutoutId } from './getFixtureIdByCutoutId'
+import styles from './wizardvideo.module.css'
 
 import type { ReactNode } from 'react'
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
@@ -29,14 +22,6 @@ interface AttachProbeProps extends ModuleSetupWizardRequiresPipetteStepProps {
   adapterId: string | null
   deckConfig: DeckConfiguration
 }
-
-const BODY_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: 1.275rem;
-    line-height: 1.75rem;
-  }
-`
 
 export function AttachProbe(props: AttachProbeProps): ReactNode {
   const {
@@ -144,19 +129,14 @@ export function AttachProbe(props: AttachProbeProps): ReactNode {
       header={i18n.format(t('attach_probe'), 'capitalize')}
       rightHandBody={
         <Flex height="13.25rem" paddingTop={SPACING.spacing4}>
-          <AnimationVideo
-            css={css`
-              max-width: 100%;
-              max-height: 100%;
-            `}
-          >
+          <AnimationVideo className={styles.animation_video}>
             <source src={pipetteAttachProbeVideoSource} />
           </AnimationVideo>
         </Flex>
       }
       bodyText={
         <>
-          <LegacyStyledText css={BODY_STYLE}>
+          <WizardBodyText>
             <Trans
               t={t}
               i18nKey="pipette_wizard_flows:install_probe"
@@ -165,7 +145,7 @@ export function AttachProbe(props: AttachProbeProps): ReactNode {
                 bold: <strong />,
               }}
             />
-          </LegacyStyledText>
+          </WizardBodyText>
 
           {wasteChuteConflictWith96Channel && (
             <Banner

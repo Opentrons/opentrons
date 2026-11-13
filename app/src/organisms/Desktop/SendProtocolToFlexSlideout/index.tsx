@@ -15,7 +15,7 @@ import {
 import { FLEX_DISPLAY_NAME, FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { isProtocolWritePermissionError } from '/app/local-resources/access-control/utils'
+import { isInsufficientScopeError } from '/app/local-resources/access-control/utils'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getValidCustomLabwareFiles } from '/app/redux/custom-labware'
@@ -51,14 +51,9 @@ export function SendProtocolToFlexSlideout(
   const { isExpanded, onCloseClick, storedProtocolData } = props
   const { protocolKey, srcFileNames, srcFiles, mostRecentAnalysis } =
     storedProtocolData
-  const { t } = useTranslation([
-    'protocol_details',
-    'protocol_list',
-    'access_control',
-  ])
+  const { t } = useTranslation(['protocol_details', 'protocol_list'])
 
   const [selectedRobot, setSelectedRobot] = useState<Robot | null>(null)
-  const [runCreationError, setRunCreationError] = useState<string | null>(null)
   const [isSending, setIsSending] = useState(false)
 
   const isSelectedRobotOnDifferentSoftwareVersion =
@@ -126,7 +121,6 @@ export function SendProtocolToFlexSlideout(
       return
     }
     setIsSending(true)
-    setRunCreationError(null)
     const toastId = makeToast(selectedRobot?.name ?? '', INFO_TOAST, {
       heading: `${t('sending')} ${protocolDisplayName}`,
       icon,
@@ -147,15 +141,10 @@ export function SendProtocolToFlexSlideout(
       })
       .catch((error: unknown) => {
         eatToast(toastId)
-        if (isDocumentedMutationError(error)) {
-          return
-        }
-        if (isProtocolWritePermissionError(error)) {
-          setRunCreationError(
-            t(
-              'access_control:send_protocol_admin_credentials_required'
-            ) as string
-          )
+        if (
+          isDocumentedMutationError(error) ||
+          isInsufficientScopeError(error)
+        ) {
           return
         }
         const axiosError = error as AxiosError<{
@@ -210,11 +199,7 @@ export function SendProtocolToFlexSlideout(
         selectedRobot={selectedRobot}
         setSelectedRobot={setSelectedRobot}
         robotType={FLEX_ROBOT_TYPE}
-        runCreationError={runCreationError}
         isCreatingRun={isSending}
-        reset={() => {
-          setRunCreationError(null)
-        }}
         isAnalysisError={analysisStatus === 'error'}
         isAnalysisStale={analysisStatus === 'stale'}
       />

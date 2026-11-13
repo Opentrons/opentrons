@@ -20,10 +20,11 @@ import {
   TYPOGRAPHY,
   useHoverTooltip,
   useMenuHandleClickOutside,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
 import { ChooseProtocolSlideout } from '/app/organisms/Desktop/ChooseProtocolSlideout'
 import { useIsRobotBusy } from '/app/redux-resources/robots'
 import { CONNECTABLE, removeRobot } from '/app/redux/discovery'
@@ -198,7 +199,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): ReactNode {
         {showOverflowMenu && !showConnectionTroubleshootingModal ? (
           <Flex
             whiteSpace={NO_WRAP}
-            zIndex={10}
+            zIndex={Z_INDEX.MODALS}
             borderRadius={BORDERS.borderRadius8}
             boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
             position={POSITION_ABSOLUTE}

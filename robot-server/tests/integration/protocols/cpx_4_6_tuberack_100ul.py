@@ -12,8 +12,9 @@ metadata = {
     "protocolName": "Two Custom Labware",
     "author": "Opentrons <engineering@opentrons.com>",
     "source": "CPX Test",
-    "apiLevel": "2.12",
 }
+
+requirements = {"apiLevel": "2.15", "robotType": "Flex"}
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
@@ -22,20 +23,20 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
     dye_container: Labware = ctx.load_labware(
         load_name="agilent_1_reservoir_290ml",
-        location="5",
+        location="C2",
         label="dye container",
     )
 
     four_tubes: Labware = ctx.load_labware(
         "cpx_4_tuberack_100ul",
-        "9",
+        "A3",
         "4 tubes",
         "custom_beta",
     )
 
     six_tubes: Labware = ctx.load_labware(
         "cpx_6_tuberack_100ul",
-        "3",
+        "D3",
         "6 tubes",
         "custom_beta",
     )

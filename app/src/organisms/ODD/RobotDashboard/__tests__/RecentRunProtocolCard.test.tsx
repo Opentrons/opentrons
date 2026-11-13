@@ -2,7 +2,6 @@ import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { formatDistance } from 'date-fns'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import {
@@ -12,7 +11,8 @@ import {
 import { simpleAnalysisFileFixture } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
-import { Skeleton } from '/app/atoms/Skeleton'
+import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
+import { RecentRunProtocolCard } from '/app/components/ODD/cards/RecentRunProtocolCard'
 import { i18n } from '/app/i18n'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import {
@@ -22,7 +22,6 @@ import {
 import { useCloneRun, useNotifyAllRunsQuery } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 
-import { RecentRunProtocolCard } from '../'
 import { useRerunnableStatusText } from '../hooks'
 
 import type { ComponentProps } from 'react'
@@ -40,7 +39,7 @@ vi.mock('react-router-dom', async importOriginal => {
 })
 
 vi.mock('@opentrons/react-api-client')
-vi.mock('/app/atoms/Skeleton')
+vi.mock('/app/components/adhoc/shared/Skeleton')
 vi.mock('/app/transformations/commands')
 vi.mock('/app/organisms/RunTimeControl/hooks')
 vi.mock('/app/redux/analytics')
@@ -153,9 +152,11 @@ describe('RecentRunProtocolCard', () => {
         runTimeParameters: [],
       },
     } as any)
-    when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
-      trackProtocolRunEvent: mockTrackProtocolRunEvent,
-    })
+    vi.when(useTrackProtocolRunEvent)
+      .calledWith(RUN_ID, ROBOT_NAME)
+      .thenReturn({
+        trackProtocolRunEvent: mockTrackProtocolRunEvent,
+      })
     vi.mocked(useCloneRun).mockReturnValue({
       cloneRun: mockCloneRun,
       isLoadingRun: false,

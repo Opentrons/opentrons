@@ -21,6 +21,7 @@
   min-width: 0;
   flex-direction: column;
   gap: var(--spacing-8);
+  transition: height 0.2s ease-in-out;
 }
 
 .text_area_container_keyboard_expanded {
@@ -39,6 +40,12 @@
   flex-direction: column;
 }
 
+.text_area_field_fill textarea {
+  font-size: var(--font-size-22);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-28);
+}
+
 .keyboard_container {
   position: fixed;
   right: 0;
@@ -48,7 +55,7 @@
 
 .overlay {
   position: fixed;
-  z-index: 1000;
+  z-index: var(--z-index-compliance-modals);
   background-color: var(--white);
   inset: 0;
 }

@@ -3,7 +3,7 @@
 import asyncio
 import logging
 from datetime import datetime
-from typing import Callable, Optional, Sequence
+from typing import Awaitable, Callable, Optional, Sequence
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
@@ -17,8 +17,8 @@ from opentrons.protocol_engine import (
     Command,
     CommandCreate,
     CommandPointer,
-    CommandSlice,
     DeckType,
+    JsonCommandSlice,
     LabwareOffset,
     LabwareOffsetCreate,
     LegacyLabwareOffsetCreate,
@@ -158,7 +158,7 @@ class MaintenanceRunOrchestratorStore:
         run_id: str,
         created_at: datetime,
         labware_offsets: Sequence[LegacyLabwareOffsetCreate | LabwareOffsetCreate],
-        notify_publishers: Callable[[], None],
+        notify_publishers: Callable[[], Awaitable[None]],
         deck_configuration: Optional[DeckConfigurationType] = [],
         proxy_of_callback_for_handling_door_events: HardwareEventHandler | None = None,
     ) -> StateSummary:
@@ -230,14 +230,13 @@ class MaintenanceRunOrchestratorStore:
             raise RunConflictError("Current run is not idle or stopped.")
 
         run_data = await self.run_orchestrator.get_state_summary()
-        commands = await self.run_orchestrator.get_all_commands()
         preconditions = await self.run_orchestrator.get_preconditions()
         self._run_orchestrator = None
         self._created_at = None
 
         return RunResult(
             state_summary=run_data,
-            commands=commands,
+            commands=[],
             parameters=[],
             command_annotations=[],
             command_preconditions=preconditions,
@@ -247,7 +246,7 @@ class MaintenanceRunOrchestratorStore:
         self,
         cursor: Optional[int],
         length: int,
-    ) -> CommandSlice:
+    ) -> JsonCommandSlice:
         """Get a slice of run commands.
 
         Args:

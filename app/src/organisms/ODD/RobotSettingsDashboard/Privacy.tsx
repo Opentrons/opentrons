@@ -4,12 +4,12 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import {
   getAnalyticsOptedIn,
   toggleAnalyticsOptedIn,
@@ -60,13 +60,13 @@ export function Privacy({
         paddingX={SPACING.spacing40}
         marginTop="7.75rem"
       >
-        <LegacyStyledText
+        <StyledText
           fontSize={TYPOGRAPHY.fontSize28}
           lineHeight={TYPOGRAPHY.lineHeight36}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
         >
           {t('branded:opentrons_cares_about_privacy')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex flexDirection={DIRECTION_COLUMN}>
           <RobotSettingButton
             settingName={t('share_display_usage')}

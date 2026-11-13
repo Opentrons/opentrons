@@ -19,12 +19,12 @@ import {
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_AROUND,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   ModalShell,
   POSITION_ABSOLUTE,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WizardHeader,
 } from '@opentrons/components'
@@ -39,12 +39,12 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import singleChannelAndEightChannel from '/app/assets/images/change-pip/1_and_8_channel.png'
 import ninetySixChannel from '/app/assets/images/change-pip/ninety-six-channel.png'
-import { SmallButton } from '/app/atoms/buttons'
+import { SimpleWizardInProgressBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { ModalContentOneColSimpleButtons } from '/app/components/ODD/modals/InterventionModal'
 import { i18n } from '/app/i18n'
 import { usePromptForDocumentation } from '/app/local-resources/access-control/usePromptForDocumentation'
 import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
-import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
-import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 import { getIsOnDevice } from '/app/redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 
@@ -239,9 +239,12 @@ export const ChoosePipette = (props: ChoosePipetteProps): ReactNode => {
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText forwardedAs="h1">
+              <StyledText
+                desktopStyle="headingSmallBold"
+                oddStyle="level4HeaderSemiBold"
+              >
                 {t('choose_pipette')}
-              </LegacyStyledText>
+              </StyledText>
               <Flex
                 margin={SPACING.spacing40}
                 justifyContent={JUSTIFY_SPACE_AROUND}
@@ -258,13 +261,13 @@ export const ChoosePipette = (props: ChoosePipetteProps): ReactNode => {
                     height="150.99px"
                     alt={singleMount}
                   />
-                  <LegacyStyledText
-                    forwardedAs="h3"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  <StyledText
+                    desktopStyle="bodyLargeSemiBold"
+                    oddStyle="bodyTextSemiBold"
                     textAlign={TYPOGRAPHY.textAlignCenter}
                   >
                     {singleMount}
-                  </LegacyStyledText>
+                  </StyledText>
                 </PipetteMountOption>
                 <PipetteMountOption
                   isSelected={selectedPipette === NINETY_SIX_CHANNEL}
@@ -278,13 +281,13 @@ export const ChoosePipette = (props: ChoosePipetteProps): ReactNode => {
                     height="151.2px"
                     alt={bothMounts}
                   />
-                  <LegacyStyledText
-                    forwardedAs="h3"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                  <StyledText
+                    desktopStyle="bodyLargeSemiBold"
+                    oddStyle="bodyTextSemiBold"
                     textAlign={TYPOGRAPHY.textAlignCenter}
                   >
                     {bothMounts}
-                  </LegacyStyledText>
+                  </StyledText>
                 </PipetteMountOption>
               </Flex>
             </Flex>

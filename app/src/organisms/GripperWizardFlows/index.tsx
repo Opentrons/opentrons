@@ -21,8 +21,9 @@ import {
 } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { getWizardHeaderExit } from '/app/components/adhoc/shared/wizards/getWizardHeaderExit'
+import { SimpleWizardBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
 import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
-import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
 import { getIsOnDevice } from '/app/redux/config'
 import {
   useChainMaintenanceCommands,
@@ -31,12 +32,18 @@ import {
 import { useCreateTargetedMaintenanceRunMutation } from '/app/resources/runs'
 
 import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
+import { DEFAULT_CALIBRATION_SLOT } from '../PipetteWizardFlows/constants'
+import { SelectCalibrationSlot } from '../PipetteWizardFlows/SelectCalibrationSlot'
 import { BeforeBeginning } from './BeforeBeginning'
-import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
+import {
+  GRIPPER_FLOW_TYPES,
+  MOVE_PIN_TO_FRONT_JAW,
+  SECTIONS,
+} from './constants'
 import { ExitConfirmation } from './ExitConfirmation'
 import { getGripperWizardSteps } from './getGripperWizardSteps'
 import { MountGripper } from './MountGripper'
-import { MovePin } from './MovePin'
+import { calibrateGripperJaw, MovePin } from './MovePin'
 import { Success } from './Success'
 import { GRIPPER_FLOW_ACTIONS, GRIPPER_FLOW_FINISH_ACTIONS } from './types'
 import { UnmountGripper } from './UnmountGripper'
@@ -53,6 +60,7 @@ import type {
 } from '@opentrons/api-client'
 import type { DocumentationState } from '@opentrons/react-api-client'
 import type { CreateCommand, Vector3D } from '@opentrons/shared-data'
+import type { CalibrationDeckSlot } from '../PipetteWizardFlows/types'
 import type { GripperWizardFlowType } from './types'
 
 const RUN_REFETCH_INTERVAL = 5000
@@ -280,6 +288,9 @@ export const GripperWizard = (
   const gripperWizardSteps = getGripperWizardSteps(flowType)
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
   const [frontJawOffset, setFrontJawOffset] = useState<Vector3D | null>(null)
+  const [selectedSlot, setSelectedSlot] = useState<CalibrationDeckSlot>(
+    DEFAULT_CALIBRATION_SLOT
+  )
 
   const totalStepCount = gripperWizardSteps.length - 1
   const currentStep = gripperWizardSteps?.[currentStepIndex]
@@ -327,8 +338,9 @@ export const GripperWizard = (
     chainRunCommands: chainMaintenanceRunCommands,
     setErrorMessage,
     errorMessage,
+    selectedSlot,
   }
-  let onExit
+  let onExit: (() => void) | undefined
   if (currentStep == null) return null
   let modalContent: JSX.Element = <div>UNASSIGNED STEP</div>
   if (showConfirmExit && maintenanceRunId !== null) {
@@ -367,6 +379,39 @@ export const GripperWizard = (
         documentationState={commandDocState}
       />
     )
+  } else if (currentStep.section === SECTIONS.SELECT_SLOT) {
+    onExit = confirmExit
+    const startFrontJawCalibration = (): void => {
+      if (sharedProps.maintenanceRunId == null) {
+        return
+      }
+      calibrateGripperJaw({
+        maintenanceRunId: sharedProps.maintenanceRunId,
+        createRunCommand,
+        setErrorMessage,
+        proceed: handleProceed,
+        jaw: 'front',
+        selectedSlot,
+        frontJawOffset,
+        setFrontJawOffset,
+      })
+    }
+    modalContent = isRobotMoving ? (
+      <MovePin
+        section={SECTIONS.MOVE_PIN}
+        movement={MOVE_PIN_TO_FRONT_JAW}
+        {...sharedProps}
+        {...{ setFrontJawOffset, frontJawOffset, createRunCommand, isExiting }}
+      />
+    ) : (
+      <SelectCalibrationSlot
+        header={t('select_deck_slot')}
+        selectedSlot={selectedSlot}
+        setSelectedSlot={setSelectedSlot}
+        proceed={startFrontJawCalibration}
+        isOnDevice={isOnDevice}
+      />
+    )
   } else if (currentStep.section === SECTIONS.MOVE_PIN) {
     onExit = confirmExit
     modalContent = modalContent = (
@@ -390,6 +435,7 @@ export const GripperWizard = (
         description={t('firmware_updating')}
         proceedDescription={t('firmware_up_to_date')}
         isOnDevice={isOnDevice}
+        onUnauthorized={handleClose}
       />
     )
   } else if (currentStep.section === SECTIONS.UNMOUNT_GRIPPER) {
@@ -413,19 +459,23 @@ export const GripperWizard = (
     [GRIPPER_FLOW_TYPES.ATTACH]: t('attach_gripper'),
     [GRIPPER_FLOW_TYPES.DETACH]: t('detach_gripper'),
   }
-  let handleExit = onExit
-  if (isRobotMoving) {
-    handleExit = undefined
-  } else if (showConfirmExit || errorMessage != null) {
-    handleExit = handleCleanUpAndClose
-  }
+  const isError =
+    errorMessage != null || maintenanceRunStatus === RUN_STATUS_FAILED
+  const idleOnExit = showConfirmExit ? handleCleanUpAndClose : onExit
+  const { onExit: headerOnExit, exitDisabled } = getWizardHeaderExit({
+    isError,
+    isBusy: isRobotMoving,
+    onExitError: handleClose,
+    onExitIdle: idleOnExit ?? handleCleanUpAndClose,
+  })
 
   const wizardHeader = (
     <WizardHeader
       title={titleByFlowType[flowType]}
       currentStep={currentStepIndex + 1}
       totalSteps={totalStepCount + 1}
-      onExit={handleExit}
+      onExit={headerOnExit}
+      exitDisabled={exitDisabled}
     />
   )
 

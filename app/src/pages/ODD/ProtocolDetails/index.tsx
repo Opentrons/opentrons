@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
-import last from 'lodash/last'
 
 import { getProtocol } from '@opentrons/api-client'
 import {
@@ -17,13 +16,14 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
+  StyledText,
   Tabs,
   truncateString,
   TYPOGRAPHY,
+  Z_INDEX,
 } from '@opentrons/components'
 import {
   isDocumentedMutationError,
@@ -31,16 +31,17 @@ import {
   useDeleteProtocolMutation,
   useDeleteRunMutation,
   useHost,
-  useProtocolAnalysisAsDocumentQuery,
-  useProtocolQuery,
 } from '@opentrons/react-api-client'
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
-import { MediumButton, SmallButton } from '/app/atoms/buttons'
+import { MediumButton, SmallButton } from '/app/components/ODD/buttons'
+import {
+  OddModal,
+  SmallModalChildren,
+} from '/app/components/ODD/modals/OddModal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
-import { OddModal, SmallModalChildren } from '/app/molecules/OddModal'
 import {
   ProtocolDetailsHeaderChipSkeleton,
   ProtocolDetailsHeaderTitleSkeleton,
@@ -51,7 +52,10 @@ import { useHardwareStatusText } from '/app/organisms/ODD/RobotDashboard/hooks'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '/app/redux/config'
 import { useIsRobotOutOfStorage } from '/app/resources/devices'
-import { useRunTimeParameters } from '/app/resources/protocols'
+import {
+  useEnsureProtocolAnalysis,
+  useRunTimeParameters,
+} from '/app/resources/protocols'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 
@@ -65,7 +69,7 @@ import { RobotOutOfStorageModal } from './RobotOutOfStorageModal'
 import type { ReactNode } from 'react'
 import type { Protocol } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '/app/App/types'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 import type { Dispatch } from '/app/redux/types'
 
 interface ProtocolHeaderProps {
@@ -108,12 +112,13 @@ const ProtocolHeader = ({
       top="0"
       backgroundColor={COLORS.white}
       marginX={`-${SPACING.spacing32}`}
-      zIndex={1} // the header is always visble when things scroll beneath
+      zIndex={Z_INDEX.BASE} // the header is always visble when things scroll beneath
     >
       <Flex
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing16}
-        width="42.125rem"
+        flex="1"
+        minWidth="0"
       >
         <Btn
           paddingLeft="0rem"
@@ -122,13 +127,15 @@ const ProtocolHeader = ({
             navigate('/protocols')
           }}
           width="3rem"
+          flexShrink={0}
         >
           <Icon name="back" size="3rem" color={COLORS.black90} />
         </Btn>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing8}
-          maxWidth="42.625rem"
+          flex="1"
+          minWidth="0"
         >
           <Flex maxWidth="max-content">
             {!isProtocolFetching ? (
@@ -141,27 +148,29 @@ const ProtocolHeader = ({
             )}
           </Flex>
           {!isProtocolFetching ? (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h2"
               fontWeight={TYPOGRAPHY.fontWeightBold}
               onClick={toggleTruncate}
               overflowWrap={OVERFLOW_WRAP_ANYWHERE}
             >
               {displayedTitle}
-            </LegacyStyledText>
+            </StyledText>
           ) : (
             <ProtocolDetailsHeaderTitleSkeleton />
           )}
         </Flex>
       </Flex>
-      <SmallButton
-        buttonCategory="rounded"
-        onClick={handleRunProtocol}
-        buttonText={t('protocol_details:start_setup')}
-        disabled={isProtocolFetching}
-        iconName={startSetup ? 'ot-spinner' : undefined}
-        iconPlacement="endIcon"
-      />
+      <Flex flexShrink={0}>
+        <SmallButton
+          buttonCategory="rounded"
+          onClick={handleRunProtocol}
+          buttonText={t('protocol_details:start_setup')}
+          disabled={isProtocolFetching}
+          iconName={startSetup ? 'ot-spinner' : undefined}
+          iconPlacement="endIcon"
+        />
+      </Flex>
     </Flex>
   )
 }
@@ -226,24 +235,21 @@ const Summary = ({ author, description, date }: SummaryProps): ReactNode => {
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         gridGap={SPACING.spacing4}
       >
-        <LegacyStyledText
+        <StyledText
           forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >{`${i18n.format(t('author'), 'capitalize')}: `}</LegacyStyledText>
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        >{`${i18n.format(t('author'), 'capitalize')}: `}</StyledText>
+        <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {author}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
-      <LegacyStyledText
+      <StyledText
         forwardedAs="p"
         color={description === null ? COLORS.grey60 : undefined}
         overflowWrap={OVERFLOW_WRAP_ANYWHERE}
       >
         {description ?? i18n.format(t('no_summary'), 'capitalize')}
-      </LegacyStyledText>
+      </StyledText>
       <Flex
         backgroundColor={COLORS.grey35}
         borderRadius={BORDERS.borderRadius8}
@@ -251,9 +257,9 @@ const Summary = ({ author, description, date }: SummaryProps): ReactNode => {
         width="max-content"
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
       >
-        <LegacyStyledText forwardedAs="p">{`${t('protocol_info:date_added')}: ${
+        <StyledText forwardedAs="p">{`${t('protocol_info:date_added')}: ${
           date != null ? formatTimeWithUtcLabel(date) : t('shared:no_data')
-        }`}</LegacyStyledText>
+        }`}</StyledText>
       </Flex>
     </Flex>
   )
@@ -331,22 +337,18 @@ export function ProtocolDetails(): JSX.Element | null {
   )
 
   const [showMaxPinsAlert, setShowMaxPinsAlert] = useState<boolean>(false)
-  const { data: protocolRecord, isLoading: isProtocolFetching } =
-    useProtocolQuery(protocolId, {
-      staleTime: Infinity,
-    })
+  const {
+    analysis: mostRecentAnalysis,
+    isAnalyzing,
+    protocolRecord,
+  } = useEnsureProtocolAnalysis(protocolId)
+  const isProtocolFetching = isAnalyzing
 
   // Watch for scrolling to toggle dropshadow
   const { scrollRef, isScrolled } = useScrollPosition()
 
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const pinned = pinnedProtocolIds.includes(protocolId)
-
-  const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
-    protocolId,
-    last(protocolRecord?.data.analysisSummaries)?.id ?? null,
-    { enabled: protocolRecord != null }
-  )
   const { documentationState: deleteDocumentationState } =
     useLinkedDocumentationState(['delete_protocol', 'delete_runs'], protocolId)
   const { deleteProtocol } = useDeleteProtocolMutation(deleteDocumentationState)
@@ -390,10 +392,20 @@ export function ProtocolDetails(): JSX.Element | null {
       setShowRobotOutOfStorageModal(true)
       return
     }
+    if (mostRecentAnalysis?.status !== 'completed') {
+      return
+    }
     setStartSetup(true)
     runTimeParameters.length > 0
       ? setShowParameters(true)
-      : createRun({ protocolId })
+      : createRun(
+          { protocolId },
+          {
+            onError: () => {
+              setStartSetup(false)
+            },
+          }
+        )
   }
   const [showConfirmDeleteProtocol, setShowConfirmationDeleteProtocol] =
     useState<boolean>(false)
@@ -470,13 +482,13 @@ export function ProtocolDetails(): JSX.Element | null {
               header={deleteModalHeader}
             >
               <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-                <LegacyStyledText
+                <StyledText
                   forwardedAs="h4"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   marginBottom={SPACING.spacing40}
                 >
                   {t('delete_protocol_perm', { name: displayName })}
-                </LegacyStyledText>
+                </StyledText>
                 <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
                   <SmallButton
                     onClick={() => {
@@ -520,7 +532,7 @@ export function ProtocolDetails(): JSX.Element | null {
           chipText={chipText}
           isScrolled={isScrolled}
           isProtocolFetching={isProtocolFetching}
-          startSetup={startSetup}
+          startSetup={startSetup || isAnalyzing}
         />
         <Flex
           flexDirection={DIRECTION_COLUMN}

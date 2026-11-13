@@ -181,7 +181,7 @@
   "submerge": "浸没",
   "submerge_aspirate_description": "在吸液前先将吸头浸没到液面下",
   "submerge_before_aspirating": "吸液前先浸没",
-  "submerge_before_dispensing": "排液前需浸没",
+  "submerge_before_dispensing": "排液前先浸入液体中",
   "submerge_dispense_description": "在排液前先将吸头浸没到液面下",
   "submerge_value": "{{speed}} 毫米/秒，{{delayDuration}} 秒，距{{positionReference}} {{position}} 毫米",
   "tip_change_frequency": "吸头更换频率",

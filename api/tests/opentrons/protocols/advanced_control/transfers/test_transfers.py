@@ -4,7 +4,6 @@ from typing import TypedDict
 
 import pytest
 
-import opentrons.protocol_api as papi
 from opentrons.hardware_control import ThreadManagedHardware
 from opentrons.protocol_api.instrument_context import InstrumentContext
 from opentrons.protocol_api.labware import Labware
@@ -50,7 +49,7 @@ def _instr_labware(ctx: ProtocolContext) -> InstrLabware:
 # +++++++ Test Helper Functions ++++++++++
 def test_check_if_zero() -> None:
     tclass = tx.TransferPlan
-    assert tclass._check_volume_not_zero(APIVersion(2, 6), 0)
+    assert not tclass._check_volume_not_zero(APIVersion(2, 6), 0)
     assert tclass._check_volume_not_zero(APIVersion(2, 6), 15)
     assert not tclass._check_volume_not_zero(APIVersion(2, 8), 0)
     assert tclass._check_volume_not_zero(APIVersion(2, 8), 15)
@@ -1146,80 +1145,9 @@ def test_oversized_transfer(_instr_labware: InstrLabware) -> None:
     assert xfer_plan_list == exp1
 
 
-def test_multichannel_transfer_old_version(
-    hardware: ThreadManagedHardware, deck_definition_name: str
-) -> None:
-    # for API version below 2.2, multichannel pipette can only
-    # reach row A of 384-well plates
-    ctx = papi.create_protocol_context(
-        api_version=APIVersion(2, 1),
-        hardware_api=hardware,
-        deck_type=deck_definition_name,
-    )
-
-    lw1 = ctx.load_labware("biorad_96_wellplate_200ul_pcr", 1)
-    lw2 = ctx.load_labware("corning_384_wellplate_112ul_flat", 2)
-    tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 3)
-    instr_multi = ctx.load_instrument("p300_multi", Mount.LEFT, tip_racks=[tiprack])
-
-    xfer_plan = tx.TransferPlan(
-        100,
-        lw1.rows()[0][0],
-        [lw2.rows()[0][1], lw2.rows()[1][1]],
-        instr_multi,
-        max_volume=instr_multi.hw_pipette["working_volume"],
-        api_version=ctx.api_version,
-        mode="distribute",
-    )
-    xfer_plan_list = []
-    for step in xfer_plan:
-        xfer_plan_list.append(step)
-    exp1 = [
-        {"method": "pick_up_tip", "args": [], "kwargs": {}},
-        {
-            "method": "aspirate",
-            "args": [100, lw1.wells_by_name()["A1"], 1.0],
-            "kwargs": {},
-        },
-        {
-            "method": "dispense",
-            "args": [100, lw2.wells_by_index()["A2"], 1.0],
-            "kwargs": {},
-        },
-        {"method": "drop_tip", "args": [], "kwargs": {}},
-    ]
-    assert xfer_plan_list == exp1
-
-    # target without row limit
-    with pytest.raises(IndexError):
-        xfer_plan = tx.TransferPlan(
-            100,
-            lw1.rows()[0][1],
-            lw2.rows()[1][1],
-            instr_multi,
-            max_volume=instr_multi.hw_pipette["working_volume"],
-            api_version=ctx.api_version,
-            # todo(mm, 2021-03-17): This test intends to test mode='transfer',
-            # but it's always accidentally tested mode='consolidate' because of
-            # a quirk in how TransferPlan used to guess the mode when not
-            # explicitly specified. If this is changed to mode='transfer' now,
-            # it raises ZeroDivisionError instead of IndexError. Bug #7516.
-            mode="consolidate",
-        )
-        xfer_plan_list = []
-        for step in xfer_plan:
-            xfer_plan_list.append(step)
-
-
 def test_multichannel_transfer_locs(
-    hardware: ThreadManagedHardware, deck_definition_name: str
+    hardware: ThreadManagedHardware, deck_definition_name: str, ctx: ProtocolContext
 ) -> None:
-    ctx = papi.create_protocol_context(
-        api_version=APIVersion(2, 2),
-        hardware_api=hardware,
-        deck_type=deck_definition_name,
-    )
-
     lw1 = ctx.load_labware("biorad_96_wellplate_200ul_pcr", 1)
     lw2 = ctx.load_labware("corning_384_wellplate_112ul_flat", 2)
     tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", 3)

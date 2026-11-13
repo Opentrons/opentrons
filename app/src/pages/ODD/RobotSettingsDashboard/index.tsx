@@ -35,6 +35,7 @@ import {
 import {
   getRobotUpdateAvailable,
   getRobotUpdateInfoForRobot,
+  isRobotSoftwareUpdateAvailable,
 } from '/app/redux/robot-update'
 import { GIT_BRANCH_NAME, GIT_COMMIT_HASH } from '/app/redux/shell'
 import { useNetworkConnection, useWifiList } from '/app/resources/networking'
@@ -60,7 +61,7 @@ export function RobotSettingsDashboard(): ReactNode {
       ? getRobotUpdateAvailable(state, localRobot)
       : null
   })
-  const isUpdateAvailable = robotUpdateType === 'upgrade'
+  const isUpdateAvailable = isRobotSoftwareUpdateAvailable(robotUpdateType)
   const robotUpdateInfo = useSelector((state: State) =>
     localRobot != null && localRobot.status !== UNREACHABLE
       ? getRobotUpdateInfoForRobot(state, localRobot)

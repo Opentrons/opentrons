@@ -1,7 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
@@ -63,9 +62,11 @@ describe('ConfirmCancelRunModal', () => {
       stopRun: mockStopRun,
     } as any)
     vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
-    when(useTrackProtocolRunEvent).calledWith(RUN_ID, ROBOT_NAME).thenReturn({
-      trackProtocolRunEvent: mockTrackProtocolRunEvent,
-    })
+    vi.when(useTrackProtocolRunEvent)
+      .calledWith(RUN_ID, ROBOT_NAME)
+      .thenReturn({
+        trackProtocolRunEvent: mockTrackProtocolRunEvent,
+      })
     vi.mocked(CancelingRunModal).mockReturnValue(
       <div>mock CancelingRunModal</div>
     )
@@ -109,7 +110,7 @@ describe('ConfirmCancelRunModal', () => {
     screen.getByText('mock CancelingRunModal')
   })
 
-  it('when tapping cancel run with error, should remain in canceling state', () => {
+  it('when tapping cancel run with error, should return to the confirm cancel modal', () => {
     mockStopRun.mockImplementation((_id: string, options: any) => {
       options.onError()
     })
@@ -118,7 +119,9 @@ describe('ConfirmCancelRunModal', () => {
     const button = screen.getByText('Cancel run')
     fireEvent.click(button)
 
-    screen.getByText('mock CancelingRunModal')
+    expect(screen.queryByText('mock CancelingRunModal')).toBeNull()
+    screen.getByText('Are you sure you want to cancel?')
+    screen.getByText('Cancel run')
   })
 
   it('when stop run succeeds, tracks cancel and does not navigate', () => {

@@ -1,17 +1,29 @@
+import { resolveStringRuntimeValue } from '../utils'
 import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
 
+import type { DropTipInPlaceParams } from '@opentrons/shared-data'
 import type {
-  BlowoutInPlaceParams,
-  DropTipInPlaceParams,
-} from '@opentrons/shared-data'
-import type { InvariantContext, RobotStateAndWarnings } from '../types'
+  BlowOutInPlaceStepGenArgs,
+  InvariantContext,
+  RobotStateAndWarnings,
+} from '../types'
 
 export const forBlowOutInPlace = (
-  params: BlowoutInPlaceParams,
+  params: BlowOutInPlaceStepGenArgs,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { pipetteId } = params
+  const { runtimeParameters } = invariantContext
+  const pipetteId = resolveStringRuntimeValue(
+    params.pipetteId,
+    runtimeParameters
+  )
+  if (pipetteId == null) {
+    console.error(
+      `forBlowOutInPlace: arg resolved to null (pipetteId=${String(pipetteId)})`
+    )
+    return
+  }
   const { robotState } = robotStateAndWarnings
   const entityId = robotState.pipettes[pipetteId].entityId ?? ''
 
@@ -30,7 +42,17 @@ export const forDropTipInPlace = (
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { pipetteId } = params
+  const { runtimeParameters } = invariantContext
+  const pipetteId = resolveStringRuntimeValue(
+    params.pipetteId,
+    runtimeParameters
+  )
+  if (pipetteId == null) {
+    console.error(
+      `forDropTipInPlace: arg resolved to null (pipetteId=${String(pipetteId)})`
+    )
+    return
+  }
   const { robotState } = robotStateAndWarnings
   const entityId = robotState.pipettes[pipetteId].entityId ?? ''
   robotState.tipState.pipettes[pipetteId] = {

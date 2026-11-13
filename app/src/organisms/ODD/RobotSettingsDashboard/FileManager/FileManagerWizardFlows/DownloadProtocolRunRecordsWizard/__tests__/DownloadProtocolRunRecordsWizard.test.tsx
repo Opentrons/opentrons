@@ -79,7 +79,7 @@ describe('DownloadProtocolRunRecordsWizard', () => {
     })
     expect(mockDownloadRuns).toHaveBeenCalledWith({
       runs: [mockRun],
-      callTimeUsbPath: '/mnt/usb1',
+      destination: '/mnt/usb1',
     })
     expect(mockDeleteSelectedRuns).not.toHaveBeenCalled()
   })

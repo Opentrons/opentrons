@@ -4,13 +4,13 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   RadioButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 
 import type { ChoiceParameter } from '@opentrons/shared-data'
 
@@ -52,13 +52,13 @@ export function ChooseEnum({
         flexDirection={DIRECTION_COLUMN}
         paddingBottom={SPACING.spacing40}
       >
-        <LegacyStyledText
+        <StyledText
           forwardedAs="h4"
           textAlign={TYPOGRAPHY.textAlignLeft}
           marginBottom={SPACING.spacing16}
         >
           {parameter.description}
-        </LegacyStyledText>
+        </StyledText>
 
         {options?.map(option => {
           return (

@@ -19,7 +19,7 @@ import {
 import { useCommandQuery } from '@opentrons/react-api-client'
 
 import { getModalPortalEl } from '/app/App/portal'
-import { ProgressBar } from '/app/atoms/ProgressBar'
+import { ProgressBar } from '/app/components/desktop/ProgressBar'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import {
   InterventionModal,

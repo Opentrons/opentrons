@@ -1,23 +1,59 @@
-import { pipetteDoesNotExist } from '../../errorCreators'
-import { uuid } from '../../utils'
+import * as errorCreators from '../../errorCreators'
+import {
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
+  uuid,
+} from '../../utils'
 
-import type { AirGapInPlaceParams } from '@opentrons/shared-data'
-import type { CommandCreator, CommandCreatorError } from '../../types'
+import type {
+  AspirateInPlaceStepGenArgs,
+  CommandCreator,
+  CommandCreatorError,
+} from '../../types'
 
-export const airGapInPlace: CommandCreator<AirGapInPlaceParams> = (
+export const airGapInPlace: CommandCreator<AspirateInPlaceStepGenArgs> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { flowRate, pipetteId, volume, correctionVolume } = args
-  const errors: CommandCreatorError[] = []
+  const { runtimeParameters } = invariantContext
+  const pipetteId = resolveStringRuntimeValue(args.pipetteId, runtimeParameters)
+  const volume = resolveNumericRuntimeValue(args.volume, runtimeParameters)
+  const flowRate = resolveNumericRuntimeValue(args.flowRate, runtimeParameters)
+  const correctionVolume =
+    args.correctionVolume == null
+      ? undefined
+      : resolveNumericRuntimeValue(args.correctionVolume, runtimeParameters)
+  const rawValues = [
+    args.pipetteId,
+    args.volume,
+    args.flowRate,
+    args.correctionVolume,
+  ]
+  const resolvedValues = [pipetteId, volume, flowRate, correctionVolume]
+  const errors: CommandCreatorError[] = rawValues.flatMap((value, i) =>
+    typeof value === 'string' && resolvedValues[i] == null
+      ? [errorCreators.invalidRuntimeParameter({ parameterName: value })]
+      : []
+  )
+  if (
+    errors.length > 0 ||
+    pipetteId == null ||
+    volume == null ||
+    flowRate == null
+  ) {
+    return { errors }
+  }
+
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
   if (!pipetteSpec) {
-    errors.push(
-      pipetteDoesNotExist({
-        pipette: pipetteId,
-      })
-    )
+    return {
+      errors: [
+        errorCreators.pipetteDoesNotExist({
+          pipette: pipetteId,
+        }),
+      ],
+    }
   }
   const pipettePythonName =
     invariantContext.pipetteEntities[pipetteId].pythonName
@@ -37,9 +73,9 @@ export const airGapInPlace: CommandCreator<AirGapInPlaceParams> = (
   return {
     commands,
     python: `${pipettePythonName}.air_gap(${[
-      `volume=${volume}`,
+      `volume=${args.volume}`,
       `in_place=True`,
-      `flow_rate=${flowRate}`,
+      `flow_rate=${args.flowRate}`,
       // Note that correction volume is not supported in our public atomic liquid handling APIs
     ].join(', ')})`,
   }

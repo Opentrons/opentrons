@@ -3,7 +3,10 @@ import { Trans, useTranslation } from 'react-i18next'
 import { StyledText } from '@opentrons/components'
 
 import ClearObstructions from '/app/assets/videos/error-recovery/FlexStacker_ClearObstructions.webm'
-import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
+import {
+  DescriptionContent,
+  TwoColumn,
+} from '/app/components/ODD/modals/InterventionModal'
 
 import { RECOVERY_MAP } from '../constants'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'

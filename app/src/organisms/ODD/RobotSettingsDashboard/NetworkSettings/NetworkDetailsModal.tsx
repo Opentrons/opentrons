@@ -8,15 +8,15 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { OddModal } from '/app/molecules/OddModal'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 
 import type { ReactNode } from 'react'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 interface NetworkDetailsModalProps {
   setShowNetworkDetailModal: (showNetworkDetailModal: boolean) => void
@@ -82,18 +82,12 @@ function ListItem({ itemName, itemValue }: ListItemProps): ReactNode {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       borderRadius={BORDERS.borderRadius8}
     >
-      <LegacyStyledText
-        forwardedAs="p"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {itemName}
-      </LegacyStyledText>
-      <LegacyStyledText
-        forwardedAs="p"
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-      >
+      </StyledText>
+      <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightRegular}>
         {itemValue}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }

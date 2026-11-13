@@ -41,9 +41,8 @@ from opentrons.protocol_engine.types.command_annotations import CommandAnnotatio
 
 def _make_config() -> Config:
     return Config(
-        # Choice of robot and deck type is arbitrary.
-        robot_type="OT-2 Standard",
-        deck_type=DeckType.OT2_STANDARD,
+        robot_type="OT-3 Standard",
+        deck_type=DeckType.OT3_STANDARD,
     )
 
 
@@ -405,7 +404,6 @@ def test_nonfatal_command_failure_with_door_open() -> None:
         is_door_open=False,
         config=Config(
             block_on_door_open=True,
-            # Choice of robot and deck type are arbitrary.
             robot_type="OT-3 Standard",
             deck_type=DeckType.OT3_STANDARD,
         ),
@@ -578,9 +576,8 @@ def test_door_during_setup_phase() -> None:
         error_recovery_policy=_placeholder_error_recovery_policy,
         config=Config(
             block_on_door_open=True,
-            # Choice of robot and deck type are arbitrary.
-            robot_type="OT-2 Standard",
-            deck_type=DeckType.OT2_STANDARD,
+            robot_type="OT-3 Standard",
+            deck_type=DeckType.OT3_STANDARD,
         ),
     )
     subject_view = CommandView(subject.state)
@@ -611,9 +608,8 @@ def test_door_during_protocol_phase() -> None:
         error_recovery_policy=_placeholder_error_recovery_policy,
         config=Config(
             block_on_door_open=True,
-            # Choice of robot and deck type are arbitrary.
-            robot_type="OT-2 Standard",
-            deck_type=DeckType.OT2_STANDARD,
+            robot_type="OT-3 Standard",
+            deck_type=DeckType.OT3_STANDARD,
         ),
     )
     subject_view = CommandView(subject.state)
@@ -661,9 +657,8 @@ def test_door_during_error_recovery() -> None:
         error_recovery_policy=_placeholder_error_recovery_policy,
         config=Config(
             block_on_door_open=True,
-            # Choice of robot and deck type are arbitrary.
-            robot_type="OT-2 Standard",
-            deck_type=DeckType.OT2_STANDARD,
+            robot_type="OT-3 Standard",
+            deck_type=DeckType.OT3_STANDARD,
         ),
     )
     subject_view = CommandView(subject.state)
@@ -749,9 +744,8 @@ def test_door_ungrip_labware(close_door_before_queueing: bool) -> None:
         error_recovery_policy=_placeholder_error_recovery_policy,
         config=Config(
             block_on_door_open=True,
-            # Choice of robot and deck type are arbitrary.
-            robot_type="OT-2 Standard",
-            deck_type=DeckType.OT2_STANDARD,
+            robot_type="OT-3 Standard",
+            deck_type=DeckType.OT3_STANDARD,
         ),
     )
     subject_view = CommandView(subject.state)
@@ -830,9 +824,8 @@ def test_door_initially_open(
         error_recovery_policy=_placeholder_error_recovery_policy,
         config=Config(
             block_on_door_open=True,
-            # Choice of robot and deck type are arbitrary.
-            robot_type="OT-2 Standard",
-            deck_type=DeckType.OT2_STANDARD,
+            robot_type="OT-3 Standard",
+            deck_type=DeckType.OT3_STANDARD,
         ),
     )
     subject_view = CommandView(subject.state)
@@ -1418,8 +1411,17 @@ def test_get_state_update_for_false_positive() -> None:
         running_command=subject_view.get("command-id-1"),
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
-        error=DefinedErrorData(
-            public=sentinel.public,
+        error=DefinedErrorData(  # type: ignore
+            public=ErrorOccurrence(
+                id="error-id",
+                createdAt=datetime(2023, 3, 3, 0, 0),
+                isDefined=False,
+                errorType="ProtocolEngineError",
+                errorCode="4000",
+                detail="oh no",
+                errorInfo={},
+                wrappedErrors=[],
+            ),
             state_update_if_false_positive=sentinel.state_update_if_false_positive,
         ),
         type=ErrorRecoveryType.WAIT_FOR_RECOVERY,

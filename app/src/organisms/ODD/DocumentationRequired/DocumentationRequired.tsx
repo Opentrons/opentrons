@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next'
 import NiceModal from '@ebay/nice-modal-react'
 import clsx from 'clsx'
 
-import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
-import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
-import { TouchTextAreaField } from '/app/molecules/TouchTextAreaField'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+import { TouchTextAreaField } from '/app/components/ODD/input/TouchTextAreaField'
+import { FullKeyboard } from '/app/components/ODD/keyboard'
+import { AccordionKeyboard } from '/app/components/ODD/keyboard/AccordionKeyboard'
 
 import { ActionsView } from './ActionsView'
 import styles from './documentationrequired.module.css'
@@ -81,7 +81,7 @@ export function DocumentationRequired({
           buttonText={t('shared:confirm')}
           onClickButton={handleConfirm}
           secondaryButtonProps={{
-            buttonText: 'View actions',
+            buttonText: t('view_actions'),
             buttonType: 'tertiaryHighLight',
             iconName: 'information',
             iconPlacement: 'startIcon',
@@ -116,6 +116,7 @@ export function DocumentationRequired({
       </div>
       <div className={styles.keyboard_container}>
         <AccordionKeyboard
+          inputRef={textAreaRef}
           isOpen={keyboardExpanded}
           onToggle={handleKeyboardToggle}
         >

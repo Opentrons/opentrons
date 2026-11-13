@@ -24,6 +24,7 @@ from typing import (
     Union,
 )
 
+from opentrons_shared_data.errors.exceptions import UnsupportedHardwareCommand
 from opentrons_shared_data.labware.labware_definition import (
     labware_definition_type_adapter,
 )
@@ -31,9 +32,6 @@ from opentrons_shared_data.robot.types import RobotType
 
 from .util import entrypoint_util
 from opentrons import __version__, protocol_api, should_use_ot3
-from opentrons.hardware_control import (
-    API as OT2API,
-)
 from opentrons.hardware_control import (
     ThreadManagedHardware,
     ThreadManager,
@@ -67,11 +65,10 @@ from opentrons.protocols.api_support.deck_type import (
     should_load_fixed_trash,
     should_load_fixed_trash_labware_for_python_protocol,
 )
+from opentrons.protocols.api_support.definitions import MIN_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.execution import execute as execute_apiv2
 from opentrons.protocols.types import (
     ApiDeprecationError,
-    Protocol,
     PythonProtocol,
 )
 
@@ -100,16 +97,6 @@ _THREAD_MANAGED_HW: Optional[ThreadManagedHardware] = None
 # If they're garbage collected, they can close their resources prematurely.
 # https://stackoverflow.com/a/69155026/497934
 _LIVE_PROTOCOL_ENGINE_CONTEXTS = contextlib.ExitStack()
-
-
-# See Jira RCORE-535.
-_JSON_TOO_NEW_MESSAGE = (
-    "Protocols created by recent versions of Protocol Designer"
-    " cannot currently be executed with"
-    " the opentrons_execute command-line tool"
-    " or the opentrons.execute.execute() function."
-    " Use the Opentrons App instead."
-)
 
 
 _EmitRunlogCallable = Callable[[command_types.CommandMessage], None]
@@ -181,31 +168,26 @@ def get_protocol_api(
 
     hardware_controller = _get_global_hardware_controller(robot_type)
 
-    if checked_version < ENGINE_CORE_API_VERSION:
-        context = _create_live_context_non_pe(
-            api_version=checked_version,
-            deck_type=deck_type,
-            hardware_api=hardware_controller,
-            bundled_labware=bundled_labware,
-            bundled_data=bundled_data,
-            extra_labware=extra_labware,
+    if checked_version < MIN_SUPPORTED_VERSION:
+        raise NotImplementedError(
+            f"This protocol requests API level {checked_version}, but this simulator "
+            f"can only simulate protocols of API level {MIN_SUPPORTED_VERSION} or higher"
         )
-    else:
-        if bundled_labware is not None:
-            # Protocol Engine has a deep assumption that standard labware definitions are always
-            # implicitly loadable.
-            raise NotImplementedError(
-                f"The bundled_labware argument is not currently supported for Python protocols"
-                f" with apiLevel {ENGINE_CORE_API_VERSION} or newer."
-            )
-        context = _create_live_context_pe(
-            api_version=checked_version,
-            robot_type=robot_type,
-            deck_type=deck_type,
-            hardware_api=_THREAD_MANAGED_HW,  # type: ignore[arg-type]
-            bundled_data=bundled_data,
-            extra_labware=extra_labware,
+    if bundled_labware is not None:
+        # Protocol Engine has a deep assumption that standard labware definitions are always
+        # implicitly loadable.
+        raise NotImplementedError(
+            f"The bundled_labware argument is not currently supported for Python protocols"
+            f" with apiLevel {ENGINE_CORE_API_VERSION} or newer."
         )
+    context = _create_live_context_pe(
+        api_version=checked_version,
+        robot_type=robot_type,
+        deck_type=deck_type,
+        hardware_api=_THREAD_MANAGED_HW,  # type: ignore[arg-type]
+        bundled_data=bundled_data,
+        extra_labware=extra_labware,
+    )
 
     hardware_controller.sync.cache_instruments()
     return context
@@ -392,20 +374,14 @@ def execute(
         extra_data = {}
 
     contents = protocol_file.read()
-    try:
-        protocol = parse.parse(
-            contents,
-            protocol_name,
-            extra_labware={
-                uri: details.definition for uri, details in extra_labware.items()
-            },
-            extra_data=extra_data,
-        )
-    except parse.JSONSchemaVersionTooNewError as e:
-        # opentrons.protocols.parse() doesn't support new JSON protocols.
-        # The code to do that should be moved from opentrons.protocol_reader.
-        # See https://opentrons.atlassian.net/browse/PLAT-94.
-        raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
+    protocol = parse.parse(
+        contents,
+        protocol_name,
+        extra_labware={
+            uri: details.definition for uri, details in extra_labware.items()
+        },
+        extra_data=extra_data,
+    )
 
     if protocol.api_level < APIVersion(2, 0):
         raise ApiDeprecationError(version=protocol.api_level)
@@ -420,25 +396,25 @@ def execute(
             f' so it can\'t execute protocols for robot type "{protocol.robot_type}"'
         )
 
-    if protocol.api_level < ENGINE_CORE_API_VERSION:
-        _run_file_non_pe(
-            protocol=protocol,
-            emit_runlog=emit_runlog,
+    if protocol.api_level < MIN_SUPPORTED_VERSION:
+        raise NotImplementedError(
+            f"This protocol requests API level {protocol.api_level}, but this simulator "
+            f"can only execute protocols of API level {MIN_SUPPORTED_VERSION} or higher"
         )
-    else:
-        # TODO(mm, 2023-07-06): Once these NotImplementedErrors are resolved, consider removing
-        # the enclosing if-else block and running everything through _run_file_pe() for simplicity.
-        if custom_data_paths:
-            raise NotImplementedError(
-                f"The custom_data_paths argument is not currently supported for Python protocols"
-                f" with apiLevel {ENGINE_CORE_API_VERSION} or newer."
-            )
-        protocol_file.seek(0)
-        _run_file_pe(
-            protocol=protocol,
-            hardware_api=_get_global_hardware_controller(_get_robot_type()),
-            emit_runlog=emit_runlog,
+
+    # TODO(mm, 2023-07-06): Once these NotImplementedErrors are resolved, consider removing
+    # the enclosing if-else block and running everything through _run_file_pe() for simplicity.
+    if custom_data_paths:
+        raise NotImplementedError(
+            f"The custom_data_paths argument is not currently supported for Python protocols"
+            f" with apiLevel {ENGINE_CORE_API_VERSION} or newer."
         )
+    protocol_file.seek(0)
+    _run_file_pe(
+        protocol=protocol,
+        hardware_api=_get_global_hardware_controller(_get_robot_type()),
+        emit_runlog=emit_runlog,
+    )
 
 
 def make_runlog_cb() -> Callable[[command_types.CommandMessage], None]:
@@ -517,29 +493,6 @@ def main() -> int:
     # Just let Python show a traceback.
 
 
-def _create_live_context_non_pe(
-    api_version: APIVersion,
-    hardware_api: ThreadManagedHardware,
-    deck_type: str,
-    extra_labware: Optional[Dict[str, "LabwareDefinitionDict"]],
-    bundled_labware: Optional[Dict[str, "LabwareDefinitionDict"]],
-    bundled_data: Optional[Dict[str, bytes]],
-) -> ProtocolContext:
-    """Return a live ProtocolContext.
-
-    This controls the robot through the older infrastructure, instead of through Protocol Engine.
-    """
-    assert api_version < ENGINE_CORE_API_VERSION
-    return protocol_api.create_protocol_context(
-        api_version=api_version,
-        deck_type=deck_type,
-        hardware_api=hardware_api,
-        bundled_labware=bundled_labware,
-        bundled_data=bundled_data,
-        extra_labware=extra_labware,
-    )
-
-
 def _create_live_context_pe(
     api_version: APIVersion,
     hardware_api: ThreadManagedHardware,
@@ -593,47 +546,8 @@ def _create_live_context_pe(
     )
 
 
-def _run_file_non_pe(
-    protocol: Protocol,
-    emit_runlog: Optional[_EmitRunlogCallable],
-) -> None:
-    """Run a protocol file without Protocol Engine, with the older infrastructure instead."""
-    if isinstance(protocol, PythonProtocol):
-        extra_labware = protocol.extra_labware
-        bundled_labware = protocol.bundled_labware
-        bundled_data = protocol.bundled_data
-    else:
-        # JSON protocols do have "bundled labware" embedded in them, but those aren't represented in
-        # the parsed Protocol object and we don't need to create the ProtocolContext with them.
-        # execute_apiv2.run_protocol() will pull them out of the JSON and load them into the
-        # ProtocolContext.
-        extra_labware = None
-        bundled_labware = None
-        bundled_data = None
-
-    context = _create_live_context_non_pe(
-        api_version=protocol.api_level,
-        hardware_api=_get_global_hardware_controller(_get_robot_type()),
-        deck_type=guess_deck_type_from_global_config(),
-        extra_labware=extra_labware,
-        bundled_labware=bundled_labware,
-        bundled_data=bundled_data,
-    )
-
-    if emit_runlog:
-        context.broker.subscribe(command_types.COMMAND, emit_runlog)
-
-    context.home()
-    try:
-        execute_apiv2.run_protocol(
-            protocol, context, run_time_parameters_with_overrides=None
-        )
-    finally:
-        context.cleanup()
-
-
 def _run_file_pe(
-    protocol: Protocol,
+    protocol: PythonProtocol,
     hardware_api: ThreadManagedHardware,
     emit_runlog: Optional[_EmitRunlogCallable],
 ) -> None:
@@ -727,10 +641,7 @@ def _get_global_hardware_controller(robot_type: RobotType) -> ThreadManagedHardw
                 feature_flags=HardwareFeatureFlags.build_from_ff(),
             )
         else:
-            _THREAD_MANAGED_HW = ThreadManager(
-                OT2API.build_hardware_controller,
-                feature_flags=HardwareFeatureFlags.build_from_ff(),
-            )
+            raise UnsupportedHardwareCommand(message="execute is not supported on OT-2")
 
     return _THREAD_MANAGED_HW
 

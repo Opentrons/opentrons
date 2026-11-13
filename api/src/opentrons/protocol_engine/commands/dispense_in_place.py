@@ -109,7 +109,7 @@ class DispenseInPlaceImplementation(
                     public=result.public,
                     state_update=result.state_update.set_liquid_operated(
                         labware_id=current_location.labware_id,
-                        well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+                        well_names=self._state_view.instrument_interface.get_wells_covered_by_pipette_with_active_well(
                             current_location.labware_id,
                             current_location.well_name,
                             params.pipetteId,
@@ -131,16 +131,18 @@ class DispenseInPlaceImplementation(
                     )
                 )
                 if volume_added is not None:
-                    volume_added *= self._state_view.geometry.get_nozzles_per_well(
-                        current_location.labware_id,
-                        current_location.well_name,
-                        params.pipetteId,
+                    volume_added *= (
+                        self._state_view.instrument_interface.get_nozzles_per_well(
+                            current_location.labware_id,
+                            current_location.well_name,
+                            params.pipetteId,
+                        )
                     )
                 return SuccessData(
                     public=DispenseInPlaceResult(volume=result.public.volume),
                     state_update=result.state_update.set_liquid_operated(
                         labware_id=current_location.labware_id,
-                        well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+                        well_names=self._state_view.instrument_interface.get_wells_covered_by_pipette_with_active_well(
                             current_location.labware_id,
                             current_location.well_name,
                             params.pipetteId,

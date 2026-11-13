@@ -16,7 +16,8 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { SmallButton, TextOnlyButton } from '/app/atoms/buttons'
+import { TextOnlyButton } from '/app/components/adhoc/shared/buttons/TextOnlyButton'
+import { SmallButton } from '/app/components/ODD/buttons'
 
 import type { ReactNode } from 'react'
 
@@ -190,7 +191,7 @@ const STICKY_FOOTER_STYLE = css`
   position: ${POSITION_STICKY};
   bottom: 0;
   background-color: ${COLORS.white};
-  z-index: 1;
+  z-index: var(--z-index-base);
 `
 
 const PRESSED_LOADING_STATE = css`

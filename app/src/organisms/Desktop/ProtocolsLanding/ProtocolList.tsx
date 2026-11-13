@@ -14,16 +14,18 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   MenuItem,
   Overlay,
   POSITION_ABSOLUTE,
   SecondaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
+  Z_INDEX,
 } from '@opentrons/components'
 
-import { Slideout } from '/app/atoms/Slideout'
+import { ProtocolCard } from '/app/components/desktop/cards/ProtocolCard'
+import { Slideout } from '/app/components/desktop/Slideout'
 import { ChooseRobotToRunProtocolSlideout } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout'
 import {
   getProtocolsDesktopSortKey,
@@ -33,7 +35,6 @@ import { useSortedProtocols } from '/app/resources/protocols/hooks'
 
 import { SendProtocolToFlexSlideout } from '../SendProtocolToFlexSlideout'
 import { EmptyStateLinks } from './EmptyStateLinks'
-import { ProtocolCard } from './ProtocolCard'
 import { ProtocolUploadInput } from './ProtocolUploadInput'
 
 import type { MouseEventHandler } from 'react'
@@ -160,20 +161,20 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         marginBottom={SPACING.spacing24}
       >
-        <LegacyStyledText forwardedAs="h1">{t('protocols')}</LegacyStyledText>
+        <StyledText forwardedAs="h1">{t('protocols')}</StyledText>
         <Flex flexDirection={DIRECTION_ROW}>
           <Flex
             flexDirection={DIRECTION_ROW}
             alignItems={ALIGN_CENTER}
             marginRight={SPACING.spacing16}
           >
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.grey60}
             >
               {t('shared:sort_by')}
-            </LegacyStyledText>
+            </StyledText>
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
@@ -183,7 +184,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               onClick={toggleSetShowSortByMenu}
               data-testid="ProtocolList_SortByMenu"
             >
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 paddingLeft={SPACING.spacing8}
@@ -192,7 +193,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
                 data-testid="sortBy-label"
               >
                 {sortByLabelType[sortBy].label}
-              </LegacyStyledText>
+              </StyledText>
               <Icon
                 paddingRight={SPACING.spacing8}
                 color={COLORS.black90}
@@ -203,7 +204,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
           </Flex>
           {showSortByMenu && (
             <Flex
-              zIndex={2}
+              zIndex={Z_INDEX.MENUS}
               borderRadius={BORDERS.borderRadius4}
               boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
               position={POSITION_ABSOLUTE}

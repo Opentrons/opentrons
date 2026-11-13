@@ -17,7 +17,7 @@ from opentrons.hardware_control.types import GripperProbe as HWAPIGripperProbe
 from opentrons.hardware_control.types import OT3Mount
 from opentrons.protocol_engine.resources import ensure_ot3_hardware
 from opentrons.protocol_engine.types import Vec3f
-from opentrons.types import Point
+from opentrons.types import DeckSlotName, Point
 
 CalibrateGripperCommandType = Literal["calibration/calibrateGripper"]
 
@@ -53,6 +53,10 @@ class CalibrateGripperParams(BaseModel):
             " the offset for the specified probe."
         ),
         json_schema_extra=_remove_default,
+    )
+    slot: DeckSlotName = Field(
+        default=DeckSlotName.SLOT_B2,
+        description="Deck slot whose calibration square to probe.",
     )
 
 
@@ -101,7 +105,9 @@ class CalibrateGripperImplementation(
         ot3_hardware_api = ensure_ot3_hardware(self._hardware_api)
 
         probe_offset = await ot3_calibration.calibrate_gripper_jaw(
-            hcapi=ot3_hardware_api, probe=self._convert_to_hw_api_probe(params.jaw)
+            hcapi=ot3_hardware_api,
+            probe=self._convert_to_hw_api_probe(params.jaw),
+            slot=params.slot.as_int(),
         )
         other_probe_offset = params.otherJawOffset
         calibration_data: Optional[GripperCalibrationOffset] = None

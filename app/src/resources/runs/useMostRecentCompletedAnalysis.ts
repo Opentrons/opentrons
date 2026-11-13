@@ -17,17 +17,12 @@ export function useMostRecentCompletedAnalysis(
   const { data: protocolData } = useProtocolQuery(protocolId, {
     enabled: protocolId != null,
   })
+  const analysisId = last(protocolData?.data.analysisSummaries)?.id ?? null
   const { data: analysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
-    last(protocolData?.data.analysisSummaries)?.id ?? null,
-    { enabled: protocolData != null }
+    analysisId,
+    { enabled: protocolData != null && analysisId != null }
   )
 
-  return analysis != null
-    ? {
-        ...analysis,
-        // NOTE: this is accounting for pre 7.1 robot-side protocol analysis that may not include the robotType key
-        robotType: analysis.robotType ?? protocolData?.data.robotType,
-      }
-    : null
+  return analysis ?? null
 }

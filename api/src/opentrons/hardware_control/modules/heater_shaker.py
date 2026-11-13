@@ -14,8 +14,8 @@ from opentrons.drivers.heater_shaker.driver import (
     HeaterShakerDriver,
 )
 from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
-from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import RPM, HeaterShakerLabwareLatchStatus, Temperature
+from opentrons.drivers.usb.types import USBPort
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.modules import mod_abc, update
 from opentrons.hardware_control.modules.retry import retry_module_init

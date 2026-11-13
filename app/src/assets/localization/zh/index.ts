@@ -3,8 +3,10 @@ import { shared_zh_resources } from '@opentrons/components'
 import access_control from './access_control.json'
 import anonymous from './anonymous.json'
 import app_settings from './app_settings.json'
+import audit_log from './audit_log.json'
 import branded from './branded.json'
 import change_pipette from './change_pipette.json'
+import command_type_summary from './command_type_summary.json'
 import device_details from './device_details.json'
 import device_settings from './device_settings.json'
 import devices_landing from './devices_landing.json'
@@ -24,6 +26,7 @@ import protocol_details from './protocol_details.json'
 import protocol_info from './protocol_info.json'
 import protocol_list from './protocol_list.json'
 import protocol_setup from './protocol_setup.json'
+import protocol_visualization from './protocol_visualization.json'
 import quick_transfer from './quick_transfer.json'
 import robot_calibration from './robot_calibration.json'
 import robot_controls from './robot_controls.json'
@@ -35,8 +38,10 @@ export const zh = {
   access_control,
   anonymous,
   app_settings,
+  audit_log,
   branded,
   change_pipette,
+  command_type_summary,
   device_details,
   device_settings,
   devices_landing,
@@ -56,6 +61,7 @@ export const zh = {
   protocol_info,
   protocol_list,
   protocol_setup,
+  protocol_visualization,
   quick_transfer,
   robot_calibration,
   robot_controls,

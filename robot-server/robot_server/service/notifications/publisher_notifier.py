@@ -42,7 +42,7 @@ class PublisherNotifier:
             self._wait_for_event(), name="Run publisher notifier"
         )
 
-    def _notify_publishers(self) -> None:
+    async def _notify_publishers(self) -> None:
         """A generic notifier, alerting all `waiters` of a change."""
         self._change_notifier.notify()
 
@@ -81,7 +81,7 @@ def get_pe_publisher_notifier(
 
 def get_pe_notify_publishers(
     app_state: Annotated[AppState, Depends(get_app_state)],
-) -> Callable[[], None]:
+) -> Callable[[], Awaitable[None]]:
     """Provides access to the callback used to notify publishers of changes. Intended for protocol engine."""
     publisher_notifier = _pe_publisher_notifier_accessor.get_from(app_state)
     assert isinstance(publisher_notifier, PublisherNotifier)

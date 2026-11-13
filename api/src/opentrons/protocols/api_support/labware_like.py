@@ -1,9 +1,8 @@
 from enum import Enum, auto
-from typing import TYPE_CHECKING, Any, List, Optional, Set, Tuple, Union, cast
+from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union, cast
 
 if TYPE_CHECKING:
     from opentrons.protocol_api._types import OffDeckType
-    from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
     from opentrons.protocol_api.labware import Labware, Well
     from opentrons.protocol_api.module_contexts import ModuleContext
 
@@ -11,7 +10,6 @@ WrappableLabwareLike = Union[
     "Labware",
     "Well",
     str,
-    "ModuleGeometry",
     "LabwareLike",
     None,
     "OffDeckType",
@@ -37,9 +35,6 @@ class LabwareLike:
         """
         # Import locally to avoid circular dependency
         from opentrons.protocol_api._types import OffDeckType
-        from opentrons.protocol_api.core.legacy.module_geometry import (
-            ModuleGeometry,
-        )
         from opentrons.protocol_api.labware import Labware, Well
         from opentrons.protocol_api.module_contexts import ModuleContext
 
@@ -57,7 +52,7 @@ class LabwareLike:
         elif isinstance(self._labware_like, str):
             self._type = LabwareLikeType.SLOT
             self._as_str = self._labware_like
-        elif isinstance(self._labware_like, (ModuleGeometry, ModuleContext)):
+        elif isinstance(self._labware_like, ModuleContext):
             self._type = LabwareLikeType.MODULE
             self._as_str = repr(self._labware_like)
         elif isinstance(self._labware_like, LabwareLike):
@@ -127,17 +122,6 @@ class LabwareLike:
 
         return cast(Labware, self.object)
 
-    def as_module(self) -> Union["ModuleContext", "ModuleGeometry"]:
-        from opentrons.protocol_api.core.legacy.module_geometry import (
-            ModuleGeometry,
-        )
-        from opentrons.protocol_api.module_contexts import ModuleContext
-
-        if isinstance(self.object, ModuleContext):
-            return self.object
-
-        return cast(ModuleGeometry, self.object)
-
     def get_parent_labware_and_well(
         self,
     ) -> Tuple[Optional["Labware"], Optional["Well"]]:
@@ -152,50 +136,7 @@ class LabwareLike:
         else:
             return None, None
 
-    def first_parent(self) -> Optional[str]:
-        """Return the topmost parent of this location. It should be
-        either a string naming a slot or a None if the location isn't
-        associated with a slot"""
-
-        # cycle-detecting recursive climbing
-        seen: Set[LabwareLike] = set()
-
-        # internal function to have the cycle detector different per call
-        def _fp_recurse(location: LabwareLike) -> Optional[str]:
-            if location in seen:
-                raise RuntimeError("Cycle in labware parent")
-            seen.add(location)
-            if location.is_empty:
-                return None
-            elif location.is_slot:
-                return str(location)
-            else:
-                return location.parent.first_parent()
-
-        return _fp_recurse(self)
-
-    def module_parent(self) -> Union["ModuleGeometry", "ModuleContext", None]:
-        """
-        Return the closest parent of this LabwareLike (including, possibly,
-        the wrapped object) that is a ModuleGeometry
-        """
-
-        def recursive_get_module_parent(
-            obj: LabwareLike,
-        ) -> Union["ModuleGeometry", "ModuleContext", None]:
-            if obj.is_module:
-                return obj.as_module()
-            next_obj = obj.parent
-            if next_obj.is_empty:
-                return None
-            else:
-                return recursive_get_module_parent(obj.parent)
-
-        if self.is_empty:
-            return None
-        return recursive_get_module_parent(self)
-
-    def quirks_from_any_parent(self) -> Set[str]:
+    def quirks_from_any_parent(self) -> set[str]:
         """Walk the tree of wells and labwares and extract quirks"""
 
         def recursive_get_quirks(obj: LabwareLike, found: List[str]) -> List[str]:
@@ -211,10 +152,6 @@ class LabwareLike:
     def is_fixed_trash(self) -> bool:
         """Check if fixedTrash quirk is in any parent."""
         return "fixedTrash" in self.quirks_from_any_parent()
-
-    def center_multichannel_on_wells(self) -> bool:
-        """Check if centerMultichannelOnWells quirk is in any parent."""
-        return "centerMultichannelOnWells" in self.quirks_from_any_parent()
 
     def __str__(self) -> str:
         return self._as_str

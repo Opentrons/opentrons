@@ -3,7 +3,10 @@ import { Trans, useTranslation } from 'react-i18next'
 import { StyledText } from '@opentrons/components'
 
 import DetachCarboyCap from '/app/assets/videos/error-recovery/Vacuum_DetachCarboyCap.webm'
-import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
+import {
+  DescriptionContent,
+  TwoColumn,
+} from '/app/components/ODD/modals/InterventionModal'
 
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'

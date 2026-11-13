@@ -37,6 +37,9 @@ from .types import (
     NotAnActiveTokenResult,
     UnableToContactAuthServerResult,
 )
+from server_utils.audit.permission_denied import (
+    attach_permission_denied_audit_logger,
+)
 from server_utils.auth.scopes import Scope
 from server_utils.fastapi_utils.app_state import (
     AppState,
@@ -204,6 +207,7 @@ def require_scopes(
     required_scopes_set = set(required_scopes)
 
     async def dependency(
+        request: fastapi.Request,
         authentication: Annotated[
             RequireAuthenticationResult, fastapi.Depends(require_authentication)
         ],
@@ -218,6 +222,7 @@ def require_scopes(
         authorized = check_authorization(authentication, required_scopes_set)
         if isinstance(authorized, (AuthorizationNotRequiredResult, AuthorizedResult)):
             return authorized
+        attach_permission_denied_audit_logger(request, authentication)
         raise AuthorizationError(authorized, required_scopes_set)
 
     return dependency

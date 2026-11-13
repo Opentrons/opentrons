@@ -168,6 +168,7 @@
   --line-height-48: 3rem; /* 48px */
   --line-height-42: 2.625rem; /* 42px */
   --line-height-36: 2.25rem; /* 36px */
+  --line-height-32: 2rem; /* 32px */
   --line-height-28: 1.75rem; /* 28px */
   --line-height-24: 1.5rem; /* 24px */
   --line-height-20: 1.25rem; /* 20px */
@@ -182,6 +183,21 @@
   --font-weight-semi-bold: 600;
   --font-weight-regular: 400;
   --font-weight-light: 300;
+
+  /* z-index */
+  --z-index-base: 1;
+  --z-index-details: 2;
+  --z-index-menus: 5;
+  --z-index-modals: 10;
+  --z-index-modal-details: 15;
+  --z-index-blocking-modals: 20;
+  --z-index-blocking-modal-details: 25;
+  --z-index-compliance-modals: 30;
+  --z-index-compliance-modal-details: 35;
+  --z-index-toasts: 40;
+  --z-index-logged-out-overlay: 100;
+  --z-index-login-modal: 105;
+  --z-index-login-toasts: 106;
 }
 
 .enable_touchscreen_colors {

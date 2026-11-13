@@ -5,16 +5,16 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   Tooltip,
   TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
-import { TertiaryButton } from '/app/atoms/buttons'
-import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { ExternalLink } from '/app/components/adhoc/desktop/Link/ExternalLink'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import { ANALYTICS_JUPYTER_OPEN, useTrackEvent } from '/app/redux/analytics'
 
 import type { ReactNode } from 'react'
@@ -50,15 +50,16 @@ export function OpenJupyterControl({
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.pSemiBold}
+        <StyledText
+          forwardedAs="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing8}
         >
           {t('jupyter_notebook')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
+        </StyledText>
+        <StyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
           {t('jupyter_notebook_description')}
-        </LegacyStyledText>
+        </StyledText>
         <ExternalLink href={JUPYTER_NOTEBOOK_LINK}>
           {t('jupyter_notebook_link')}
         </ExternalLink>

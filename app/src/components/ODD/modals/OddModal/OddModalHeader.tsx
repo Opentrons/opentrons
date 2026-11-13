@@ -1,0 +1,84 @@
+import {
+  ALIGN_CENTER,
+  BORDERS,
+  COLORS,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  StyledText,
+  Tag,
+  TYPOGRAPHY,
+} from '@opentrons/components'
+
+import type { ReactNode } from 'react'
+import type { OddModalHeaderBaseProps } from './types'
+
+export function OddModalHeader(props: OddModalHeaderBaseProps): ReactNode {
+  const {
+    title,
+    hasExitIcon,
+    iconName,
+    iconColor,
+    tagText,
+    onClick,
+    ...styleProps
+  } = props
+  return (
+    <Flex
+      backgroundColor={COLORS.white}
+      color={COLORS.black90}
+      height="6.25rem"
+      width="100%"
+      padding={SPACING.spacing32}
+      flexDirection={DIRECTION_ROW}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      alignItems={ALIGN_CENTER}
+      borderRadius={`${BORDERS.borderRadius12} ${BORDERS.borderRadius12} 0px 0px`}
+      {...styleProps}
+    >
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        gridGap={SPACING.spacing16}
+        alignItems={ALIGN_CENTER}
+        overflow="hidden"
+        flex="1 1 auto"
+      >
+        {iconName != null && iconColor != null ? (
+          <Icon
+            aria-label={`icon_${iconName}`}
+            name={iconName}
+            color={iconColor}
+            size="2rem"
+            alignSelf={ALIGN_CENTER}
+          />
+        ) : null}
+        {tagText != null ? <Tag type="default" text={tagText} /> : null}
+        <StyledText
+          forwardedAs="h4"
+          fontWeight={TYPOGRAPHY.fontWeightBold}
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            flex: '1 1 auto',
+            minWidth: '0',
+          }}
+        >
+          {title}
+        </StyledText>
+      </Flex>
+      {hasExitIcon && onClick != null ? (
+        <Flex
+          onClick={onClick}
+          aria-label="closeIcon"
+          alignItems={ALIGN_CENTER}
+          flexShrink="0"
+        >
+          <Icon size="3.5rem" name="ot-close" />
+        </Flex>
+      ) : null}
+    </Flex>
+  )
+}

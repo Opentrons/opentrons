@@ -3,7 +3,6 @@ import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { useCurrentProtocol } from '../useCurrentProtocol'
 import { useProtocolMetadata } from '../useProtocolMetadata'
@@ -17,7 +16,7 @@ vi.mock('../useCurrentProtocol')
 describe('useProtocolMetadata', () => {
   const store: Store<State> = legacy_createStore(vi.fn(), {})
 
-  when(vi.mocked(useCurrentProtocol))
+  vi.when(vi.mocked(useCurrentProtocol))
     .calledWith()
     .thenReturn({
       data: {

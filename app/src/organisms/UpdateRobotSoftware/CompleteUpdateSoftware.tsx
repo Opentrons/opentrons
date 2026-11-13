@@ -8,12 +8,12 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ProgressBar } from '/app/atoms/ProgressBar'
+import { ProgressBar } from '/app/components/desktop/ProgressBar'
 
 import type { ReactNode } from 'react'
 
@@ -25,6 +25,7 @@ export function CompleteUpdateSoftware({
 }: CompleteUpdateSoftwareProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'robot_controls'])
 
+  // TODO (jj, 2026-10-29): ProgressBar is a desktop component. We should replace this on ODD.
   return (
     <Flex flexDirection={DIRECTION_COLUMN} width="100%">
       <Flex
@@ -36,16 +37,16 @@ export function CompleteUpdateSoftware({
         justifyContent={JUSTIFY_CENTER}
         borderRadius={BORDERS.borderRadius12}
       >
-        <LegacyStyledText
+        <StyledText
           forwardedAs="h2"
           fontWeight={TYPOGRAPHY.fontWeightBold}
           color={COLORS.black90}
         >
           {t('update_complete')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="h3" marginTop={SPACING.spacing16}>
+        </StyledText>
+        <StyledText forwardedAs="h3" marginTop={SPACING.spacing16}>
           {t('restarting_robot')}
-        </LegacyStyledText>
+        </StyledText>
         <Box width="47.5rem">
           <ProgressBar percentComplete={100} />
         </Box>

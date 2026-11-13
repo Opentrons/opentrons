@@ -18,22 +18,23 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   MenuItem,
   POSITION_ABSOLUTE,
   PrimaryButton,
   SecondaryButton,
   SPACING,
+  StyledText,
   SUCCESS_TOAST,
   TYPOGRAPHY,
   useOnClickOutside,
+  Z_INDEX,
 } from '@opentrons/components'
 import { LabwareCreator } from '@opentrons/labware-library'
 
+import { LabwareCard } from '/app/components/desktop/cards/LabwareCard'
 import { useAllLabware } from '/app/local-resources/labware'
 import { AddCustomLabwareSlideout } from '/app/organisms/Desktop/Labware/AddCustomLabwareSlideout'
-import { LabwareCard } from '/app/organisms/Desktop/Labware/LabwareCard'
 import { LabwareDetails } from '/app/organisms/Desktop/Labware/LabwareDetails'
 import { useToaster } from '/app/organisms/ToasterOven'
 import {
@@ -64,6 +65,7 @@ const labwareDisplayCategoryFilters: LabwareFilter[] = [
   'tipRack',
   'tubeRack',
   'wellPlate',
+  'filterPlate',
 ]
 
 // note: we've decided not to translate these categories
@@ -158,12 +160,12 @@ export function Labware(): ReactNode {
           alignItems={ALIGN_CENTER}
           paddingBottom={SPACING.spacing24}
         >
-          <LegacyStyledText
+          <StyledText
             forwardedAs="h1"
             textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
             {t('labware')}
-          </LegacyStyledText>
+          </StyledText>
           <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
             <SecondaryButton
               onClick={() => {
@@ -198,9 +200,13 @@ export function Labware(): ReactNode {
             title={t('category')}
           />
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-            <LegacyStyledText css={TYPOGRAPHY.pSemiBold} color={COLORS.grey50}>
+            <StyledText
+              forwardedAs="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              color={COLORS.grey50}
+            >
               {t('shared:sort_by')}
-            </LegacyStyledText>
+            </StyledText>
             <Flex
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
@@ -209,8 +215,9 @@ export function Labware(): ReactNode {
               css={SORT_BY_BUTTON_STYLE}
               onClick={toggleSetShowSortByMenu}
             >
-              <LegacyStyledText
-                css={TYPOGRAPHY.pSemiBold}
+              <StyledText
+                forwardedAs="p"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 paddingLeft={SPACING.spacing8}
                 paddingRight={SPACING.spacing4}
                 paddingY={SPACING.spacing4}
@@ -219,7 +226,7 @@ export function Labware(): ReactNode {
                 {sortBy === 'alphabetical'
                   ? t('shared:alphabetical')
                   : t('shared:reverse')}
-              </LegacyStyledText>
+              </StyledText>
               <Icon
                 paddingRight={SPACING.spacing8}
                 height={TYPOGRAPHY.lineHeight16}
@@ -230,7 +237,7 @@ export function Labware(): ReactNode {
           {showSortByMenu && (
             <Flex
               width="9.375rem"
-              zIndex={2}
+              zIndex={Z_INDEX.MENUS}
               borderRadius={BORDERS.borderRadius4}
               boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
               position={POSITION_ABSOLUTE}
@@ -276,13 +283,13 @@ export function Labware(): ReactNode {
           alignItems={ALIGN_CENTER}
           marginTop={SPACING.spacing32}
         >
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             color={COLORS.black90}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('create_new_def')}
-          </LegacyStyledText>
+          </StyledText>
 
           <Link
             external

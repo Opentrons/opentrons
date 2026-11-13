@@ -42,9 +42,8 @@ from opentrons.protocol_engine.types import DeckType
 def _make_config(block_on_door_open: bool = False) -> Config:
     return Config(
         block_on_door_open=block_on_door_open,
-        # Choice of robot and deck type is arbitrary.
-        robot_type="OT-2 Standard",
-        deck_type=DeckType.OT2_STANDARD,
+        robot_type="OT-3 Standard",
+        deck_type=DeckType.OT3_STANDARD,
     )
 
 

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useDeleteMaintenanceRunMutation } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { useCoalescedJogAudit } from '/app/local-resources/access-control/useCoalescedJogAudit'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import {
@@ -24,7 +25,11 @@ import type {
   PipetteModelSpecs,
   RunCommandError,
 } from '@opentrons/shared-data'
-import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
+import type {
+  Axis,
+  Sign,
+  StepSize,
+} from '/app/components/adhoc/shared/JogControls/types'
 import type { SetRobotErrorDetailsParams, UseDTWithTypeParams } from '.'
 import type {
   DropTipFlowsRoute,
@@ -47,8 +52,10 @@ type UseDropTipSetupCommandsParams = UseDTWithTypeParams & {
   setErrorDetails: (errorDetails: SetRobotErrorDetailsParams) => void
   toggleIsExiting: () => void
   fixitCommandTypeUtils?: FixitCommandTypeUtils
+  commandDocState: DocumentationState
   deletionDocState: DocumentationState
   actionsToDocument: DocumentedAction[]
+  addActionToDocument: (action: DocumentedAction) => void
 }
 
 export interface UseDropTipCommandsResult {
@@ -58,6 +65,7 @@ export interface UseDropTipCommandsResult {
     isPredefinedLocation: boolean // Is a predefined location in "choose location."
   ) => Promise<void>
   handleJog: (axis: Axis, dir: Sign, step: StepSize) => void
+  flushJogAudit: () => void
   blowoutOrDropTip: (
     currentRoute: DropTipFlowsRoute,
     proceed: () => void
@@ -76,14 +84,20 @@ export function useDropTipCommands({
   instrumentModelSpecs,
   robotType,
   fixitCommandTypeUtils,
+  commandDocState,
   deletionDocState,
   actionsToDocument,
+  addActionToDocument,
 }: UseDropTipSetupCommandsParams): UseDropTipCommandsResult {
   const isFlex = robotType === FLEX_ROBOT_TYPE
   const [hasSeenClose, setHasSeenClose] = useState(false)
   const [jogQueue, setJogQueue] = useState<Array<() => Promise<void>>>([])
   const [isJogging, setIsJogging] = useState(false)
   const pipetteId = fixitCommandTypeUtils?.pipetteId ?? null
+  const { recordJog, flush: flushJogAudit } = useCoalescedJogAudit(
+    commandDocState,
+    addActionToDocument
+  )
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation(
     deletionDocState,
@@ -104,6 +118,7 @@ export function useDropTipCommands({
         return Promise.resolve()
       } else {
         if (!hasSeenClose) {
+          flushJogAudit()
           setHasSeenClose(true)
           toggleIsExiting()
           if (activeMaintenanceRunId == null) {
@@ -218,6 +233,7 @@ export function useDropTipCommands({
         timeout: JOG_COMMAND_TIMEOUT_MS,
       })
         .then(() => {
+          recordJog(axis, dir, step)
           resolve()
         })
         .catch((error: Error) => {
@@ -367,6 +383,7 @@ export function useDropTipCommands({
     handleCleanUpAndClose,
     moveToAddressableArea,
     handleJog,
+    flushJogAudit,
     blowoutOrDropTip,
     handleMustHome,
   }

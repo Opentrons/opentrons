@@ -1,15 +1,16 @@
 import * as React from 'react'
 
 import { Toast } from '.'
+import { PrimaryButton } from '../../helix/buttons'
 import { Flex, STYLE_PROPS } from '../../primitives'
 import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_CENTER,
   POSITION_FIXED,
+  Z_INDEX,
 } from '../../styles'
 import { SPACING, VIEWPORT } from '../../ui-style-constants'
-import { PrimaryButton } from '../buttons'
 import { StyledText } from '../StyledText'
 
 import type { Meta, Story } from '@storybook/react'
@@ -56,7 +57,7 @@ const Template: Story<React.ComponentProps<typeof Toast>> = args => {
           justifyContent={JUSTIFY_CENTER}
           position={POSITION_FIXED}
           bottom={SPACING.spacing16}
-          zIndex={1000}
+          zIndex={Z_INDEX.TOASTS}
         >
           <Toast
             {...args}

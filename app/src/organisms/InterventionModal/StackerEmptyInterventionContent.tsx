@@ -14,7 +14,7 @@ import {
 } from '@opentrons/shared-data'
 
 import EmptyHopper from '/app/assets/videos/error-recovery/FlexStacker_EmptyHopper.webm'
-import { InterventionInfo } from '/app/molecules/InterventionModal/InterventionContent'
+import { InterventionInfo } from '/app/components/ODD/modals/InterventionModal/InterventionContent'
 
 import { InterventionCommandMessage } from './InterventionCommandMessage'
 

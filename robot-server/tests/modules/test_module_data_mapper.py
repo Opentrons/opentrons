@@ -3,8 +3,8 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.drivers.rpi_drivers.types import PortGroup
-from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort
+from opentrons.drivers.usb.types import PortGroup
+from opentrons.drivers.usb.types import USBPort as HardwareUSBPort
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
     FlexStackerStatus,
@@ -55,50 +55,6 @@ from robot_server.modules.module_models import (
     [
         (
             "magneticModuleV1",
-            DeckType("ot2_standard"),
-            {"status": "disengaged", "data": {"engaged": False, "height": 0.0}},
-            MagneticModuleData(
-                status=MagneticStatus.DISENGAGED,
-                engaged=False,
-                height=-2.5,
-            ),
-            True,
-        ),
-        (
-            "magneticModuleV1",
-            DeckType("ot3_standard"),
-            {"status": "disengaged", "data": {"engaged": False, "height": 0.0}},
-            MagneticModuleData(
-                status=MagneticStatus.DISENGAGED,
-                engaged=False,
-                height=-2.5,
-            ),
-            False,
-        ),
-        (
-            "magneticModuleV1",
-            DeckType("ot2_standard"),
-            {"status": "engaged", "data": {"engaged": True, "height": 42}},
-            MagneticModuleData(
-                status=MagneticStatus.ENGAGED,
-                engaged=True,
-                height=18.5,
-            ),
-            True,
-        ),
-        (
-            "magneticModuleV2",
-            DeckType("ot2_standard"),
-            {"status": "disengaged", "data": {"engaged": False, "height": 0.0}},
-            MagneticModuleData(
-                status=MagneticStatus.DISENGAGED,
-                engaged=False,
-                height=-2.5,
-            ),
-            True,
-        ),
-        (
-            "magneticModuleV2",
             DeckType("ot3_standard"),
             {"status": "disengaged", "data": {"engaged": False, "height": 0.0}},
             MagneticModuleData(
@@ -110,14 +66,14 @@ from robot_server.modules.module_models import (
         ),
         (
             "magneticModuleV2",
-            DeckType("ot2_standard"),
-            {"status": "engaged", "data": {"engaged": True, "height": 42}},
+            DeckType("ot3_standard"),
+            {"status": "disengaged", "data": {"engaged": False, "height": 0.0}},
             MagneticModuleData(
-                status=MagneticStatus.ENGAGED,
-                engaged=True,
-                height=39.5,
+                status=MagneticStatus.DISENGAGED,
+                engaged=False,
+                height=-2.5,
             ),
-            True,
+            False,
         ),
     ],
 )
@@ -187,9 +143,7 @@ def test_maps_magnetic_module_data(
 @pytest.mark.parametrize(
     "input_model,deck_type,expected_compatible",
     [
-        ("temperatureModuleV1", DeckType("ot2_standard"), True),
         ("temperatureModuleV1", DeckType("ot3_standard"), False),
-        ("temperatureModuleV2", DeckType("ot2_standard"), True),
         ("temperatureModuleV2", DeckType("ot3_standard"), True),
     ],
 )
@@ -271,9 +225,7 @@ def test_maps_temperature_module_data(
 @pytest.mark.parametrize(
     "input_model,deck_type,expected_compatible",
     [
-        ("thermocyclerModuleV1", DeckType("ot2_standard"), True),
         ("thermocyclerModuleV1", DeckType("ot3_standard"), False),
-        ("thermocyclerModuleV2", DeckType("ot2_standard"), True),
         ("thermocyclerModuleV2", DeckType("ot3_standard"), True),
     ],
 )
@@ -395,13 +347,6 @@ def test_maps_thermocycler_module_data(
 
 
 @pytest.mark.parametrize(
-    "input_model,deck_type",
-    [
-        ("heaterShakerModuleV1", DeckType("ot2_standard")),
-        ("heaterShakerModuleV1", DeckType("ot3_standard")),
-    ],
-)
-@pytest.mark.parametrize(
     "status,data",
     [
         (
@@ -433,8 +378,6 @@ def test_maps_thermocycler_module_data(
     ],
 )
 def test_maps_heater_shaker_module_data(
-    input_model: str,
-    deck_type: DeckType,
     status: str,
     data: hc_types.HeaterShakerData,
     hardware_api: HardwareControlAPI,
@@ -459,12 +402,12 @@ def test_maps_heater_shaker_module_data(
     )
 
     subject = ModuleDataMapper(
-        deck_type=deck_type,
+        deck_type=DeckType.OT3_STANDARD,
         hardware=hardware_api,
         hardware_state_store=hardware_state_store,
     )
     result = subject.map_data(
-        model=input_model,
+        model="heaterShakerModuleV1",
         module_identity=module_identity,
         has_available_update=True,
         live_data=input_data,
@@ -482,7 +425,7 @@ def test_maps_heater_shaker_module_data(
         hasAvailableUpdate=True,
         moduleType=ModuleType.HEATER_SHAKER,
         compatibleWithRobot=True,
-        moduleModel=ModuleModel(input_model),  # type: ignore[arg-type]
+        moduleModel=ModuleModel.HEATER_SHAKER_MODULE_V1,
         usbPort=UsbPort(
             port=101,
             portGroup=PortGroup.UNKNOWN,
@@ -508,7 +451,6 @@ def test_maps_heater_shaker_module_data(
 @pytest.mark.parametrize(
     "input_model,deck_type,rear_panel_rev,compatible",
     [
-        ("flexStackerModuleV1", DeckType("ot2_standard"), "", False),
         ("flexStackerModuleV1", DeckType("ot3_standard"), "C1", False),
         ("flexStackerModuleV1", DeckType("ot3_standard"), "D1", True),
     ],
@@ -624,13 +566,6 @@ def test_maps_flex_stacker_module_data(
 
 
 @pytest.mark.parametrize(
-    "input_model,deck_type",
-    [
-        ("vacuumModuleV1", DeckType("ot2_standard")),
-        ("vacuumModuleV1", DeckType("ot3_standard")),
-    ],
-)
-@pytest.mark.parametrize(
     "status,data,expected_vent_status",
     [
         (
@@ -664,8 +599,6 @@ def test_maps_flex_stacker_module_data(
     ],
 )
 def test_maps_vacuum_module_data(
-    input_model: str,
-    deck_type: DeckType,
     status: str,
     data: hc_types.VacuumModuleData,
     expected_vent_status: str,
@@ -691,12 +624,12 @@ def test_maps_vacuum_module_data(
     )
 
     subject = ModuleDataMapper(
-        deck_type=deck_type,
+        deck_type=DeckType.OT3_STANDARD,
         hardware=hardware_api,
         hardware_state_store=hardware_state_store,
     )
     result = subject.map_data(
-        model=input_model,
+        model="vacuumModuleV1",
         module_identity=module_identity,
         has_available_update=False,
         live_data=input_data,
@@ -711,8 +644,8 @@ def test_maps_vacuum_module_data(
         hardwareRevision="4.5.6",
         hasAvailableUpdate=False,
         moduleType=ModuleType.VACUUM_MODULE,
-        compatibleWithRobot=deck_type == DeckType("ot3_standard"),
-        moduleModel=ModuleModel(input_model),  # type: ignore[arg-type]
+        compatibleWithRobot=True,
+        moduleModel=ModuleModel.VACUUM_MODULE_V1,
         usbPort=UsbPort(
             port=101,
             portGroup=PortGroup.RIGHT,

@@ -11,7 +11,8 @@ import {
   RESPONSIVENESS,
 } from '@opentrons/components'
 
-import { SmallButton, TextOnlyButton } from '../../../atoms/buttons'
+import { TextOnlyButton } from '/app/components/adhoc/shared/buttons/TextOnlyButton'
+import { SmallButton } from '/app/components/ODD/buttons'
 
 import type { ReactNode } from 'react'
 

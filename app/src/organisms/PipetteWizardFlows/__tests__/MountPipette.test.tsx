@@ -39,14 +39,12 @@ describe('MountPipette', () => {
       attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       flowType: FLOWS.ATTACH,
       errorMessage: null,
-      setShowErrorMessage: vi.fn(),
-      isDoorOpenError: false,
-      setIsDoorOpenError: vi.fn(),
-      dismissDoorOpenError: vi.fn(),
+      handleCommandError: vi.fn(),
       isRobotMoving: false,
       isFetching: false,
       setFetching: vi.fn(),
       isOnDevice: false,
+      selectedSlot: 'B2',
     }
     vi.mocked(CheckPipetteButton).mockReturnValue(
       <div>mock check pipette button</div>

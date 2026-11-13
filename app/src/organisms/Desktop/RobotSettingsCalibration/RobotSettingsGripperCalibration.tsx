@@ -9,16 +9,17 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   MenuItem,
   NO_WRAP,
   OverflowBtn,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   useMenuHandleClickOutside,
   useOnClickOutside,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
@@ -90,19 +91,16 @@ export function RobotSettingsGripperCalibration(
       paddingY={SPACING.spacing24}
       gridGap={SPACING.spacing8}
     >
-      <LegacyStyledText
-        forwardedAs="h3"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <StyledText forwardedAs="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('gripper_calibration_title')}
-      </LegacyStyledText>
-      <LegacyStyledText forwardedAs="p">
+      </StyledText>
+      <StyledText forwardedAs="p">
         {t('gripper_calibration_description')}
-      </LegacyStyledText>
+      </StyledText>
       {gripper == null ? (
-        <LegacyStyledText forwardedAs="label" marginTop={SPACING.spacing8}>
+        <StyledText forwardedAs="label" marginTop={SPACING.spacing8}>
           {t('no_gripper_attached')}
-        </LegacyStyledText>
+        </StyledText>
       ) : (
         <StyledTable>
           <thead>
@@ -116,20 +114,18 @@ export function RobotSettingsGripperCalibration(
           <tbody css={BODY_STYLE}>
             <StyledTableRow>
               <StyledTableCell>
-                <LegacyStyledText forwardedAs="p">
-                  {gripper.serialNumber}
-                </LegacyStyledText>
+                <StyledText forwardedAs="p">{gripper.serialNumber}</StyledText>
               </StyledTableCell>
               <StyledTableCell>
                 <Flex alignItems={ALIGN_CENTER}>
                   {gripperCalibrationLastModified != null ? (
-                    <LegacyStyledText forwardedAs="p">
+                    <StyledText forwardedAs="p">
                       {formatLastCalibrated(gripperCalibrationLastModified)}
-                    </LegacyStyledText>
+                    </StyledText>
                   ) : (
-                    <LegacyStyledText forwardedAs="p">
+                    <StyledText forwardedAs="p">
                       {t('not_calibrated_short')}
-                    </LegacyStyledText>
+                    </StyledText>
                   )}
                 </Flex>
               </StyledTableCell>
@@ -157,7 +153,7 @@ export function RobotSettingsGripperCalibration(
                     <Flex
                       ref={calsOverflowWrapperRef}
                       whiteSpace={NO_WRAP}
-                      zIndex={10}
+                      zIndex={Z_INDEX.MENUS}
                       borderRadius="4px 4px 0px 0px"
                       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
                       position={POSITION_ABSOLUTE}

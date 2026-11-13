@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 from dataclasses import dataclass
 from logging import getLogger
 from typing import Dict, List, Mapping, Optional, Union
@@ -13,7 +12,6 @@ from pydantic import ValidationError
 
 from opentrons.protocols.parameters.types import PrimitiveAllowedTypes
 
-from .analysis_memcache import MemoryCache
 from .analysis_models import (
     AnalysisResult,
     AnalysisStatus,
@@ -53,6 +51,7 @@ class CompletedAnalysisResource:
     protocol_id: str
     analyzer_version: str
     completed_analysis: CompletedAnalysis
+    result: str  # Also already in completed_analysis, but pulled out for efficient querying.
 
     async def to_sql_values(self) -> Dict[str, object]:
         """Return this data as a dict that can be passed to a SQLALchemy insert.
@@ -79,6 +78,7 @@ class CompletedAnalysisResource:
             "protocol_id": self.protocol_id,
             "analyzer_version": self.analyzer_version,
             "completed_analysis": serialized_analysis,
+            "result": self.result,
         }
 
     @classmethod
@@ -106,6 +106,9 @@ class CompletedAnalysisResource:
         protocol_id = sql_row.protocol_id
         assert isinstance(protocol_id, str)
 
+        result = sql_row.result
+        assert isinstance(result, str)
+
         def parse_completed_analysis() -> CompletedAnalysis:
             try:
                 parsed_analysis = json_to_pydantic(
@@ -127,6 +130,7 @@ class CompletedAnalysisResource:
             protocol_id=protocol_id,
             analyzer_version=analyzer_version,
             completed_analysis=completed_analysis,
+            result=result,
         )
 
 
@@ -141,57 +145,30 @@ class CompletedAnalysisStore:
     _sql_engine: sqlalchemy.engine.Engine
     _current_analyzer_version: str
 
-    # Parsing and validating blobs from the database into CompletedAnalysisResources
-    # is a major compute bottleneck. It can take minutes for long protocols.
-    # Caching it can speed up the overall HTTP response time by ~10x (after the first request).
-    _memcache: MemoryCache[str, CompletedAnalysisResource]
-
-    # This is a lock for performance, not correctness.
-    #
-    # If multiple clients request the same resources all at once, we want to handle the requests
-    # serially to take the most advantage of _memcache. Otherwise, two concurrent requests for the
-    # same uncached CompletedAnalysisResource would each do their own work to parse it, which would
-    # be redundant and waste compute time.
-    #
-    # Handling requests serially does not harm overall throughput because even if we handled them
-    # concurrently, we'd be bottlenecked by Python's GIL. It will, however, increase latency for
-    # a small request if it gets blocked behind a big request.
-    _memcache_lock: asyncio.Lock
-
     def __init__(
         self,
         sql_engine: sqlalchemy.engine.Engine,
-        memory_cache: MemoryCache[str, CompletedAnalysisResource],
         current_analyzer_version: str,
     ) -> None:
         self._sql_engine = sql_engine
         self._current_analyzer_version = current_analyzer_version
-        self._memcache = memory_cache
-        self._memcache_lock = asyncio.Lock()
 
     async def get_by_id(self, analysis_id: str) -> Optional[CompletedAnalysisResource]:
         """Return the analysis with the given ID, if it exists."""
-        async with self._memcache_lock:
+        statement = sqlalchemy.select(analysis_table).where(
+            analysis_table.c.id == analysis_id
+        )
+        with self._sql_engine.begin() as transaction:
             try:
-                return self._memcache.get(analysis_id)
-            except KeyError:
-                pass
+                result = transaction.execute(statement).one()
+            except sqlalchemy.exc.NoResultFound:
+                return None
 
-            statement = sqlalchemy.select(analysis_table).where(
-                analysis_table.c.id == analysis_id
-            )
-            with self._sql_engine.begin() as transaction:
-                try:
-                    result = transaction.execute(statement).one()
-                except sqlalchemy.exc.NoResultFound:
-                    return None
+        resource = await CompletedAnalysisResource.from_sql_row(
+            result, self._current_analyzer_version
+        )
 
-            resource = await CompletedAnalysisResource.from_sql_row(
-                result, self._current_analyzer_version
-            )
-            self._memcache.insert(resource.id, resource)
-
-            return resource
+        return resource
 
     async def get_by_id_as_document(self, analysis_id: str) -> Optional[str]:
         """Return the analysis with the given ID, if it exists.
@@ -220,57 +197,32 @@ class CompletedAnalysisStore:
         If protocol_id doesn't point to a valid protocol, returns an empty list;
         doesn't raise an error.
         """
-        async with self._memcache_lock:
-            id_statement = (
-                sqlalchemy.select(analysis_table.c.id)
-                .where(analysis_table.c.protocol_id == protocol_id)
-                .order_by(sqlite_rowid)
-            )
-            with self._sql_engine.begin() as transaction:
-                ordered_analyses_for_protocol = [
-                    row.id for row in transaction.execute(id_statement).all()
-                ]
-
-            analysis_set = set(ordered_analyses_for_protocol)
-            cached_analyses = {
-                analysis_id
-                for analysis_id in ordered_analyses_for_protocol
-                if self._memcache.contains(analysis_id)
-            }
-            uncached_analyses = analysis_set - cached_analyses
-
-            # Because we'll be loading whatever resources are not currently cached from sql
-            # using an async method, if this method is called reentrantly then inserting those
-            # newly-fetched resources into the memcache could race and eject resources we just
-            # added and were about to return. To prevent this, we'll make a second memcache just
-            # for this coroutine - since we don't care about size limitations we can just use a
-            # dict.
-            local_memcache: Dict[str, CompletedAnalysisResource] = {}
-
-            for key in cached_analyses:
-                local_memcache[key] = self._memcache.get(key)
-
-            if uncached_analyses:
-                statement = (
-                    sqlalchemy.select(analysis_table)
-                    .where(analysis_table.c.id.in_(uncached_analyses))
-                    .order_by(sqlite_rowid)
-                )
-                with self._sql_engine.begin() as transaction:
-                    results = transaction.execute(statement).all()
-                for r in results:
-                    resource = await CompletedAnalysisResource.from_sql_row(
-                        r, self._current_analyzer_version
-                    )
-                    local_memcache[resource.id] = resource
-                    self._memcache.insert(resource.id, resource)
-
-            # note: we want to iterate through ordered_analyseS_for_protocol rather than
-            # just the local_memcache dict to preserve total ordering
-            return [
-                local_memcache[analysis_id]
-                for analysis_id in ordered_analyses_for_protocol
+        id_statement = (
+            sqlalchemy.select(analysis_table.c.id)
+            .where(analysis_table.c.protocol_id == protocol_id)
+            .order_by(sqlite_rowid)
+        )
+        with self._sql_engine.begin() as transaction:
+            ordered_analyses_for_protocol = [
+                row.id for row in transaction.execute(id_statement).all()
             ]
+
+        statement = (
+            sqlalchemy.select(analysis_table)
+            .where(analysis_table.c.id.in_(ordered_analyses_for_protocol))
+            .order_by(sqlite_rowid)
+        )
+        with self._sql_engine.begin() as transaction:
+            results = transaction.execute(statement).all()
+
+        completed_analysis_resources = []
+        for r in results:
+            resource = await CompletedAnalysisResource.from_sql_row(
+                r, self._current_analyzer_version
+            )
+            completed_analysis_resources.append(resource)
+
+        return completed_analysis_resources
 
     def get_ids_by_protocol(self, protocol_id: str) -> List[str]:
         """Like `get_by_protocol()`, but return only the ID of each analysis."""
@@ -294,9 +246,7 @@ class CompletedAnalysisStore:
         statement = (
             sqlalchemy.select(
                 analysis_table.c.id,
-                sqlalchemy.func.json_extract(
-                    analysis_table.c.completed_analysis, "$.result"
-                ).label("result"),
+                analysis_table.c.result,
             )
             .where(analysis_table.c.protocol_id == protocol_id)
             .order_by(sqlite_rowid)
@@ -374,8 +324,6 @@ class CompletedAnalysisStore:
         # but there would be some internally that added multiple analyses before
         # we started capping the number of analyses.
         analyses_to_delete = analyses_ids[: -MAX_ANALYSES_TO_STORE + 1]
-        for analysis_id in analyses_to_delete:
-            self._memcache.remove(analysis_id)
 
         # Delete the RTP table rows that reference the analyses being deleted
         delete_primitive_rtp_statement = (
@@ -411,6 +359,3 @@ class CompletedAnalysisStore:
                     insert_csv_rtp_statement,
                     csv_param.to_sql_values(),
                 )
-        self._memcache.insert(
-            completed_analysis_resource.id, completed_analysis_resource
-        )

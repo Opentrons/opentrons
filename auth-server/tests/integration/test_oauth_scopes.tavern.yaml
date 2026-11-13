@@ -145,3 +145,119 @@ stages:
         extra_kwargs:
           expected_present: protocols.write run_signoff.write
           expected_absent: updates.write
+
+---
+test_name: Auditor scopes stay read-only
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+      - seed_users
+
+stages:
+  - name: Create an auditor with a password
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: testauditor
+          password: testauditorpassword
+          fullName: Test Auditor
+          accountType: auditor
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 201
+      json:
+        data:
+          username: testauditor
+          fullName: Test Auditor
+          accountType: auditor
+          locked: false
+          resetPassword: false
+
+  - name: Auditor login should include self and others read scopes but no robot writes
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: testauditor
+        password: testauditorpassword
+    response:
+      status_code: 200
+      verify_response_with:
+        function: tests.integration.utils:verify_oauth_scopes
+        extra_kwargs:
+          expected_present: users.read.others users.read.self users.write.self
+          expected_absent: robot_control.write robot_settings.write protocols.write restart.write updates.write run_signoff.write
+      save:
+        json:
+          auditor_access_token: access_token
+
+  - name: Token introspection should match default auditor scopes
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/introspect'
+      data:
+        client_id: opentrons_app
+        token: '{auditor_access_token}'
+    response:
+      status_code: 200
+      verify_response_with:
+        function: tests.integration.utils:verify_oauth_scopes
+        extra_kwargs:
+          expected_present: users.read.others users.read.self users.write.self
+          expected_absent: robot_control.write robot_settings.write protocols.write restart.write updates.write run_signoff.write
+
+  - name: Allow regular users extra write scopes
+    request:
+      method: PATCH
+      url: '{run_server.base_url}/auth/settings'
+      headers:
+        Authorization: '{admin_access_token}'
+      json:
+        data:
+          requireAdminCredsWhenUpdatingRobotSoftware: false
+          requireAdminCredsWhenSendingProtocolToRobot: false
+          requireAdminCredsForSignoffProtocol: false
+    response:
+      status_code: 200
+
+  - name: Auditor login should still not get extra write scopes
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/token'
+      data:
+        client_id: opentrons_app
+        grant_type: password
+        username: testauditor
+        password: testauditorpassword
+    response:
+      status_code: 200
+      verify_response_with:
+        function: tests.integration.utils:verify_oauth_scopes
+        extra_kwargs:
+          expected_present: users.read.others users.read.self users.write.self
+          expected_absent: robot_control.write robot_settings.write protocols.write restart.write updates.write run_signoff.write
+      save:
+        json:
+          auditor_access_token: access_token
+
+  - name: Token introspection should still match read-only auditor scopes
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/oauth2/introspect'
+      data:
+        client_id: opentrons_app
+        token: '{auditor_access_token}'
+    response:
+      status_code: 200
+      verify_response_with:
+        function: tests.integration.utils:verify_oauth_scopes
+        extra_kwargs:
+          expected_present: users.read.others users.read.self users.write.self
+          expected_absent: robot_control.write robot_settings.write protocols.write restart.write updates.write run_signoff.write

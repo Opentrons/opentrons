@@ -7,7 +7,7 @@ from decoy import Decoy
 
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.types import (
-    DeckDefinitionV5,
+    DeckDefinitionV6,
     SlotDefV3,
 )
 from opentrons_shared_data.robot.types import RobotType
@@ -37,11 +37,8 @@ from opentrons.protocol_engine.state.update_types import LoadModuleUpdate, State
 from opentrons.protocol_engine.types import (
     AddressableAreaLocation,
     DeckSlotLocation,
+    DeckType,
     ModuleModel,
-)
-from opentrons.protocols.api_support.deck_type import (
-    STANDARD_OT2_DECK,
-    STANDARD_OT3_DECK,
 )
 from opentrons.types import DeckSlotName
 
@@ -94,7 +91,7 @@ async def test_load_module_implementation(
     decoy: Decoy,
     equipment: EquipmentHandler,
     state_view: StateView,
-    ot3_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
     module_model: ModuleModel,
     module_def_fixture_name: str,
     load_slot_name: DeckSlotName,
@@ -108,8 +105,6 @@ async def test_load_module_implementation(
         location=DeckSlotLocation(slotName=load_slot_name),
         moduleId="some-id",
     )
-
-    decoy.when(state_view.modules.get_deck_supports_module_fixtures()).then_return(True)
 
     decoy.when(state_view.labware.get_deck_definition()).then_return(
         ot3_standard_deck_def
@@ -209,7 +204,6 @@ async def test_load_module_raises_if_location_occupied(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_D1),
         moduleId="some-id",
     )
-    decoy.when(state_view.modules.get_deck_supports_module_fixtures()).then_return(True)
     addressable_area_provided_by_module = (
         f"{data.model}{data.location.slotName.value}"
         if data.model != ModuleModel.FLEX_STACKER_MODULE_V1
@@ -222,7 +216,7 @@ async def test_load_module_raises_if_location_occupied(
         )
     ).then_return(addressable_area_provided_by_module)
 
-    deck_def = load_deck(STANDARD_OT3_DECK, 5)
+    deck_def = load_deck(DeckType.OT3_STANDARD, 6)
 
     decoy.when(state_view.labware.get_deck_definition()).then_return(deck_def)
     decoy.when(
@@ -254,35 +248,35 @@ async def test_load_module_raises_if_location_occupied(
         (
             TemperatureModuleModel.TEMPERATURE_V2,
             EngineModuleModel.TEMPERATURE_MODULE_V2,
-            load_deck(STANDARD_OT3_DECK, 5),
+            load_deck(DeckType.OT3_STANDARD, 6),
             DeckSlotName.SLOT_D2,
             "OT-3 Standard",
         ),
         (
             ThermocyclerModuleModel.THERMOCYCLER_V1,
             EngineModuleModel.THERMOCYCLER_MODULE_V1,
-            load_deck(STANDARD_OT2_DECK, 5),
-            DeckSlotName.SLOT_1,
+            load_deck(DeckType.OT3_STANDARD, 6),
+            DeckSlotName.SLOT_D1,
             "OT-2 Standard",
         ),
         (
             ThermocyclerModuleModel.THERMOCYCLER_V2,
             EngineModuleModel.THERMOCYCLER_MODULE_V2,
-            load_deck(STANDARD_OT3_DECK, 5),
+            load_deck(DeckType.OT3_STANDARD, 6),
             DeckSlotName.SLOT_A2,
             "OT-3 Standard",
         ),
         (
             HeaterShakerModuleModel.HEATER_SHAKER_V1,
             EngineModuleModel.HEATER_SHAKER_MODULE_V1,
-            load_deck(STANDARD_OT3_DECK, 5),
+            load_deck(DeckType.OT3_STANDARD, 6),
             DeckSlotName.SLOT_A2,
             "OT-3 Standard",
         ),
         (
             FlexStackerModuleModel.FLEX_STACKER_V1,
             EngineModuleModel.FLEX_STACKER_MODULE_V1,
-            load_deck(STANDARD_OT3_DECK, 5),
+            load_deck(DeckType.OT3_STANDARD, 6),
             DeckSlotName.SLOT_A2,
             "OT-3 Standard",
         ),
@@ -294,7 +288,7 @@ async def test_load_module_raises_wrong_location(
     state_view: StateView,
     requested_model: HardwareModuleModel,
     engine_model: EngineModuleModel,
-    deck_def: DeckDefinitionV5,
+    deck_def: DeckDefinitionV6,
     slot_name: DeckSlotName,
     robot_type: RobotType,
 ) -> None:
@@ -338,7 +332,7 @@ async def test_load_module_raises_wrong_location(
         (
             MagneticModuleModel.MAGNETIC_V2,
             EngineModuleModel.MAGNETIC_MODULE_V2,
-            load_deck(STANDARD_OT3_DECK, 5),
+            load_deck(DeckType.OT3_STANDARD, 5),
             DeckSlotName.SLOT_A2,
             "OT-3 Standard",
         ),
@@ -350,7 +344,7 @@ async def test_load_module_raises_module_fixture_id_does_not_exist(
     state_view: StateView,
     requested_model: HardwareModuleModel,
     engine_model: EngineModuleModel,
-    deck_def: DeckDefinitionV5,
+    deck_def: DeckDefinitionV6,
     slot_name: DeckSlotName,
     robot_type: RobotType,
 ) -> None:

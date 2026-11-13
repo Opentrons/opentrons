@@ -33,8 +33,8 @@ import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import { getIsShellReady } from '/app/redux/shell'
 import { useNotifyCurrentMaintenanceRun } from '/app/resources/maintenance_runs'
 
+import { LoggedOutOverlay } from '../../components/ODD/modals/LoggedOutOverlay'
 import { LocalizationProvider } from '../../LocalizationProvider'
-import { LoggedOutOverlay } from '../../molecules/LoggedOutOverlay'
 import { useScrollRef } from '../hooks/useModuleAttachedToast'
 import { useProtocolReceiptToast } from '../hooks/useProtocolReceiptToast'
 import { ODDTopLevelRedirects } from '../ODDTopLevelRedirects'
@@ -87,8 +87,9 @@ vi.mock('/app/organisms/ModuleWizardFlows')
 vi.mock('../hooks/useModuleAttachedToast')
 vi.mock('../hooks/useProtocolReceiptToast')
 vi.mock('../hooks/useSoftwareUpdatePoll')
+vi.mock('/app/local-resources/access-control/useHandleInsufficientPermissions')
 vi.mock('../ODDTopLevelRedirects')
-vi.mock('../../molecules/LoggedOutOverlay')
+vi.mock('../../components/ODD/modals/LoggedOutOverlay')
 vi.mock('/app/resources/devices/hooks/useTrackRobotRestarts', () => ({
   useTrackRobotRestarts: vi.fn(),
 }))
@@ -239,6 +240,40 @@ describe('OnDeviceDisplayApp', () => {
     render('/')
     screen.getByLabelText('loading indicator')
     expect(vi.mocked(LocalizationProvider)).not.toHaveBeenCalled()
+  })
+  it('does not return to the loading screen if access-control queries reset after initial ready', () => {
+    const [{ rerender }] = render('/')
+    expect(screen.queryByLabelText('loading indicator')).toBeNull()
+    expect(vi.mocked(LocalizationProvider)).toHaveBeenCalled()
+
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      data: undefined,
+      isSuccess: false,
+    } as any)
+
+    rerender(
+      <MemoryRouter initialEntries={['/']} initialIndex={0}>
+        <OnDeviceDisplayApp />
+      </MemoryRouter>
+    )
+
+    expect(screen.queryByLabelText('loading indicator')).toBeNull()
+    expect(vi.mocked(LocalizationProvider)).toHaveBeenCalled()
+  })
+  it('does not return to the loading screen if the shell becomes unready after initial ready', () => {
+    const [{ rerender }] = render('/')
+    expect(screen.queryByLabelText('loading indicator')).toBeNull()
+
+    vi.mocked(getIsShellReady).mockReturnValue(false)
+
+    rerender(
+      <MemoryRouter initialEntries={['/']} initialIndex={0}>
+        <OnDeviceDisplayApp />
+      </MemoryRouter>
+    )
+
+    expect(screen.queryByLabelText('loading indicator')).toBeNull()
+    expect(vi.mocked(LocalizationProvider)).toHaveBeenCalled()
   })
   it('renders EmergencyStop component from /emergency-stop', () => {
     render('/emergency-stop')

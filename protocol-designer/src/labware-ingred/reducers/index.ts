@@ -81,6 +81,12 @@ const selectedContainerId: Reducer<SelectedContainerId, any> = handleActions(
       state,
       action: CloseIngredientSelectorAction
     ): SelectedContainerId => null,
+    DELETE_CONTAINER: (
+      state,
+      action: DeleteContainerAction
+    ): SelectedContainerId =>
+      action.payload.labwareId === state ? null : state,
+    LOAD_FILE: (): SelectedContainerId => null,
   },
   null
 )
@@ -178,7 +184,7 @@ export const containers: Reducer<ContainersState, any> = handleActions(
     ): ContainersState => {
       const { labwareId, name } = action.payload
       // ignore renaming to whitespace
-      return name && name.trim()
+      return name?.trim()
         ? { ...state, [labwareId]: { ...state[labwareId], nickname: name } }
         : state
     },

@@ -11,8 +11,9 @@ import { labwareFormSchema } from './labwareFormSchema'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareFields, ProcessedLabwareFields } from './fields'
 
-// Fill arbitrary values in to any missing fields that aren't needed for this render,
-// eg some required definition data like well volume, height, and bottom shape don't affect the render.
+// Fill arbitrary values in to any missing fields so a partial form can still render.
+// Height, well depth, and bottom shape do not change the top view, but the side view
+// reads them. Those fields still refresh the preview through getIsSideViewGeometryChanged.
 //
 // The "defaulted def" is also used to calculate multichannel compatibility, which similarly
 // only needs XY data and not Z / volume / bottom shape etc.

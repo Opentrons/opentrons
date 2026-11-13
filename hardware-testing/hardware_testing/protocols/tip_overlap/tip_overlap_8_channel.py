@@ -3,9 +3,7 @@ from opentrons.protocol_api import ProtocolContext, ParameterContext
 from opentrons.types import Point
 from opentrons.config import IS_ROBOT
 from typing import List, Dict, Optional
-import csv
 import time
-import os
 
 from opentrons.protocol_api.core.engine import (
     pipette_movement_conflict,
@@ -14,7 +12,7 @@ from opentrons.protocol_api._nozzle_layout import NozzleLayout
 
 metadata = {"protocolName": "test overlap 2 - multi"}
 
-requirements = {"robotType": "Flex", "apiLevel": "2.24"}
+requirements = {"robotType": "Flex", "apiLevel": "2.30"}
 
 if IS_ROBOT:
     from hardware_testing.drivers.mitutoyo_digimatic_indicator import find_dial
@@ -53,6 +51,12 @@ def add_parameters(parameters: ParameterContext) -> None:
             for name in [
                 "SingleA1",
                 "SingleH1",
+                "A1toB1",
+                "A1toC1",
+                "A1toD1",
+                "A1toE1",
+                "A1toF1",
+                "A1toG1",
                 "H1toG1",
                 "H1toF1",
                 "H1toE1",
@@ -90,24 +94,43 @@ def add_parameters(parameters: ParameterContext) -> None:
         default=True,
         description="Return tips or drop tips",
     )
+    parameters.add_float(
+        display_name="Default overlap",
+        variable_name="default_overlap",
+        minimum=1.0,
+        maximum=15.0,
+        default=10.5,
+        description="Default overlap to use in calculation of final overlap. Should match the pipette definition.",
+    )
 
 
 LAYOUT_TO_NOZZLES: Dict[str, List[int]] = {
     "SingleA1": [0],
     "SingleH1": [7],
     "H1toG1": [6, 7],
+    "A1toB1": [0, 1],
     "H1toF1": [5, 6, 7],
+    "A1toC1": [0, 1, 2],
     "H1toE1": [4, 5, 6, 7],
+    "A1toD1": [0, 1, 2, 3],
     "H1toD1": [3, 4, 5, 6, 7],
+    "A1toE1": [0, 1, 2, 3, 4],
     "H1toC1": [2, 3, 4, 5, 6, 7],
+    "A1toF1": [0, 1, 2, 3, 4, 5],
     "H1toB1": [1, 2, 3, 4, 5, 6, 7],
+    "A1toG1": [0, 1, 2, 3, 4, 5, 6],
     "Full": [0, 1, 2, 3, 4, 5, 6, 7],
 }
 
 LAYOUT_TO_STYLE: Dict[str, NozzleLayout] = {
     "SingleA1": NozzleLayout.SINGLE,
     "SingleH1": NozzleLayout.SINGLE,
-    "H1toG1": NozzleLayout.PARTIAL_COLUMN,
+    "A1toB1": NozzleLayout.PARTIAL_COLUMN,
+    "A1toC1": NozzleLayout.PARTIAL_COLUMN,
+    "A1toD1": NozzleLayout.PARTIAL_COLUMN,
+    "A1toE1": NozzleLayout.PARTIAL_COLUMN,
+    "A1toF1": NozzleLayout.PARTIAL_COLUMN,
+    "A1toG1": NozzleLayout.PARTIAL_COLUMN,
     "H1toF1": NozzleLayout.PARTIAL_COLUMN,
     "H1toE1": NozzleLayout.PARTIAL_COLUMN,
     "H1toD1": NozzleLayout.PARTIAL_COLUMN,
@@ -119,6 +142,12 @@ LAYOUT_TO_STYLE: Dict[str, NozzleLayout] = {
 LAYOUT_TO_START: Dict[str, Optional[str]] = {
     "SingleA1": "A1",
     "SingleH1": "H1",
+    "A1toB1": "A1",
+    "A1toC1": "A1",
+    "A1toD1": "A1",
+    "A1toE1": "A1",
+    "A1toF1": "A1",
+    "A1toG1": "A1",
     "H1toG1": "H1",
     "H1toF1": "H1",
     "H1toE1": "H1",
@@ -130,6 +159,12 @@ LAYOUT_TO_START: Dict[str, Optional[str]] = {
 LAYOUT_TO_END: Dict[str, Optional[str]] = {
     "SingleA1": None,
     "SingleH1": None,
+    "A1toB1": "B1",
+    "A1toC1": "C1",
+    "A1toD1": "D1",
+    "A1toE1": "E1",
+    "A1toF1": "F1",
+    "A1toG1": "G1",
     "H1toG1": "G1",
     "H1toF1": "F1",
     "H1toE1": "E1",
@@ -144,6 +179,8 @@ def offset_for_channel(channel: int, layout: str) -> Point:
     """Get the y offset for each nozzle."""
     if layout in ["SingleA1", "Full"]:
         # channel 0 is the critical point
+        return Point(x=0, y=channel * 9, z=0)
+    elif "A1to" in layout:
         return Point(x=0, y=channel * 9, z=0)
     else:
         # channel 7 is the critical point
@@ -209,25 +246,37 @@ def run(ctx: ProtocolContext) -> None:
     ctx.comment(str(results))
     if IS_ROBOT and not ctx.is_simulating():
         dial.disconnect()  # type: ignore [union-attr]
-        formatted_time = time.strftime("%Y-%m-%d:%H:%M:%S", time.localtime(time.time()))
+        formatted_time = time.strftime("%Y-%m-%dH%HM%MS%S", time.localtime(time.time()))
         test_name = f"overlap-P{ctx.params.pipette_volume}M-{ctx.params.layout}-{formatted_time}"  # type: ignore [attr-defined]
-        filename = f"/data/testing_data/overlap/{test_name}.csv"
-        os.makedirs(os.path.dirname(filename), exist_ok=True)
-        with open(filename, "w") as f:
-            writer = csv.writer(f)
-            writer.writerow(
-                [
-                    "Trial",
-                    "Nozzle 1",
-                    "Nozzle 2",
-                    "Nozzle 3",
-                    "Nozzle 4",
-                    "Nozzle 5",
-                    "Nozzle 6",
-                    "Nozzle 7",
-                    "Nozzle 8",
-                ]
-            )
-            writer.writerow(["bare_nozzles"] + nozzle_results)
-            for trial in range(ctx.params.trials):  # type: ignore [attr-defined]
-                writer.writerow([trial] + results[trial])
+        filename = f"{test_name}"
+
+        title_row = [
+            "Trial",
+            "Nozzle 1",
+            "Nozzle 2",
+            "Nozzle 3",
+            "Nozzle 4",
+            "Nozzle 5",
+            "Nozzle 6",
+            "Nozzle 7",
+            "Nozzle 8",
+        ]
+        csv_output = ctx.create_csv(filename, title_row=title_row)
+        csv_output.write_row(["bare_nozzles"] + [str(val) for val in nozzle_results])
+        for trial in range(ctx.params.trials):  # type: ignore [attr-defined]
+            csv_output.write_row([str(trial)] + [str(val) for val in results[trial]])
+        # NOTE: The optimal tip overlap is calculated with the following formula:
+        # Where (T) is tip overlap, (d) is the default overlap, (bN) is a bare nozzle delta to a given position, (tN) is a trial result delta and (A) is the number of active nozzles:
+        # T = d - (b1 + ... + bA) / A + (t1 + ... + tN) / (A * tN)
+        active_nozzles = len(LAYOUT_TO_NOZZLES[ctx.params.layout])  # type: ignore [attr-defined]
+        trial_deltas: List[float] = []
+        for val in results.values():
+            trial_deltas.extend(val)
+
+        tip_overlap = (
+            ctx.params.default_overlap  # type: ignore [attr-defined]
+            - sum(nozzle_results[:active_nozzles]) / active_nozzles
+            + sum(trial_deltas) / (active_nozzles * len(results))
+        )
+        ctx.comment(f"Tip Overlap: {tip_overlap}")
+        csv_output.write_row(["tip_overlap"] + [str(tip_overlap)])

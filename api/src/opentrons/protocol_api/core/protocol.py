@@ -5,7 +5,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Dict, Generic, List, Optional, Sequence, Tuple, Union
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
+from opentrons_shared_data.deck.types import DeckDefinitionV6, SlotDefV3
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.robot.types import RobotType
@@ -21,7 +21,6 @@ from .robot import AbstractRobot
 from .tasks import TaskCoreType
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
-from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.types import (
     DeckSlotName,
     Location,
@@ -47,9 +46,6 @@ class AbstractProtocol(
     @property
     @abstractmethod
     def robot_type(self) -> RobotType: ...
-
-    @abstractmethod
-    def get_max_speeds(self) -> AxisMaxSpeeds: ...
 
     @abstractmethod
     def get_hardware(self) -> SyncHardwareAPI: ...
@@ -99,6 +95,7 @@ class AbstractProtocol(
         location: Union[
             DeckSlotName,
             StagingSlotName,
+            LabwareCoreType,
             ModuleCoreType,
             ModuleFixtureLocation,
             OffDeckType,
@@ -237,7 +234,7 @@ class AbstractProtocol(
     ) -> LabwareCoreType: ...
 
     @abstractmethod
-    def get_deck_definition(self) -> DeckDefinitionV5:
+    def get_deck_definition(self) -> DeckDefinitionV6:
         """Get the geometry definition of the robot's deck."""
 
     @abstractmethod

@@ -7,8 +7,9 @@ import {
   DEFAULT_VENDOR_ID,
   fetchSerialPortList,
   SerialPortHttpAgent,
-} from '@opentrons/usb-bridge/node-client'
+} from '@opentrons/node-usb-bridge-client'
 
+import { cloneError } from './cloneError'
 import { usbRequestsStart, usbRequestsStop } from './config/actions'
 import {
   SYSTEM_INFO_INITIALIZED,
@@ -21,7 +22,7 @@ import type { AxiosRequestConfig } from 'axios'
 import type { IpcMainInvokeEvent } from 'electron'
 import type { IPCSafeFormData } from '@opentrons/app/src/redux/shell/types'
 import type { UsbDevice } from '@opentrons/app/src/redux/system-info/types'
-import type { PortInfo } from '@opentrons/usb-bridge/node-client'
+import type { PortInfo } from '@opentrons/node-usb-bridge-client'
 import type { Action, Dispatch } from './types'
 
 let usbHttpAgent: SerialPortHttpAgent | undefined
@@ -93,19 +94,6 @@ function reconstructFormData(ipcSafeFormData: IPCSafeFormData): FormData {
   })
   return result
 }
-
-const cloneError = (e: any): Record<string, unknown> =>
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  Object.entries(axios.isAxiosError(e) ? e.toJSON() : e).reduce<
-    Record<string, unknown>
-  >((acc, [k, v]) => {
-    try {
-      acc[k] = structuredClone(v)
-      return acc
-    } catch (e) {
-      return acc
-    }
-  }, {})
 
 async function usbListener(
   _event: IpcMainInvokeEvent,

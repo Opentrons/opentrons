@@ -1,11 +1,14 @@
 """Support utilities for accessing the RobotServerPyroResource."""
 
-from typing import TYPE_CHECKING, Callable, cast
+from typing import TYPE_CHECKING, Awaitable, Callable, cast
 
 import Pyro5.errors as pyro_errors
 
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
+)
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
 )
 from opentrons.protocol_engine.resources.file_provider import FileProvider
 from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
@@ -121,7 +124,7 @@ def register_file_provider_to_pyro_resource(
 
 def register_notify_publishers_to_pyro_resource(
     app_state: AppState,
-    notify_publishers: Callable[[], None],
+    notify_publishers: Callable[[], Awaitable[None]],
 ) -> None:
     """Set the provided Notification Publishers as the callback to be used by the Robot Server's Pyro Resource."""
     robot_server_pyro_resource = robot_server_pyro_resource_accessor.get_from(app_state)
@@ -143,4 +146,30 @@ def register_hardware_state_store_to_pyro_resource(
     else:
         raise RuntimeError(
             "Cannot set HardwareStateStore, RobotServerPyroResource is not initialized."
+        )
+
+
+def register_run_store_provider_to_pyro_resource(
+    app_state: AppState, run_store_provider: CommandStoreProvider
+) -> None:
+    """Set the CommandStoreProvider for RunStore as the active instance to be used by the Robot Server's Pyro Resource."""
+    robot_server_pyro_resource = robot_server_pyro_resource_accessor.get_from(app_state)
+    if robot_server_pyro_resource is not None:
+        robot_server_pyro_resource.set_run_store_provider(run_store_provider)
+    else:
+        raise RuntimeError(
+            "Cannot set CommandStoreProvider for RunStore, RobotServerPyroResource is not initialized."
+        )
+
+
+def register_analysis_store_provider_to_pyro_resource(
+    app_state: AppState, analysis_store_provider: CommandStoreProvider
+) -> None:
+    """Set the CommandStoreProvider for AnalysisStore as the active instance to be used by the Robot Server's Pyro Resource."""
+    robot_server_pyro_resource = robot_server_pyro_resource_accessor.get_from(app_state)
+    if robot_server_pyro_resource is not None:
+        robot_server_pyro_resource.set_analysis_store_provider(analysis_store_provider)
+    else:
+        raise RuntimeError(
+            "Cannot set CommandStoreProvider for AnalysisStore, RobotServerPyroResource is not initialized."
         )

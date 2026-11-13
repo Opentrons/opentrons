@@ -1,3 +1,4 @@
+export * from './useAttachedInstrumentDisplayName'
 export * from './useGripperDisplayName'
 export * from './useHomeGantry'
 export * from './useHomePipettes'

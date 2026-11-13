@@ -11,20 +11,20 @@ import {
   Flex,
   Icon,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import successIcon from '/app/assets/images/icon_success.png'
-import { ProgressBar } from '/app/atoms/ProgressBar'
+import { ProgressBar } from '/app/components/desktop/ProgressBar'
+import { useGatedStartRobotUpdate } from '/app/local-resources/access-control/useGatedStartRobotUpdate'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/utils'
 import {
   clearRobotUpdateSession,
   getRobotUpdateDownloadError,
-  startRobotUpdate,
 } from '/app/redux/robot-update'
 import {
   INIT_STATUS,
@@ -47,10 +47,6 @@ const UPDATE_PROGRESS_BAR_STYLE = css`
   background: ${COLORS.grey30};
   width: 17.12rem;
 `
-const UPDATE_TEXT_STYLE = css`
-  color: ${COLORS.grey50};
-  font-size: 0.8rem;
-`
 const HIDDEN_CSS = css`
   position: fixed;
   clip: rect(1px 1px 1px 1px);
@@ -67,8 +63,8 @@ export function RobotUpdateProgressModal({
   session,
   closeRobotUpdate,
 }: RobotUpdateProgressModalProps): ReactNode {
-  const dispatch = useDispatch()
   const { t } = useTranslation('device_settings')
+  const { startUpdate } = useGatedStartRobotUpdate(robotName)
   const [showFileSelect, setShowFileSelect] = useState<boolean>(false)
   const installFromFileRef = useRef<HTMLInputElement>(null)
 
@@ -86,7 +82,7 @@ export function RobotUpdateProgressModal({
   const handleFileSelect: ChangeEventHandler<HTMLInputElement> = event => {
     const { files } = event.target
     if (files?.length === 1) {
-      dispatch(startRobotUpdate(robotName, files[0].path))
+      startUpdate(files[0].path)
     }
     setShowFileSelect(false)
   }
@@ -137,12 +133,12 @@ export function RobotUpdateProgressModal({
           alignItems={ALIGN_CENTER}
           padding={SPACING.spacing48}
         >
-          <LegacyStyledText>{modalBodyText}</LegacyStyledText>
+          <StyledText>{modalBodyText}</StyledText>
           <ProgressBar
             percentComplete={progressPercent}
             outerStyles={UPDATE_PROGRESS_BAR_STYLE}
           />
-          <LegacyStyledText css={UPDATE_TEXT_STYLE}>
+          <StyledText color={COLORS.grey50} style={{ fontSize: '0.8rem' }}>
             {letUserExitUpdate &&
             updateStep !== 'restart' &&
             updateStep !== 'finished' ? (
@@ -160,7 +156,7 @@ export function RobotUpdateProgressModal({
             ) : (
               subProgressBarText
             )}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
       )}
     </Modal>
@@ -197,7 +193,7 @@ function SuccessOrError({ errorMessage }: SuccessOrErrorProps): ReactNode {
   let renderedImg: JSX.Element
   if (!errorMessage) {
     renderedImg = (
-      <img alt={IMAGE_ALT} src={successIcon} height="208px" width="250px" />
+      <img alt={IMAGE_ALT} src={successIcon} height="150px" width="170px" />
     )
   } else {
     renderedImg = (
@@ -213,9 +209,9 @@ function SuccessOrError({ errorMessage }: SuccessOrErrorProps): ReactNode {
   return (
     <>
       {renderedImg}
-      <LegacyStyledText>
+      <StyledText desktopStyle="headingSmallBold">
         {!errorMessage ? t('robot_update_success') : errorMessage}
-      </LegacyStyledText>
+      </StyledText>
     </>
   )
 }

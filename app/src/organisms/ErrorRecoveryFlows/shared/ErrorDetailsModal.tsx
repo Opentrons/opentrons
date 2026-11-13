@@ -13,10 +13,11 @@ import {
   ModalShell,
   SPACING,
   StyledText,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
-import { OddModal } from '/app/molecules/OddModal'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 
 import { ERROR_KINDS } from '../constants'
 import { useErrorName } from '../hooks'
@@ -26,7 +27,7 @@ import { StepInfo } from './StepInfo'
 import type { ReactNode } from 'react'
 import type { IconProps } from '@opentrons/components'
 import type { LabwareDefinition, RobotType } from '@opentrons/shared-data'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { ERUtilsResults, useRetainedFailedCommandBySource } from '../hooks'
 import type { DesktopSizeType, ErrorKind } from '../types'
@@ -191,7 +192,7 @@ export function ErrorDetailsModalODD(props: ErrorDetailsModalType): ReactNode {
     <OddModal
       header={modalHeader}
       onOutsideClick={toggleModal}
-      zIndex={15}
+      zIndex={Z_INDEX.MODAL_DETAILS}
       gridGap={SPACING.spacing32}
     >
       <Flex gridGap={SPACING.spacing24} flexDirection={DIRECTION_COLUMN}>

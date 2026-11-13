@@ -3,7 +3,7 @@
 
 .modal {
   position: fixed;
-  z-index: 1;
+  z-index: var(--z-index-base);
 
   /* from legacy --absolute-fill */
 
@@ -76,7 +76,7 @@
 
 .title_bar {
   position: absolute;
-  z-index: 3;
+  z-index: var(--z-index-details);
   top: 0;
   right: 0;
   left: 0;
@@ -84,7 +84,7 @@
 }
 
 .modal_contents {
-  z-index: 1;
+  z-index: var(--z-index-base);
 
   /* from legacy --modal-contents */
   width: 100%;
@@ -107,7 +107,7 @@
 }
 
 .modal_page_contents {
-  z-index: 1;
+  z-index: var(--z-index-base);
 
   /* from legacy --modal-contents */
   width: 100%;
@@ -163,7 +163,7 @@
 }
 
 .spinner_modal_contents {
-  z-index: 4;
+  z-index: var(--z-index-details);
 
   /* from legacy --modal-contents */
   width: 100%;
@@ -206,7 +206,7 @@
 }
 
 .alert_modal {
-  z-index: 10;
+  z-index: var(--z-index-modals);
 }
 
 .alert_modal_overlay {

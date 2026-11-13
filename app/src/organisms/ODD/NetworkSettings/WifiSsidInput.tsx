@@ -5,14 +5,14 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   POSITION_FIXED,
   SPACING,
-  TouchInputField,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
+import { FullKeyboard } from '/app/components/ODD/keyboard'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
@@ -41,13 +41,13 @@ export function WifiSsidInput({
         gridGap={SPACING.spacing8}
         marginTop={isUnboxingFlowOngoing ? undefined : '7.75rem'}
       >
-        <LegacyStyledText
+        <StyledText
           forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={errorMessage != null ? COLORS.red50 : COLORS.black90}
         >
           {t('enter_network_name')}
-        </LegacyStyledText>
+        </StyledText>
         <TouchInputField
           ref={inputRef}
           autoFocus

@@ -3,16 +3,16 @@ import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { OddModal } from '/app/molecules/OddModal'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { LPC_STEP_KEY, STEP_KEY_TO_I18N_KEY } from '/app/redux/protocol-runs'
 
 import type { ReactNode } from 'react'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 import type { StepKey } from '/app/redux/protocol-runs'
 
 interface ConfirmSetupStepsCompleteModalProps {
@@ -60,9 +60,7 @@ export function ConfirmSetupStepsCompleteModal({
         gridGap={SPACING.spacing32}
         width="100%"
       >
-        <LegacyStyledText forwardedAs="p">
-          {buildMissingStepsCopy()}
-        </LegacyStyledText>
+        <StyledText forwardedAs="p">{buildMissingStepsCopy()}</StyledText>
         <Flex gridGap={SPACING.spacing8}>
           <SmallButton
             flex="1"

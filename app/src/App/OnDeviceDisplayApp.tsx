@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -19,7 +19,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { ReactQueryDevtools } from '/app/App/tools'
-import { SleepScreen } from '/app/atoms/SleepScreen'
+import { SleepScreen } from '/app/components/adhoc/ODD/SleepScreen'
 import { SLEEP_NEVER_MS, useScreenIdle } from '/app/local-resources/dom-utils'
 import { EstopTakeover } from '/app/organisms/EmergencyStop'
 import { FirmwareUpdateTakeover } from '/app/organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'
@@ -30,7 +30,6 @@ import { QuickTransferFlow } from '/app/organisms/ODD/QuickTransferFlow'
 import { RobotEncryptionKeyTakeover } from '/app/organisms/ODD/RobotSettingsDashboard/RobotEncryptionKey/RobotEncryptionKeyTakeover'
 import { MaintenanceRunTakeover } from '/app/organisms/TakeoverModal'
 import { ToasterOven } from '/app/organisms/ToasterOven'
-import { Account } from '/app/pages/ODD/Account'
 import { ChooseLanguage } from '/app/pages/ODD/ChooseLanguage'
 import { ConnectViaEthernet } from '/app/pages/ODD/ConnectViaEthernet'
 import { ConnectViaUSB } from '/app/pages/ODD/ConnectViaUSB'
@@ -63,11 +62,14 @@ import { useTrackRobotRestarts } from '/app/resources/devices/hooks/useTrackRobo
 import { RobotUpdateProvider } from '/app/resources/robot-update/RobotUpdateProvider'
 
 import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
+import { useHandleInsufficientPermissions } from '../local-resources/access-control/useHandleInsufficientPermissions'
 import { LocalizationProvider } from '../LocalizationProvider'
 import { requireDocumentation } from '../organisms/ODD/DocumentationRequired/requireDocumentation'
 import { showDownloadLogsModal } from '../organisms/ODD/DownloadAuditLogsModal'
 import { DragToLogOutOverlay } from '../organisms/ODD/OnDeviceLogin/DragToLogOutOverlay'
 import { showLoginModal } from '../organisms/ODD/OnDeviceLogin/LoginModal'
+import { AdminHub } from '../pages/ODD/AdminHub'
+import { RunLoading } from '../pages/ODD/RunLoading/RunLoading'
 import { showSignRunModal } from '../pages/ODD/RunSummary/SignRun'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
 import { hackWindowNavigatorOnLine } from './hacks'
@@ -114,6 +116,7 @@ export const ON_DEVICE_DISPLAY_PATHS = [
   '/runs/:runId/run',
   '/runs/:runId/setup',
   '/runs/:runId/summary',
+  '/run-loading',
   '/welcome',
 ] as const
 
@@ -123,7 +126,7 @@ function getPathComponent(
 ): JSX.Element {
   switch (path) {
     case '/account':
-      return <Account />
+      return <AdminHub />
     case '/choose-language':
       return <ChooseLanguage />
     case '/dashboard':
@@ -166,6 +169,8 @@ function getPathComponent(
       return <ProtocolSetup />
     case '/runs/:runId/summary':
       return <RunSummary />
+    case '/run-loading':
+      return <RunLoading />
     case '/welcome':
       return <Welcome />
   }
@@ -238,15 +243,15 @@ export const OnDeviceDisplayApp = (): ReactNode => {
 
   const isCRSEnabled =
     accessControlEnabledQuery.data?.data.accessControlEnabled ?? false
+  const queriesSucceeded =
+    robotSettingsQuery.isSuccess && accessControlEnabledQuery.isSuccess
+  // After the first successful load, never return to the initial init spinner.
+  const hasCompletedInitialReadyRef = useRef(false)
+  if (isShellReady && queriesSucceeded) {
+    hasCompletedInitialReadyRef.current = true
+  }
   const isReady =
-    // ensure robot-server api, etc. is up and running
-    isShellReady &&
-    // ensure settings query data is available for localization provider
-    robotSettingsQuery.isSuccess &&
-    // ensure we know whether access control is enabled or not,
-    // so on first render we can immediately show the LoggedOutOverlay
-    // and hide CRS-incompatible UI, if appropriate.
-    accessControlEnabledQuery.isSuccess
+    hasCompletedInitialReadyRef.current || (isShellReady && queriesSucceeded)
   // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
     // to make sure that the host config stays stable and in step with the initial queries,
@@ -274,21 +279,22 @@ export const OnDeviceDisplayApp = (): ReactNode => {
                     <RobotUpdateProvider>
                       <MaintenanceRunTakeover>
                         <EstopTakeover />
-                        <FirmwareUpdateTakeover />
-                        {showModuleSetupModal && localRobot?.name != null ? (
-                          <ModuleWizardFlows
-                            showSetupLauncher={true}
-                            closeFlow={() => {
-                              setShowModuleSetupModal(false)
-                            }}
-                            robotName={localRobot.name}
-                          />
-                        ) : null}
-
                         <ToasterOven>
                           <NiceModal.Provider>
+                            <FirmwareUpdateTakeover />
+                            {showModuleSetupModal &&
+                            localRobot?.name != null ? (
+                              <ModuleWizardFlows
+                                showSetupLauncher={true}
+                                closeFlow={() => {
+                                  setShowModuleSetupModal(false)
+                                }}
+                                robotName={localRobot.name}
+                              />
+                            ) : null}
                             <RobotEncryptionKeyTakeover>
                               <ProtocolReceiptToasts />
+                              <InsufficientPermissionsToasts />
                               {!showModuleSetupModal ? (
                                 <ModuleAttachedToasts
                                   openFlow={(open: boolean) => {
@@ -403,6 +409,12 @@ export function OnDeviceDisplayAppRoutes({
 
 function ProtocolReceiptToasts(): null {
   useProtocolReceiptToast()
+  return null
+}
+
+function InsufficientPermissionsToasts(): null {
+  useHandleInsufficientPermissions()
+
   return null
 }
 

@@ -5,14 +5,14 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
-  TouchInputField,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
+import { NumericalKeyboard } from '/app/components/ODD/keyboard'
 import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useToaster } from '/app/organisms/ToasterOven'
 
@@ -37,7 +37,7 @@ export function ChooseNumber({
   const [paramValue, setParamValue] = useState<string>(String(parameter.value))
 
   if (parameter.type !== 'int' && parameter.type !== 'float') {
-    console.log(`Incorrect parameter type: ${parameter.type as string}`)
+    console.error(`Incorrect parameter type: ${parameter.type as string}`)
     return null
   }
 
@@ -97,12 +97,9 @@ export function ChooseNumber({
           flexDirection={DIRECTION_COLUMN}
           marginTop="7.75rem"
         >
-          <LegacyStyledText
-            forwardedAs="h4"
-            textAlign={TYPOGRAPHY.textAlignLeft}
-          >
+          <StyledText forwardedAs="h4" textAlign={TYPOGRAPHY.textAlignLeft}>
             {parameter.description}
-          </LegacyStyledText>
+          </StyledText>
           <TouchInputField
             ref={inputElementRef}
             autoFocus

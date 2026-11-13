@@ -17,12 +17,20 @@ import pydantic
 HEALTH_ENDPOINT_PATH = "health"
 PROTOCOLS_ENDPOINT_PATH = "protocols"
 RUNS_ENDPOINT_PATH = "runs"
+SETTINGS_ENDPOINT_PATH = "settings"
+
+HARDWARE_SUBPROCESS_SETTING_ID = "enableHardwareSubprocess"
+PROTOCOL_SUBPROCESS_SETTING_ID = "enableProtocolSubprocess"
+_PYRO_SUBPROCESS_SETTING_IDS = (
+    HARDWARE_SUBPROCESS_SETTING_ID,
+    PROTOCOL_SUBPROCESS_SETTING_ID,
+)
 
 _log = logging.getLogger(__name__)
 
 
 class Client(ABC):
-    """An interface for a dependent server to get health information via robot-server."""
+    """An interface for a dependent server to talk to robot-server."""
 
     @abstractmethod
     async def get_name_and_serial(self) -> RobotNameandSerial:
@@ -32,6 +40,11 @@ class Client(ABC):
     @abstractmethod
     async def get_current_run_log(self) -> RobotCurrentRunLog:
         """If there is a current run, get it's run log data, else return with None."""
+        pass
+
+    @abstractmethod
+    async def enable_pyro_subprocess_flags(self) -> None:
+        """Enable hardware and protocol Pyro subprocess feature flags."""
         pass
 
 
@@ -160,6 +173,15 @@ class LocalHTTPClient(Client):
         else:
             serialized_log = None
         return RobotCurrentRunLog(serialized_log=serialized_log)
+
+    @typing.override
+    async def enable_pyro_subprocess_flags(self) -> None:
+        for setting_id in _PYRO_SUBPROCESS_SETTING_IDS:
+            async with self._session.post(
+                SETTINGS_ENDPOINT_PATH,
+                json={"id": setting_id, "value": True},
+            ) as response:
+                response.raise_for_status()
 
 
 def _get_run_log_file_name(

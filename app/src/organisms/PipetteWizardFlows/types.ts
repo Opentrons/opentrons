@@ -1,12 +1,13 @@
-import type { Dispatch, SetStateAction } from 'react'
 import type { useCreateCommandMutation } from '@opentrons/react-api-client'
 import type { CreateCommand, PipetteMount } from '@opentrons/shared-data'
 import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
-import type { FLOWS, SECTIONS } from './constants'
+import type { CALIBRATION_DECK_SLOTS, FLOWS, SECTIONS } from './constants'
+
+export type CalibrationDeckSlot = (typeof CALIBRATION_DECK_SLOTS)[number]
 
 export type PipetteWizardStep =
   | BeforeBeginningStep
-  | RemoveWasteChuteStep
+  | SelectSlotStep
   | DetachProbeStep
   | AttachProbeStep
   | ResultsStep
@@ -15,7 +16,6 @@ export type PipetteWizardStep =
   | MountingPlateStep
   | CarriageStep
   | FirmwareUpdateStep
-  | AttachWasteChuteStep
 
 export type PipetteWizardFlow =
   typeof FLOWS.ATTACH | typeof FLOWS.DETACH | typeof FLOWS.CALIBRATE
@@ -27,8 +27,8 @@ export interface BaseStep {
 export interface BeforeBeginningStep extends BaseStep {
   section: typeof SECTIONS.BEFORE_BEGINNING
 }
-export interface RemoveWasteChuteStep extends BaseStep {
-  section: typeof SECTIONS.REMOVE_WASTE_CHUTE
+export interface SelectSlotStep extends BaseStep {
+  section: typeof SECTIONS.SELECT_SLOT
 }
 export interface DetachProbeStep extends BaseStep {
   section: typeof SECTIONS.DETACH_PROBE
@@ -58,9 +58,6 @@ export interface MountingPlateStep extends BaseStep {
 export interface FirmwareUpdateStep extends BaseStep {
   section: typeof SECTIONS.FIRMWARE_UPDATE
 }
-export interface AttachWasteChuteStep extends BaseStep {
-  section: typeof SECTIONS.ATTACH_WASTE_CHUTE
-}
 
 type CreateCommandMutate = ReturnType<
   typeof useCreateCommandMutation
@@ -84,11 +81,9 @@ export interface PipetteWizardStepProps {
   isRobotMoving: boolean
   maintenanceRunId?: string
   attachedPipettes: AttachedPipettesFromInstrumentsQuery
-  setShowErrorMessage: Dispatch<SetStateAction<string | null>>
+  handleCommandError: (error: Error) => void
   errorMessage: string | null
-  isDoorOpenError: boolean
-  setIsDoorOpenError: Dispatch<SetStateAction<boolean>>
-  dismissDoorOpenError: () => void
   selectedPipette: SelectablePipettes
   isOnDevice: boolean | null
+  selectedSlot: CalibrationDeckSlot
 }

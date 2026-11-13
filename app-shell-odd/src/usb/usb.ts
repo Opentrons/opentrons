@@ -42,7 +42,7 @@ export const isSingleFunctionMassStorageMount = async (
     // mount dirs are named `<LABEL>-sdX#` or `sdX#`; recover the block node
     const blockName = mountPath.match(FLEX_USB_DEVICE_FILTER)?.[0]
     if (blockName == null) {
-      return true
+      return false
     }
     // a partition (sdb1) maps to its whole disk (sdb) under /sys/block
     const diskName = blockName.replace(/[0-9]+$/, '')
@@ -55,14 +55,14 @@ export const isSingleFunctionMassStorageMount = async (
       .map(segment => segment.match(USB_INTERFACE_DIR_REGEX)?.[1])
       .find((name): name is string => name != null)
     if (usbDeviceName == null) {
-      return true
+      return false
     }
     const usbDeviceDir = join(USB_SYS_DEVICE_DIR, usbDeviceName)
     const interfaceDirs = (await fsPromises.readdir(usbDeviceDir)).filter(
       entry => entry.startsWith(`${usbDeviceName}:`)
     )
     if (interfaceDirs.length === 0) {
-      return true
+      return false
     }
     const interfaceClasses = await Promise.all(
       interfaceDirs.map(interfaceDir =>
@@ -83,7 +83,7 @@ export const isSingleFunctionMassStorageMount = async (
       `Could not determine mass-storage status for ${mountPath}; treating as mass storage`,
       error
     )
-    return true
+    return false
   }
 }
 

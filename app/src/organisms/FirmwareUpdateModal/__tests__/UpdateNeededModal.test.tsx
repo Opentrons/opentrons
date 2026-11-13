@@ -26,6 +26,18 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
   useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
 }))
+vi.mock(
+  '/app/local-resources/access-control/useRequireAdminForUpdates',
+  () => ({
+    useRequireAdminForUpdates: () => ({
+      isLoading: false,
+      ensureCanUpdate: () => true,
+    }),
+  })
+)
+vi.mock('/app/redux-resources/robots/hooks/useLocalRobotName', () => ({
+  useLocalRobotName: () => 'otie',
+}))
 vi.mock('../UpdateInProgressModal')
 vi.mock('../UpdateResultsModal')
 

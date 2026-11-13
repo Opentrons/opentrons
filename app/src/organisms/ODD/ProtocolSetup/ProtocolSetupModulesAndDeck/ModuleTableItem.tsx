@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -9,11 +9,12 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   RobotInfoLabel,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { isDocumentedMutationError } from '@opentrons/react-api-client'
 import {
   FLEX_STACKER_MODULE_TYPE,
   getFixtureDisplayName,
@@ -21,27 +22,30 @@ import {
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { getFlexStackerPrepCommands } from '/app/local-resources/modules'
-import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
-import { OddModal } from '/app/molecules/OddModal'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
+import { OddInfoScreen } from '/app/components/ODD/ODDInfoScreen'
+import {
+  getFlexStackerPrepActions,
+  getFlexStackerPrepCommands,
+} from '/app/local-resources/modules'
 import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import { LocationConflictModal } from '/app/organisms/LocationConflictModal'
 import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useToaster } from '/app/organisms/ToasterOven'
+import { useChainLiveCommands } from '/app/resources/runs'
 import { getModuleTooHot } from '/app/transformations/modules'
 
 import { getDoesModuleRequireCalibration } from './utils'
 
 import type { TFunction } from 'i18next'
 import type { ReactNode } from 'react'
-import type { AttachedModule, CommandData } from '@opentrons/api-client'
+import type { AttachedModule } from '@opentrons/api-client'
 import type {
   CutoutConfig,
   CutoutFixtureId,
   DeckDefinition,
 } from '@opentrons/shared-data'
-import type { ModulePrepCommandsType } from '/app/local-resources/modules'
 import type { ProtocolCalibrationStatus } from '/app/resources/runs'
 import type { AttachedProtocolModuleMatch } from '/app/transformations/analysis'
 
@@ -93,24 +97,21 @@ export const getModuleDisplayStatus = (
 
 interface ModuleTableItemProps {
   calibrationStatus: ProtocolCalibrationStatus
-  chainLiveCommands: (
-    commands: ModulePrepCommandsType[],
-    continuePastCommandFailure: boolean
-  ) => Promise<CommandData[]>
   conflictedFixture: CutoutConfig | null
   module: AttachedProtocolModuleMatch
   deckDef: DeckDefinition
   robotName: string
+  runId: string
   comboFixtureId?: CutoutFixtureId
 }
 
 export function ModuleTableItem({
   module,
   calibrationStatus,
-  chainLiveCommands,
   conflictedFixture,
   deckDef,
   robotName,
+  runId,
   comboFixtureId,
 }: ModuleTableItemProps): ReactNode {
   const { i18n, t } = useTranslation([
@@ -120,6 +121,14 @@ export function ModuleTableItem({
   ])
 
   const { makeSnackbar } = useToaster()
+
+  // NOTE (jj 9/4/26): chainLiveCommands is only used here to home this row's Flex Stacker.
+  // If it is ever used to send other commands, this will need updating.
+  const actionsToDocument = useMemo(
+    () => getFlexStackerPrepActions([module.attachedModuleMatch]),
+    [module.attachedModuleMatch]
+  )
+  const { chainLiveCommands } = useChainLiveCommands(actionsToDocument, runId)
 
   const handleCalibrate = (): void => {
     if (module.attachedModuleMatch != null) {
@@ -144,7 +153,14 @@ export function ModuleTableItem({
         // if the close latch command fails, we still want to home the shuttle
         true
       )
-      setShowHomeStackerWarning(false)
+        .then(() => {
+          setShowHomeStackerWarning(false)
+        })
+        .catch(error => {
+          if (!isDocumentedMutationError(error)) {
+            setShowHomeStackerWarning(false)
+          }
+        })
     }
   }
 
@@ -236,14 +252,14 @@ export function ModuleTableItem({
         )
       case 'calibrationBlocked':
         return (
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {calibrationStatus?.reason === 'attach_pipette_failure_reason'
               ? t('calibration_required_attach_pipette_first')
               : t('calibration_required_calibrate_pipette_first')}
-          </LegacyStyledText>
+          </StyledText>
         )
       case 'needsCalibration':
         return (
@@ -306,14 +322,14 @@ export function ModuleTableItem({
         padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       >
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {comboFixtureId != null
               ? getFixtureDisplayName(t as TFunction, comboFixtureId)
               : getModuleDisplayName(module.moduleDef.model)}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
           <RobotInfoLabel

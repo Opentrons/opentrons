@@ -23,7 +23,7 @@
   "fixed_trash_in_12": "固定垃圾存放位置为12",
   "getting_ready": "正在准备…",
   "go_back": "返回",
-  "jog_too_far": "移动过远？",
+  "jog_too_far": "调整过远？",
   "liquid_damages_pipette": "如果移液器中有液体，将移液器归位可能会损坏它。您必须在使用移液器之前取下所有吸头。",
   "liquid_damages_this_pipette": "如果<strong>{{mount}}移液器</strong>的移液器中有液体，将其归位可能会损坏它。您必须在使用移液器之前取下所有吸头。",
   "move_to_slot": "移至板位",

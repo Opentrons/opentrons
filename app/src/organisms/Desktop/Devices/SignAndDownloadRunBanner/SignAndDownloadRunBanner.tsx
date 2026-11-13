@@ -4,8 +4,6 @@ import { InlineNotification } from '@opentrons/components'
 
 import { useIsSigningOrDownloadingRequired } from '/app/resources/audit/useIsSigningOrDownloadingRequired'
 
-import styles from './signanddownloadrunbanner.module.css'
-
 import type { ReactNode } from 'react'
 
 const COPY_BY_BANNER_TYPE = {
@@ -34,7 +32,7 @@ export function SignAndDownloadRunBanner({
     useIsSigningOrDownloadingRequired(robotName)
 
   if (!isSigningRequired && !isDownloadingRequired) {
-    return <></>
+    return null
   }
 
   const bannerType = isSigningRequired ? 'signing' : 'downloading'
@@ -42,16 +40,12 @@ export function SignAndDownloadRunBanner({
     COPY_BY_BANNER_TYPE[bannerType]
 
   return (
-    // reserves room for the robot card's overflow menu in the top right corner
-    <div className={styles.banner_wrapper}>
-      <InlineNotification
-        type="alert"
-        heading={t(headingKey)}
-        message={t(messageKey)}
-        linkText={t(linkTextKey)}
-        onLinkClick={onLinkClick}
-        className={styles.notification}
-      />
-    </div>
+    <InlineNotification
+      type="alert"
+      heading={t(headingKey)}
+      message={t(messageKey)}
+      linkText={t(linkTextKey)}
+      onLinkClick={onLinkClick}
+    />
   )
 }

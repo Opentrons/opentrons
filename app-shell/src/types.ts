@@ -1,5 +1,4 @@
 // TODO(mc, 2018-08-08): figure out type exports from app
-import type { Logger } from '@opentrons/app/src/logger'
 import type {
   Action,
   Error as PlainError,
@@ -10,7 +9,16 @@ export type { Action, PlainError }
 
 export type Dispatch = (action: Action) => void
 
-export type { Logger }
+export type Log = (message: string, meta?: {}) => void
+export interface Logger {
+  error: Log
+  warn: Log
+  info: Log
+  http: Log
+  verbose: Log
+  debug: Log
+  silly: Log
+}
 
 // copied types below from the app so the app shell does not pull in the app
 // in its bundle

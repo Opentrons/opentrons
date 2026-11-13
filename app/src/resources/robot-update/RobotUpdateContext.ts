@@ -7,7 +7,9 @@ export interface RobotUpdateContextValue {
 export const RobotUpdateContext = createContext<RobotUpdateContextValue | null>(
   null
 )
-
+/**
+ * Use useGatedStartRobotUpdate for any user driven robot update flow.
+ */
 export function useRobotUpdateContext(): RobotUpdateContextValue {
   const value = useContext(RobotUpdateContext)
   if (value == null) {

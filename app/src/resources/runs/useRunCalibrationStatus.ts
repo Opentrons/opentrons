@@ -1,62 +1,22 @@
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
-import { useIsFlex } from '/app/redux-resources/robots'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
-import { useDeckCalibrationStatus } from '/app/resources/calibration'
 import { isGripperInCommands } from '/app/resources/protocols/utils'
-import { INEXACT_MATCH, MATCH } from '/app/resources/runs/constants'
 
-import { useMostRecentCompletedAnalysis, useRunPipetteInfoByMount } from '.'
+import { useMostRecentCompletedAnalysis } from '.'
 
-import type {
-  GripperData,
-  Instruments,
-  PipetteData,
-} from '@opentrons/api-client'
-import type {
-  CompletedProtocolAnalysis,
-  LoadedPipette,
-  ProtocolAnalysisOutput,
-} from '@opentrons/shared-data'
-import type { DeckCalibrationStatus } from '/app/redux/calibration/api-types'
-
-export interface ProtocolCalibrationStatus {
-  complete: boolean
-  reason?:
-    | 'calibrate_deck_failure_reason'
-    | 'calibrate_tiprack_failure_reason'
-    | 'calibrate_pipette_failure_reason'
-    | 'calibrate_gripper_failure_reason'
-    | 'calibrate_module_failure_reason'
-    | 'attach_pipette_failure_reason'
-    | 'attach_gripper_failure_reason'
-}
+import type { GripperData, PipetteData } from '@opentrons/api-client'
+import type { LoadedPipette } from '@opentrons/shared-data'
+import type { ProtocolCalibrationStatus } from './types'
 
 export function useRunCalibrationStatus(
   robotName: string,
   runId: string
 ): ProtocolCalibrationStatus {
-  const deckCalStatus = useDeckCalibrationStatus(robotName)
-  const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
-  const isFlex = useIsFlex(robotName)
-  const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
+  const robotAnalysis = useMostRecentCompletedAnalysis(runId)
+  const storedAnalysis = useStoredProtocolAnalysis(runId)
   const { data: instrumentsQueryData = null } = useInstrumentsQuery()
 
-  return isFlex
-    ? getFlexRunCalibrationStatus(
-        mostRecentAnalysis,
-        storedProtocolAnalysis,
-        instrumentsQueryData
-      )
-    : getOT2RunCalibrationStatus(deckCalStatus, runPipetteInfoByMount)
-}
-
-function getFlexRunCalibrationStatus(
-  robotAnalysis: CompletedProtocolAnalysis | null,
-  storedAnalysis: ProtocolAnalysisOutput | null,
-  instrumentsQueryData: Instruments | null
-): ProtocolCalibrationStatus {
   const attachedInstruments = instrumentsQueryData?.data ?? []
 
   const requiredPipettes: LoadedPipette[] =
@@ -102,51 +62,4 @@ function getFlexRunCalibrationStatus(
     }
   }
   return { complete: true }
-}
-
-function getOT2RunCalibrationStatus(
-  deckCalStatus: DeckCalibrationStatus | null,
-  runPipetteInfoByMount: ReturnType<typeof useRunPipetteInfoByMount>
-): ProtocolCalibrationStatus {
-  const runPipetteInfoValues = Object.values(runPipetteInfoByMount)
-
-  if (deckCalStatus !== 'OK') {
-    return {
-      complete: false,
-      reason: 'calibrate_deck_failure_reason',
-    }
-  }
-  let calibrationStatus: ProtocolCalibrationStatus = {
-    complete: true,
-  }
-  runPipetteInfoValues.forEach(pipette => {
-    pipette?.tipRacksForPipette.forEach(tiprack => {
-      if (tiprack.lastModifiedDate == null) {
-        calibrationStatus = {
-          complete: false,
-          reason: 'calibrate_tiprack_failure_reason',
-        }
-      }
-    })
-  })
-  runPipetteInfoValues.forEach(pipette => {
-    if (pipette !== null && pipette.pipetteCalDate == null) {
-      calibrationStatus = {
-        complete: false,
-        reason: 'calibrate_pipette_failure_reason',
-      }
-    }
-  })
-  runPipetteInfoValues.forEach(pipette => {
-    const pipetteIsMatch =
-      pipette?.requestedPipetteMatch === MATCH ||
-      pipette?.requestedPipetteMatch === INEXACT_MATCH
-    if (pipette !== null && !pipetteIsMatch) {
-      calibrationStatus = {
-        complete: false,
-        reason: 'attach_pipette_failure_reason',
-      }
-    }
-  })
-  return calibrationStatus
 }

@@ -60,7 +60,7 @@
   "pipette_probe": "移液器校准探头",
   "place_flush": "将适配器水平放到模块上。",
   "place_flush_heater_shaker": "将适配器水平放到模块上。使用热震荡模块专用螺丝和 T10 Torx 螺丝刀将适配器固定到模块上。",
-  "place_flush_thermocycler": "确保热循环仪盖处于打开状态，并将适配器平放在模块顶部、通常放置实验耗材的位置。",
+  "place_flush_thermocycler": "确保热循环仪的热盖处于打开状态，并将适配器平放在模块顶部，即通常放置实验耗材的位置。",
   "place_shuttle": "将耗材滑台放置在轨道上",
   "place_shuttle_description": "将磁性耗材滑台平整地放置在轨道顶部。",
   "prepping_module": "准备 {{module}} 进行模块设置",

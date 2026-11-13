@@ -4,7 +4,7 @@ import { getSchema2Dimensions } from '@opentrons/shared-data'
 
 import { COLORS } from '../../../../helix-design-system'
 import { C_BLACK, C_BLUE } from '../../../../styles/colors'
-import { RobotCoordsText } from '../../../Deck'
+import { RobotCoordsText } from '../../../Deck/RobotCoordsText'
 import { WELL_LABEL_OPTIONS } from './constants'
 
 import type { MemoExoticComponent, ReactNode } from 'react'

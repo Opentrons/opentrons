@@ -144,7 +144,7 @@ from opentrons.config.types import (
     OT3Config,
     RobotConfig,
 )
-from opentrons.drivers.rpi_drivers.types import PortGroup, USBPort
+from opentrons.drivers.usb.types import PortGroup, USBPort
 from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
 )
@@ -2641,6 +2641,7 @@ class OT3API(
         }
 
     @property
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
     def hardware_gripper(self) -> Optional[Gripper]:
         if not self.has_gripper():
             return None
@@ -2648,7 +2649,7 @@ class OT3API(
 
     @property
     @pyro_behavior(specialty_func=convert_result_to_dict_of_proxies, apply_local=False)
-    def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:  # type: ignore
+    def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:
         # see comment in `protocols.instrument_configurer`
         # override required for type matching
         # Warning: don't use this in new code, used `hardware_pipettes` instead
@@ -3491,3 +3492,7 @@ class OT3API(
                 message=f"No stored firmware for {module.name} {module.serial_number}"
             )
         return await modules.update_firmware(module, bundled_fw.path)
+
+    async def debug_set_active_current(self, axis_currents: OT3AxisMap[float]) -> None:
+        """This is a debug utility function- the protocol engine or anything user-facing shouldn't touch this!"""
+        await self._backend.set_active_current(axis_currents=axis_currents)

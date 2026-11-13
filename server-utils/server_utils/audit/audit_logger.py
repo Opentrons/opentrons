@@ -8,10 +8,10 @@ from starlette.responses import FileResponse, Response, StreamingResponse
 
 from .audit_server import Client as AuditClient
 from .audit_server import SubmitAuditLogMessageData
-from server_utils.auth.resource_server.fastapi import (
-    RequireAuthenticationResult,
+from server_utils.auth.resource_server.types import (
+    AuthenticatedResult,
+    AuthenticationNotRequiredResult,
 )
-from server_utils.auth.resource_server.types import AuthenticatedResult
 
 MAX_LOG_CHUNK_SIZE = 1 * 1024
 TRUNCATION_MESSAGE = f"(truncated after {MAX_LOG_CHUNK_SIZE} elements)"
@@ -33,6 +33,7 @@ class AuditLogger:
         auto_log_response_head: bool,
         auto_log_request_body: bool,
         auto_log_response_body: bool,
+        auto_log_request_full_headers: bool,
     ) -> None:
         """Build an audit logger object.
 
@@ -51,9 +52,23 @@ class AuditLogger:
         self.auto_log_response_head = auto_log_response_head
         self.auto_log_request_body = auto_log_request_body
         self.auto_log_response_body = auto_log_response_body
+        self.auto_log_request_full_headers = auto_log_request_full_headers
         self.did_log = False
         self.should_log = True
         self.request = request
+
+    def skip_persist(self: Self) -> Self:
+        """Do not sign or store an audit record for this request.
+
+        Use this when the route is audited in general but this particular
+        request should not wait on audit-server persist.
+        Middleware will return the HTTP response as soon as the handler finishes.
+
+        This is not a substitute for ``skip_audit_logger()``, which marks an
+        entire route as never audited.
+        """
+        self.should_log = False
+        return self
 
     def set_action_from_request(self: Self, request: Request) -> Self:
         """Set the action to log based on the request.
@@ -98,11 +113,14 @@ class AuditLogger:
             self._message_chunks.append("Query parameters: none")
         return self
 
-    def append_request_head_to_message(self: Self, request: Request) -> Self:
+    def append_request_head_to_message(
+        self: Self, request: Request, full_headers: bool
+    ) -> Self:
         """Append material from the query head (aka not the body) to the message."""
         self.append_request_method_path_to_message(request)
         self.append_request_query_params_to_message(request)
-        self.append_request_headers_to_message(request)
+        if full_headers:
+            self.append_request_headers_to_message(request)
         return self
 
     async def append_request_body_to_message(self: Self, request: Request) -> Self:
@@ -266,15 +284,18 @@ class AuditLogger:
         self._fullname = fullname
         return self
 
-    def set_auth_details(self: Self, auth_details: RequireAuthenticationResult) -> Self:
+    def set_auth_details(
+        self: Self,
+        auth_details: AuthenticatedResult | AuthenticationNotRequiredResult,
+    ) -> Self:
         """Set the username and fullname to be used in the log from auth details."""
         if isinstance(auth_details, AuthenticatedResult):
             self._fullname = auth_details.fullname
             self._username = auth_details.username
+            return self
         else:
             _LOG.warning(f"Will not send audit log because auth was {auth_details}")
-            self.should_log = False
-        return self
+            return self.skip_persist()
 
     def set_user_note(self: Self, user_note: str | None) -> Self:
         """Set the user note to be included in the log."""

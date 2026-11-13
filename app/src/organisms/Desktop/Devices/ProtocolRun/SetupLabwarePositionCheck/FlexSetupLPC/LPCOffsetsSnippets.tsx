@@ -24,7 +24,7 @@ import {
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getModalPortalEl } from '/app/App/portal'
-import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
+import { LabwareOffsetSnippet } from '/app/components/desktop/chips/LabwareOffsetSnippet'
 import { LearnAboutOffsetsLink } from '/app/organisms/Desktop/Devices/ProtocolRun/LearnAboutOffsetsLink'
 
 import type { ReactNode } from 'react'

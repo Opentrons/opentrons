@@ -10,9 +10,9 @@ import {
   POSITION_RELATIVE,
 } from '@opentrons/components'
 
+import { Breadcrumbs } from '/app/components/desktop/Breadcrumbs'
 import { LocalizationProvider } from '/app/LocalizationProvider'
 import { Alerts } from '/app/organisms/Desktop/Alerts'
-import { Breadcrumbs } from '/app/organisms/Desktop/Breadcrumbs'
 import { SystemLanguagePreferenceModal } from '/app/organisms/Desktop/SystemLanguagePreferenceModal'
 import {
   EmergencyStopContext,
@@ -21,7 +21,6 @@ import {
 import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
 import { ToasterOven } from '/app/organisms/ToasterOven'
 import { AppSettings } from '/app/pages/Desktop/AppSettings'
-import { CalibrationDashboard } from '/app/pages/Desktop/Devices/CalibrationDashboard'
 import { DeviceDetails } from '/app/pages/Desktop/Devices/DeviceDetails'
 import { DevicesLanding } from '/app/pages/Desktop/Devices/DevicesLanding'
 import { ProtocolRunDetails } from '/app/pages/Desktop/Devices/ProtocolRunDetails'
@@ -34,6 +33,7 @@ import { useTrackRobotRestarts } from '/app/resources/devices/hooks/useTrackRobo
 import { RobotUpdateProvider } from '/app/resources/robot-update/RobotUpdateProvider'
 
 import { DocumentationRequiredModalContext } from '../local-resources/access-control/DocumentationRequiredModalContext'
+import { useHandleInsufficientPermissions } from '../local-resources/access-control/useHandleInsufficientPermissions'
 import { ApiHostProvider } from '../local-resources/api-host-provider/ApiHostProvider'
 import { showDocumentationRequiredModal } from '../organisms/Desktop/DocumentationRequired/DocumentationRequiredModal'
 import { showDownloadLogsModal } from '../organisms/Desktop/DownloadAuditLogsModal'
@@ -92,11 +92,6 @@ export const DesktopApp = (): ReactNode => {
       path: '/devices/:robotName/:deviceDetailsTab?',
     },
     {
-      Component: CalibrationDashboard,
-      name: 'Calibration Dashboard',
-      path: '/devices/:robotName/robot-settings/calibration/dashboard',
-    },
-    {
       Component: RobotSettings,
       name: 'Robot Settings',
       path: '/devices/:robotName/robot-settings/:robotSettingsTab?',
@@ -130,6 +125,7 @@ export const DesktopApp = (): ReactNode => {
       >
         <RobotUpdateProvider>
           <ToasterOven>
+            <InsufficientPermissionsToasts />
             <NiceModal.Provider>
               <ErrorBoundary FallbackComponent={DesktopAppFallback}>
                 <ReactQueryDevtools />
@@ -197,6 +193,12 @@ export const DesktopApp = (): ReactNode => {
       </DocumentationRequiredModalContext.Provider>
     </LocalizationProvider>
   )
+}
+
+function InsufficientPermissionsToasts(): null {
+  useHandleInsufficientPermissions()
+
+  return null
 }
 
 function RobotControlTakeover(): JSX.Element | null {

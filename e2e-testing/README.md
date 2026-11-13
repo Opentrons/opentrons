@@ -105,8 +105,7 @@ make test-ll TEST_ENV=prod      # Equivalent to make test-ll-prod
   - `pd/` — PD tests (marked `@pytest.mark.pdE2E`)
   - `ll/` — LL tests (marked `@pytest.mark.llE2E`)
 - `fixtures/` — Protocol JSON files, labware definitions, and test data
-- `conftest.py` — Pytest fixtures for server lifecycle, page creation, video recording, and Applitools
-- `eyes.py` — Applitools Eyes wrapper and pytest fixture
+- `conftest.py` — Pytest fixtures for server lifecycle, page creation, and video recording
 - `utility.py` — Shared test helpers
 
 ## Architecture
@@ -130,19 +129,17 @@ Tests use the **Page Object Model** pattern for maintainability:
 | `pd_base_url` | session  | Resolves PD URL; starts local preview server when `TEST_ENV=local`                             |
 | `ll_base_url` | session  | Resolves LL URL; starts local preview server when `TEST_ENV=local`                             |
 | `page`        | function | Creates a Playwright page, navigates to the correct app URL based on test markers, saves video |
-| `eyes`        | function | Applitools Eyes session (or `None` when disabled)                                              |
 
 ### Environment Variables
 
-| Variable             | Default | Notes                                 |
-| -------------------- | ------- | ------------------------------------- |
-| `TEST_ENV`           | `local` | `local`, `staging`, `prod`, `sandbox` |
-| `HEADLESS`           | (unset) | `true` / `false`; overrides default   |
-| `SKIP_SERVER_START`  | `false` | Skip automatic server build+serve     |
-| `PD_SERVER_URL`      | auto    | Override PD URL                       |
-| `LL_SERVER_URL`      | auto    | Override LL URL                       |
-| `LL_SERVER_PORT`     | `4176`  | Preferred port for LL local server    |
-| `APPLITOOLS_API_KEY` | (unset) | Enable Applitools visual checks       |
+| Variable            | Default | Notes                                 |
+| ------------------- | ------- | ------------------------------------- |
+| `TEST_ENV`          | `local` | `local`, `staging`, `prod`, `sandbox` |
+| `HEADLESS`          | (unset) | `true` / `false`; overrides default   |
+| `SKIP_SERVER_START` | `false` | Skip automatic server build+serve     |
+| `PD_SERVER_URL`     | auto    | Override PD URL                       |
+| `LL_SERVER_URL`     | auto    | Override LL URL                       |
+| `LL_SERVER_PORT`    | `4176`  | Preferred port for LL local server    |
 
 ## Development Workflow
 
@@ -221,57 +218,6 @@ All tests automatically generate comprehensive reports and recordings:
 6. Add type annotations (enforced by mypy)
 7. Document test steps with comments and print statements so agents can maintain them
 8. Mark PD tests `@pytest.mark.pdE2E`, LL tests `@pytest.mark.llE2E` — never both
-
-## Visual Snapshots (Applitools Eyes)
-
-This project includes an opt-in Applitools Eyes integration for visual snapshots.
-
-### Setup
-
-1. Copy the example env file:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-2. Add your Applitools API key:
-
-   ```bash
-   APPLITOOLS_API_KEY=...your_key...
-   ```
-
-`python-dotenv` will load the nearest `.env` automatically during the test run.
-
-### Usage
-
-Use the `eyes` pytest fixture when you want to capture visual checkpoints.
-
-```python
-from playwright.sync_api import Locator, Page
-
-from eyes import Eyes
-
-
-def test_visual_checkpoint(page: Page, eyes: Eyes | None) -> None:
-   # ... navigate using page objects ...
-
-   if eyes is None:
-      # Eyes is disabled in headed mode or when APPLITOOLS_API_KEY is missing.
-      return
-
-   eyes.check("Main Page")
-
-   timeline: Locator = page.get_by_test_id("TimelineToolbox_scrollContainer")
-   eyes.check_element("Timeline Toolbox (stitched)", timeline)
-```
-
-Notes:
-
-- If `APPLITOOLS_API_KEY` is not set, the `eyes` fixture yields `None`.
-- In headed mode, the `eyes` fixture yields `None` (no visual snapshots).
-- Applitools batch name:
-  - Local/dev: `dev run | <TEST_ENV>`
-  - CI: `CI | <PR branch>`
 
 ## CI/CD Integration
 

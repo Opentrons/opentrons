@@ -1,12 +1,6 @@
-import type { PipetteMount as Mount, RobotType } from '@opentrons/shared-data'
-import type { DeckCalibrationStatus } from '../calibration/types'
+import type { RobotType } from '@opentrons/shared-data'
 import type { Config } from '../config/types'
-import type { CalibrationCheckComparisonsPerCalibration } from '../sessions/types'
-import type {
-  ANALYTICS_PIPETTE_OFFSET_STARTED,
-  ANALYTICS_RESOURCE_MONITOR_REPORT,
-  ANALYTICS_TIP_LENGTH_STARTED,
-} from './constants'
+import type { ANALYTICS_RESOURCE_MONITOR_REPORT } from './constants'
 
 export type AnalyticsConfig = Config['analytics']
 
@@ -43,52 +37,6 @@ export interface BuildrootAnalyticsData {
   robotType: RobotType | undefined
 }
 
-export interface PipetteOffsetCalibrationAnalyticsData {
-  calibrationExists: boolean
-  markedBad: boolean | null
-  pipetteModel: string
-}
-
-export interface TipLengthCalibrationAnalyticsData {
-  calibrationExists: boolean
-  markedBad: boolean | null
-  pipetteModel: string
-}
-
-export type ModelsByMount = {
-  [mount in Mount]: { model: string } | null
-}
-
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-export type DeckCalibrationAnalyticsData = {
-  calibrationStatus: DeckCalibrationStatus | null
-  markedBad: boolean | null
-  pipettes: ModelsByMount
-}
-
-export interface CalibrationCheckByMount {
-  left: {
-    model: string
-    comparisons: CalibrationCheckComparisonsPerCalibration
-    succeeded: boolean
-  } | null
-  right: {
-    model: string
-    comparisons: CalibrationCheckComparisonsPerCalibration
-    succeeded: boolean
-  } | null
-}
-
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-export type CalibrationHealthCheckAnalyticsData = {
-  pipettes: CalibrationCheckByMount | null
-}
-
-export interface AnalyticsSessionExitDetails {
-  sessionType: string
-  step: string
-}
-
 export type AnalyticsEvent =
   | {
       name: string
@@ -99,25 +47,6 @@ export type AnalyticsEvent =
 
 export type TrackEventArgs = [AnalyticsEvent | null, AnalyticsConfig | null]
 
-export interface PipetteOffsetStartedAnalyticsAction {
-  type: typeof ANALYTICS_PIPETTE_OFFSET_STARTED
-  payload: {
-    mount: string
-    calBlock: boolean
-    shouldPerformTipLength: boolean
-    tipRackURI: string | null
-  }
-}
-
-export interface TipLengthStartedAnalyticsAction {
-  type: typeof ANALYTICS_TIP_LENGTH_STARTED
-  payload: {
-    mount: string
-    calBlock: boolean
-    tipRackURI: string
-  }
-}
-
 export interface ResourceMonitorAnalyticsAction {
   type: typeof ANALYTICS_RESOURCE_MONITOR_REPORT
   payload: {
@@ -127,12 +56,4 @@ export interface ResourceMonitorAnalyticsAction {
   }
 }
 
-export type AnalyticsTriggerAction =
-  | PipetteOffsetStartedAnalyticsAction
-  | TipLengthStartedAnalyticsAction
-  | ResourceMonitorAnalyticsAction
-
-export interface SessionInstrumentAnalyticsData {
-  sessionType: string
-  pipetteModel: string
-}
+export type AnalyticsTriggerAction = ResourceMonitorAnalyticsAction

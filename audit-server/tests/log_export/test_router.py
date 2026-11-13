@@ -189,10 +189,14 @@ async def test_download_log_period_stages_under_persistence_temp(
 
     assert result.headers["opentrons-log-period-deletion-key"] == "a-deletion-key"
 
-    zip_path = Path(result.path)
-    assert zip_path.is_relative_to(tmp_path / PERSISTENCE_TEMP_SUBDIRECTORY)
-    assert zip_path.exists()
+    result_dir = tmp_path / PERSISTENCE_TEMP_SUBDIRECTORY
+    result_dir_contents = [f for f in result_dir.iterdir()]
+    assert len(result_dir_contents) == 1
+    result_path = result_dir_contents[0]
+    assert result_path.is_relative_to(result_dir)
+    assert result_path.exists()
+    assert any([f for f in result_path.iterdir()])
 
     assert result.background is not None
     await result.background()
-    assert not zip_path.exists()
+    assert not result_path.exists()

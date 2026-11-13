@@ -4,6 +4,9 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  useAccessControlEnabledQuery,
+  useLogLevelQuery,
+  usePostLogLevelMutation,
   usePostLogMessageMutation,
   usePostWifiConfigureMutation,
   useRobotSettingsQuery,
@@ -11,9 +14,9 @@ import {
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { Navigation } from '/app/components/ODD/headers/Navigation'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
-import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
   DeviceReset,
   Devices,
@@ -49,7 +52,7 @@ import {
 import { RobotSettingsDashboard } from '../'
 
 import type { UseQueryResult } from 'react-query'
-import type { RobotSettingsResponse } from '@opentrons/api-client'
+import type { LogLevels, RobotSettingsResponse } from '@opentrons/api-client'
 import type { Config } from '/app/redux/config'
 
 vi.mock('react-redux', async () => {
@@ -72,11 +75,18 @@ vi.mock('/app/resources/networking', async () => {
   }
 })
 vi.mock('/app/redux/discovery')
-vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux/robot-update', async importOriginal => {
+  const actual = await vi.importActual('/app/redux/robot-update')
+  return {
+    ...actual,
+    getRobotUpdateAvailable: vi.fn(),
+    getRobotUpdateInfoForRobot: vi.fn(),
+  }
+})
 vi.mock('/app/redux/config')
 vi.mock('/app/resources/robot-settings')
 vi.mock('/app/resources/errorRecovery')
-vi.mock('/app/organisms/ODD/Navigation')
+vi.mock('/app/components/ODD/headers/Navigation')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/TouchScreenSleep')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/DeviceReset')
@@ -118,8 +128,24 @@ const mockDispatch = vi.fn()
 
 // Note kj 01/25/2023 Currently test cases only check text since this PR is bare-bones for RobotSettings Dashboard
 describe('RobotSettingsDashboard', () => {
+  let logLevel: LogLevels = 'warning'
+  const mockChangeLogLevel: ReturnType<
+    typeof usePostLogLevelMutation
+  >['postLogLevel'] = async newLevel => {
+    logLevel = newLevel
+    return newLevel
+  }
   beforeEach(() => {
+    vi.when(useLogLevelQuery)
+      .calledWith()
+      .thenReturn({ status: 'success', data: { log_level: logLevel } } as any)
+    vi.when(usePostLogLevelMutation)
+      .calledWith(expect.anything())
+      .thenReturn({ postLogLevel: mockChangeLogLevel } as any)
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      data: { data: { accessControlEnabled: false } },
+    } as ReturnType<typeof useAccessControlEnabledQuery>)
     vi.mocked(useUpdateRobotSettingMutation).mockReturnValue({
       updateRobotSetting: mockUpdateRobotSetting,
     } as unknown as ReturnType<typeof useUpdateRobotSettingMutation>)
@@ -449,6 +475,18 @@ describe('RobotSettingsDashboard', () => {
     vi.mocked(getRobotUpdateAvailable).mockReturnValue('upgrade')
     render()
     screen.getByText('Update available')
+  })
+
+  it('should return an update available when the channel version is a downgrade', () => {
+    vi.mocked(getRobotUpdateAvailable).mockReturnValue('downgrade')
+    render()
+    screen.getByText('Update available')
+  })
+
+  it('should not return an update available for a reinstall', () => {
+    vi.mocked(getRobotUpdateAvailable).mockReturnValue('reinstall')
+    render()
+    expect(screen.queryByText('Update available')).not.toBeInTheDocument()
   })
 
   it('should render component when tapping Language', () => {

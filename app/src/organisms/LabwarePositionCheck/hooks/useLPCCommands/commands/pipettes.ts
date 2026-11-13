@@ -6,7 +6,11 @@ import type {
   LoadedPipette,
   MotorAxes,
 } from '@opentrons/shared-data'
-import type { Axis, Sign, StepSize } from '/app/molecules/JogControls/types'
+import type {
+  Axis,
+  Sign,
+  StepSize,
+} from '/app/components/adhoc/shared/JogControls/types'
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
 
 const PROBE_LENGTH_MM = 44.5

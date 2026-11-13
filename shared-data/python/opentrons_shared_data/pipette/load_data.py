@@ -17,8 +17,6 @@ from .types import (
     LiquidClasses,
     PipetteChannelType,
     PipetteGenerationType,
-    PipetteModelMajorVersion,
-    PipetteModelMinorVersion,
     PipetteModelType,
     PipetteOEMType,
     PipetteVersionType,
@@ -253,16 +251,34 @@ def update_pipette_configuration(
     return PipetteConfigurations.model_validate(dict_of_base_model)
 
 
+def pipette_version_has_def(
+    model: PipetteModelType,
+    channels: PipetteChannelType,
+    version: PipetteVersionType,
+    oem: PipetteOEMType,
+) -> bool:
+    """Check to see if a given pipette model and version is defined in shared data."""
+    oem_extension = f"_{oem.value}" if oem != PipetteOEMType.OT else ""
+    config_path = (
+        get_shared_data_root()
+        / "pipette"
+        / "definitions"
+        / "2"
+        / "general"
+        / f"{channels.name.lower()}{oem_extension}"
+        / model.value
+        / f"{version.major}_{version.minor}.json"
+    )
+    return Path.exists(config_path)
+
+
 def load_definition(
     model: PipetteModelType,
     channels: PipetteChannelType,
     version: PipetteVersionType,
     oem: PipetteOEMType,
 ) -> PipetteConfigurations:
-    if (
-        version.major not in PipetteModelMajorVersion
-        or version.minor not in PipetteModelMinorVersion
-    ):
+    if not pipette_version_has_def(model, channels, version, oem):
         raise KeyError("Pipette version not found.")
 
     geometry_dict = _geometry(channels, model, version, oem)
@@ -289,10 +305,7 @@ def load_valid_nozzle_maps(
     version: PipetteVersionType,
     oem: PipetteOEMType,
 ) -> ValidNozzleMaps:
-    if (
-        version.major not in PipetteModelMajorVersion
-        or version.minor not in PipetteModelMinorVersion
-    ):
+    if not pipette_version_has_def(model, channels, version, oem):
         raise KeyError("Pipette version not found.")
 
     physical_dict = _physical(channels, model, version, oem)

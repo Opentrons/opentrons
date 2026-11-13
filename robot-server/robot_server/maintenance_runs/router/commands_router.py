@@ -1,15 +1,13 @@
 """Router for /maintenance_runs commands endpoints."""
 
 import textwrap
-from typing import Annotated, Optional, Union
+from typing import Annotated, Any, Optional, Union
 
 from fastapi import Depends, Query, status
 from typing_extensions import Final, Literal
 
 from opentrons.hardware_control.types import DoorState
-from opentrons.protocol_engine import (
-    CommandPointer,
-)
+from opentrons.protocol_engine import CommandPointer
 from opentrons.protocol_engine import (
     commands as pe_commands,
 )
@@ -17,6 +15,7 @@ from opentrons.protocol_engine import (
     errors as pe_errors,
 )
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
+from server_utils.audit.audit_logger import AuditLogger
 from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
 from server_utils.auth.scopes import Scope
@@ -119,7 +118,6 @@ async def get_current_run_from_url(
     },
     dependencies=[
         Depends(require_scopes(Scope.ROBOT_CONTROL_WRITE)),
-        Depends(get_audit_logger("execute command in maintenance run")),
     ],
 )
 async def create_run_command(
@@ -131,6 +129,9 @@ async def create_run_command(
     check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
     hardware_state_store: Annotated[
         HardwareStateStore, Depends(get_hardware_state_store)
+    ],
+    audit_logger: Annotated[
+        AuditLogger, Depends(get_audit_logger("execute command in maintenance run"))
     ],
     waitUntilComplete: Annotated[
         bool,
@@ -189,11 +190,17 @@ async def create_run_command(
         run_id: Run identification to attach command to.
         hardware_state_store: The hardware state store.
         requiresClosedDoor: If True, reject the command when the door is open.
+        audit_logger: Records the command for audit when access control is enabled.
     """
     # TODO(mc, 2022-05-26): increment the HTTP API version so that default
     # behavior is to pass through `command_intent` without overriding it
     command_intent = pe_commands.CommandIntent.SETUP
     command_create = request_body.data.model_copy(update={"intent": command_intent})
+
+    # Jog presses are frequent and signing each one after waitUntilComplete makes
+    # the HTTP response lag the physical move.
+    if request_body.data.commandType == "moveRelative":
+        audit_logger.skip_persist()
 
     if requiresClosedDoor and hardware_state_store.door_state == DoorState.OPEN:
         raise MaintenanceCommandDoorOpen(
@@ -257,7 +264,7 @@ async def get_run_commands(
             description="The maximum number of commands in the list to return.",
         ),
     ] = _DEFAULT_COMMAND_LIST_LENGTH,
-) -> PydanticResponse[MultiBody[RunCommandSummary, CommandCollectionLinks]]:
+) -> PydanticResponse[MultiBody[dict[str, Any], CommandCollectionLinks]]:
     """Get a summary of a set of commands in a run.
 
     Arguments:
@@ -281,18 +288,8 @@ async def get_run_commands(
     )
 
     data = [
-        RunCommandSummary.model_construct(
-            id=c.id,
-            key=c.key,
-            commandType=c.commandType,
-            intent=c.intent,
-            status=c.status,
-            createdAt=c.createdAt,
-            startedAt=c.startedAt,
-            completedAt=c.completedAt,
-            params=c.params,
-            error=c.error,
-            failedCommandId=c.failedCommandId,
+        RunCommandSummary.build_from_json(c).model_dump(
+            by_alias=True, exclude_none=True
         )
         for c in command_slice.commands
     ]

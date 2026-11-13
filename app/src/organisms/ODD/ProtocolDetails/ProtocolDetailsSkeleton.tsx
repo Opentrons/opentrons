@@ -1,6 +1,6 @@
 import { BORDERS, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
-import { Skeleton } from '/app/atoms/Skeleton'
+import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
 
 import type { ReactNode } from 'react'
 
@@ -18,7 +18,7 @@ export function ProtocolDetailsHeaderChipSkeleton(): ReactNode {
 export function ProtocolDetailsHeaderTitleSkeleton(): ReactNode {
   return (
     <Skeleton
-      width="42rem"
+      width="100%"
       height="3rem"
       backgroundSize="99rem"
       borderRadius={BORDERS.borderRadius12}

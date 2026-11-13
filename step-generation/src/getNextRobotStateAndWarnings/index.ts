@@ -69,6 +69,7 @@ import {
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
+  PickUpTipStepGenArgs,
   RobotState,
   RobotStateAndWarnings,
 } from '../types'
@@ -114,12 +115,26 @@ function _getNextRobotStateAndWarningsSingleCommand(
       forBlowout(command.params, invariantContext, robotStateAndWarnings)
       break
 
-    case 'dropTip':
-      forDropTip(command.params, invariantContext, robotStateAndWarnings)
+    case 'dropTip': {
+      const { pipetteId, labwareId, wellName } = command.params
+      forDropTip(
+        {
+          pipette: pipetteId,
+          dropTipLocation: labwareId,
+          wellName,
+        },
+        invariantContext,
+        robotStateAndWarnings
+      )
       break
+    }
 
     case 'pickUpTip':
-      forPickUpTip(command.params, invariantContext, robotStateAndWarnings)
+      forPickUpTip(
+        command.params as PickUpTipStepGenArgs,
+        invariantContext,
+        robotStateAndWarnings
+      )
       break
 
     case 'setTipState':
@@ -288,13 +303,17 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
 
-    case 'temperatureModule/waitForTemperature':
-      forAwaitTemperature(
-        command.params,
-        invariantContext,
-        robotStateAndWarnings
-      )
+    case 'temperatureModule/waitForTemperature': {
+      const { moduleId, celsius } = command.params
+      if (celsius != null) {
+        forAwaitTemperature(
+          { moduleId, celsius },
+          invariantContext,
+          robotStateAndWarnings
+        )
+      }
       break
+    }
 
     case 'thermocycler/setTargetBlockTemperature':
       forThermocyclerSetTargetBlockTemperature(
@@ -487,7 +506,12 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
     case 'vacuumModule/startRunProfile':
       forVacuumStartRunProfile(
-        command.params,
+        {
+          moduleId: command.params.moduleId,
+          profile: command.params.steps,
+          ventAfter: command.params.ventAfter ?? true,
+          taskId: command.params.taskId,
+        },
         invariantContext,
         robotStateAndWarnings
       )

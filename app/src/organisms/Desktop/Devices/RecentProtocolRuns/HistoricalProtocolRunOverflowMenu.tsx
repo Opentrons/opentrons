@@ -8,6 +8,7 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_END,
+  BORDERS,
   Box,
   COLORS,
   DIRECTION_COLUMN,
@@ -33,6 +34,7 @@ import {
   useHoverTooltip,
   useMenuHandleClickOutside,
   useOnClickOutside,
+  Z_INDEX,
 } from '@opentrons/components'
 import {
   isDocumentedMutationError,
@@ -40,9 +42,8 @@ import {
 } from '@opentrons/react-api-client'
 
 import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure/index.js'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { useRunControls } from '/app/organisms/RunTimeControl'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import {
@@ -70,10 +71,9 @@ import type {
   ReactNode,
   SetStateAction,
 } from 'react'
-import type { Run, RunData } from '@opentrons/api-client'
+import type { RunData } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
 import type { UseDeleteRunMutationResult } from '@opentrons/react-api-client'
-import type { RunControls } from '/app/organisms/RunTimeControl'
 
 export interface HistoricalProtocolRunOverflowMenuProps {
   run: RunData
@@ -110,12 +110,6 @@ export function HistoricalProtocolRunOverflowMenu(
   const [showRobotOutOfStorageModal, setShowRobotOutOfStorageModal] =
     useState<boolean>(false)
   const navigate = useNavigate()
-  const onResetSuccess = (createRunResponse: Run): void => {
-    navigate(
-      `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
-    )
-  }
-  const runControls = useRunControls(run.id, onResetSuccess)
 
   return (
     <>
@@ -153,10 +147,8 @@ export function HistoricalProtocolRunOverflowMenu(
                 {...props}
                 downloadRunRecord={downloadRunRecord}
                 isDownloading={isDownloading}
-                closeOverflowMenu={handleOverflowClick}
                 setShowRobotOutOfStorageModal={setShowRobotOutOfStorageModal}
                 setShowOverflowMenu={setShowOverflowMenu}
-                runControls={runControls}
               />
             </Box>
             {menuOverlay}
@@ -168,12 +160,10 @@ export function HistoricalProtocolRunOverflowMenu(
 }
 
 interface MenuDropdownProps extends HistoricalProtocolRunOverflowMenuProps {
-  closeOverflowMenu: MouseEventHandler<HTMLButtonElement>
   downloadRunRecord: () => void
   isDownloading: boolean
   setShowRobotOutOfStorageModal: Dispatch<SetStateAction<boolean>>
   setShowOverflowMenu: Dispatch<SetStateAction<boolean>>
-  runControls: RunControls
   deleteRun: UseDeleteRunMutationResult['deleteRun']
   isDeletingRun: boolean
 }
@@ -184,19 +174,17 @@ function MenuDropdown(props: MenuDropdownProps): ReactNode {
     run,
     robotName,
     robotIsBusy,
-    closeOverflowMenu,
     downloadRunRecord,
     isDownloading,
     runHasImages,
     setShowRobotOutOfStorageModal,
     setShowOverflowMenu,
-    runControls,
     deleteRun,
     isDeletingRun,
   } = props
 
   const { id: runId } = run
-  const { reset, isResetRunLoading, isRunControlLoading } = runControls
+  const navigate = useNavigate()
   const isRobotOnWrongVersionOfSoftware =
     useIsRobotOnWrongVersionOfSoftware(robotName)
   const documentationState = useDocumentationState()
@@ -205,11 +193,15 @@ function MenuDropdown(props: MenuDropdownProps): ReactNode {
 
   const [targetProps, tooltipProps] = useHoverTooltip()
 
+  const closeOverflowMenu = (): void => {
+    setShowOverflowMenu(false)
+  }
+
   const onDownloadClick: MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
     downloadRunRecord()
-    closeOverflowMenu(e)
+    closeOverflowMenu()
   }
   const trackEvent = useTrackEvent()
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
@@ -223,16 +215,15 @@ function MenuDropdown(props: MenuDropdownProps): ReactNode {
   const isRobotOutOfStorage = useIsRobotOutOfStorage()
 
   const handleResetClick: MouseEventHandler<HTMLButtonElement> = (e): void => {
+    e.preventDefault()
+    e.stopPropagation()
+    closeOverflowMenu()
+
     if (isRobotOutOfStorage) {
       setShowRobotOutOfStorageModal(true)
-      setShowOverflowMenu(false)
       return
     }
 
-    e.preventDefault()
-    e.stopPropagation()
-
-    reset()
     trackEvent({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
       properties: {
@@ -241,13 +232,17 @@ function MenuDropdown(props: MenuDropdownProps): ReactNode {
       },
     })
     trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN })
+    // Navigate immediately so the run page can show loading; clone starts there.
+    navigate(`/devices/${robotName}/protocol-runs/${runId}/setup`, {
+      state: { pendingRerun: true },
+    })
   }
 
   const handleDeleteClick: MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
     void deleteRun({ runId })
-    closeOverflowMenu(e)
+    closeOverflowMenu()
   }
 
   const onDeleteRunImages = (): ReturnType<typeof deleteRunImages> => {
@@ -261,18 +256,22 @@ function MenuDropdown(props: MenuDropdownProps): ReactNode {
     handleDeleteRunImagesModal({ onDeleteRunImages })
     e.preventDefault()
     e.stopPropagation()
-    closeOverflowMenu(e)
+    closeOverflowMenu()
 
     reportPhotoAccessUsage({
       action: 'delete',
     })
   }
 
+  const handleViewRunRecord = (): void => {
+    closeOverflowMenu()
+  }
+
   return (
     <Flex
       whiteSpace={NO_WRAP}
-      zIndex={10}
-      borderRadius="4px 4px 0px 0px"
+      zIndex={Z_INDEX.MODALS}
+      borderRadius={BORDERS.borderRadius8}
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
       position={POSITION_ABSOLUTE}
       backgroundColor={COLORS.white}
@@ -281,7 +280,10 @@ function MenuDropdown(props: MenuDropdownProps): ReactNode {
       flexDirection={DIRECTION_COLUMN}
       width={FLEX_MAX_CONTENT}
     >
-      <NavLink to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}>
+      <NavLink
+        to={`/devices/${robotName}/protocol-runs/${runId}/run-preview`}
+        onClick={handleViewRunRecord}
+      >
         <MenuItem data-testid="RecentProtocolRun_OverflowMenu_viewRunRecord">
           {t('view_run_record')}
         </MenuItem>
@@ -289,32 +291,14 @@ function MenuDropdown(props: MenuDropdownProps): ReactNode {
       <MenuItem
         {...targetProps}
         onClick={handleResetClick}
-        disabled={
-          robotIsBusy || isRobotOnWrongVersionOfSoftware || isRunControlLoading
-        }
+        disabled={robotIsBusy || isRobotOnWrongVersionOfSoftware}
         data-testid="RecentProtocolRun_OverflowMenu_rerunNow"
       >
-        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
-          {t('rerun_now')}
-          {isResetRunLoading ? (
-            <Icon
-              name="ot-spinner"
-              size={SIZE_1}
-              color={COLORS.grey50}
-              aria-label="spinner"
-              spin
-            />
-          ) : null}
-        </Flex>
+        {t('rerun_now')}
       </MenuItem>
       {isRobotOnWrongVersionOfSoftware && (
         <Tooltip tooltipProps={tooltipProps}>
           {t('shared:a_software_update_is_available')}
-        </Tooltip>
-      )}
-      {isRunControlLoading && (
-        <Tooltip whiteSpace="normal" tooltipProps={tooltipProps}>
-          {t('rerun_loading')}
         </Tooltip>
       )}
       <MenuItem

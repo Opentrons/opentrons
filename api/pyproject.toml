@@ -33,6 +33,7 @@ dependencies = [
     'importlib-metadata >= 1.0 ; python_version < "3.8"',
     "packaging>=25.0",
     "Pyro5>=5.16,<6",
+    "zipstream-ng==1.9.3",
 ]
 
 dynamic = ['version', 'hatch-dependency-coversion']
@@ -50,6 +51,7 @@ robot = [
     "zipp==3.21.0",
     "opentrons-hardware[FLEX]==0.0.0",
     "Pyro5==5.16",
+    "zipstream-ng==1.9.3",
 ]
 # Dev dependencies - from Pipfile [dev-packages]
 # Robot group is always included in dev to ensure dev environment matches robot
@@ -139,7 +141,6 @@ ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
 "tests/opentrons/data/*" = ["ANN","D"]
 "tests/opentrons/drivers/*" = ["ANN","D"]
 "tests/opentrons/hardware_control/*" = ["ANN","D"]
-"tests/opentrons/protocol_api_old/*" = ["ANN","D"]
 "tests/opentrons/protocols/*" = ["ANN","D"]
 "tests/opentrons/system/*" = ["ANN","D"]
 "tests/opentrons/tools/*" = ["ANN","D"]
@@ -203,8 +204,6 @@ packages = ['src/opentrons']
 addopts = ["-m", "not stackup_testing", "--color=yes", "--strict-markers"]
 asyncio_mode = "auto"
 markers = [
-    "apiv2_non_pe_only: This test invocation requires a legacy PAPI context, not backed by Protocol Engine",
-    "ot2_only: Test only functions using the OT2 hardware",
     "ot3_only: Test only functions using the OT3 hardware",
     "stackup_testing: marks tests as stackup regression tests",
 ]
@@ -229,4 +228,8 @@ module = [
     "Pyro5.*",
     "serpent"
 ]
+follow_untyped_imports = true
+
+[[tool.mypy.overrides]]
+module = ["zipstream-ng.*"]
 follow_untyped_imports = true

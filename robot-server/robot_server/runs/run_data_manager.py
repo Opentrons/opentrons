@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from typing import (
+    Awaitable,
     Callable,
     Dict,
     List,
@@ -14,10 +15,11 @@ from typing import (
 from opentrons import config
 from opentrons.protocol_engine import (
     Command,
+    CommandAdapter,
     CommandErrorSlice,
     CommandPointer,
-    CommandSlice,
     EngineStatus,
+    JsonCommandSlice,
     LabwareOffsetCreate,
     LegacyLabwareOffsetCreate,
     StateSummary,
@@ -47,6 +49,7 @@ from .run_store import BadRunResource, BadStateSummary, RunResource, RunStore
 from robot_server.access_control.settings.store import AccessControlSettingStore
 from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
+from robot_server.persistence.pydantic import json_to_pydantic
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.notifications import RunsPublisher
 
@@ -218,7 +221,7 @@ class RunDataManager:
         camera_provider: CameraProvider,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
         run_time_param_paths: Optional[CSVRuntimeParamPaths],
-        notify_publishers: Callable[[], None],
+        notify_publishers: Callable[[], Awaitable[None]],
         protocol: Optional[ProtocolResource],
         access_control_status: bool,
         log_period_id: Optional[str],
@@ -258,7 +261,7 @@ class RunDataManager:
             self._run_store.update_run_state(
                 run_id=prev_run_id,
                 summary=prev_run_result.state_summary,
-                commands=prev_run_result.commands,
+                commands=None,
                 command_annotations=prev_run_result.command_annotations,
                 run_time_parameters=prev_run_result.parameters,
             )
@@ -467,7 +470,7 @@ class RunDataManager:
             self._run_store.update_run_state(
                 run_id=run_id,
                 summary=run_result.state_summary,
-                commands=run_result.commands,
+                commands=None,
                 command_annotations=run_result.command_annotations,
                 run_time_parameters=run_result.parameters,
             )
@@ -517,7 +520,7 @@ class RunDataManager:
         cursor: Optional[int],
         length: int,
         include_fixit_commands: bool,
-    ) -> CommandSlice:
+    ) -> JsonCommandSlice:
         """Get a slice of run commands.
 
         Args:
@@ -529,12 +532,16 @@ class RunDataManager:
         Raises:
             RunNotFoundError: The given run identifier was not found in the database.
         """
-        if run_id == self._run_orchestrator_store.current_run_id:
-            return await self._run_orchestrator_store.get_command_slice(
+        if (
+            run_id == self._run_orchestrator_store.current_run_id
+            and not await self._run_orchestrator_store.get_commands_deleted()
+        ):
+            commands_slice = await self._run_orchestrator_store.get_command_slice(
                 cursor=cursor,
                 length=length,
                 include_fixit_commands=include_fixit_commands,
             )
+            return commands_slice
 
         # Let exception propagate
         return self._run_store.get_commands_slice(
@@ -616,7 +623,10 @@ class RunDataManager:
             RunNotFoundError: The given run identifier was not found.
             CommandNotFoundError: The given command identifier was not found.
         """
-        if self._run_orchestrator_store.current_run_id == run_id:
+        if (
+            self._run_orchestrator_store.current_run_id == run_id
+            and not await self._run_orchestrator_store.get_commands_deleted()
+        ):
             return await self._run_orchestrator_store.get_command(command_id=command_id)
 
         return self._run_store.get_command(run_id=run_id, command_id=command_id)
@@ -771,7 +781,7 @@ class RunDataManager:
         )
         if not command_slice.commands:
             return None
-        command = command_slice.commands[-1]
+        command = json_to_pydantic(CommandAdapter, command_slice.commands[-1])
 
         return (
             CommandPointer(

@@ -10,26 +10,18 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type { EmptyResponse } from '@opentrons/api-client'
+import type { Run } from '@opentrons/api-client'
 import type { DocumentationState } from '../accessControl'
 import type { DocumentedMutationParameters } from '../accessControl/types'
 
-export type UseSignRunMutationOptions = UseMutationOptions<
-  EmptyResponse,
-  unknown,
-  string
->
+export type UseSignRunMutationOptions = UseMutationOptions<Run, unknown, string>
 
 export type UseSignRunMutationResult = UseMutationResult<
-  EmptyResponse,
+  Run,
   unknown,
   { runId: string; name: string }
 > & {
-  signRun: UseMutateFunction<
-    EmptyResponse,
-    unknown,
-    { runId: string; name: string }
-  >
+  signRun: UseMutateFunction<Run, unknown, { runId: string; name: string }>
 }
 
 export function useSignRunMutation(
@@ -40,7 +32,7 @@ export function useSignRunMutation(
   const queryClient = useQueryClient()
 
   const mutation = useDocumentedMutation<
-    EmptyResponse,
+    Run,
     unknown,
     { runId: string; name: string }
   >(
@@ -51,9 +43,12 @@ export function useSignRunMutation(
       variables: { runId, name },
     }: DocumentedMutationParameters<{ runId: string; name: string }>) =>
       signRun(host!, runId, name, userNotes).then(response => {
-        queryClient.removeQueries(getQueryKey(host, 'runs', runId))
+        queryClient.setQueryData(
+          getQueryKey(host, 'runs', runId, 'details'),
+          response.data
+        )
         queryClient
-          .invalidateQueries(getQueryKey(host, 'runs'))
+          .invalidateQueries(getQueryKey(host, 'runs', 'details'))
           .catch((e: Error) => {
             console.error(`error invalidating runs query: ${e.message}`)
           })

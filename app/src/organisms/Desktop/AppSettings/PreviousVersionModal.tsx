@@ -4,13 +4,13 @@ import {
   Box,
   Flex,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { ExternalLink } from '/app/components/adhoc/desktop/Link/ExternalLink'
 
 import type { ReactNode } from 'react'
 
@@ -31,9 +31,9 @@ export function PreviousVersionModal(
   return (
     <Modal onClose={props.closeModal} title={t('how_to_restore')}>
       <Box>
-        <LegacyStyledText forwardedAs="p" paddingBottom={SPACING.spacing8}>
+        <StyledText forwardedAs="p" paddingBottom={SPACING.spacing8}>
           {t('branded:restore_description')}
-        </LegacyStyledText>
+        </StyledText>
         <ExternalLink href={UNINSTALL_APP_URL}>
           {t('branded:learn_uninstalling')}
         </ExternalLink>

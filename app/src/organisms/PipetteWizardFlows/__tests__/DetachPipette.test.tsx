@@ -8,8 +8,8 @@ import {
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { InProgressModal } from '/app/components/adhoc/shared/InProgressModal'
 import { i18n } from '/app/i18n'
-import { InProgressModal } from '/app/molecules/InProgressModal/InProgressModal'
 import {
   mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
@@ -22,7 +22,7 @@ import { DetachPipette } from '../DetachPipette'
 import type { ComponentProps } from 'react'
 
 vi.mock('../CheckPipetteButton')
-vi.mock('/app/molecules/InProgressModal/InProgressModal')
+vi.mock('/app/components/adhoc/shared/InProgressModal')
 
 const render = (props: ComponentProps<typeof DetachPipette>) => {
   return renderWithProviders(<DetachPipette {...props} />, {
@@ -43,14 +43,12 @@ describe('DetachPipette', () => {
       attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       flowType: FLOWS.DETACH,
       errorMessage: null,
-      setShowErrorMessage: vi.fn(),
-      isDoorOpenError: false,
-      setIsDoorOpenError: vi.fn(),
-      dismissDoorOpenError: vi.fn(),
+      handleCommandError: vi.fn(),
       isRobotMoving: false,
       isFetching: false,
       setFetching: vi.fn(),
       isOnDevice: false,
+      selectedSlot: 'B2',
     }
     vi.mocked(InProgressModal).mockReturnValue(<div>mock in progress</div>)
   })

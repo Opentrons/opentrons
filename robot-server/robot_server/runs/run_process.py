@@ -26,6 +26,7 @@ from opentrons.protocol_engine import (
     CommandSlice,
     DeckType,
     ErrorOccurrence,
+    JsonCommandSlice,
     StateSummary,
 )
 from opentrons.protocol_engine import (
@@ -61,7 +62,7 @@ from opentrons.protocol_reader.protocol_source import ProtocolSource
 from opentrons.protocol_runner.create_simulating_orchestrator import (
     create_simulating_orchestrator,
 )
-from opentrons.protocol_runner.protocol_runner import RunResult
+from opentrons.protocol_runner.protocol_runner import EngineRunResult
 from opentrons.protocol_runner.run_coordinator import AbstractRunCoordinator, ParseMode
 from opentrons.protocol_runner.run_orchestrator import RunOrchestrator
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
@@ -128,7 +129,7 @@ def register_process_types() -> None:
         NozzleMap,
         ProtocolSource,
         ProtocolResource,
-        RunResult,
+        EngineRunResult,
         StateSummary,
         FlexStackerSubState,
         NozzleMapNotification,
@@ -145,6 +146,9 @@ def register_process_types() -> None:
         OpentronsPyroSerializer.register_pydantic_model(command)
     for command_create in get_args(get_args(CommandCreate)[0]):
         OpentronsPyroSerializer.register_pydantic_model(command_create)
+
+    for class_type in [JsonCommandSlice]:
+        OpentronsPyroSerializer.register_class(class_type)
 
 
 def register_all_needed_types() -> None:
@@ -231,6 +235,10 @@ class DirectedRunProcess(AbstractRunCoordinator):
 
         self._run_id = run_id
 
+        # Get the CommandStoreProvider
+        command_store_provider = self._robot_server_resource.get_run_store_provider()
+        command_store_provider.set_run_id(self._run_id)
+
         if protocol is not None:
             load_fixed_trash = should_load_fixed_trash(protocol.source.config)
         else:
@@ -254,9 +262,10 @@ class DirectedRunProcess(AbstractRunCoordinator):
             deck_configuration=await self._robot_server_resource.get_deck_configuration(),
             file_provider=self._robot_server_resource.get_file_provider(),
             camera_provider=self._robot_server_resource.get_camera_provider(),
-            notify_publishers=self._robot_server_resource.get_notify_publishers(),
-            updates_callback=self._robot_server_resource.get_engine_updates_callback,
+            notify_publishers=self._robot_server_resource.notify_publishers_callback,
+            updates_callback=self._robot_server_resource.engine_updates_callback,
             proxy_of_callback_for_handling_door_events=proxy_of_callback_for_handling_door_events,
+            command_store_provider=self._robot_server_resource.get_run_store_provider(),
         )
 
         orchestrator = RunOrchestrator.build_orchestrator(
@@ -288,9 +297,14 @@ class DirectedRunProcess(AbstractRunCoordinator):
 
     async def create_simulating(self, protocol_resource: ProtocolResource) -> None:
         """Create a simulating runner for use in analysis."""
+        if self._robot_server_resource is None:
+            await self._connect_to_robot_server_resource()
+            assert self._robot_server_resource is not None
+
         self._run_orchestrator = await create_simulating_orchestrator(
             robot_type=protocol_resource.source.robot_type,
             protocol_config=protocol_resource.source.config,
+            analysis_store_provider=self._robot_server_resource.get_analysis_store_provider(),
         )
 
     @property
@@ -314,7 +328,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
-    ) -> RunResult:
+    ) -> EngineRunResult:
         """Start the run."""
         return await self._guaranteed_run_orchestrator.run(
             deck_configuration, protocol_source, run_time_param_values
@@ -400,7 +414,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
 
     async def get_command_slice(
         self, cursor: Optional[int], length: int, include_fixit_commands: bool
-    ) -> CommandSlice:
+    ) -> JsonCommandSlice:
         """Get a slice of run commands.
 
         Args:
@@ -411,6 +425,14 @@ class DirectedRunProcess(AbstractRunCoordinator):
         return await self._guaranteed_run_orchestrator.get_command_slice(
             cursor, length, include_fixit_commands
         )
+
+    async def get_length(self) -> int:
+        """Get the length of all elements added to the history."""
+        return await self._guaranteed_run_orchestrator.get_length()
+
+    async def delete_command_slice_end(self, length: int) -> None:
+        """Delete the end of the command history up to a given length."""
+        await self._guaranteed_run_orchestrator.delete_command_slice_end(length)
 
     async def get_command_annotations_slice(
         self, cursor: int, length: int
@@ -440,6 +462,10 @@ class DirectedRunProcess(AbstractRunCoordinator):
     async def get_command_recovery_target(self) -> Optional[CommandPointer]:
         """Get the current error recovery target."""
         return await self._guaranteed_run_orchestrator.get_command_recovery_target()
+
+    async def get_commands_deleted(self) -> bool:
+        """Get the status of command deletion."""
+        return await self._guaranteed_run_orchestrator.get_commands_deleted()
 
     async def get_command(self, command_id: str) -> Command:
         """Get a run's command by ID."""

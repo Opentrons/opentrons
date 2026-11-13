@@ -6,7 +6,7 @@ Contains routes dealing primarily with `Maintenance Run` models.
 import logging
 from datetime import datetime
 from textwrap import dedent
-from typing import Annotated, Callable, Optional
+from typing import Annotated, Awaitable, Callable, Optional
 
 from fastapi import Depends, status
 from pydantic import BaseModel, Field
@@ -168,7 +168,9 @@ async def create_run(
     deck_configuration_store: Annotated[
         DeckConfigurationStore, Depends(get_deck_configuration_store)
     ],
-    notify_publishers: Annotated[Callable[[], None], Depends(get_pe_notify_publishers)],
+    notify_publishers: Annotated[
+        Callable[[], Awaitable[None]], Depends(get_pe_notify_publishers)
+    ],
     camera_provider: Annotated[CameraProvider, Depends(get_camera_provider)],
     request_body: Optional[RequestModel[MaintenanceRunCreate]] = None,
 ) -> PydanticResponse[SimpleBody[MaintenanceRun]]:

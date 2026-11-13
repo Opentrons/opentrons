@@ -2,15 +2,12 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { COLORS, LegacyStyledText } from '@opentrons/components'
-import {
-  isDocumentedMutationError,
-  useStopRunMutation,
-} from '@opentrons/react-api-client'
+import { COLORS, StyledText } from '@opentrons/components'
+import { useStopRunMutation } from '@opentrons/react-api-client'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { OddModal } from '/app/molecules/OddModal'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
@@ -19,7 +16,7 @@ import { CancelingRunModal } from '../CancelingRunModal'
 import styles from './confirmcancelmodal.module.css'
 
 import type { ReactNode } from 'react'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 interface ConfirmCancelRunModalProps {
   runId: string
@@ -54,10 +51,8 @@ export function ConfirmCancelRunModal({
       onSuccess: () => {
         trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.CANCEL })
       },
-      onError: (error: unknown) => {
-        if (isDocumentedMutationError(error)) {
-          setIsCanceling(false)
-        }
+      onError: () => {
+        setIsCanceling(false)
       },
     })
   }
@@ -78,12 +73,10 @@ export function ConfirmCancelRunModal({
             isActiveRun ? styles.active_run : styles.inactive_run
           }`}
         >
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {t('cancel_run_alert_info_flex')}
-          </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
-            {t('cancel_run_module_info')}
-          </LegacyStyledText>
+          </StyledText>
+          <StyledText forwardedAs="p">{t('cancel_run_module_info')}</StyledText>
         </div>
         <div className={styles.button_row}>
           <SmallButton

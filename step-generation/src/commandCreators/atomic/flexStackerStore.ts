@@ -4,18 +4,28 @@ import {
   getIsSpaceInHopper,
   getLabwareIdOnShuttle,
   labwareMatchesLabwareInHopper,
+  resolveStringRuntimeValue,
   uuid,
 } from '../../utils'
 
-import type { FlexStackerStoreCreateCommand } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+import type { CommandCreator, ModuleStepGenArgs } from '../../types'
 
-export const flexStackerStore: CommandCreator<
-  FlexStackerStoreCreateCommand['params']
-> = (args, invariantContext, robotState) => {
-  const { moduleId } = args
-  const { labwareEntities, moduleEntities } = invariantContext
-  if (moduleId == null || moduleEntities[moduleId] == null) {
+export const flexStackerStore: CommandCreator<ModuleStepGenArgs> = (
+  args,
+  invariantContext,
+  robotState
+) => {
+  const { labwareEntities, moduleEntities, runtimeParameters } =
+    invariantContext
+  const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
+  if (moduleId == null) {
+    return {
+      errors: [
+        errorCreators.invalidRuntimeParameter({ parameterName: args.moduleId }),
+      ],
+    }
+  }
+  if (moduleEntities[moduleId] == null) {
     return { errors: [errorCreators.missingModuleError()] }
   }
   const pythonName = moduleEntities[moduleId].pythonName

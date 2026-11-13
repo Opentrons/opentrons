@@ -27,7 +27,7 @@ from opentrons_shared_data.errors.exceptions import (
 
 from opentrons.config import IS_ROBOT
 from opentrons.config import feature_flags as ff
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 from opentrons.drivers.vacuum_module.abstract import AbstractVacuumModuleDriver
 from opentrons.drivers.vacuum_module.driver import (
     VacuumModuleDriver,
@@ -125,7 +125,7 @@ DEFAULT_PRESSURE_CONTROL_TUNINGS = PressureControlTunings(
 DEFAULT_WASTE_CONFIG = WasteConfigParameters(
     waste_detection_enabled=True,
     p_filter_alpha=0.5,
-    g_sealed_max=0.50,
+    g_sealed_max=0.35,
     flowing_dp_mbar=8.0,
     stable_hold_ms=6000.0,
     stable_hold_deep_ms=10000.0,

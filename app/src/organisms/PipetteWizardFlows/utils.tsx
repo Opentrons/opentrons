@@ -1,7 +1,7 @@
 import { css } from 'styled-components'
 
 import { AnimationVideo, SPACING } from '@opentrons/components'
-import { LEFT, RIGHT, WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
+import { LEFT, RIGHT } from '@opentrons/shared-data'
 
 import attachLeft18 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_L.webm'
 import attachRight18 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_R.webm'
@@ -21,17 +21,10 @@ import detachProbe8 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach
 import detachProbe96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_96.webm'
 import zAxisAttach96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Zaxis_Attach_96.webm'
 import zAxisDetach96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Zaxis_Detach_96.webm'
-import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils'
 
 import { FLOWS, SECTIONS } from './constants'
 
-import type { Dispatch, SetStateAction } from 'react'
-import type { UseQueryResult } from 'react-query'
-import type {
-  CreateCommand,
-  DeckConfiguration,
-  MotorAxes,
-} from '@opentrons/shared-data'
+import type { CreateCommand, MotorAxes } from '@opentrons/shared-data'
 import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import type {
   PipetteWizardFlow,
@@ -52,17 +45,10 @@ interface PipetteAnimationProps {
 
 export function startCalibrationOnClick(
   props: PipetteWizardStepProps,
-  setShowUnableToDetect: Dispatch<SetStateAction<boolean>>,
-  pipetteId: string,
-  doorOpenHeader: string
+  pipetteId: string
 ): () => void {
-  const {
-    chainRunCommands,
-    proceed,
-    setShowErrorMessage,
-    setIsDoorOpenError,
-    mount,
-  } = props
+  const { chainRunCommands, proceed, handleCommandError, mount, selectedSlot } =
+    props
   return () => {
     const axes: MotorAxes = mount === LEFT ? ['leftZ'] : ['rightZ']
     const verifyCommands: CreateCommand[] = [
@@ -86,7 +72,7 @@ export function startCalibrationOnClick(
       },
       {
         commandType: 'calibration/calibratePipette',
-        params: { mount },
+        params: { mount, slot: selectedSlot },
       },
       {
         commandType: 'calibration/moveToMaintenancePosition',
@@ -100,48 +86,9 @@ export function startCalibrationOnClick(
           .then(() => {
             proceed()
           })
-          .catch(error => {
-            if (isMaintenanceDoorOpenError(error)) {
-              setIsDoorOpenError(true)
-              setShowErrorMessage(doorOpenHeader)
-            } else {
-              setShowErrorMessage(error.message as string)
-            }
-          })
+          .catch(handleCommandError)
       })
-      .catch(error => {
-        if (isMaintenanceDoorOpenError(error)) {
-          setIsDoorOpenError(true)
-          setShowErrorMessage(doorOpenHeader)
-        } else {
-          setShowUnableToDetect?.(true)
-        }
-      })
-  }
-}
-
-export function isWasteChuteOnDeck(
-  deckConfig?: UseQueryResult<DeckConfiguration>
-): boolean {
-  return !!deckConfig?.data?.find(
-    fixture =>
-      fixture.cutoutId === WASTE_CHUTE_CUTOUT &&
-      fixture.cutoutFixtureId?.includes('wasteChute')
-  )
-}
-
-export function is96Channel(
-  instrument: AttachedPipettesFromInstrumentsQuery
-): boolean {
-  const left_instrument = instrument[LEFT]
-  const right_instrument = instrument[RIGHT]
-  if (
-    left_instrument?.data?.channels === 96 ||
-    right_instrument?.data?.channels === 96
-  ) {
-    return true
-  } else {
-    return false
+      .catch(handleCommandError)
   }
 }
 

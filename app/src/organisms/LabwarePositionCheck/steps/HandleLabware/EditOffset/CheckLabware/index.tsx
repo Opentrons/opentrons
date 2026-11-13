@@ -10,7 +10,6 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
   StyledText,
@@ -22,8 +21,9 @@ import {
   IDENTITY_VECTOR,
 } from '@opentrons/shared-data'
 
-import { SmallButton, TextOnlyButton } from '/app/atoms/buttons'
-import { JogControls } from '/app/molecules/JogControls'
+import { TextOnlyButton } from '/app/components/adhoc/shared/buttons/TextOnlyButton'
+import { JogControls } from '/app/components/adhoc/shared/JogControls'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import { LPCJogControlsOdd } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset/CheckLabware/LPCJogControlsOdd'
@@ -40,12 +40,10 @@ import {
   selectSelectedLwWithOffsetDetailsWorkingOffsets,
 } from '/app/redux/protocol-runs'
 
-import type { TFunction } from 'i18next'
 import type { ReactNode } from 'react'
 import type { VectorOffset } from '@opentrons/api-client'
 import type { Vector3D } from '@opentrons/shared-data'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
-import type { State } from '/app/redux/types'
 
 interface CheckLabwareProps extends EditOffsetContentProps {
   handleAddConfirmedWorkingVector: () => void
@@ -53,16 +51,17 @@ interface CheckLabwareProps extends EditOffsetContentProps {
 
 export function CheckLabware(props: CheckLabwareProps): ReactNode {
   const { runId, commandUtils, contentHeader } = props
-  const { toggleRobotMoving, handleJog, resetJog, handleResetLwModulesOnDeck } =
-    commandUtils
+  const {
+    toggleRobotMoving,
+    handleJog,
+    resetJog,
+    handleResetLwModulesOnDeck,
+    flushJogAudit,
+  } = commandUtils
   const { t } = useTranslation('labware_position_check')
-  const { t: commandTextT } = useTranslation('protocol_command_text')
   const dispatch = useDispatch()
 
   const isOnDevice = useSelector(getIsOnDevice)
-  const { protocolData } = useSelector(
-    (state: State) => state.protocolRuns[runId]?.lpc!
-  )
   const workingInitialOffset = useSelector(
     selectSelectedLwWithOffsetDetailsWorkingOffsets(runId)
   )?.initialPosition!
@@ -103,9 +102,7 @@ export function CheckLabware(props: CheckLabwareProps): ReactNode {
   )
 
   const slotOnlyDisplayLocation = getFlexSlotNameOnly(
-    selectedLwInfo.offsetLocationDetails,
-    protocolData,
-    commandTextT as TFunction
+    selectedLwInfo.offsetLocationDetails
   )
 
   const buildSectionHeader = (): string =>
@@ -115,6 +112,7 @@ export function CheckLabware(props: CheckLabwareProps): ReactNode {
     })
 
   const handleGoBack = (): void => {
+    flushJogAudit()
     void toggleRobotMoving(true)
       .then(() => handleResetLwModulesOnDeck(offsetLocationDetails))
       .then(() => {
@@ -178,10 +176,12 @@ function CheckLabwareContentODD(props: CheckLabwareContentProps): ReactNode {
     isLwTiprack,
     liveOffset,
     setJoggedPosition,
+    commandUtils,
   } = props
   const [showOddJogControls, setShowOddJogControls] = useState(false)
 
   const handleProceed = (): void => {
+    commandUtils.flushJogAudit()
     handleAddConfirmedWorkingVector()
   }
 
@@ -211,7 +211,7 @@ function CheckLabwareContentODD(props: CheckLabwareContentProps): ReactNode {
                     : t('check_well_location'),
                 }}
                 components={{
-                  block: <LegacyStyledText forwardedAs="p" />,
+                  block: <StyledText forwardedAs="p" />,
                   bold: <strong />,
                 }}
               />
@@ -272,6 +272,7 @@ function CheckLabwareContentDesktop(
   const dispatch = useDispatch()
 
   const handleProceed = (): void => {
+    commandUtils.flushJogAudit()
     dispatch(proceedEditOffsetSubstep(runId, true))
   }
 
@@ -302,7 +303,7 @@ function CheckLabwareContentDesktop(
                   : t('check_well_location'),
               }}
               components={{
-                block: <LegacyStyledText forwardedAs="p" />,
+                block: <StyledText forwardedAs="p" />,
                 bold: <strong />,
               }}
             />

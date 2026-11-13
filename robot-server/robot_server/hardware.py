@@ -6,7 +6,6 @@ from contextlib import contextmanager, suppress
 from pathlib import Path
 from traceback import TracebackException, format_exception_only
 from typing import (
-    TYPE_CHECKING,
     Annotated,
     Awaitable,
     Callable,
@@ -35,12 +34,12 @@ from opentrons.config import (
     feature_flags as ff,
 )
 from opentrons.hardware_control import (
-    API,
     HardwareControlAPI,
     ThreadManagedHardware,
     ThreadManager,
 )
 from opentrons.hardware_control.modules import AbstractModule
+from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.simulator_setup import load_simulator_thread_manager
 from opentrons.hardware_control.types import (
     DoorState,
@@ -91,10 +90,6 @@ from robot_server.service.pyro_utils.resource_utilities import (
     get_pyro_resource,
     register_hardware_state_store_to_pyro_resource,
 )
-
-if TYPE_CHECKING:
-    from opentrons.hardware_control.ot3api import OT3API
-
 
 PostInitCallback = Tuple[
     Callable[[AppState, HardwareControlAPI, "HardwareStateStore"], Awaitable[None]],
@@ -445,29 +440,10 @@ async def get_hardware_resource(
     hardware_api = _hw_api_accessor.get_from(app_state)
     hardware_api_subprocess = _hw_subprocess_accessor.get_from(app_state)
 
-    if ff.hardware_subprocess_enabled():
-        if (
-            hardware_api_subprocess is None
-            or initialize_task is None
-            or not initialize_task.done()
-        ):
-            raise HardwareNotYetInitialized().as_error(
-                status.HTTP_503_SERVICE_UNAVAILABLE
-            )
-
-    else:
-        if (
-            (
-                not ff.hardware_subprocess_enabled()
-                and hardware_api_subprocess is not None
-            )
-            or hardware_api is None
-            or initialize_task is None
-            or not initialize_task.done()
-        ):
-            raise HardwareNotYetInitialized().as_error(
-                status.HTTP_503_SERVICE_UNAVAILABLE
-            )
+    # Use whichever backend this process actually initialized. The live feature
+    # flag can change before restart.
+    if initialize_task is None or not initialize_task.done():
+        raise HardwareNotYetInitialized().as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
 
     if initialize_task.cancelled():
         raise HardwareFailedToInitialize(
@@ -518,9 +494,9 @@ async def get_hardware(
     Raises:
         ApiError: The Hardware API is still initializing or failed to initialize.
     """
-    if ff.hardware_subprocess_enabled():
-        return hardware_resource
-    return hardware_resource.wrapped()  # type: ignore
+    if isinstance(hardware_resource, ThreadManager):
+        return hardware_resource.wrapped()
+    return hardware_resource
 
 
 def get_ot3_hardware(
@@ -533,34 +509,25 @@ def get_ot3_hardware(
         raise NotSupportedOnOT2(detail=str(exception)).as_error(
             status.HTTP_403_FORBIDDEN
         ) from exception
-    if ff.hardware_subprocess_enabled():
-        return cast(OT3API, hardware_resource)
-
     if isinstance(
         hardware_resource, ThreadManager
     ) and hardware_resource.wraps_instance(OT3API):
         return cast(OT3API, hardware_resource.wrapped())
     if isinstance(hardware_resource, OT3API):
         return hardware_resource
+    if ff.hardware_subprocess_enabled():
+        return cast(OT3API, hardware_resource)
 
     raise NotSupportedOnOT2(detail="This route is only available on a Flex.").as_error(
         status.HTTP_403_FORBIDDEN
     )
 
 
-def get_ot2_hardware(
-    thread_manager: Annotated[ThreadManagedHardware, Depends(get_hardware_resource)],
-) -> "API":
+def get_ot2_hardware() -> HardwareControlAPI:
     """Get an OT2 hardware controller."""
-    if not isinstance(
-        # If this isn't a thread manager, it's an Async Pyro object and this is on OT-3
-        thread_manager,
-        ThreadManager,
-    ) or not thread_manager.wraps_instance(API):
-        raise NotSupportedOnFlex(
-            detail="This route is only available on an OT-2."
-        ).as_error(status.HTTP_403_FORBIDDEN)
-    return cast(API, thread_manager.wrapped())
+    raise NotSupportedOnFlex(
+        detail="This route is only available on an OT-2."
+    ).as_error(status.HTTP_403_FORBIDDEN)
 
 
 async def get_firmware_update_manager(
@@ -615,9 +582,9 @@ async def get_deck_type() -> DeckType:
 
 async def get_deck_definition(
     deck_type: Annotated[DeckType, Depends(get_deck_type)],
-) -> deck.types.DeckDefinitionV5:
+) -> deck.types.DeckDefinitionV6:
     """Return this robot's deck definition."""
-    return deck.load(deck_type, version=5)
+    return deck.load(deck_type, version=6)
 
 
 async def _postinit_ot2_tasks(

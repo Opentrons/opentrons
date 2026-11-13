@@ -56,6 +56,7 @@ describe('CloseDoorInstallShuttle', () => {
       dismissDoorOpenError: vi.fn(),
       isOnDevice: false,
       sendIdentifyModule: vi.fn(),
+      setExitCleanupCommands: vi.fn(),
       deckConfig: mockDeckConfig,
       maintenanceRunId: null,
     }
@@ -93,6 +94,7 @@ describe('CloseDoorInstallShuttle', () => {
       dismissDoorOpenError: vi.fn(),
       isOnDevice: false,
       sendIdentifyModule: vi.fn(),
+      setExitCleanupCommands: vi.fn(),
       deckConfig: mockDeckConfig,
       maintenanceRunId: null,
     }
@@ -115,6 +117,7 @@ describe('CloseDoorInstallShuttle', () => {
       dismissDoorOpenError: vi.fn(),
       isOnDevice: false,
       sendIdentifyModule: vi.fn(),
+      setExitCleanupCommands: vi.fn(),
       deckConfig: mockDeckConfig,
       maintenanceRunId: null,
       restartSetup: vi.fn(),

@@ -7,7 +7,7 @@ from decoy import Decoy, matchers
 
 from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
 
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.commands.aspirate_in_place import (
     AspirateInPlaceImplementation,
     AspirateInPlaceParams,
@@ -32,9 +32,9 @@ from opentrons.types import Point
 
 
 @pytest.fixture
-def hardware_api(decoy: Decoy) -> HardwareAPI:
-    """Get a mock in the shape of a HardwareAPI."""
-    return decoy.mock(cls=HardwareAPI)
+def hardware_api(decoy: Decoy) -> HardwareControlAPI:
+    """Get a mock in the shape of a HardwareControlAPI."""
+    return decoy.mock(cls=HardwareControlAPI)
 
 
 @pytest.fixture
@@ -53,7 +53,7 @@ def pipetting(decoy: Decoy) -> PipettingHandler:
 def subject(
     pipetting: PipettingHandler,
     state_store: StateStore,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     mock_command_note_adder: CommandNoteAdder,
     model_utils: ModelUtils,
     gantry_mover: GantryMover,
@@ -90,7 +90,7 @@ async def test_aspirate_in_place_implementation(
     gantry_mover: GantryMover,
     pipetting: PipettingHandler,
     state_store: StateStore,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     mock_command_note_adder: CommandNoteAdder,
     subject: AspirateInPlaceImplementation,
     location: CurrentPipetteLocation | None,
@@ -104,7 +104,7 @@ async def test_aspirate_in_place_implementation(
         flowRate=1.234,
     )
     decoy.when(
-        state_store.geometry.get_nozzles_per_well(
+        state_store.instrument_interface.get_nozzles_per_well(
             labware_id=stateupdateLabware,
             target_well_name=stateupdateWell,
             pipette_id="pipette-id-abc",
@@ -112,7 +112,7 @@ async def test_aspirate_in_place_implementation(
     ).then_return(2)
 
     decoy.when(
-        state_store.geometry.get_wells_covered_by_pipette_with_active_well(
+        state_store.instrument_interface.get_wells_covered_by_pipette_with_active_well(
             stateupdateLabware, stateupdateWell, "pipette-id-abc"
         )
     ).then_return(["A3", "A4"])
@@ -175,7 +175,7 @@ async def test_handle_aspirate_in_place_request_not_ready_to_aspirate(
     gantry_mover: GantryMover,
     pipetting: PipettingHandler,
     state_store: StateStore,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     subject: AspirateInPlaceImplementation,
 ) -> None:
     """Should raise an exception for not ready to aspirate."""
@@ -271,7 +271,7 @@ async def test_overpressure_error(
     error_id = "error-id"
     error_timestamp = datetime(year=2020, month=1, day=2)
     decoy.when(
-        state_store.geometry.get_nozzles_per_well(
+        state_store.instrument_interface.get_nozzles_per_well(
             labware_id=stateupdateLabware,
             target_well_name=stateupdateWell,
             pipette_id="pipette-id",
@@ -279,7 +279,7 @@ async def test_overpressure_error(
     ).then_return(2)
 
     decoy.when(
-        state_store.geometry.get_wells_covered_by_pipette_with_active_well(
+        state_store.instrument_interface.get_wells_covered_by_pipette_with_active_well(
             stateupdateLabware, stateupdateWell, "pipette-id"
         )
     ).then_return(["A3", "A4"])

@@ -32,8 +32,8 @@ def default_file_settings() -> Dict[str, Any]:
         "enableOEMMode": None,
         "enablePerformanceMetrics": None,
         "disableFlexStackerLabwareDetection": None,
-        "enableProtocolSubprocess": True,
-        "enableHardwareSubprocess": True,
+        "enableProtocolSubprocess": False,
+        "enableHardwareSubprocess": False,
         "alwaysRunProtocolAsUser": False,
         "internal96chAttach": False,
         "disableVacuumModuleWasteDetection": None,
@@ -507,8 +507,8 @@ def v43_config(v42_config: Dict[str, Any]) -> Dict[str, Any]:
     r.update(
         {
             "_version": 43,
-            "enableProtocolSubprocess": True,
-            "enableHardwareSubprocess": True,
+            "enableProtocolSubprocess": False,
+            "enableHardwareSubprocess": False,
         }
     )
     return r

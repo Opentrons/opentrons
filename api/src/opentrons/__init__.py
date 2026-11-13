@@ -18,7 +18,6 @@ from opentrons.config import (
     feature_flags as ff,
 )
 from opentrons.drivers.serial_communication import get_ports_by_name
-from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control import (
     HardwareControlAPI,
     ThreadManagedHardware,
@@ -118,10 +117,7 @@ async def _create_thread_manager() -> ThreadManagedHardware:
         ThreadManager is on its way out.
     """
     if os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
-        log.info("Initialized robot using virtual Smoothie")
-        thread_manager: ThreadManagedHardware = ThreadManager(
-            HardwareAPI.build_hardware_simulator
-        )
+        raise RuntimeError("OT-2 is not supported")
     elif should_use_ot3():
         from opentrons.hardware_control.ot3api import OT3API
 
@@ -131,18 +127,13 @@ async def _create_thread_manager() -> ThreadManagedHardware:
             feature_flags=hw_types.HardwareFeatureFlags.build_from_ff(),
         )
     else:
-        thread_manager = ThreadManager(
-            ThreadManager.nonblocking_builder(HardwareAPI.build_hardware_controller),
-            port=_get_motor_control_serial_port(),
-            firmware=_find_smoothie_file(),
-            feature_flags=hw_types.HardwareFeatureFlags.build_from_ff(),
-        )
+        raise RuntimeError("OT-2 is not supported")
 
     try:
         await thread_manager.managed_thread_ready_async()
     except RuntimeError:
         log.exception("Could not build hardware controller, forcing virtual")
-        thread_manager = ThreadManager(HardwareAPI.build_hardware_simulator)
+        thread_manager = ThreadManager(OT3API.build_hardware_simulator)
 
     return thread_manager
 

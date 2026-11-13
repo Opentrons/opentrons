@@ -1226,7 +1226,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "ValueError [line 167]: Partial column configurations require the 'end' parameter.",
+      "detail": "ValueError [line 153]: Partial column configurations require the 'end' parameter.",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",

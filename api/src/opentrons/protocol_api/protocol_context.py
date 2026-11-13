@@ -34,7 +34,6 @@ from .core.common import LabwareCore, ModuleCore, ProtocolCore
 from .core.core_map import LoadedCoreMap
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.engine.module_core import NonConnectedModuleCore
-from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 from .core.module import (
     AbstractAbsorbanceReaderCore,
     AbstractFlexStackerCore,
@@ -66,7 +65,6 @@ from .tasks import Task
 from opentrons.hardware_control.modules.types import (
     AbsorbanceReaderModel,
     FlexStackerModuleModel,
-    MagneticBlockModel,
 )
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.legacy_commands import protocol_commands as cmds
@@ -317,17 +315,14 @@ class ProtocolContext(CommandPublisher):
         !!! note
             This property is not yet supported in API version 2.14 or higher.
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
-            # TODO(mc, 2023-02-23): per-axis max speeds not yet supported on the engine
-            # See https://opentrons.atlassian.net/browse/RCORE-373
-            raise UnsupportedAPIError(
-                api_element="ProtocolContext.max_speeds",
-                since_version=f"{ENGINE_CORE_API_VERSION}",
-                current_version=f"{self._api_version}",
-                extra_message="Set speeds using InstrumentContext.default_speed or the per-method 'speed' argument.",
-            )
-
-        return self._core.get_max_speeds()
+        # TODO(mc, 2023-02-23): per-axis max speeds not yet supported on the engine
+        # See https://opentrons.atlassian.net/browse/RCORE-373
+        raise UnsupportedAPIError(
+            api_element="ProtocolContext.max_speeds",
+            since_version=f"{ENGINE_CORE_API_VERSION}",
+            current_version=f"{self._api_version}",
+            extra_message="Set speeds using InstrumentContext.default_speed or the per-method 'speed' argument.",
+        )
 
     @requires_version(2, 0)
     def commands(self) -> List[str]:
@@ -509,13 +504,6 @@ class ProtocolContext(CommandPublisher):
                 When unspecified, the API uses the newest version available for your protocol's API level.
         """
 
-        if isinstance(location, OffDeckType) and self._api_version < APIVersion(2, 15):
-            raise APIVersionError(
-                api_element="Loading a labware off-deck",
-                until_version="2.15",
-                current_version=f"{self._api_version}",
-            )
-
         if self._api_version < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE:
             if adapter_namespace is not None:
                 raise APIVersionError(
@@ -559,13 +547,6 @@ class ProtocolContext(CommandPublisher):
             ModuleFixtureLocation,
         ]
         if adapter is not None:
-            if self._api_version < APIVersion(2, 15):
-                raise APIVersionError(
-                    api_element="Loading a labware on an adapter",
-                    until_version="2.15",
-                    current_version=f"{self._api_version}",
-                )
-
             if (
                 self._api_version
                 < validation.NAMESPACE_VERSION_ADAPTER_LID_VERSION_GATE
@@ -1006,28 +987,13 @@ class ProtocolContext(CommandPublisher):
                 Added `FlexStackerModuleContext` return value.
         """
         if configuration:
-            if self._api_version < APIVersion(2, 4):
-                raise APIVersionError(
-                    api_element="Thermocycler parameters",
-                    until_version="2.4",
-                    current_version=f"{self._api_version}",
-                )
-            if self._api_version >= ENGINE_CORE_API_VERSION:
-                raise UnsupportedAPIError(
-                    api_element="The configuration parameter of load_module",
-                    since_version=f"{ENGINE_CORE_API_VERSION}",
-                    current_version=f"{self._api_version}",
-                )
-
-        requested_model = validation.ensure_module_model(module_name)
-        if isinstance(
-            requested_model, MagneticBlockModel
-        ) and self._api_version < APIVersion(2, 15):
-            raise APIVersionError(
-                api_element=f"Module of type {module_name}",
-                until_version="2.15",
+            raise UnsupportedAPIError(
+                api_element="The configuration parameter of load_module",
+                since_version=f"{ENGINE_CORE_API_VERSION}",
                 current_version=f"{self._api_version}",
             )
+
+        requested_model = validation.ensure_module_model(module_name)
         if isinstance(
             requested_model, AbsorbanceReaderModel
         ) and self._api_version < APIVersion(2, 21):
@@ -1275,16 +1241,12 @@ class ProtocolContext(CommandPublisher):
         If you're looking for a way for your protocol to resume automatically
         after a period of time, use [`delay()`][opentrons.protocol_api.ProtocolContext.delay].
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise UnsupportedAPIError(
-                api_element="A Python Protocol safely resuming itself after a pause",
-                since_version=f"{ENGINE_CORE_API_VERSION}",
-                current_version=f"{self._api_version}",
-                extra_message="To wait automatically for a period of time, use ProtocolContext.delay().",
-            )
-
-        assert isinstance(self._core, LegacyProtocolCore)
-        self._core.resume()
+        raise UnsupportedAPIError(
+            api_element="A Python Protocol safely resuming itself after a pause",
+            since_version=f"{ENGINE_CORE_API_VERSION}",
+            current_version=f"{self._api_version}",
+            extra_message="To wait automatically for a period of time, use ProtocolContext.delay().",
+        )
 
     @publish(command=cmds.comment)
     @requires_version(2, 0)
@@ -1342,7 +1304,7 @@ class ProtocolContext(CommandPublisher):
             seconds (float): The time to delay in seconds.
 
         This timer will continue to run until it is complete and will not block
-            subsequent commands.
+            subsequent commands. There is no notification when the timer is complete.
         """
         task_core = self._core.create_timer(seconds=seconds)
         return Task(core=task_core, api_version=self._api_version)

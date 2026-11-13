@@ -16,9 +16,9 @@ import {
   useLogPeriodSummariesQuery,
 } from '@opentrons/react-api-client'
 
-import { Skeleton } from '/app/atoms/Skeleton'
+import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
-import { getAuditLogDeleteErrorMessage } from '/app/local-resources/access-control/utils'
+import { isInsufficientScopeError } from '/app/local-resources/access-control/utils'
 import { DownloadAuditLogsModal } from '/app/organisms/Desktop/DownloadAuditLogsModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useEnsureAuditLogAuthorization } from '/app/resources/audit/useEnsureAuditLogAuthorization'
@@ -36,13 +36,7 @@ import type { ReactNode } from 'react'
 import type { LogPeriodSummary } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
 import type { DocumentedAction } from '@opentrons/react-api-client'
-import type { MakeToastOptions } from '/app/organisms/ToasterOven/ToasterContext'
 import type { DownloadedLogPeriod } from '/app/resources/devices/hooks/useDownloadSelectedLogPeriods'
-
-const TOAST_STYLE: MakeToastOptions = {
-  closeButton: true,
-  width: '80%',
-}
 
 const DELETE_LOG_PERIODS_ACTIONS: DocumentedAction[] = [
   'download_log_period',
@@ -56,7 +50,7 @@ interface ComplianceReadySoftwareFilesProps {
 export function ComplianceReadySoftwareFiles({
   robotName,
 }: ComplianceReadySoftwareFilesProps): ReactNode {
-  const { t } = useTranslation(['device_details', 'access_control'])
+  const { t } = useTranslation('device_details')
   const { data: logPeriodSummariesData, status: logPeriodSummaryStatus } =
     useLogPeriodSummariesQuery()
   const { documentationState } = useLinkedDocumentationState(
@@ -134,23 +128,18 @@ export function ComplianceReadySoftwareFiles({
         const toastId = makeToast(
           t('downloading_log_periods') as string,
           INFO_TOAST,
-          {
-            disableTimeout: true,
-            icon: toastIcon,
-            ...TOAST_STYLE,
-          }
+          { disableTimeout: true, icon: toastIcon }
         )
         await downloadLogPeriodsMutation
           .mutateAsync({ logPeriods })
           .then(() => {
             makeToast(
               t('files_successfully_downloaded') as string,
-              SUCCESS_TOAST,
-              TOAST_STYLE
+              SUCCESS_TOAST
             )
           })
           .catch((error: Error) => {
-            makeToast(error.message, ERROR_TOAST, TOAST_STYLE)
+            makeToast(error.message, ERROR_TOAST, { closeButton: true })
           })
           .finally(() => {
             eatToast(toastId)
@@ -193,9 +182,18 @@ export function ComplianceReadySoftwareFiles({
       } finally {
         setIsAuthorizing(false)
       }
+      const toastId = makeToast(
+        t('downloading_log_periods') as string,
+        INFO_TOAST,
+        {
+          disableTimeout: true,
+          icon: { name: 'ot-spinner', spin: true },
+        }
+      )
       void downloadLogPeriodsMutation
         .mutateAsync({ logPeriods })
         .then(downloadedPeriods => {
+          makeToast(t('files_successfully_downloaded') as string, SUCCESS_TOAST)
           // only chain a delete for periods that actually came back with a
           // deletion key; a period downloaded without one can't be deleted yet
           const deletableDownloads = downloadedPeriods.filter(
@@ -206,9 +204,19 @@ export function ComplianceReadySoftwareFiles({
               downloaded.deletionKey != null
           )
           if (deletableDownloads.length < logPeriods.length) {
-            makeToast(t('some_logs_not_deleted') as string, WARNING_TOAST, {
-              closeButton: true,
-            })
+            const allDownloaded = downloadedPeriods.length === logPeriods.length
+            makeToast(
+              (allDownloaded
+                ? t('in_progress_logs_cannot_be_deleted')
+                : t('some_logs_not_deleted')) as string,
+              WARNING_TOAST,
+              {
+                ...(allDownloaded
+                  ? { heading: t('unable_to_delete_audit_logs') }
+                  : {}),
+                closeButton: true,
+              }
+            )
           }
           if (deletableDownloads.length === 0) {
             return
@@ -228,29 +236,24 @@ export function ComplianceReadySoftwareFiles({
           setDownloadModalDismissed(true)
         })
         .catch((e: unknown) => {
-          if (!isDocumentedMutationError(e)) {
+          if (isDocumentedMutationError(e)) {
+            restoreDeleteModal()
+          } else if (!isInsufficientScopeError(e)) {
             const fallbackMessage =
               e instanceof Error && e.message.length > 0
                 ? e.message
                 : t('some_logs_not_deleted')
-            makeToast(
-              getAuditLogDeleteErrorMessage(
-                e,
-                t(
-                  'access_control:delete_audit_logs_permission_required'
-                ) as string,
-                fallbackMessage as string
-              ),
-              ERROR_TOAST
-            )
-          } else {
-            restoreDeleteModal()
+            makeToast(fallbackMessage as string, ERROR_TOAST)
           }
+        })
+        .finally(() => {
+          eatToast(toastId)
         })
     },
     [
       deleteSelectedLogPeriods,
       downloadLogPeriodsMutation,
+      eatToast,
       ensureAuthorized,
       makeToast,
       t,

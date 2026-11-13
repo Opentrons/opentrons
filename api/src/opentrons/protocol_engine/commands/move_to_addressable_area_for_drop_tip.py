@@ -138,7 +138,7 @@ class MoveToAddressableAreaForDropTipImplementation(
             )
 
         if params.alternateDropLocation:
-            offset = self._state_view.geometry.get_next_tip_drop_location_for_addressable_area(
+            offset = self._state_view.instrument_interface.get_next_tip_drop_location_for_addressable_area(
                 addressable_area_name=params.addressableAreaName,
                 pipette_id=params.pipetteId,
             )

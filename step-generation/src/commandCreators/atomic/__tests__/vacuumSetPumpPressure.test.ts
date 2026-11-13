@@ -58,7 +58,6 @@ describe('vacuumSetPumpPressure', () => {
     const result = vacuumSetPumpPressure(
       {
         moduleId: vacuumModuleId,
-        commandCreatorFnName: 'vacuumSetPumpPressure',
         gaugePressure: 150,
       },
       invariantContext,
@@ -96,7 +95,6 @@ mock_vacuum_module.start_set_vacuum_pressure(
     const result = vacuumSetPumpPressure(
       {
         moduleId: vacuumModuleId,
-        commandCreatorFnName: 'vacuumSetPumpPressure',
         gaugePressure: 100,
         duration: 45,
         ventAfter: true,
@@ -132,7 +130,6 @@ mock_vacuum_module_task_3 = mock_vacuum_module.start_set_vacuum_pressure(
     const result = vacuumSetPumpPressure(
       {
         moduleId: 'missingVacuum',
-        commandCreatorFnName: 'vacuumSetPumpPressure',
         gaugePressure: 1,
       },
       invariantContext,
@@ -162,12 +159,116 @@ mock_vacuum_module_task_3 = mock_vacuum_module.start_set_vacuum_pressure(
     const result = vacuumSetPumpPressure(
       {
         moduleId: vacuumModuleId,
-        commandCreatorFnName: 'vacuumSetPumpPressure',
         gaugePressure: 200,
       },
       invariantContext,
       busyRobot
     )
     expect(getErrorResult(result)).toEqual(liveTaskError)
+  })
+
+  it('resolves all args when they are runtime parameters', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: vacuumModuleId,
+      },
+      gauge_pressure: {
+        variableName: 'gauge_pressure',
+        displayName: 'Gauge pressure',
+        type: 'int',
+        default: 100,
+      },
+      hold_duration: {
+        variableName: 'hold_duration',
+        displayName: 'Hold duration',
+        type: 'int',
+        default: 45,
+      },
+      vent_after: {
+        variableName: 'vent_after',
+        displayName: 'Vent after',
+        type: 'boolean',
+        default: true,
+      },
+    }
+    const result = vacuumSetPumpPressure(
+      {
+        moduleId: 'selected_module',
+        gaugePressure: 'gauge_pressure',
+        duration: 'hold_duration',
+        ventAfter: 'vent_after',
+      },
+      invariantContext,
+      robotState
+    )
+    expect(getSuccessResult(result)).toEqual({
+      commands: [
+        {
+          commandType: 'vacuumModule/startSetVacuumPressure',
+          key: expect.any(String),
+          params: {
+            moduleId: vacuumModuleId,
+            gaugePressure: 100,
+            duration: 45,
+            ventAfter: true,
+            taskId: 'mock_vacuum_module_task_1',
+          },
+        },
+      ],
+      python: `
+mock_vacuum_module_task_1 = mock_vacuum_module.start_set_vacuum_pressure(
+    gauge_pressure_mbar=gauge_pressure,
+    duration_s=hold_duration,
+    vent_after=vent_after
+)`.trim(),
+    })
+  })
+
+  it('returns errors if runtime parameters are missing or invalid', () => {
+    invariantContext.runtimeParameters = {
+      mock_rtp: {
+        variableName: 'mock_rtp',
+        displayName: 'mock rtp',
+        type: 'boolean',
+        default: false,
+      },
+      hold_duration: {
+        variableName: 'hold_duration',
+        displayName: 'Hold duration',
+        type: 'int',
+        default: 45,
+      },
+    }
+    const result = vacuumSetPumpPressure(
+      {
+        moduleId: 'mock_rtp',
+        gaugePressure: 'missing_pressure',
+        duration: 'missing_duration',
+        ventAfter: 'hold_duration',
+      },
+      invariantContext,
+      robotState
+    )
+    expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "missing_pressure" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "missing_duration" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "hold_duration" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+    ])
   })
 })

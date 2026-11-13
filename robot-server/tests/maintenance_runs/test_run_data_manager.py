@@ -7,9 +7,9 @@ from decoy import Decoy
 
 from opentrons.config import feature_flags
 from opentrons.protocol_engine import (
-    CommandSlice,
     EngineStatus,
     ErrorOccurrence,
+    JsonCommandSlice,
     LabwareOffset,
     Liquid,
     LoadedLabware,
@@ -42,7 +42,7 @@ from robot_server.service.notifications import (
 )
 
 
-def mock_notify_publishers() -> None:
+async def mock_notify_publishers() -> None:
     """A mock notify_publishers."""
     return None
 
@@ -381,8 +381,13 @@ async def test_get_commands_slice_current_run(
         run_command,
     ]
 
-    expected_command_slice = CommandSlice(
-        commands=expected_commands_result, cursor=1, total_length=3
+    expected_command_slice = JsonCommandSlice(
+        commands=[
+            command.model_dump_json(by_alias=True, exclude_none=True)
+            for command in expected_commands_result
+        ],
+        cursor=1,
+        total_length=3,
     )
     decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(
         "run-id"

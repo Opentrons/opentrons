@@ -15,21 +15,64 @@ import {
   pipetteAdjacentHeaterShakerWhileShaking,
   pipetteIntoHeaterShakerLatchOpen,
   pipetteIntoHeaterShakerWhileShaking,
+  resolveNumericRuntimeValue,
+  resolveRuntimeWellLocation,
+  resolveStringRuntimeValue,
   thermocyclerPipetteCollision,
   uuid,
 } from '../../utils'
 
 import type { BlowoutParams, CreateCommand } from '@opentrons/shared-data'
-import type { CommandCreator, CommandCreatorError } from '../../types'
+import type {
+  BlowOutInWellStepGenArgs,
+  CommandCreator,
+  CommandCreatorError,
+} from '../../types'
 
-export const blowOutInWell: CommandCreator<BlowoutParams> = (
+export const blowOutInWell: CommandCreator<BlowOutInWellStepGenArgs> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
   /** Blowout with given args. Requires tip. */
-  const { pipetteId, labwareId, wellName, wellLocation, flowRate } = args
-  const { pipetteEntities, labwareEntities } = invariantContext
+  const { pipetteEntities, labwareEntities, runtimeParameters } =
+    invariantContext
+  const pipetteId = resolveStringRuntimeValue(args.pipetteId, runtimeParameters)
+  const labwareId = resolveStringRuntimeValue(args.labwareId, runtimeParameters)
+  const wellName = resolveStringRuntimeValue(args.wellName, runtimeParameters)
+  const flowRate = resolveNumericRuntimeValue(args.flowRate, runtimeParameters)
+  const resolvedWellLocation = resolveRuntimeWellLocation(
+    args.wellLocation,
+    runtimeParameters
+  )
+  const rawValues = [
+    args.pipetteId,
+    args.labwareId,
+    args.wellName,
+    args.flowRate,
+  ]
+  const resolvedValues = [pipetteId, labwareId, wellName, flowRate]
+  const rtpErrors: CommandCreatorError[] = [
+    ...rawValues.flatMap((value, i) =>
+      typeof value === 'string' && resolvedValues[i] == null
+        ? [errorCreators.invalidRuntimeParameter({ parameterName: value })]
+        : []
+    ),
+    ...resolvedWellLocation.invalidParameterNames.map(parameterName =>
+      errorCreators.invalidRuntimeParameter({ parameterName })
+    ),
+  ]
+  if (
+    rtpErrors.length > 0 ||
+    pipetteId == null ||
+    labwareId == null ||
+    wellName == null ||
+    flowRate == null
+  ) {
+    return { errors: rtpErrors }
+  }
+  const wellLocation =
+    resolvedWellLocation.location as BlowoutParams['wellLocation']
   const pipette = pipetteEntities[pipetteId]
   const actionName = 'blowout'
   const errors: CommandCreatorError[] = []
@@ -191,6 +234,18 @@ export const blowOutInWell: CommandCreator<BlowoutParams> = (
 
   const pipettePythonName = pipette.pythonName
   const labwarePythonName = labwareEntities[labwareId].pythonName
+  const pythonWellName =
+    runtimeParameters[args.wellName] != null
+      ? args.wellName
+      : formatPyStr(wellName)
+  const pythonWellLocation = formatPyWellLocation(
+    args.wellLocation == null
+      ? undefined
+      : {
+          origin: wellLocation?.origin,
+          offset: args.wellLocation.offset,
+        }
+  )
 
   const commands: CreateCommand[] = [
     {
@@ -210,9 +265,7 @@ export const blowOutInWell: CommandCreator<BlowoutParams> = (
     python:
       // The Python blow_out() does not take a flow rate argument, so we have to
       // reconfigure the pipette's default blow out rate instead:
-      `${pipettePythonName}.flow_rate.blow_out = ${flowRate}\n` +
-      `${pipettePythonName}.blow_out(${labwarePythonName}[${formatPyStr(
-        wellName
-      )}]${formatPyWellLocation(wellLocation)})`,
+      `${pipettePythonName}.flow_rate.blow_out = ${args.flowRate}\n` +
+      `${pipettePythonName}.blow_out(${labwarePythonName}[${pythonWellName}]${pythonWellLocation})`,
   }
 }

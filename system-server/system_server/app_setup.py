@@ -1,5 +1,6 @@
 """Main FastAPI application."""
 
+import logging
 from contextlib import AsyncExitStack, asynccontextmanager
 from typing import AsyncGenerator
 
@@ -22,10 +23,14 @@ from server_utils.auth.resource_server.fastapi import (
 from server_utils.fastapi_utils.server_timing_middleware import server_timing_middleware
 
 from system_server._version import version
+from system_server.logs.settings import apply_persisted_log_level
+from system_server.persistence import get_persistence_directory, get_sql_engine
 from system_server.router import router
 from system_server.settings import get_settings
 
 _REDOC_CDN_URL = "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js"
+
+_log = logging.getLogger(__name__)
 
 
 @asynccontextmanager
@@ -47,6 +52,16 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             )
         )
         install_audit_client(app.state, audit_client)
+
+        if settings.persistence_directory is not None:
+            persistence_directory = await get_persistence_directory(app.state)
+            sql_engine = await get_sql_engine(app.state, persistence_directory)
+            try:
+                # After migrate (inside create_sql_engine), apply the stored log level.
+                apply_persisted_log_level(sql_engine)
+            except Exception:
+                # Non-robot/dev environments may not have journald or systemctl.
+                _log.exception("Failed to apply persisted log level to journald")
 
         # Start serving requests.
         yield

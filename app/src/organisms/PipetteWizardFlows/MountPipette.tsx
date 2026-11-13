@@ -4,20 +4,21 @@ import {
   Banner,
   Flex,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SIZE_1,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import {
   SINGLE_MOUNT_PIPETTES,
   WEIGHT_OF_96_CHANNEL,
 } from '@opentrons/shared-data'
 
-import { Skeleton } from '/app/atoms/Skeleton'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
+import { WizardBodyText } from '/app/components/adhoc/shared/wizards/WizardBodyText'
 
 import { CheckPipetteButton } from './CheckPipetteButton'
-import { BODY_STYLE, SECTIONS } from './constants'
+import { SECTIONS } from './constants'
 import { getPipetteAnimations, getPipetteAnimations96 } from './utils'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
@@ -64,11 +65,11 @@ export const MountPipette = (props: MountPipetteProps): ReactNode => {
   } else {
     bodyText = (
       <>
-        <LegacyStyledText css={BODY_STYLE}>
+        <WizardBodyText>
           {isSingleMountPipette
             ? t('align_the_connector')
             : t('hold_pipette_carefully')}
-        </LegacyStyledText>
+        </WizardBodyText>
         {!isSingleMountPipette ? (
           <Banner
             type="warning"
@@ -92,14 +93,19 @@ export const MountPipette = (props: MountPipetteProps): ReactNode => {
             backgroundSize={BACKGROUND_SIZE}
           />
         ) : (
-          i18n.format(
-            t(
-              isSingleMountPipette
-                ? 'connect_and_secure_pipette'
-                : 'connect_96_channel'
-            ),
-            'capitalize'
-          )
+          <StyledText
+            desktopStyle="headingSmallBold"
+            oddStyle="level4HeaderSemiBold"
+          >
+            {i18n.format(
+              t(
+                isSingleMountPipette
+                  ? 'connect_and_secure_pipette'
+                  : 'connect_96_channel'
+              ),
+              'capitalize'
+            )}
+          </StyledText>
         )
       }
       rightHandBody={

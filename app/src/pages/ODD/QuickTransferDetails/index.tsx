@@ -15,13 +15,14 @@ import {
   Icon,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   POSITION_STICKY,
   SPACING,
+  StyledText,
   Tabs,
   truncateString,
   TYPOGRAPHY,
+  Z_INDEX,
 } from '@opentrons/components'
 import {
   useCreateRunMutation,
@@ -29,10 +30,10 @@ import {
 } from '@opentrons/react-api-client'
 
 import { MAXIMUM_PINNED_PROTOCOLS } from '/app/App/constants'
-import { MediumButton, SmallButton } from '/app/atoms/buttons'
+import { MediumButton, SmallButton } from '/app/components/ODD/buttons'
+import { SmallModalChildren } from '/app/components/ODD/modals/OddModal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useScrollPosition } from '/app/local-resources/dom-utils'
-import { SmallModalChildren } from '/app/molecules/OddModal'
 import {
   ProtocolDetailsHeaderChipSkeleton,
   ProtocolDetailsHeaderTitleSkeleton,
@@ -113,12 +114,13 @@ const QuickTransferHeader = ({
       top="0"
       backgroundColor={COLORS.white}
       marginX={`-${SPACING.spacing32}`}
-      zIndex={1} // the header is always visble when things scroll beneath
+      zIndex={Z_INDEX.BASE} // the header is always visble when things scroll beneath
     >
       <Flex
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing16}
-        width="42.125rem"
+        flex="1"
+        minWidth="0"
       >
         <Btn
           paddingLeft="0rem"
@@ -127,13 +129,15 @@ const QuickTransferHeader = ({
             navigate('/protocols')
           }}
           width="3rem"
+          flexShrink={0}
         >
           <Icon name="back" size="3rem" color={COLORS.black90} />
         </Btn>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing8}
-          maxWidth="42.625rem"
+          flex="1"
+          minWidth="0"
         >
           <Flex maxWidth="max-content">
             {!isTransferFetching ? (
@@ -146,36 +150,38 @@ const QuickTransferHeader = ({
             )}
           </Flex>
           {!isTransferFetching ? (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h2"
               fontWeight={TYPOGRAPHY.fontWeightBold}
               onClick={toggleTruncate}
               overflowWrap={OVERFLOW_WRAP_ANYWHERE}
             >
               {displayedTitle}
-            </LegacyStyledText>
+            </StyledText>
           ) : (
             <ProtocolDetailsHeaderTitleSkeleton />
           )}
         </Flex>
       </Flex>
-      <SmallButton
-        buttonCategory="rounded"
-        onClick={() => {
-          setStartSetup(true)
-          handleRunTransfer()
-          trackEventWithRobotSerial({
-            name: ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
-            properties: {
-              name: title,
-            },
-          })
-        }}
-        buttonText={t('start_setup')}
-        disabled={isTransferFetching}
-        iconName={startSetup ? 'ot-spinner' : undefined}
-        iconPlacement="endIcon"
-      />
+      <Flex flexShrink={0}>
+        <SmallButton
+          buttonCategory="rounded"
+          onClick={() => {
+            setStartSetup(true)
+            handleRunTransfer()
+            trackEventWithRobotSerial({
+              name: ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
+              properties: {
+                name: title,
+              },
+            })
+          }}
+          buttonText={t('start_setup')}
+          disabled={isTransferFetching}
+          iconName={startSetup ? 'ot-spinner' : undefined}
+          iconPlacement="endIcon"
+        />
+      </Flex>
     </Flex>
   )
 }
@@ -230,12 +236,12 @@ const Summary = ({ description, date }: SummaryProps): ReactNode => {
       gridGap={SPACING.spacing4}
       paddingBottom={SPACING.spacing24}
     >
-      <LegacyStyledText
+      <StyledText
         forwardedAs="p"
         color={description === null ? COLORS.grey60 : undefined}
       >
         {description}
-      </LegacyStyledText>
+      </StyledText>
       <Flex
         backgroundColor={COLORS.grey35}
         borderRadius={BORDERS.borderRadius8}
@@ -243,9 +249,9 @@ const Summary = ({ description, date }: SummaryProps): ReactNode => {
         width="max-content"
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
       >
-        <LegacyStyledText forwardedAs="p">{`${t('protocol_info:date_added')}: ${
+        <StyledText forwardedAs="p">{`${t('protocol_info:date_added')}: ${
           date != null ? formatTimeWithUtcLabel(date) : t('shared:no_data')
-        }`}</LegacyStyledText>
+        }`}</StyledText>
       </Flex>
     </Flex>
   )
