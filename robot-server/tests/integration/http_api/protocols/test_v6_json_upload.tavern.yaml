@@ -10,7 +10,7 @@ stages:
       url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
-        files: '../shared-data/protocol/fixtures/6/simpleV6.json'
+        files: 'tests/integration/protocols/simpleV6.json'
     response:
       strict:
         - json:off
@@ -658,7 +658,7 @@ stages:
       url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
-        files: '../shared-data/protocol/fixtures/6/simpleV6.json'
+        files: 'tests/integration/protocols/simpleV6.json'
     response:
       strict:
         - json:off
