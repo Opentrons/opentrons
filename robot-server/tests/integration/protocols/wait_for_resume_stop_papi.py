@@ -3,6 +3,9 @@ from opentrons.protocol_api import ProtocolContext
 metadata = {
     "protocolName": "stop while waiting test",
     "author": "Opentrons <protocols@opentrons.com>",
+}
+requirements = {
+    "robotType": "Flex",
     "apiLevel": "2.15",
 }
 

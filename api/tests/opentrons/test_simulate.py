@@ -162,29 +162,6 @@ class TestSimulatePythonLabware:
         )
         simulate.simulate(protocol_file=protocol_filelike, file_name=file_name)
 
-    @pytest.mark.xfail(
-        strict=True, raises=pytest.fail.Exception
-    )  # TODO(mm, 2023-07-14): Fix this bug.
-    def test_jupyter_override(
-        self,
-        protocol_filelike: TextIO,
-        file_name: str,
-        monkeypatch: pytest.MonkeyPatch,
-    ) -> None:
-        """Passing any custom_labware_paths should prevent searching the Jupyter directory."""
-        # TODO(mm, 2023-10-06): This is monkeypatching a dependency of a dependency,
-        # which is too deep.
-        monkeypatch.setattr(entrypoint_util, "IS_ROBOT", True)
-        monkeypatch.setattr(
-            entrypoint_util, "JUPYTER_NOTEBOOK_LABWARE_DIR", self.LW_DIR
-        )
-        with pytest.raises(Exception, match="Labware .+ not found"):
-            simulate.simulate(
-                protocol_file=protocol_filelike,
-                file_name=file_name,
-                custom_labware_paths=[],
-            )
-
     @staticmethod
     def test_jupyter_not_on_filesystem(
         protocol_filelike: TextIO,

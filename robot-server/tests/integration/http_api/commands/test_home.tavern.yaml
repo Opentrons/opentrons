@@ -2,12 +2,12 @@ test_name: home standalone command
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 
 stages:
   - name: issue home Command params all
     request:
-      url: '{ot2_server_base_url}/commands'
+      url: '{ot3_server_base_url}/commands'
       method: POST
       params:
         waitUntilComplete: true
@@ -34,7 +34,7 @@ stages:
           command_id_all: data.id
   - name: issue home Command params empty
     request:
-      url: '{ot2_server_base_url}/commands'
+      url: '{ot3_server_base_url}/commands'
       method: POST
       params:
         waitUntilComplete: true
@@ -54,7 +54,7 @@ stages:
           command_id_empty: data.id
   - name: Get command by id
     request:
-      url: '{ot2_server_base_url}/commands/{command_id_empty}'
+      url: '{ot3_server_base_url}/commands/{command_id_empty}'
       method: GET
     response:
       strict:
@@ -66,7 +66,7 @@ stages:
           status: succeeded
   - name: Get commands
     request:
-      url: '{ot2_server_base_url}/commands'
+      url: '{ot3_server_base_url}/commands'
       method: GET
     response:
       strict:
@@ -74,11 +74,11 @@ stages:
       status_code: 200
       json:
         data: # order is enforced on this check!
-            - id: '{command_id_all}'
-            - id: '{command_id_empty}'
+          - id: '{command_id_all}'
+          - id: '{command_id_empty}'
   - name: Create Empty Run
     request:
-      url: '{ot2_server_base_url}/runs'
+      url: '{ot3_server_base_url}/runs'
       json:
         data: {}
       method: POST
@@ -96,7 +96,7 @@ stages:
           run_id: data.id
   - name: issue home Command
     request:
-      url: '{ot2_server_base_url}/commands'
+      url: '{ot3_server_base_url}/commands'
       method: POST
       params:
         waitUntilComplete: true

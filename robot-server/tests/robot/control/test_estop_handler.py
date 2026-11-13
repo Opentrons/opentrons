@@ -27,9 +27,8 @@ from robot_server.robot.control.models import (
 
 
 @pytest.fixture
-def mock_hardware(decoy: Decoy, request: pytest.FixtureRequest) -> "OT3API":
+def mock_hardware(decoy: Decoy) -> "OT3API":
     """Create a mocked hardware api."""
-    request.node.add_marker("ot3_only")
     try:
         from opentrons.hardware_control.ot3api import OT3API
 

@@ -1,7 +1,6 @@
 test_name: Upload, analyze, delete flex_basic_transfer_standalone protocol.
 
 marks:
-  - ot3_only
   - usefixtures:
       - ot3_server_base_url
 stages:

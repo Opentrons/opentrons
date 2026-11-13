@@ -2,12 +2,12 @@
 test_name: GET list of useful robot positions
 marks:
   - usefixtures:
-    - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: Get robot positions
     request:
       method: GET
-      url: "{ot2_server_base_url}/robot/positions"
+      url: '{ot3_server_base_url}/robot/positions'
     response:
       status_code: 200
       json:
@@ -32,12 +32,12 @@ stages:
 test_name: POST Move Robot
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: GET the left pipette attached to the robot
     request:
       method: GET
-      url: "{ot2_server_base_url}/pipettes"
+      url: '{ot3_server_base_url}/pipettes'
     response:
       status_code: 200
       save:
@@ -46,7 +46,7 @@ stages:
   - name: POST Move the left pipette to a specific location
     request:
       method: POST
-      url: "{ot2_server_base_url}/robot/move"
+      url: '{ot3_server_base_url}/robot/move'
       json:
         target: pipette
         point:
@@ -54,21 +54,21 @@ stages:
           - 90.0
           - 150.0
         mount: left
-        model: "{left_pipette}"
+        model: '{left_pipette}'
     response:
       status_code: 200
       json:
-        message: !re_search "Move complete"
+        message: !re_search 'Move complete'
 ---
 test_name: POST Robot Home
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: Home the Robot
     request:
       method: POST
-      url: "{ot2_server_base_url}/robot/home"
+      url: '{ot3_server_base_url}/robot/home'
       json:
         target: pipette
         mount: right
@@ -80,47 +80,47 @@ stages:
 test_name: Turn on the robot lights
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: POST Robot Lights
     request:
       method: POST
-      url: "{ot2_server_base_url}/robot/lights"
+      url: '{ot3_server_base_url}/robot/lights'
       json:
-        "on": true # needed to escape "on" because it is a keyword
+        'on': true # needed to escape "on" because it is a keyword
     response:
       status_code: 200
       json:
-        "on": true
+        'on': true
   - name: GET Robot lights status
     request:
       method: GET
-      url: "{ot2_server_base_url}/robot/lights"
+      url: '{ot3_server_base_url}/robot/lights'
     response:
       status_code: 200
       json:
-        "on": true
+        'on': true
 ---
 test_name: Turn off the robot lights
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: POST Robot Lights
     request:
       method: POST
-      url: "{ot2_server_base_url}/robot/lights"
+      url: '{ot3_server_base_url}/robot/lights'
       json:
-        "on": false
+        'on': false
     response:
       status_code: 200
       json:
-        "on": false
+        'on': false
   - name: GET Robot lights status
     request:
       method: GET
-      url: "{ot2_server_base_url}/robot/lights"
+      url: '{ot3_server_base_url}/robot/lights'
     response:
       status_code: 200
       json:
-        "on": false
+        'on': false

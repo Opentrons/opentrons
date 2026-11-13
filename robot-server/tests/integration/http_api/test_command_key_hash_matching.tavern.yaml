@@ -2,15 +2,15 @@ test_name: Test that command keys in analysis and protocol run match for a deter
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 
 stages:
   - name: Upload a protocol
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
-        files: 'tests/integration/protocols/basic_transfer_with_run_time_parameters.py'
+        files: 'tests/integration/protocols/flex_basic_transfer_standalone.py'
     response:
       save:
         json:
@@ -24,7 +24,7 @@ stages:
     max_retries: 5
     delay_after: 1
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id}'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id}'
     response:
       save:
         json:
@@ -32,8 +32,8 @@ stages:
           home_cmd_key: data.commands[0].key
           plate_load_key: data.commands[1].key
           pipette_load_key: data.commands[3].key
-          pick_up_tip_key: data.commands[4].key
-          drop_tip_key: data.commands[7].key
+          pick_up_tip_key: data.commands[5].key
+          drop_tip_key: data.commands[8].key
       strict:
         - json:off
       json:
@@ -44,7 +44,7 @@ stages:
 
   - name: Create run from protocol
     request:
-      url: '{ot2_server_base_url}/runs'
+      url: '{ot3_server_base_url}/runs'
       method: POST
       json:
         data:
@@ -58,7 +58,7 @@ stages:
 
   - name: Play the run
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      url: '{ot3_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
@@ -70,7 +70,7 @@ stages:
     max_retries: 5
     delay_after: 1
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}'
+      url: '{ot3_server_base_url}/runs/{run_id}'
       method: GET
     response:
       status_code: 200
@@ -82,7 +82,7 @@ stages:
 
   - name: Verify commands have keys identical to their counterparts in analysis
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      url: '{ot3_server_base_url}/runs/{run_id}/commands'
       method: GET
     response:
       strict:
@@ -95,12 +95,12 @@ stages:
             meta:
               runId: !anystr
               commandId: !anystr
-              index: 7
+              index: 10
               key: !anystr
               createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
         meta:
           cursor: 0
-          totalLength: 8
+          totalLength: 11
         data:
           - id: !anystr
             key: '{home_cmd_key}'
