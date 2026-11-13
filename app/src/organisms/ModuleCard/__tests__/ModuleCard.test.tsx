@@ -482,7 +482,7 @@ describe('ModuleCard', () => {
         ...props,
         module,
       })
-      screen.getByText('Set up module for use.')
+      screen.getByText('Module setup required.')
       const button = screen.getByText('Set up module')
       fireEvent.click(button)
       expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()
@@ -496,7 +496,7 @@ describe('ModuleCard', () => {
         ...props,
         module,
       })
-      screen.getByText('Set up module for use.')
+      screen.getByText('Module setup required.')
       const button = screen.getByText('Set up module')
       fireEvent.click(button)
       expect(vi.mocked(handleModuleWizardFlows)).toHaveBeenCalled()

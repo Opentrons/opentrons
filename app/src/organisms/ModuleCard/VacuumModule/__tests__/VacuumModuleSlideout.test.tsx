@@ -80,15 +80,20 @@ describe('VacuumModuleSlideout', () => {
     render(props)
 
     expect(screen.getByText('Select mode type')).toBeInTheDocument()
-    expect(screen.getByLabelText('Pressure')).toBeInTheDocument()
-    expect(screen.getByLabelText('Power')).toBeInTheDocument()
+    expect(screen.getByText('Gauge pressure (mbar)')).toBeInTheDocument()
+    expect(screen.getByText('Pump power (%)')).toBeInTheDocument()
+    expect(
+      screen.getByText('Set a specific vacuum pressure value')
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText('Apply a percentage of the total pump power')
+    ).toBeInTheDocument()
   })
 
   it('renders pressure input when pressure mode is selected', () => {
     render(props)
 
-    const pressureButton = screen.getByLabelText('Pressure')
-    fireEvent.click(pressureButton)
+    fireEvent.click(screen.getByText('Gauge pressure (mbar)'))
 
     expect(screen.getByText('Gauge pressure')).toBeInTheDocument()
     expect(screen.getByText('Valid range between -800-0')).toBeInTheDocument()
@@ -98,8 +103,7 @@ describe('VacuumModuleSlideout', () => {
   it('renders power slider when power mode is selected', () => {
     render(props)
 
-    const powerButton = screen.getByLabelText('Power')
-    fireEvent.click(powerButton)
+    fireEvent.click(screen.getByText('Pump power (%)'))
 
     expect(screen.getByText('Pump power')).toBeInTheDocument()
     expect(screen.getByRole('slider')).toBeInTheDocument()
@@ -116,14 +120,12 @@ describe('VacuumModuleSlideout', () => {
     render(props)
 
     // Select pressure mode
-    const pressureButton = screen.getByLabelText('Pressure')
-    fireEvent.click(pressureButton)
+    fireEvent.click(screen.getByText('Gauge pressure (mbar)'))
     expect(screen.getByText('Gauge pressure')).toBeInTheDocument()
     expect(screen.queryByText('Pump power')).not.toBeInTheDocument()
 
     // Switch to power mode
-    const powerButton = screen.getByLabelText('Power')
-    fireEvent.click(powerButton)
+    fireEvent.click(screen.getByText('Pump power (%)'))
     expect(screen.queryByText('Gauge pressure')).not.toBeInTheDocument()
     expect(screen.getByText('Pump power')).toBeInTheDocument()
   })
@@ -137,9 +139,7 @@ describe('VacuumModuleSlideout', () => {
   it('allows entering pressure value in pressure mode', () => {
     render(props)
 
-    // Select pressure mode
-    const pressureButton = screen.getByLabelText('Pressure')
-    fireEvent.click(pressureButton)
+    fireEvent.click(screen.getByText('Gauge pressure (mbar)'))
 
     screen.getByText('Gauge pressure')
     screen.getByText('Valid range between -800-0')
@@ -148,8 +148,7 @@ describe('VacuumModuleSlideout', () => {
   it('calls setVacuumPressure with correct value when confirming in pressure mode', () => {
     render(props)
 
-    const pressureButton = screen.getByLabelText('Pressure')
-    fireEvent.click(pressureButton)
+    fireEvent.click(screen.getByText('Gauge pressure (mbar)'))
 
     const input = screen.getByLabelText('Gauge pressure')
     fireEvent.change(input, { target: { value: '-50' } })
@@ -167,8 +166,7 @@ describe('VacuumModuleSlideout', () => {
   it('calls setVacuumPower with correct value when confirming in power mode', () => {
     render(props)
 
-    const powerButton = screen.getByLabelText('Power')
-    fireEvent.click(powerButton)
+    fireEvent.click(screen.getByText('Pump power (%)'))
 
     const slider = screen.getByRole('slider')
     fireEvent.change(slider, { target: { value: '75' } })
