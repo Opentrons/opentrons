@@ -49,7 +49,7 @@ In the menu, search for or select a labware type and view available options from
 
 You can stack up to five lids to use later in your protocol in an open deck slot or on the [Flex Deck Riser](https://opentrons.com/products/opentrons-flex-deck-riser). Tip rack lids can't be stacked or placed on the deck or a the deck riser. Click at the bottom of the labware list to upload a JSON file and use custom labware in your protocol.
 
-After adding labware, you can drag and drop it and move that labware to another slot. Clicking the deck slot opens a popup menu that lets you:
+After adding labware, you can drag and drop it and move that labware to another slot. Click the deck slot to:
 
 * **Edit labware:** Click to replace, rename, or delete labware in a slot. You can rename any labware (with the exception of tip racks) to make them easier to identify throughout your protocol.
 * **Duplicate labware:** Click to add the slot's adapters, labware, lids, and liquids to another open deck slot. 
@@ -115,7 +115,7 @@ The Vacuum Module requires a physical deck adapter to hold module components, la
 
 * **Slot A3:** This is the recessed part of the deck adapter that holds the vacuum base piece, its attached 6 mm hose, any optional spacers, and well plates.
 
-* **Slot A4:** Known as "the dock" this raised part of the deck adapter that stages collars when they're not seated on the vacuum base or actively used in a protocol. You cannot store or put well plates directly on the dock.
+* **Slot A4:** Known as "the dock," this raised part of the deck adapter stages collars when they're not seated on the vacuum base or actively used in a protocol. You cannot store or put well plates directly on the dock.
 
 Filter plates cannot sit directly on an empty deck slot. For staging, you can place filter plates a collar on the dock, on top of the vacuum base stack, or nested inside a deep-well plate on the deck.
 
