@@ -1,7 +1,7 @@
 import pick from 'lodash/pick'
 import { css } from 'styled-components'
 
-import { LegacyStyledText, StyledText } from '../../atoms'
+import { StyledText } from '../../atoms'
 import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
 import { RESPONSIVENESS, SPACING } from '../../ui-style-constants'
@@ -25,7 +25,7 @@ export * from './useCommandTextString'
 export * from './getCommandData'
 
 interface LegacySTProps {
-  as?: ComponentProps<typeof LegacyStyledText>['as']
+  as?: ComponentProps<typeof StyledText>['as']
   modernStyledTextDefaults?: false
 }
 
@@ -114,9 +114,9 @@ function CommandStyledText(
     )
   } else {
     return (
-      <LegacyStyledText as={props.as ?? 'p'} {...props}>
+      <StyledText as={props.as ?? 'p'} {...props}>
         {props.children}
-      </LegacyStyledText>
+      </StyledText>
     )
   }
 }

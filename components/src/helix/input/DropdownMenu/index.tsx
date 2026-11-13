@@ -2,7 +2,6 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 import { css } from 'styled-components'
 
 import { StyledText } from '../../../atoms/StyledText'
-import { LegacyStyledText } from '../../../atoms/StyledText/LegacyStyledText'
 import { BORDERS, COLORS } from '../../../helix-design-system'
 import { useOnClickOutside } from '../../../interaction-enhancers'
 import { Flex } from '../../../primitives'
@@ -408,9 +407,9 @@ export function DropdownMenu(props: DropdownMenuProps): ReactNode {
         )}
       </Flex>
       {caption != null ? (
-        <LegacyStyledText forwardedAs="label" color={COLORS.grey60}>
+        <StyledText forwardedAs="label" color={COLORS.grey60}>
           {caption}
-        </LegacyStyledText>
+        </StyledText>
       ) : null}
       {error != null ? (
         <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.red50}>
