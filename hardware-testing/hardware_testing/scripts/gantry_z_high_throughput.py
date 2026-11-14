@@ -29,7 +29,7 @@ async def _bowtie_move(api) -> tuple:
     x_max = 427
     y_max = 408
     z_max = 249
-    prep_position_block_location = 150
+    prep_position_block_location = 188
 
     homed_position_left = Point(x_max, y_max, z_max)
     print(f"homed_position_left: {homed_position_left}\n")  # 427-1, 408-21, 249-1
