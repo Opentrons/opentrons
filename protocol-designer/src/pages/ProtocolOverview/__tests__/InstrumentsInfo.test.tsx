@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -128,9 +129,10 @@ describe('InstrumentsInfo', () => {
     screen.getByText('Opentrons Flex Gripper')
   })
 
-  it('should call mock function when clicking edit text button', () => {
+  it('should call mock function when clicking edit text button', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByText('Edit'))
+    await user.click(screen.getByText('Edit'))
     expect(mockSetShowEditInstrumentsModal).toHaveBeenCalled()
   })
 

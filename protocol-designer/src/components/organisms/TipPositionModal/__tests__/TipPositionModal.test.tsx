@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -75,17 +76,20 @@ describe('TipPositionModal', () => {
       <div>mock TipPositionSideView</div>
     )
   })
-  it('renders the modal text', () => {
+
+  it('renders the modal text', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('Edit aspirate tip position')
-    fireEvent.click(screen.getByText('Cancel'))
+    await user.click(screen.getByText('Cancel'))
     expect(props.closeModal).toHaveBeenCalled()
-    fireEvent.click(screen.getByText('Save'))
+    await user.click(screen.getByText('Save'))
     expect(props.closeModal).toHaveBeenCalled()
     expect(mockUpdateXSpec).toHaveBeenCalled()
     expect(mockUpdateYSpec).toHaveBeenCalled()
     expect(mockUpdateZSpec).toHaveBeenCalled()
   })
+
   it('renders the alert if the x/y position values are too close to the max/min for x value', () => {
     props.specs.x.value = 9.7
     render(props)
@@ -93,6 +97,7 @@ describe('TipPositionModal', () => {
       'Tip position is close to the edge of the well and may cause collisions.'
     )
   })
+
   it('renders the alert if the x/y position values are too close to the max/min for y value', () => {
     props.specs.y.value = -9.7
     render(props)
@@ -100,6 +105,7 @@ describe('TipPositionModal', () => {
       'Tip position is close to the edge of the well and may cause collisions.'
     )
   })
+
   describe('submerge/retract in well warning', () => {
     const prefixes = [
       'aspirate_submerge',
@@ -121,6 +127,7 @@ describe('TipPositionModal', () => {
       })
     })
   })
+
   it('renders the captions, and visual', () => {
     render(props)
     screen.getByText('X position')
@@ -131,21 +138,28 @@ describe('TipPositionModal', () => {
     screen.getByText('Must be between 0 and 52')
     screen.getByText('mock TipPositionSideView')
   })
-  it('renders a custom input field and clicks on it, calling the mock updates', () => {
+
+  it('renders a custom input field and clicks on it, calling the mock updates', async () => {
+    const user = userEvent.setup()
     render(props)
     const xInputField = screen.getByRole('textbox', { name: 'X position' })
-    fireEvent.change(xInputField, { target: { value: 3 } })
+    await user.clear(xInputField)
+    await user.type(xInputField, '3')
     const yInputField = screen.getByRole('textbox', { name: 'Y position' })
-    fireEvent.change(yInputField, { target: { value: -2 } })
+    await user.clear(yInputField)
+    await user.type(yInputField, '-2')
     const zInputField = screen.getByRole('textbox', { name: 'Z position' })
-    fireEvent.change(zInputField, { target: { value: 10 } })
-    fireEvent.click(screen.getByText('Save'))
+    await user.clear(zInputField)
+    await user.type(zInputField, '10')
+    await user.click(screen.getByText('Save'))
     expect(props.closeModal).toHaveBeenCalled()
     expect(mockUpdateXSpec).toHaveBeenCalled()
     expect(mockUpdateYSpec).toHaveBeenCalled()
     expect(mockUpdateZSpec).toHaveBeenCalled()
   })
-  it('renders custom input fields and displays error texts', () => {
+
+  it('renders custom input fields and displays error texts', async () => {
+    const user = userEvent.setup()
     props = {
       ...props,
       specs: {
@@ -167,10 +181,11 @@ describe('TipPositionModal', () => {
       },
     }
     render(props)
-    fireEvent.click(screen.getByText('Save'))
+    await user.click(screen.getByText('Save'))
     const xInputField = screen.getByRole('textbox', { name: 'X position' })
-    fireEvent.change(xInputField, { target: { value: 3.55555 } })
-    fireEvent.click(screen.getByText('Save'))
+    await user.clear(xInputField)
+    await user.type(xInputField, '3.55555')
+    await user.click(screen.getByText('Save'))
     //   display too many decimals error
     screen.getByText('a max of 1 decimal place is allowed')
   })

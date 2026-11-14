@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fixture96Plate } from '@opentrons/shared-data'
@@ -66,23 +67,26 @@ describe('EditLabwareQuantityModal', () => {
     } as AllTemporalPropertiesForTimelineFrame)
   })
 
-  it('renders the text and changes the quantity to 2', () => {
+  it('renders the text and changes the quantity to 2', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('Edit labware quantity')
     screen.getByText('Labware quantity')
     screen.getByText('Valid range between 1-3')
 
-    fireEvent.click(screen.getByText('Cancel'))
+    await user.click(screen.getByText('Cancel'))
     expect(props.onClose).toHaveBeenCalled()
 
     const input = screen.getByRole('textbox')
-    fireEvent.change(input, { target: { value: '2' } })
-    fireEvent.click(screen.getByText('Confirm quantity'))
+    await user.type(input, '2')
+    await user.click(screen.getByText('Confirm quantity'))
     expect(vi.mocked(deleteContainer)).not.toHaveBeenCalled()
     expect(vi.mocked(createContainer)).toHaveBeenCalledOnce()
     expect(props.onClose).toHaveBeenCalled()
   })
-  it('renders changes the quantity from 2 to 1', () => {
+
+  it('renders changes the quantity from 2 to 1', async () => {
+    const user = userEvent.setup()
     vi.mocked(getLabwareEntities).mockReturnValue({
       mockId: labwareEntity1,
       mockId2: labwareEntity2,
@@ -90,14 +94,16 @@ describe('EditLabwareQuantityModal', () => {
     props.allLabwareIdsOnStack = ['mockId', 'mockId2']
     render(props)
     const input = screen.getByRole('textbox')
-    fireEvent.change(input, { target: { value: '1' } })
-    fireEvent.click(screen.getByText('Confirm quantity'))
+    await user.type(input, '1')
+    await user.click(screen.getByText('Confirm quantity'))
     //   delete the 2nd labware in quantity
     expect(vi.mocked(deleteContainer)).toHaveBeenCalledOnce()
     expect(vi.mocked(createContainer)).not.toHaveBeenCalled()
     expect(props.onClose).toHaveBeenCalled()
   })
-  it('renders the error copy when you try to confirm', () => {
+
+  it('renders the error copy when you try to confirm', async () => {
+    const user = userEvent.setup()
     vi.mocked(getLabwareEntities).mockReturnValue({
       mockId: labwareEntity1,
       mockId2: labwareEntity2,
@@ -105,8 +111,8 @@ describe('EditLabwareQuantityModal', () => {
     props.allLabwareIdsOnStack = ['mockId', 'mockId2']
     render(props)
     const input = screen.getByRole('textbox')
-    fireEvent.change(input, { target: { value: '4' } })
-    fireEvent.click(screen.getByText('Confirm quantity'))
+    await user.type(input, '4')
+    await user.click(screen.getByText('Confirm quantity'))
     expect(vi.mocked(deleteContainer)).not.toHaveBeenCalledOnce()
     expect(vi.mocked(createContainer)).not.toHaveBeenCalled()
     screen.getByText('Enter a value within the specified range')

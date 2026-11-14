@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -69,9 +70,10 @@ describe('ProtocolMetadata', () => {
     )
   })
 
-  it('should call a mock function when clicking edit button', () => {
+  it('should call a mock function when clicking edit button', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByText('Edit'))
+    await user.click(screen.getByText('Edit'))
     expect(mockSetShowEditMetadataModal).toHaveBeenCalledWith(true)
   })
 })

@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -18,7 +19,9 @@ const render = (
 
 describe('ConfirmDeleteEntityInUseModal', () => {
   let props: ComponentProps<typeof ConfirmDeleteEntityInUseModal>
-  it('renders the text and buttons work as expected for clear', () => {
+
+  it('renders the text and buttons work as expected for clear', async () => {
+    const user = userEvent.setup()
     props = {
       onClose: vi.fn(),
       onConfirm: vi.fn(),
@@ -28,9 +31,9 @@ describe('ConfirmDeleteEntityInUseModal', () => {
     screen.getByText(
       'This slot contains hardware or labware used in a protocol step, and clearing it may cause errors in your protocol.'
     )
-    fireEvent.click(screen.getByText('Cancel'))
+    await user.click(screen.getByText('Cancel'))
     expect(props.onClose).toHaveBeenCalled()
-    fireEvent.click(screen.getByText('Clear slot'))
+    await user.click(screen.getByText('Clear slot'))
     expect(props.onConfirm).toHaveBeenCalled()
   })
 })

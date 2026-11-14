@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -30,9 +31,10 @@ describe('LiquidButton', () => {
     screen.getByText('Liquids')
   })
 
-  it('should call a mock function when clicking', () => {
+  it('should call a mock function when clicking', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByText('Liquids'))
+    await user.click(screen.getByText('Liquids'))
     expect(mockShowLiquidOverflowMenu).toHaveBeenCalled()
   })
 })
