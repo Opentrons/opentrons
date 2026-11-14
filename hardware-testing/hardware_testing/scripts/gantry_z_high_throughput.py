@@ -25,28 +25,24 @@ def convert(seconds):
     return "%02d:%02d:%02d:%02d:%02d" % (weeks, days, hours, minutes, seconds)
 
 
-async def _bowtie_move(
-    api, homed_position_left: Point, homed_position_right: Point
-) -> tuple:
+async def _bowtie_move(api) -> tuple:
+    x_max = 427
+    y_max = 408
+    z_max = 249
+    prep_position_block_location = 150
 
-    pos_max_left = homed_position_left - Point(x=1, y=21, z=1)
+    homed_position_left = Point(x_max, y_max, z_max)
+    print(f"homed_position_left: {homed_position_left}\n")  # 427-1, 408-21, 249-1
+    pos_max_left = Point(x=x_max -1, y=y_max - 21, z = z_max)
+    print(f"pos_max_left: {pos_max_left}\n")  # 426-1, 387-21, 248-1
+    # 427-1, 408-21, 249-1
     pos_min_left = Point(
-        x=-65, y=75, z=pos_max_left.z - 150
-    )  # stay above deck to be safe
-    pos_max_right = homed_position_right - Point(x=1, y=21, z=1)
-    pos_min_right = Point(
-        x=0, y=75, z=pos_max_right.z - 150
-    )  # stay above deck to be safe
-
-    # print(f"pos_max_left: {pos_max_left}\n")
-    # print(f"pos_min_left: {pos_min_left}\n")
-    # print(f"pos_max_right: {pos_max_right}\n")
-    # print(f"pos_min_right: {pos_min_right}\n")
+        x=-65, y=75, z=pos_max_left.z
+    )  
+    print(f"pos_min_left: {pos_min_left}\n")  # 0, 75, 98
+    # stay above deck to be safe
 
     stall_count = xy_count = y_count = z_l_count = z_r_count = 0
-    x_pt = -54
-    y_pt = 95
-    z_pt = 509.15
 
     high_tp_points: Dict[Union[str, int], Point] = {
         0: pos_max_left,  # back right and up
@@ -61,12 +57,15 @@ async def _bowtie_move(
         7: pos_max_left._replace(z=pos_min_left.z),  # back right and down
         8: pos_max_left,  # back right and up
     }
+    print(f"high_tp_points: {high_tp_points}\n")
 
     for key in high_tp_points.keys():
-        if key is int:
+        print(f"key: {key}\n")
+        if isinstance(key, int):
             print(f">> Move {key} <<\n")
             try:
                 await api.move_to(OT3Mount.LEFT, high_tp_points[key])
+                print(f"Moved to {key} successfully\n")
             except StallOrCollisionDetectedError:
                 print("--STALL DETECTED--\n")
                 stall_count += 1
@@ -90,17 +89,21 @@ async def _bowtie_move(
             tip_pick_up_pos = await api.current_position_ot3(
                 OT3Mount.LEFT, refresh=True
             )
+            print(f"tip_pick_up_pos: {tip_pick_up_pos}\n")
             await api.move_to(
                 OT3Mount.LEFT,
                 Point(
                     tip_pick_up_pos[Axis.X],
                     tip_pick_up_pos[Axis.Y],
-                    tip_pick_up_pos[Axis.Z_L] - 30.0,
+                    tip_pick_up_pos[Axis.Z_L] - prep_position_block_location,
                 ),
             )
             tip_len = 57
+            print(f"tip_len: {tip_len}\n")
+            print(f"picking up tip with mount: {OT3Mount.LEFT}\n")
             await api.pick_up_tip(OT3Mount.LEFT, tip_len, prep_after=False)
-            await api.remove_tip(OT3Mount.LEFT)
+            api.remove_tip(OT3Mount.LEFT)
+            print(f"Moving mount back up to previous position...\n")
             await api.move_to(
                 OT3Mount.LEFT,
                 Point(
@@ -125,7 +128,6 @@ async def _bowtie_move(
         final_encoder_pos,
         open_loop_pos,
     )
-
 
 async def _main(is_simulating: bool, cycles: int, mount: OT3Mount) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
@@ -193,6 +195,7 @@ async def _main(is_simulating: bool, cycles: int, mount: OT3Mount) -> None:
                 load,
             )
         )
+    print(f"MAX_SPEED: {MAX_SPEED}\nACCEL: {ACCEL}\nHOLD_CURRENT: {HOLD_CURRENT}\nRUN_CURRENT: {RUN_CURRENT}\nMAX_DISCONTINUITY: {MAX_DISCONTINUITY}\nDIRECTION_CHANGE_DISCONTINUITY: {DIRECTION_CHANGE_DISCONTINUITY}\n")
     run_id = data.create_run_id()
     file_name = data.create_file_name(test_name=test_name, run_id=run_id, tag=test_tag)
 
@@ -236,9 +239,19 @@ async def _main(is_simulating: bool, cycles: int, mount: OT3Mount) -> None:
     )
 
     start_time = time.perf_counter()
-    homed_pos_left = await api.gantry_position(OT3Mount.LEFT)
-    homed_pos_right = await api.gantry_position(OT3Mount.RIGHT)
+    
+    # homed_pos_left = await api.gantry_position(OT3Mount.LEFT)
+    # homed_pos_right = await api.gantry_position(OT3Mount.RIGHT)
+
+    # print(f"homed_pos_left: {homed_pos_left}\n")
+    # print(f"homed_pos_right: {homed_pos_right}\n")
     total_stalls = 0
+
+    await api.update_nozzle_configuration_for_mount(mount = OT3Mount.LEFT, 
+        back_left_nozzle = 'A1',
+        front_right_nozzle = 'H1'
+    )
+
     for i in range(cycles):
         print(f"\n========== Cycle {i + 1}/{cycles} ==========\n")
 
@@ -263,7 +276,7 @@ async def _main(is_simulating: bool, cycles: int, mount: OT3Mount) -> None:
             z_r_count,
             final_encoder_pos,
             open_loop_pos,
-        ) = await _bowtie_move(api, homed_pos_left, homed_pos_right)
+        ) = await _bowtie_move(api)
         total_stalls += stall_count
 
         print(f"{final_encoder_pos}\n")
