@@ -20,7 +20,7 @@ dependencies = [
     "python-dotenv==1.2.4",
     "python-multipart==0.0.33",
     "pydantic-settings==2.4.0",
-    "uvicorn==0.27.0.post1",
+    "uvicorn==0.54.0",
     "systemd-python==234; sys_platform == 'linux'",
     "fastapi==0.100.0",
 ]
@@ -34,7 +34,7 @@ robot = [
     "python-dotenv==1.2.4",
     "python-multipart==0.0.33",
     "pydantic-settings==2.4.0",
-    "uvicorn==0.27.0.post1",
+    "uvicorn==0.54.0",
     "systemd-python==234; sys_platform == 'linux'",
     "fastapi==0.100.0",
 ]

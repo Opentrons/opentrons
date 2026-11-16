@@ -10,7 +10,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-11-09T21:22:24.028121Z"
+exclude-newer = "2026-11-09T21:23:13.199606Z"
 exclude-newer-span = "P1W"
 
 [manifest]
@@ -2010,7 +2010,7 @@ requires-dist = [
     { name = "sqlalchemy", specifier = "==1.4.51" },
     { name = "systemd-python", marker = "sys_platform == 'linux'", specifier = "==234" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
-    { name = "uvicorn", specifier = "==0.27.0.post1" },
+    { name = "uvicorn", specifier = "==0.54.0" },
     { name = "wsproto", specifier = "==1.3.2" },
     { name = "zipstream-ng", specifier = "==1.9.3" },
 ]
@@ -2062,7 +2062,7 @@ robot = [
     { name = "server-utils", editable = "../server-utils" },
     { name = "sqlalchemy", specifier = "==1.4.51" },
     { name = "systemd-python", marker = "sys_platform == 'linux'", specifier = "==234" },
-    { name = "uvicorn", specifier = "==0.27.0.post1" },
+    { name = "uvicorn", specifier = "==0.54.0" },
     { name = "wsproto", specifier = "==1.3.2" },
     { name = "zipstream-ng", specifier = "==1.9.3" },
 ]
@@ -2222,7 +2222,7 @@ requires-dist = [
     { name = "sqlalchemy", specifier = ">=1.4.51,<3" },
     { name = "systemd-python", marker = "sys_platform == 'linux'", specifier = "==234" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
-    { name = "uvicorn", specifier = "==0.27.0.post1" },
+    { name = "uvicorn", specifier = "==0.54.0" },
     { name = "wsproto", specifier = "==1.3.2" },
 ]
 
@@ -2499,15 +2499,15 @@ wheels = [
 
 [[package]]
 name = "uvicorn"
-version = "0.27.0.post1"
+version = "0.54.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
     { name = "h11" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/38/56/7bc5cf1d693d0c8e5d9dd66c29808691c17260b31346e4ddfbee26ba9bc2/uvicorn-0.27.0.post1.tar.gz", hash = "sha256:54898fcd80c13ff1cd28bf77b04ec9dbd8ff60c5259b499b4b12bb0917f22907", size = 40971, upload-time = "2024-01-29T09:30:55.956Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/da/34/30e9280707135d2cfc589dfff3cb796bd07a3aeb1a3e415ba09dd89d7bb4/uvicorn-0.54.0.tar.gz", hash = "sha256:a2e33cbfaa0306f8e6b0c13e0cb89d7d7a2da3e62b90c66e18c33d9807b28620", size = 112283, upload-time = "2026-09-25T06:52:37.601Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c7/f3/29caa83f5795b20ed3aca357c648f3ae995ff6ff08e38b22387017abbdc5/uvicorn-0.27.0.post1-py3-none-any.whl", hash = "sha256:4b85ba02b8a20429b9b205d015cbeb788a12da527f731811b643fd739ef90d5f", size = 60730, upload-time = "2024-01-29T09:30:52.9Z" },
+    { url = "https://files.pythonhosted.org/packages/38/0c/b54a4fdd7f90a3af8b02ebc9ce6712c2c208b7926a2f7bad95c33ebbe943/uvicorn-0.54.0-py3-none-any.whl", hash = "sha256:505bdb0f318731d45f1f712071fc781a8981f6847a31c902c9f5e652d4f67faf", size = 87427, upload-time = "2026-09-25T06:52:35.829Z" },
 ]
 
 [[package]]
