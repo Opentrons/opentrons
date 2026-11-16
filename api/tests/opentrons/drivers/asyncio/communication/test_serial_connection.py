@@ -701,8 +701,9 @@ def test_partition_serial_read_permutations(
     argnames=["build_raw", "build_expected"],
     argvalues=[
         pytest.param(
-            lambda ack, ending: _async_error_no_ack(line_ending=ending)
-            + _command_response(ack),
+            lambda ack, ending: (
+                _async_error_no_ack(line_ending=ending) + _command_response(ack)
+            ),
             lambda ack, ending: [
                 ("error", _async_error_no_ack(line_ending=ending)),
                 ("response", _command_response(ack)),
@@ -710,8 +711,9 @@ def test_partition_serial_read_permutations(
             id="async-then-response",
         ),
         pytest.param(
-            lambda ack, ending: _command_response(ack)
-            + _async_error_no_ack(line_ending=ending),
+            lambda ack, ending: (
+                _command_response(ack) + _async_error_no_ack(line_ending=ending)
+            ),
             lambda ack, ending: [
                 ("response", _command_response(ack)),
                 ("error", _async_error_no_ack(line_ending=ending)),
@@ -744,8 +746,9 @@ def test_partition_serial_read_permutations(
         pytest.param(
             # Async line uses LF while the command ack uses the device terminator
             # (e.g. firmware prints async with \n even when OK is \r\n).
-            lambda ack, ending: _async_error_no_ack(line_ending="\n")
-            + _command_response(ack),
+            lambda ack, ending: (
+                _async_error_no_ack(line_ending="\n") + _command_response(ack)
+            ),
             lambda ack, ending: [
                 ("error", _async_error_no_ack(line_ending="\n")),
                 ("response", _command_response(ack)),

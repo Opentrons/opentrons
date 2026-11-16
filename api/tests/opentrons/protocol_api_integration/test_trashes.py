@@ -17,12 +17,10 @@ from opentrons.protocols.api_support.util import UnsupportedAPIError
         pytest.param(
             ("2.15", "Flex"),
             protocol_api.Labware,
-            marks=pytest.mark.ot3_only,  # Simulating a Flex protocol requires a Flex hardware API.
         ),
         pytest.param(
             ("2.16", "Flex"),
             None,
-            marks=pytest.mark.ot3_only,  # Simulating a Flex protocol requires a Flex hardware API.
         ),
     ],
     indirect=["simulated_protocol_context"],
@@ -38,8 +36,7 @@ def test_fixed_trash_presence(
     should point to it. The type of the object depends on the API version.
     """
     instrument = simulated_protocol_context.load_instrument(
-        "flex_1channel_50",
-        mount="left",
+        "flex_1channel_50", mount="left"
     )
 
     if expected_trash_class is None:
@@ -107,12 +104,10 @@ def test_trash_search(simulated_protocol_context: protocol_api.ProtocolContext) 
         pytest.param(
             ("2.15", "Flex"),
             False,
-            marks=pytest.mark.ot3_only,  # Simulating a Flex protocol requires a Flex hardware API.
         ),
         pytest.param(
             ("2.16", "Flex"),
             True,
-            marks=pytest.mark.ot3_only,  # Simulating a Flex protocol requires a Flex hardware API.
         ),
     ],
     indirect=["simulated_protocol_context"],
