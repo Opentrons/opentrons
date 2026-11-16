@@ -20,21 +20,22 @@ DEFAULT_Z_CURRENT = 1.5
 PARTIAL_PICK_UP_CURRENT = 0.75
 
 MAX_TRAVEL_MM = {
-    AXIS_X: 427,
-    AXIS_Y: 408,
-    AXIS_Z: 249,
+    Axis.X: 427,
+    Axis.Y: 408,
+    Axis.Z: 249,
 }
 
 PREP_POSITION_BLOCK_LOCATION = 188
-MIN_LEFT_X_OFFSET = -65
+# MIN_LEFT_X_OFFSET = -65
+MIN_LEFT_X_OFFSET = -75
 MIN_LEFT_Y_OFFSET = 74
 
 MAX_REAR_Y_OFFSET = 21
 MAX_RIGHT_X_OFFSET = 1
 
-MAX_RIGHT_POINT = Point(x=MAX_TRAVEL_MM[AXIS_X] - MAX_RIGHT_X_  OFFSET, 
-                            y=MAX_TRAVEL_MM[AXIS_Y] - MAX_REAR_Y_OFFSET, 
-                            z = MAX_TRAVEL_MM[AXIS_Z])
+MAX_RIGHT_POINT = Point(x=MAX_TRAVEL_MM[Axis.X] - MAX_RIGHT_X_OFFSET, 
+                            y=MAX_TRAVEL_MM[Axis.Y] - MAX_REAR_Y_OFFSET, 
+                            z = MAX_TRAVEL_MM[Axis.Z])
 MIN_LEFT_POINT = Point(
                         x=MIN_LEFT_X_OFFSET, 
                         y=MIN_LEFT_Y_OFFSET, 
@@ -176,9 +177,6 @@ async def _main(is_simulating: bool, cycles: int, mount: OT3Mount) -> None:
     else:
         print(f"Left mount: {lm}\n")
         print(f"Right mount (should be empty): {rm}\n")
-
-    load = GANTRY
-
 
     for AXIS in AXES:
         MAX_SPEED.append(
