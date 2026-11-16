@@ -70,6 +70,5 @@ stages:
           /system/time:
             put:
               security:
-                - oauth2: []
                 - oauth2:
                     - system_time.write

@@ -4,7 +4,7 @@ from typing import List
 
 import pytest
 from decoy import matchers
-from fastapi import FastAPI, Header, status
+from fastapi import APIRouter, FastAPI, Header, status
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
 
@@ -154,7 +154,7 @@ def test_handles_body_validation_error(app: FastAPI, client: TestClient) -> None
         json={"int_field": "foobar", "array_field": ["fizzbuzz"]},
     )
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
     assert response.json() == {
         "errors": [
             {
@@ -192,7 +192,7 @@ def test_handles_query_validation_error(app: FastAPI, client: TestClient) -> Non
 
     response = client.get("/items?count=foo")
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
     assert response.json() == {
         "errors": [
             {
@@ -216,7 +216,7 @@ def test_handles_header_validation_error(app: FastAPI, client: TestClient) -> No
 
     response = client.get("/items")
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
     assert response.json() == {
         "errors": [
             {
@@ -242,7 +242,7 @@ def test_handles_legacy_validation_error(app: FastAPI, client: TestClient) -> No
         json={"string_field": None, "int_field": "foobar", "array_field": ["fizzbuzz"]},
     )
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
     assert response.json() == {
         "errorCode": "4000",
         "message": (
@@ -252,6 +252,32 @@ def test_handles_legacy_validation_error(app: FastAPI, client: TestClient) -> No
             "boolean, unable to interpret input"
         ),
     }
+
+
+def test_handles_legacy_validation_error_via_include_router_tags(
+    app: FastAPI, client: TestClient
+) -> None:
+    """Legacy detection must see tags applied via include_router.
+
+    FastAPI 0.16x+ keeps include_router tags on an effective route context
+    rather than copying them onto the leaf APIRoute.
+    """
+    nested = APIRouter()
+
+    @nested.post("/items-nested-legacy")
+    def create_item_nested(item: Item) -> Item:
+        return item
+
+    app.include_router(nested, tags=[V1_TAG])
+
+    response = client.post(
+        "/items-nested-legacy",
+        json={"string_field": None, "int_field": "foobar", "array_field": ["fizzbuzz"]},
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+    assert "message" in response.json()
+    assert "errorCode" in response.json()
 
 
 def test_handles_authorization_error(app: FastAPI, client: TestClient) -> None:

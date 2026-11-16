@@ -277,7 +277,7 @@ async def post_camera_preview_image(
         not in [EngineStatus.STOPPED, EngineStatus.FAILED, EngineStatus.SUCCEEDED]
     ):
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=str("Cannot capture preview photo, run is active."),
         )
 
@@ -285,7 +285,7 @@ async def post_camera_preview_image(
 
     if not camera_settings_store.get_camera_enabled():
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=str("Cannot capture preview photo, camera is disabled on robot."),
         )
 
@@ -323,7 +323,7 @@ async def post_camera_preview_image(
                 f.write(image_data)
         else:
             raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail=str(
                     f"Preview image capture failed with the following: {image_data.message}"
                 ),
@@ -375,7 +375,7 @@ async def post_picture_capture(
             )
     else:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=str("Cannot take photo, camera is disabled."),
         )
 

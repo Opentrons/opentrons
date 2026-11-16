@@ -127,7 +127,7 @@ def test_get_serial_log_with_invalid_params(
     response = api_client.get(
         f"/system/logs/serial.log?format={format_param}&records={records_param}"
     )
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
 
 
 def test_get_log_level_local(api_client: TestClient) -> None:
@@ -181,7 +181,7 @@ def test_post_log_level_local_invalid(
 
     response = api_client.post("/system/settings/log_level/local", json=body)
 
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
 
 
 def test_post_log_level_local_journald_failure_does_not_persist(

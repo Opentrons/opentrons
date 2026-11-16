@@ -94,7 +94,7 @@ async def get_log_level_local(
     ),
     response_model=LogLevel,
     responses={
-        status.HTTP_422_UNPROCESSABLE_ENTITY: {
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {
             "description": "log_level was missing or invalid",
         },
         status.HTTP_500_INTERNAL_SERVER_ERROR: {
@@ -114,7 +114,7 @@ async def post_log_level_local(
     level = log_level.log_level
     if level is None:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="log_level must be set",
         )
 
