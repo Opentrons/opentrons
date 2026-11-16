@@ -375,28 +375,42 @@ def _get_serial_for_dut(
 
 
 async def _scan_barcode(self) -> Optional[str]:  # noqa: ANN001
-    scanners = self.attached_peripherals
-    if not scanners:
-        raise RuntimeError(
-            "No barcode scanner detected. "
-            "Connect a supported scanner to the robot and try again."
-        )
-    scanner = scanners[0]
-    return await scanner.scan_barcode()
+    # A keyboard answer may leave a serial read finishing in the background.
+    # Serialize all helper scans, including ID scans outside Yes/No prompts.
+    lock = getattr(self, "_qc_scan_lock", None)
+    if lock is None:
+        lock = self._qc_scan_lock = asyncio.Lock()
+    async with lock:
+        scanners = self.attached_peripherals
+        if not scanners:
+            raise RuntimeError(
+                "No barcode scanner detected. "
+                "Connect a supported scanner to the robot and try again."
+            )
+        scanner = scanners[0]
+        return await scanner.scan_barcode()
 
 
 def get_device_barcode(
     ctx: ProtocolContext,
     api: SyncHardwareAPI,
     dut: DeviceUnderTest = DeviceUnderTest.ROBOT,
+    *,
+    barcode_timeout_seconds: Optional[float] = 600,
 ) -> str:
-    """Retry pipette IDs for ten minutes, then return the last scan for reporting."""
+    """Retry pipette IDs until timeout; None waits indefinitely for a valid ID."""
     is_pipette = dut in (DeviceUnderTest.PIPETTE_LEFT, DeviceUnderTest.PIPETTE_RIGHT)
     OT3API._scan_barcode = _scan_barcode  # type: ignore[attr-defined]
     barcode = ""
-    deadline = monotonic() + 600
+    deadline = (
+        monotonic() + barcode_timeout_seconds
+        if barcode_timeout_seconds is not None
+        else None
+    )
     i = 0
-    while (is_pipette and monotonic() < deadline) or (not is_pipette and i < 3):
+    while (is_pipette and (deadline is None or monotonic() < deadline)) or (
+        not is_pipette and i < 3
+    ):
         i += 1
         ctx.comment(
             f"将扫描仪对准 {dut.value} 条形码"
@@ -411,7 +425,7 @@ def get_device_barcode(
                 if LOCALIZE
                 else f"Barcode scan attempt {i}: {result!r}"
             )
-        if is_pipette and monotonic() >= deadline:
+        if is_pipette and deadline is not None and monotonic() >= deadline:
             break
         if barcode and (not is_pipette or barcode.startswith("P")):
             return barcode
@@ -448,8 +462,10 @@ def set_csv_report_meta_data_ot3(
     dut: DeviceUnderTest = DeviceUnderTest.ROBOT,
     tag: str = "",
     ctx: Optional[ProtocolContext] = None,
+    *,
+    barcode_timeout_seconds: Optional[float] = 600,
 ) -> None:
-    """Set CSVReport meta-data given an OT3."""
+    """Set CSVReport metadata; None disables the pipette barcode wait timeout."""
     # operator should be entered first
     report.set_operator(operator)
 
@@ -465,7 +481,9 @@ def set_csv_report_meta_data_ot3(
             # if we're running with one of protocol engine's adapters we're running in a protocol and
             # need to use the ctx to grab the barcode scanner instead of users typing input.
             assert ctx
-            barcode = get_device_barcode(ctx, api, dut)
+            barcode = get_device_barcode(
+                ctx, api, dut, barcode_timeout_seconds=barcode_timeout_seconds
+            )
         elif not api.is_simulator:
             barcode = input("SCAN device barcode: ").strip()
     print(f"barcode: {barcode}")
@@ -486,7 +504,7 @@ def set_gantry_per_axis_setting_ot3(
     match load:
         case GantryLoad.HIGH_THROUGHPUT_1000:
             settings.high_throughput_1000[axis_kind] = value
-        case GantryLoad.HIGH_THROUGHPUT_1000:
+        case GantryLoad.HIGH_THROUGHPUT_200:
             settings.high_throughput_200[axis_kind] = value
         case GantryLoad.LOW_THROUGHPUT:
             settings.low_throughput[axis_kind] = value
@@ -1652,56 +1670,56 @@ def direct_eeprom_data(data: EEPROMData) -> DirectEEPROMData:
     )
 
 
-def get_user_answer(ctx: ProtocolContext, api: SyncHardwareAPI, prompt: str) -> bool:
-    """Answer Yes/No by scan or USB keyboard; Escape is No, not cancellation."""
+def get_user_answer(
+    ctx: ProtocolContext,
+    api: SyncHardwareAPI,
+    prompt: str,
+    *,
+    timeout_seconds: Optional[float] = 600,
+) -> bool:
+    """Answer Yes/No by scan or keyboard; None disables the total wait timeout."""
     OT3API._scan_barcode = _scan_barcode  # type: ignore[attr-defined]
     with ExitStack() as cleanup:
         keyboard = YesNoKeyboard.open(ctx.comment)
-        inputs = None
-        if keyboard is not None:
-            inputs = LiquidCalibrationInput(keyboard, ctx.comment, YesNoKeyboard)
-            cleanup.callback(inputs.close_keyboard)
-            OT3API._liquid_calibration_input = read_liquid_calibration_input  # type: ignore[attr-defined]
-            cleanup.callback(api._liquid_calibration_input, inputs, close=True)
-        return _wait_for_yes_no(ctx, api, prompt, inputs)
+        inputs = LiquidCalibrationInput(keyboard, ctx.comment, YesNoKeyboard)
+        cleanup.callback(inputs.close_keyboard)
+        OT3API._liquid_calibration_input = read_liquid_calibration_input  # type: ignore[attr-defined]
+        cleanup.callback(api._liquid_calibration_input, inputs, close=True)
+        if keyboard is None:
+            ctx.comment("尚未打开可用键盘，将自动重试连接；也可扫描 Yes / No。")
+        return _wait_for_yes_no(
+            ctx, api, prompt, inputs, timeout_seconds=timeout_seconds
+        )
 
 
 def _wait_for_yes_no(
     ctx: ProtocolContext,
     api: SyncHardwareAPI,
     prompt: str,
-    inputs: Optional[LiquidCalibrationInput],
+    inputs: LiquidCalibrationInput,
+    *,
+    timeout_seconds: Optional[float] = 600,
 ) -> bool:
     """Keep pause/cancel checks active while waiting for a fresh explicit answer."""
-    if inputs is not None:
-        ctx.comment(
-            f"{prompt}：扫描 Yes / No，或按 Enter = Yes（是）、Esc = No（否）（Y/N 也可）。"
-            if LOCALIZE
-            else f"{prompt}: Scan Yes / No, or press Enter = Yes, Esc = No (Y/N also work)."
-        )
-        inputs.discard_pending()
-    else:
-        ctx.comment(
-            f"将扫描仪对准“是”或“否”： {prompt}"
-            if LOCALIZE
-            else f"Point Scanner at Yes or No: {prompt}"
-        )
-    deadline = monotonic() + 600
-    failed_scans = 0
-    while failed_scans < 3 and monotonic() < deadline:
+    # Clear stale input before displaying the question, so a key pressed in
+    # response to the visible prompt is not invalidated by a later reset.
+    inputs.discard_pending()
+    ctx.comment(
+        f"{prompt}：扫描 Yes / No，或按 Enter = Yes（是）、Esc = No（否）（Y/N 也可）。"
+        if LOCALIZE
+        else f"{prompt}: Scan Yes / No, or press Enter = Yes, Esc = No (Y/N also work)."
+    )
+    deadline = monotonic() + timeout_seconds if timeout_seconds is not None else None
+    next_invalid_notice = 0.0
+    while deadline is None or monotonic() < deadline:
         api.delay(0.1)
-        if inputs is None:
-            result = api._scan_barcode()
-            received_at = monotonic()
-        else:
-            result, received_at = api._liquid_calibration_input(inputs)
-            inputs.report_disconnect()
+        result, received_at = api._liquid_calibration_input(inputs)
+        inputs.report_disconnect()
         api.delay(0.1)
-        if monotonic() >= deadline:
+        if deadline is not None and monotonic() >= deadline:
             break
         if monotonic() - received_at > 3:
-            if inputs is not None:
-                inputs.discard_pending()
+            inputs.discard_pending()
             ctx.comment(
                 "回答已过期，请重新扫码或按键。"
                 if LOCALIZE
@@ -1712,22 +1730,20 @@ def _wait_for_yes_no(
         if answer in ("yes", "no"):
             ctx.comment(f"{prompt}: {answer.title()}")
             return answer == "yes"
-        # Polling or scanner timeouts must not exhaust retries before a key is
-        # pressed. Non-empty invalid scans retain the three-attempt limit.
-        if inputs is not None and not answer:
+        # Ignore unrelated barcodes without limiting attempts or extending
+        # any configured deadline. Only an explicit Yes/No completes the prompt.
+        if not answer:
             continue
-        failed_scans += 1
-        if answer:
+        now = monotonic()
+        if now >= next_invalid_notice:
             ctx.comment(
-                "回答无效，请扫描 Yes 或 No 条形码。"
+                "已忽略无效回答。请扫描 Yes / No，或按 Enter / Esc；仍在等待有效回答。"
                 if LOCALIZE
-                else "Invalid answer. Scan a Yes or No barcode."
+                else "Invalid answer ignored. Scan Yes / No or press Enter / Esc; "
+                "still waiting for a valid answer."
             )
-        else:
-            ctx.comment("扫描失败，请重试" if LOCALIZE else "Failed to scan, try again.")
+            next_invalid_notice = now + 10
 
-    if failed_scans >= 3:
-        raise RuntimeError("Error scanning barcode.")
     raise RuntimeError("Yes/No confirmation timed out without an answer.")
 
 

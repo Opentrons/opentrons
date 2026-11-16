@@ -1,4 +1,4 @@
-"""Read liquid calibration and Yes/No keys from a Linux USB keyboard."""
+"""Read liquid calibration, Yes/No and channel keys from a Linux USB keyboard."""
 
 import errno
 import fcntl
@@ -13,7 +13,7 @@ from typing import Callable, Optional, Tuple
 
 # Use the robot's API logger so these records are included in exported api.log.
 log = logging.getLogger("opentrons.hardware_testing.liquid_calibration_keyboard")
-INPUT_REVISION = "2026-09-21.1"
+INPUT_REVISION = "2026-10-29.1"
 
 
 @dataclass(frozen=True)
@@ -66,6 +66,7 @@ class LiquidCalibrationKeyboard:
     KEY_STATE = 0x80604518  # EVIOCGKEY(96)
     LED_STATE = 0x80014519  # EVIOCGLED(1)
     NUM_LOCK_KEY = 69
+    HELD_WARNING_SECONDS = 5.0
     DISCONNECTED = (errno.ENODEV, errno.ENXIO, errno.EBADF)
 
     def __init__(
@@ -86,6 +87,12 @@ class LiquidCalibrationKeyboard:
         self._led_controller: Optional[LiquidCalibrationKeyboard] = None
         self.not_before = self._opened_at = monotonic()
         self._held: set[int] = set()
+        self._held_since: dict[int, float] = {}
+        self._held_warned: set[int] = set()
+        # Num Lock is a keyboard LED state key, never a QC command. Keep its
+        # edge state separately so a stuck/repeating Num Lock cannot affect
+        # the held-key filtering for Enter/Esc.
+        self._num_lock_pressed = False
         self._seen_key = False
         self._dropped = False
         self._resync()
@@ -111,8 +118,10 @@ class LiquidCalibrationKeyboard:
     def _resync(self) -> None:
         state = bytearray(96)
         fcntl.ioctl(self.fd, self.KEY_STATE, state)
-        keys = set(self.KEYS) | {self.NUM_LOCK_KEY}
+        keys = set(self.KEYS)
         self._held = {k for k in keys if state[k // 8] & (1 << (k % 8))}
+        self._held_since = {k: monotonic() for k in self._held}
+        self._held_warned.clear()
 
     def _read_num_lock(self) -> bool:
         state = bytearray(1)
@@ -285,14 +294,32 @@ class LiquidCalibrationKeyboard:
     def _press(
         self, code: int, value: int, timestamp: float, now: float
     ) -> Optional[Tuple[str, float]]:
+        if code == self.NUM_LOCK_KEY:
+            if value == 0:
+                self._num_lock_pressed = False
+            elif value == 1 and not self._num_lock_pressed:
+                self._num_lock_pressed = True
+                # LED feedback is best effort. Num Lock never becomes a
+                # pending command and never produces a user-facing warning.
+                self._toggle_num_lock()
+            log.debug(
+                "keyboard=%s NumLock event value=%d ignored for QC command input",
+                self.path,
+                value,
+            )
+            return None
         was_held = code in self._held
         if value == 0:
             self._held.discard(code)
+            self._held_since.pop(code, None)
+            self._held_warned.discard(code)
             reason = "release"
         else:
             self._held.add(code)
-            cutoff = self._opened_at if code == self.NUM_LOCK_KEY else self.not_before
-            if code not in self.KEYS and code != self.NUM_LOCK_KEY:
+            if code in self.KEYS:
+                self._held_since.setdefault(code, now)
+            cutoff = self.not_before
+            if code not in self.KEYS:
                 reason = "unmapped"
             elif value != 1 or was_held:
                 reason = "repeat/held"
@@ -300,6 +327,19 @@ class LiquidCalibrationKeyboard:
                 reason = "stale/future"
             else:
                 reason = "accepted"
+        if (
+            reason == "repeat/held"
+            and code not in self._held_warned
+            and now - self._held_since[code] >= self.HELD_WARNING_SECONDS
+        ):
+            self._held_warned.add(code)
+            key_name = f"key code {code}"
+            log.warning(
+                "keyboard=%s %s remains held; waiting for release", self.path, key_name
+            )
+            self._notice(
+                f"键盘 {key_name} 持续处于按住状态，重复事件不会用于确认。" "请松开后重新按键；仍无响应时，请重新连接键盘。"
+            )
         emit = log.debug if value == 2 else log.info
         emit(
             "keyboard=%s code=%d value=%d age=%.6f reason=%s",
@@ -407,3 +447,151 @@ class YesNoKeyboard(LiquidCalibrationKeyboard):
     }
     REQUIRED_KEY_GROUPS = ((KEY_ENTER, KEY_KPENTER, 21), (KEY_ESC, 49))
     REJECT_COMMAND = "NO"
+
+
+@dataclass
+class _ChannelEntry:
+    characters: list[str]
+    submitted: bool = False
+
+
+class ChannelSelectionKeyboard(LiquidCalibrationKeyboard):
+    """Collect channel digits until Enter, independently of Num Lock state."""
+
+    # Preserve unsupported keys as invalid characters: silently ignoring a
+    # decimal point or letter could turn an invalid answer into valid channels.
+    KEYS = {
+        **dict.fromkeys(range(1, 768), "?"),
+        **dict(zip(range(2, 12), "1234567890")),
+        **dict(zip((71, 72, 73, 75, 76, 77, 79, 80, 81, 82), "7894561230")),
+        **dict(zip(range(16, 26), "qwertyuiop")),
+        **dict(zip(range(30, 39), "asdfghjkl")),
+        **dict(zip(range(44, 51), "zxcvbnm")),
+        1: "CLEAR",
+        14: "BACKSPACE",
+        28: "SUBMIT",
+        96: "SUBMIT",
+        12: "-",
+        13: "=",
+        51: ",",
+        52: ".",
+        53: "/",
+        55: "*",
+        57: " ",
+        74: "-",
+        78: "+",
+        83: ".",
+        98: "/",
+    }
+    REQUIRED_KEY_GROUPS = (
+        (2, 79),
+        (3, 80),
+        (4, 81),
+        (5, 75),
+        (6, 76),
+        (7, 77),
+        (8, 71),
+        (9, 72),
+        (28, 96),
+    )
+    REJECT_COMMAND = ""
+
+    def __init__(
+        self,
+        fd: int,
+        name: str,
+        *,
+        path: str = "",
+        identity: str = "",
+        num_led: bool = True,
+        writable: bool = True,
+        notice: Optional[Callable[[str], None]] = None,
+    ) -> None:
+        """Start each opened or reconnected keyboard with an empty answer."""
+        self._entry = _ChannelEntry([])
+        super().__init__(
+            fd,
+            name,
+            path=path,
+            identity=identity,
+            num_led=num_led,
+            writable=writable,
+            notice=notice,
+        )
+
+    def _press(
+        self, code: int, value: int, timestamp: float, now: float
+    ) -> Optional[Tuple[str, float]]:
+        candidate = super()._press(code, value, timestamp, now)
+        if candidate is None or self._entry.submitted:
+            return None
+        action, timestamp = candidate
+        if action == "SUBMIT":
+            raw = "".join(self._entry.characters)
+            self._entry.characters.clear()
+            self._entry.submitted = True
+            return f"CHANNELS:{raw}", timestamp
+        if action == "CLEAR":
+            self._entry.characters.clear()
+        elif action == "BACKSPACE":
+            if self._entry.characters:
+                self._entry.characters.pop()
+        else:
+            if self._held.intersection((29, 42, 54, 56, 97, 100)):
+                action = "?"
+            self._entry.characters.append(action)
+        self._notice(f"漏液通道输入：{''.join(self._entry.characters) or '（空）'}，按 Enter 提交。")
+        return None
+
+    def _channel_events(self) -> list[tuple[float, int, int, int]]:
+        events = []
+        while True:
+            try:
+                data = os.read(self.fd, self.EVENT.size * 256)
+            except BlockingIOError:
+                return events
+            if not data or len(data) % self.EVENT.size:
+                raise OSError("Keyboard disconnected or returned an incomplete event")
+            events.extend(
+                (sec + usec / 1_000_000, kind, code, value)
+                for sec, usec, kind, code, value in self.EVENT.iter_unpack(data)
+            )
+
+    def _channel_event(
+        self, event: tuple[float, int, int, int], now: float
+    ) -> Optional[Tuple[str, float]]:
+        timestamp, kind, code, value = event
+        if kind == 0 and code == 3:  # SYN_DROPPED
+            self._dropped = True
+            self._entry.characters[:] = ["?"]
+            self._notice("键盘输入事件丢失，请按 Esc 清空后重新输入漏液通道。")
+        elif self._dropped:
+            if kind == 0 and code == 0:  # SYN_REPORT
+                self._resync()
+                self.not_before = self._opened_at = monotonic()
+                self._dropped = False
+        elif kind == 1:
+            return self._press(code, value, timestamp, now)
+        return None
+
+    def poll(self) -> Optional[Tuple[str, float]]:
+        """Merge interfaces in event order and submit at most one answer per batch."""
+        interfaces = [self, *self._children]
+        events = []
+        self._entry.submitted = False
+        for keyboard in interfaces:
+            if not isinstance(keyboard, ChannelSelectionKeyboard):
+                raise TypeError("Channel keyboard interfaces must use the same reader")
+            keyboard._entry = self._entry
+            keyboard.not_before = max(keyboard.not_before, self.not_before)
+            events.extend((event, keyboard) for event in keyboard._channel_events())
+        now = monotonic()
+        command = None
+        for event, keyboard in sorted(events, key=lambda item: item[0][0]):
+            candidate = keyboard._channel_event(event, now)
+            if event[1:3] == (0, 3):
+                command = None
+                self._entry.submitted = True
+            if candidate is not None and command is None:
+                command = candidate
+        return command

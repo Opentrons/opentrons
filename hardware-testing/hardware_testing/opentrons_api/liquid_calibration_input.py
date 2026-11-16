@@ -16,7 +16,7 @@ from hardware_testing.drivers.liquid_calibration_keyboard import (
 
 log = logging.getLogger("opentrons.hardware_testing.liquid_calibration_input")
 Command = Tuple[Optional[str], float]
-INPUT_REVISION = "2026-09-21.1"
+INPUT_REVISION = "2026-10-19.1"
 
 
 def log_input_versions() -> None:
@@ -43,10 +43,12 @@ class LiquidCalibrationInput:
 
     POLL_SECONDS = 0.02
     RECONNECT_SECONDS = 1.0
+    SCAN_RETRY_SECONDS = 2.0
+    SCAN_WARNING_SECONDS = 10.0
 
     def __init__(
         self,
-        keyboard: LiquidCalibrationKeyboard,
+        keyboard: Optional[LiquidCalibrationKeyboard],
         comment: Callable[[str], None],
         keyboard_type: type[LiquidCalibrationKeyboard] = LiquidCalibrationKeyboard,
     ) -> None:
@@ -54,15 +56,22 @@ class LiquidCalibrationInput:
         self.keyboard: Optional[LiquidCalibrationKeyboard] = keyboard
         self._keyboard_type = keyboard_type
         self._identity = (
-            keyboard.identity if isinstance(keyboard.identity, str) else None
+            keyboard.identity
+            if keyboard is not None and isinstance(keyboard.identity, str)
+            else None
         )
         self._comment = comment
         self._notices: SimpleQueue[str] = SimpleQueue()
         self._last_notice: Optional[str] = None
-        keyboard.set_notice(self._notice)
+        if keyboard is not None:
+            keyboard.set_notice(self._notice)
         self._lock = Lock()
         self._receiver: Optional[asyncio.Task[None]] = None
         self._scan: Optional[asyncio.Task[Command]] = None
+        self._next_scan = 0.0
+        self._scan_started = 0.0
+        self._scan_warning_sent = False
+        self._last_scan_error: Optional[str] = None
         self._discard_scan = False
         self._pending_key: Optional[Tuple[str, float]] = None
         self._not_before = 0.0
@@ -70,6 +79,7 @@ class LiquidCalibrationInput:
         self._closed = False
         self._next_reconnect = 0.0
         self._next_health_log = monotonic() + 10
+        self._next_discard_notice = 0.0
         self.last_source = ""
 
     def _notice(self, message: str) -> None:
@@ -95,6 +105,8 @@ class LiquidCalibrationInput:
                 )
                 if self.keyboard is None:
                     return
+                if self._identity is None:
+                    self._identity = self.keyboard.identity
                 self._notice(f"键盘已重新连接：{self.keyboard.name}。请松开后重新按键。")
                 self._pending_key = None
                 self._not_before = monotonic()
@@ -126,6 +138,9 @@ class LiquidCalibrationInput:
                     "keyboard command=%s discarded: movement/previous input in progress",
                     key[0],
                 )
+                if monotonic() >= self._next_discard_notice:
+                    self._notice("按键发生在有效回答时段之外，未用于确认。请在问题显示后松开并重新按键。")
+                    self._next_discard_notice = monotonic() + 3
                 return
             if (
                 self._pending_key is None
@@ -184,7 +199,9 @@ class LiquidCalibrationInput:
                 self._accept_commands = False
         return result
 
-    async def read(self, scan: Callable[[], Awaitable[Optional[str]]]) -> Command:
+    async def read(
+        self, scan: Optional[Callable[[], Awaitable[Optional[str]]]]
+    ) -> Command:
         """Return one input; keep handling key releases and LEDs between calls."""
         with self._lock:
             if self._closed:
@@ -195,8 +212,10 @@ class LiquidCalibrationInput:
             self._receiver = asyncio.create_task(self._receive_keyboard())
         elif self._receiver.done():
             self._receiver.result()  # Never hide an unexpected receiver failure.
-        if self._scan is None:
+        if self._scan is None and scan is not None and monotonic() >= self._next_scan:
             self._discard_scan = False
+            self._scan_started = monotonic()
+            self._scan_warning_sent = False
             self._scan = asyncio.create_task(self._scan_once(scan))
         await asyncio.sleep(self.POLL_SECONDS)
         if self._receiver.done():
@@ -205,11 +224,32 @@ class LiquidCalibrationInput:
         if key is not None:
             self._discard_scan = True
             return self._received(key, "keyboard")
-        if self._scan.done():
+        if self._scan is not None and self._scan.done():
             task, self._scan = self._scan, None
-            result = task.result()
+            try:
+                if task.cancelled():
+                    raise RuntimeError("Scanner read was cancelled")
+                result = task.result()
+            except Exception as error:
+                self._next_scan = monotonic() + self.SCAN_RETRY_SECONDS
+                message = f"{type(error).__name__}: {error}"
+                if message != self._last_scan_error:
+                    log.warning(
+                        "Scanner unavailable; keyboard remains active: %s", message
+                    )
+                    self._notice(f"扫码暂不可用，仍可按键盘回答；将自动重试。原因：{message}")
+                    self._last_scan_error = message
+                return None, monotonic()
+            self._last_scan_error = None
             if not self._discard_scan:
                 return self._received(result, "scanner")
+        if (
+            self._scan is not None
+            and not self._scan_warning_sent
+            and monotonic() - self._scan_started >= self.SCAN_WARNING_SECONDS
+        ):
+            self._notice("扫码响应超时，键盘输入仍可使用。请检查扫描仪连接。")
+            self._scan_warning_sent = True
         return None, monotonic()
 
     def report_disconnect(self) -> None:
@@ -237,8 +277,13 @@ class LiquidCalibrationInput:
                 self.keyboard.close()
                 self.keyboard = None
 
-    async def close(self) -> None:
-        """Stop the receiver, release ownership and finish the serial read."""
+    async def close(self) -> Optional[asyncio.Task[Command]]:
+        """Release the keyboard and hand off any unfinished serial read.
+
+        Cancelling an asyncio task does not stop its serial executor thread.
+        Keep the read alive for the adapter to drain before the next scan,
+        without delaying a keyboard answer or reusing the previous answer.
+        """
         self.close_keyboard()
         if self._receiver is not None:
             receiver, self._receiver = self._receiver, None
@@ -249,12 +294,18 @@ class LiquidCalibrationInput:
                 pass
             except Exception:
                 log.exception("Keyboard receiver failed while closing")
-        if self._scan is not None:
-            task, self._scan = self._scan, None
-            try:
-                await task
-            except Exception:
-                log.exception("Scanner read failed while leaving liquid calibration")
+        task, self._scan = self._scan, None
+        if task is not None:
+            task.add_done_callback(_finish_abandoned_scan)
+        return task
+
+
+def _finish_abandoned_scan(task: asyncio.Task[Command]) -> None:
+    """Retrieve errors even when no subsequent confirmation is opened."""
+    if not task.cancelled():
+        error = task.exception()
+        if error is not None:
+            log.warning("Discarded scanner read failed: %s", error)
 
 
 async def read_liquid_calibration_input(
@@ -262,6 +313,14 @@ async def read_liquid_calibration_input(
 ) -> Command:
     """Run input tasks on the hardware loop via the synchronous API adapter."""
     if close:
-        await inputs.close()
+        pending = await inputs.close()
+        if pending is not None:
+            self._qc_pending_input_scan = pending
         return None, monotonic()
+    pending = getattr(self, "_qc_pending_input_scan", None)
+    if pending is not None:
+        if not pending.done():
+            return await inputs.read(None)
+        # Never use a result originating from a previous confirmation.
+        self._qc_pending_input_scan = None
     return await inputs.read(self._scan_barcode)

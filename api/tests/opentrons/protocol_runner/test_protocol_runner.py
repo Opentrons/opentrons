@@ -17,6 +17,8 @@ from opentrons_shared_data.protocol.models import ProtocolSchemaV6, ProtocolSche
 from opentrons_shared_data.protocol.types import (
     JsonProtocol as LegacyJsonProtocolDict,
 )
+from opentrons_shared_data.protocol.types import Metadata as JsonProtocolMetadata
+from opentrons_shared_data.robot.types import RobotType
 
 from opentrons import protocol_reader
 from opentrons.hardware_control import API as HardwareAPI
@@ -59,7 +61,11 @@ from opentrons.protocol_runner.python_protocol_wrappers import (
 from opentrons.protocol_runner.task_queue import TaskQueue
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parse import PythonParseMode
-from opentrons.protocols.types import JsonProtocol, PythonProtocol
+from opentrons.protocols.types import (
+    JsonProtocol,
+    PythonProtocol,
+    PythonProtocolMetadata,
+)
 from opentrons.util.broker import Broker
 
 
@@ -466,6 +472,10 @@ async def test_run_json_runner_stop_requested_stops_enqueuing(
 
 @pytest.mark.filterwarnings("ignore::decoy.warnings.RedundantVerifyWarning")
 @pytest.mark.parametrize(
+    "metadata",
+    [{}, {"maintenanceProtocol": "pipetteIdentityProvisioning"}],
+)
+@pytest.mark.parametrize(
     "schema_version, json_protocol",
     [
         (6, ProtocolSchemaV6.model_construct()),  # type: ignore[call-arg]
@@ -481,6 +491,7 @@ async def test_load_json_runner(
     json_runner_subject: JsonRunner,
     schema_version: int,
     json_protocol: Union[ProtocolSchemaV6, ProtocolSchemaV7],
+    metadata: dict[str, str],
 ) -> None:
     """It should load a JSON protocol file."""
     labware_definition = LabwareDefinition2.model_construct()  # type: ignore[call-arg]
@@ -489,7 +500,7 @@ async def test_load_json_runner(
         directory=Path("/dev/null"),
         main_file=Path("/dev/null/abc.json"),
         files=[],
-        metadata={},
+        metadata=metadata,
         robot_type="OT-2 Standard",
         config=JsonProtocolConfig(schema_version=schema_version),
         content_hash="abc123",
@@ -512,6 +523,7 @@ async def test_load_json_runner(
     liquids: List[Liquid] = [
         Liquid(id="water-id", displayName="water", description="water desc")
     ]
+    json_protocol = json_protocol.model_copy(update={"metadata": metadata})
 
     decoy.when(
         await protocol_reader.extract_labware_definitions(json_protocol_source)
@@ -702,20 +714,41 @@ async def test_load_legacy_python(
     )
 
 
+@pytest.mark.parametrize(
+    "filename", ["provision_pipette_ot3.py", "renamed_protocol.py"]
+)
+@pytest.mark.parametrize(
+    "robot_type,metadata,initial_home_count",
+    [
+        ("OT-3 Standard", {"maintenanceProtocol": "pipetteIdentityProvisioning"}, 0),
+        ("OT-3 Standard", None, 1),
+        ("OT-3 Standard", {}, 1),
+        ("OT-3 Standard", {"maintenanceProtocol": ""}, 1),
+        ("OT-3 Standard", {"maintenanceProtocol": "otherMaintenance"}, 1),
+        ("OT-3 Standard", {"protocolName": "pipetteIdentityProvisioning"}, 1),
+        ("OT-2 Standard", {"maintenanceProtocol": "pipetteIdentityProvisioning"}, 1),
+    ],
+)
 async def test_load_python_with_pe_papi_core(
     decoy: Decoy,
     python_and_legacy_file_reader: PythonAndLegacyFileReader,
     protocol_context_creator: ProtocolContextCreator,
+    python_protocol_executor: PythonProtocolExecutor,
+    task_queue: TaskQueue,
     protocol_engine: ProtocolEngine,
     python_runner_subject: PythonAndLegacyRunner,
+    robot_type: RobotType,
+    metadata: PythonProtocolMetadata,
+    initial_home_count: int,
+    filename: str,
 ) -> None:
-    """It should load a legacy context-based Python protocol."""
+    """Only the specifically marked Flex Python protocol may skip its initial home."""
     protocol_source = ProtocolSource(
         directory=Path("/dev/null"),
         main_file=Path("/dev/null/abc.py"),
         files=[],
         metadata={},
-        robot_type="OT-2 Standard",
+        robot_type=robot_type,
         config=PythonProtocolConfig(api_version=APIVersion(2, 14)),
         content_hash="abc123",
     )
@@ -723,10 +756,10 @@ async def test_load_python_with_pe_papi_core(
     protocol = PythonProtocol(
         text="",
         contents="",
-        filename="protocol.py",
-        robot_type="OT-3 Standard",
+        filename=filename,
+        robot_type=robot_type,
         api_level=APIVersion(2, 14),
-        metadata={"foo": "bar"},
+        metadata=metadata,
         bundled_labware=None,
         bundled_data=None,
         bundled_python=None,
@@ -762,7 +795,40 @@ async def test_load_python_with_pe_papi_core(
     decoy.verify(protocol_engine.add_plugin(matchers.IsA(LegacyContextPlugin)), times=0)
     assert broker_captor.value is python_runner_subject.broker
 
+    run_func_captor = matchers.Captor()
+    decoy.verify(task_queue.set_run_func(run_func_captor), times=1)
+    await run_func_captor.value()
+    decoy.verify(
+        await protocol_engine.add_and_execute_command(
+            request=pe_commands.HomeCreate(params=pe_commands.HomeParams(axes=None))
+        ),
+        times=initial_home_count,
+    )
+    decoy.verify(
+        await python_protocol_executor.execute(
+            protocol=protocol,
+            context=protocol_context,
+            run_time_parameters_with_overrides=None,
+        ),
+        times=1,
+    )
+    decoy.verify(
+        task_queue.set_cleanup_func(
+            func=protocol_engine.finish,
+            drop_tips_after_run=True,
+            post_run_hardware_state=PostRunHardwareState.HOME_AND_STAY_ENGAGED,
+        ),
+        times=1,
+    )
 
+
+@pytest.mark.parametrize(
+    "metadata",
+    [
+        {"protocolName": "A Very Impressive Protocol"},
+        {"maintenanceProtocol": "pipetteIdentityProvisioning"},
+    ],
+)
 async def test_load_legacy_json(
     decoy: Decoy,
     python_and_legacy_file_reader: PythonAndLegacyFileReader,
@@ -771,6 +837,7 @@ async def test_load_legacy_json(
     task_queue: TaskQueue,
     protocol_engine: ProtocolEngine,
     python_runner_subject: PythonAndLegacyRunner,
+    metadata: dict[str, str],
 ) -> None:
     """It should load a legacy context-based JSON protocol."""
     labware_definition = LabwareDefinition2.model_construct()  # type: ignore[call-arg]
@@ -779,7 +846,7 @@ async def test_load_legacy_json(
         directory=Path("/dev/null"),
         main_file=Path("/dev/null/abc.json"),
         files=[],
-        metadata={},
+        metadata=metadata,
         robot_type="OT-2 Standard",
         config=JsonProtocolConfig(schema_version=5),
         content_hash="abc123",
@@ -792,7 +859,7 @@ async def test_load_legacy_json(
         robot_type="OT-3 Standard",
         api_level=APIVersion(2, 11),
         schema_version=5,
-        metadata={"protocolName": "A Very Impressive Protocol"},
+        metadata=cast(JsonProtocolMetadata, metadata),
     )
 
     protocol_context = decoy.mock(cls=ProtocolContext)
