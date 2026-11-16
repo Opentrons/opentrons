@@ -30,7 +30,7 @@ dynamic = ['version']
 [dependency-groups]
 # Robot dependencies for robot deployment
 robot = [
-    "jsonschema==4.17.3",
+    "jsonschema==4.26.0",
     "pydantic==2.11.7",
     "numpy==1.26.4",
     "zipp==3.21.0",
