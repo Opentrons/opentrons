@@ -362,7 +362,7 @@ export function Toast(props: ToastProps): ReactNode {
           ) : null}
           <Flex alignItems={ALIGN_CENTER}>
             <StyledText
-              oddStyle="bodyTextRegular"
+              oddStyle="bodyTextBold"
               desktopStyle="bodyDefaultRegular"
               overflow="hidden"
               textOverflow="ellipsis"
