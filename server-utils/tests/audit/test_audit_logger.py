@@ -857,7 +857,7 @@ async def test_log_handles_json(
     assert response.status_code == 200
     decoy.verify(
         await mock_client.submit_log_message(
-            parametrized_log('Request body: {"hello": "world"}')
+            parametrized_log('Request body: {"hello":"world"}')
         )
     )
 
@@ -875,11 +875,11 @@ async def test_log_handles_long_json(
         method.lower(), "/body", json={"hello": "a" * MAX_LOG_CHUNK_SIZE}
     )
     assert response.status_code == 200
-    as_remaining = "a" * (MAX_LOG_CHUNK_SIZE - 11)
+    as_remaining = "a" * (MAX_LOG_CHUNK_SIZE - 10)
     decoy.verify(
         await mock_client.submit_log_message(
             parametrized_log(
-                'Request body: {"hello": "'
+                'Request body: {"hello":"'
                 + as_remaining
                 + " "
                 + f"(truncated after {MAX_LOG_CHUNK_SIZE} elements)"
