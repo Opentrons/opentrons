@@ -4,6 +4,7 @@ import time
 from typing import List, Dict, Union
 import sys
 import json
+import requests
 
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing import data
@@ -22,7 +23,7 @@ PARTIAL_PICK_UP_CURRENT = 0.75
 MAX_TRAVEL_MM = {
     Axis.X: 427,
     Axis.Y: 408,
-    Axis.Z: 249,
+    Axis.Z_L: 249,
 }
 
 PREP_POSITION_BLOCK_LOCATION = 188
@@ -55,13 +56,23 @@ BOWTIE_COORDINATES: Dict[Union[str, int], Point] = {
     8: MAX_RIGHT_POINT,  # back right and up
 }
 
-HEADER = ["Time (H:M:S)", "Test Robot", "Test Configuration", "Pick Up Current (A)", "Cycle",
-"XY Stall", "Y Stall", "Z_L Stall", "Z_R Stall", "Cycle Stalls", "Total Stalls", "", "Open-Loop Position",
-"Encoder Position", "Difference X (mm)", "Difference Y (mm)", "Difference Z (mm)", "",
-"Left Mount", "Right Mount", "Gripper Attached", "", "Axis",
-"Max Speed (mm/s)", "Acceleration (mm^2/s)", "Hold Current (A)", "Run Current (A)",
-"Max Speed Discontinuity", "Direction Change Speed Discontinuity",
-]
+HEADER = ["Cycle", "Time (H:M:S)", "Pick Up Current (A)",
+            "XY Stall", "Y Stall", "Z_L Stall", "Z_R Stall", "Cycle Stalls", 
+            "Total Stalls","Open-Loop Position", "Encoder Position", "Difference X (mm)", 
+            "Difference Y (mm)", "Difference Z (mm)"]
+
+TEST_DETAILS_HEADER = ["Robot Name", "Test Configuration", "Axis", "Max Speed (mm/s)", 
+                        "Acceleration (mm^2/s)", "Hold Current (A)", "Run Current (A)", 
+                        "Max Speed Discontinuity", "Direction Change Speed Discontinuity"]
+
+AXES: List[Axis] = [Axis.X, Axis.Y, Axis.Z_L]
+
+MAX_SPEED: List[int] = []
+ACCEL: List[int] = []
+HOLD_CURRENT: List[float] = []
+RUN_CURRENT: List[float] = []
+MAX_DISCONTINUITY: List[float] = []
+DIRECTION_CHANGE_DISCONTINUITY: List[float] = []
 
 def convert(seconds):
     weeks, seconds = divmod(seconds, 7 * 24 * 60 * 60)
@@ -70,6 +81,37 @@ def convert(seconds):
     minutes, seconds = divmod(seconds, 60)
 
     return "%02d:%02d:%02d:%02d:%02d" % (weeks, days, hours, minutes, seconds)
+
+def get_robot_name() -> str:
+    response = requests.get("http://10.14.19.25:31950/health", headers={"opentrons-version": "3"})
+    health_data = response.json()
+    return health_data['name']
+
+def record_test_details(
+    test_name: str,
+    run_id: str,
+    file_name: str,
+    robot_name: str,
+    test_config: str,
+) -> None:
+    rows = [
+        [TEST_DETAILS_HEADER[0], robot_name],
+        [TEST_DETAILS_HEADER[1], test_config],
+        [TEST_DETAILS_HEADER[2]] + [str(Axis.to_kind(axis)) for axis in AXES],
+        [TEST_DETAILS_HEADER[3]] + [str(v) for v in MAX_SPEED],
+        [TEST_DETAILS_HEADER[4]] + [str(v) for v in ACCEL],
+        [TEST_DETAILS_HEADER[5]] + [str(v) for v in HOLD_CURRENT],
+        [TEST_DETAILS_HEADER[6]] + [str(v) for v in RUN_CURRENT],
+        [TEST_DETAILS_HEADER[7]] + [str(v) for v in MAX_DISCONTINUITY],
+        [TEST_DETAILS_HEADER[8]] + [str(v) for v in DIRECTION_CHANGE_DISCONTINUITY],
+    ]
+    for row in rows:
+        data.append_data_to_file(
+            test_name=test_name,
+            run_id=run_id,
+            file_name=file_name,
+            data=",".join(row) + "\n",
+        )
 
 async def _bowtie_move(api) -> tuple:
     # initialize stall counts for each axis
@@ -151,18 +193,9 @@ async def _main(is_simulating: bool, cycles: int, mount: OT3Mount) -> None:
     await api.cache_instruments()
     await api.home()
     load = api.gantry_load
-
-    AXES = [Axis.X, Axis.Y, Axis.Z_L]
-
-    MAX_SPEED = []
-    ACCEL = []
-    HOLD_CURRENT = []
-    RUN_CURRENT = []
-    MAX_DISCONTINUITY = []
-    DIRECTION_CHANGE_DISCONTINUITY = []
-
-    test_robot = "gantry lifetime robot"
-    test_name = "gantry-z-lifetime-test"
+    robot_name = 'TEST_ROBOT'
+    test_robot = f"gantry lifetime {robot_name}"
+    test_name = f"gantry-z-lifetime-test-{robot_name}"
     test_config = load.value
     test_tag = load.value
     print(f"\ntest_config: {load.value}\n")
@@ -213,7 +246,15 @@ async def _main(is_simulating: bool, cycles: int, mount: OT3Mount) -> None:
     print(f"MAX_SPEED: {MAX_SPEED}\nACCEL: {ACCEL}\nHOLD_CURRENT: {HOLD_CURRENT}\nRUN_CURRENT: {RUN_CURRENT}\nMAX_DISCONTINUITY: {MAX_DISCONTINUITY}\nDIRECTION_CHANGE_DISCONTINUITY: {DIRECTION_CHANGE_DISCONTINUITY}\n")
     run_id = data.create_run_id()
     file_name = data.create_file_name(test_name=test_name, run_id=run_id, tag=test_tag)
-    header_str = data.convert_list_to_csv_line(HEADER)
+    record_test_details(
+        test_name=test_name,
+        run_id=run_id,
+        file_name=file_name,
+        robot_name=robot_name,
+        test_config=test_config,
+    )
+    header_str = ",".join(HEADER) + "\n"
+    print(f"header_str: {header_str}\n")
     data.append_data_to_file(
         test_name=test_name,
         run_id=run_id,
@@ -228,7 +269,6 @@ async def _main(is_simulating: bool, cycles: int, mount: OT3Mount) -> None:
         back_left_nozzle = 'A1',
         front_right_nozzle = 'H1'
     )
-
     for cycle in range(cycles):
         print(f"\n========== Cycle {cycle + 1}/{cycles} ==========\n")
 
@@ -262,77 +302,38 @@ async def _main(is_simulating: bool, cycles: int, mount: OT3Mount) -> None:
         diff_pos_y = final_encoder_pos[Axis.Y] - open_loop_pos[Axis.Y]
         diff_pos_z = final_encoder_pos[Axis.Z_L] - open_loop_pos[Axis.Z_L]
         str_open = (
-            str(open_loop_pos[Axis.X])
+            f"{open_loop_pos[Axis.X]:.3f}"
             + " "
-            + str(open_loop_pos[Axis.Y])
+            + f"{open_loop_pos[Axis.Y]:.3f}"
             + " "
-            + str(open_loop_pos[Axis.Z_L])
+            + f"{open_loop_pos[Axis.Z_L]:.3f}"
         )
         str_enc = (
-            str(final_encoder_pos[Axis.X])
+            f"{final_encoder_pos[Axis.X]:.3f}"
             + " "
-            + str(final_encoder_pos[Axis.Y])
+            + f"{final_encoder_pos[Axis.Y]:.3f}"
             + " "
-            + str(final_encoder_pos[Axis.Z_L])
+            + f"{final_encoder_pos[Axis.Z_L]:.3f}"
         )
-
-        if cycle == 0 or cycle == 1 or cycle == 2:
-            cycle_data = [
-                convert(time.perf_counter() - start_time),
-                test_robot,
-                test_config,
-                test_current,
-                cycle + 1,
-                xy_count,
-                y_count,
-                z_l_count,
-                z_r_count,
-                stall_count,
-                total_stalls,
-                "",
-                str_open,
-                str_enc,
-                diff_pos_x,
-                diff_pos_y,
-                diff_pos_z,
-                "",
-                lm,
-                rm,
-                gripper,
-                "",
-                Axis.to_kind(AXIS),
-                MAX_SPEED[AXIS],
-                ACCEL[AXIS],
-                HOLD_CURRENT[AXIS],
-                RUN_CURRENT[AXIS],
-                MAX_DISCONTINUITY[AXIS],
-                DIRECTION_CHANGE_DISCONTINUITY[AXIS],
-            ]
-            print(f"CYCLE DATA: {cycle_data}\n")
-            rm = ""
-            lm = ""
-            gripper = ""
-        else:
-            cycle_data = [
-                convert(time.perf_counter() - start_time),
-                test_robot,
-                test_config,
-                test_current,
-                cycle + 1,
-                xy_count,
-                y_count,
-                z_l_count,
-                z_r_count,
-                stall_count,
-                total_stalls,
-                "",
-                str_open,
-                str_enc,
-                diff_pos_x,
-                diff_pos_y,
-                diff_pos_z,
-            ]
-        cycle_data_str = data.convert_list_to_csv_line(cycle_data)
+        
+        cycle_data = [
+            str(cycle + 1),
+            str(convert(time.perf_counter() - start_time)),
+            str(test_current),
+            str(xy_count),
+            str(y_count),
+            str(z_l_count),
+            str(z_r_count),
+            str(stall_count),
+            str(total_stalls),
+            str_open,
+            str_enc,
+            str(diff_pos_x),
+            str(diff_pos_y),
+            str(diff_pos_z),
+        ]
+        # cycle_data_str = data.convert_list_to_csv_line(cycle_data)
+        cycle_data_str = ",".join(cycle_data) + "\n"
         data.append_data_to_file(
             test_name=test_name,
             run_id=run_id,
