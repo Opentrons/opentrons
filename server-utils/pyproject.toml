@@ -22,7 +22,7 @@ dependencies = [
     "systemd-python==234; sys_platform=='linux'",
     # todo(mm, 2026-03-24): Set sqlalchemy to >=2,<3 when robot-server and system-server are no longer on 1.4.
     "sqlalchemy>=1.4.51,<3",
-    "idna==3.3",
+    "idna==3.20",
 ]
 
 dynamic = ['version']

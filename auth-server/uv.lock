@@ -8,7 +8,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-11-09T14:53:38.997768Z"
+exclude-newer = "2026-11-09T18:18:07.391791Z"
 exclude-newer-span = "P1W"
 
 [manifest]
@@ -927,11 +927,11 @@ wheels = [
 
 [[package]]
 name = "idna"
-version = "3.3"
+version = "3.20"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/62/08/e3fc7c8161090f742f504f40b1bccbfc544d4a4e09eb774bf40aafce5436/idna-3.3.tar.gz", hash = "sha256:9d643ff0a55b762d5cdb124b8eaa99c66322e2157b69160bc32796e824360e6d", size = 286689, upload-time = "2021-10-12T23:33:41.312Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f5/08/8eea9d4b8302028f3abb2c0813953f7aec26d33b7a8960ed760e65ff29fa/idna-3.20.tar.gz", hash = "sha256:a7db850025b95ded1eae8a46181a1a6c56c92c96f0e2b005d9ff8dc0210cab44", size = 216463, upload-time = "2026-09-17T14:11:04.752Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/04/a2/d918dcd22354d8958fe113e1a3630137e0fc8b44859ade3063982eacd2a4/idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff", size = 61160, upload-time = "2021-10-12T23:33:38.02Z" },
+    { url = "https://files.pythonhosted.org/packages/58/a2/bb081bab032533a855d44de1d56f8e8426114ff1ba5d1f07a438a0a654f8/idna-3.20-py3-none-any.whl", hash = "sha256:ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c", size = 69583, upload-time = "2026-09-17T14:11:03.168Z" },
 ]
 
 [[package]]
@@ -1914,7 +1914,7 @@ requires-dist = [
     { name = "aiohttp", specifier = ">=3.12.14,<4" },
     { name = "anyio", specifier = "==4.9.0" },
     { name = "fastapi", specifier = "==0.100.0" },
-    { name = "idna", specifier = "==3.3" },
+    { name = "idna", specifier = "==3.20" },
     { name = "pydantic", specifier = ">2.0.0,<3" },
     { name = "pydantic-settings", specifier = ">=2.0.0,<3" },
     { name = "python-dotenv", specifier = "==1.0.1" },
