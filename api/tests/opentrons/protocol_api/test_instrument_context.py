@@ -8,7 +8,6 @@ from unittest.mock import sentinel
 
 import pytest
 from decoy import Decoy, matchers
-from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
@@ -40,6 +39,7 @@ from opentrons.protocol_api import (
     Well,
     labware,
 )
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocol_api.core.common import (
     InstrumentCore,
     LabwareCore,
@@ -47,9 +47,6 @@ from opentrons.protocol_api.core.common import (
     WellCore,
 )
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
-from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
-    LegacyInstrumentCore,
-)
 from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
 from opentrons.protocol_engine.errors.error_occurrence import (
@@ -67,7 +64,6 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     APIVersionError,
     FlowRates,
-    PlungerSpeeds,
     UnsupportedAPIError,
 )
 from opentrons.types import (
@@ -118,14 +114,6 @@ def mock_instrument_core(decoy: Decoy) -> InstrumentCore:
     instrument_core.get_liquid_presence_detection = _getter  # type: ignore[method-assign]
     instrument_core.set_liquid_presence_detection = _setter  # type: ignore[method-assign]
 
-    return instrument_core
-
-
-@pytest.fixture
-def mock_legacy_instrument_core(decoy: Decoy) -> LegacyInstrumentCore:
-    """Get a mock instrument implementation core."""
-    instrument_core = decoy.mock(cls=LegacyInstrumentCore)
-    decoy.when(instrument_core.get_mount()).then_return(Mount.LEFT)
     return instrument_core
 
 
@@ -295,35 +283,10 @@ def test_move_to_well(
     )
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
-def test_pick_up_from_well(
-    decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
-) -> None:
-    """It should pick up a specific tip."""
-    mock_well = decoy.mock(cls=Well)
-    top_location = Location(point=Point(1, 2, 3), labware=mock_well)
-
-    decoy.when(mock_well.top()).then_return(top_location)
-
-    subject.pick_up_tip(mock_well, presses=1, increment=2.0, prep_after=False)
-
-    decoy.verify(
-        mock_instrument_core.pick_up_tip(
-            location=top_location,
-            well_core=mock_well._core,
-            presses=1,
-            increment=2.0,
-            prep_after=False,
-        ),
-        times=1,
-    )
-
-
-@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
 def test_pick_up_from_well_deprecated_args(
     decoy: Decoy, mock_instrument_core: InstrumentCore, subject: InstrumentContext
 ) -> None:
-    """It should pick up a specific tip."""
+    """It should reject presses and increment arguments."""
     mock_well = decoy.mock(cls=Well)
 
     with pytest.raises(UnsupportedAPIError):
@@ -1121,31 +1084,6 @@ def test_drop_tip_to_well(
     )
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
-def test_drop_tip_to_trash(
-    decoy: Decoy,
-    mock_instrument_core: InstrumentCore,
-    mock_trash: Labware,
-    subject: InstrumentContext,
-) -> None:
-    """It should drop a tip in the trash if not given a location ."""
-    mock_well = decoy.mock(cls=Well)
-
-    decoy.when(mock_trash.wells()).then_return([mock_well])
-
-    subject.drop_tip()
-
-    decoy.verify(
-        mock_instrument_core.drop_tip(
-            location=None,
-            well_core=mock_well._core,
-            home_after=None,
-            alternate_drop_location=False,
-        ),
-        times=1,
-    )
-
-
 @pytest.mark.parametrize(
     "api_version", [APIVersion(2, 15), APIVersion(2, 18), APIVersion(2, 28)]
 )
@@ -1616,21 +1554,6 @@ def test_dynamic_dispense_validation(
         )
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
-def test_dispense_push_out_on_not_allowed_version(
-    decoy: Decoy,
-    mock_instrument_core: InstrumentCore,
-    subject: InstrumentContext,
-    mock_protocol_core: ProtocolCore,
-) -> None:
-    """Should raise a APIVersionError."""
-    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
-    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(None)
-
-    with pytest.raises(APIVersionError):
-        subject.dispense(push_out=3)
-
-
 def test_dispense_flow_rate(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
@@ -1817,28 +1740,8 @@ def test_liquid_presence_detection(
     decoy.verify(mock_instrument_core.set_liquid_presence_detection(True), times=1)
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
-@pytest.mark.parametrize(
-    "mock_instrument_core",
-    [lazy_fixture("mock_legacy_instrument_core")],
-)
-def test_plunger_speed(
-    decoy: Decoy,
-    mock_legacy_instrument_core: LegacyInstrumentCore,
-    subject: InstrumentContext,
-) -> None:
-    """It should return a PlungerSpeeds object on PAPI <= v2.13."""
-    plunger_speeds = decoy.mock(cls=PlungerSpeeds)
-    decoy.when(mock_legacy_instrument_core.get_speed()).then_return(plunger_speeds)
-
-    result = subject.speed
-
-    assert result == plunger_speeds
-
-
-@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
 def test_plunger_speed_removed(subject: InstrumentContext) -> None:
-    """It should raise an error on PAPI >= v2.14."""
+    """It should raise an error for the removed speed property."""
     with pytest.raises(UnsupportedAPIError):
         subject.speed
 
@@ -1936,12 +1839,55 @@ def test_configure_nozzle_layout(
     )
     decoy.verify(
         mock_instrument_core.configure_nozzle_layout(
-            style=nozzle_layout_args.style,
+            style=expected_core_args.style,
             primary_nozzle=expected_core_args.primary_nozzle,
             front_right_nozzle=expected_core_args.front_right_nozzle,
             back_left_nozzle=expected_core_args.back_left_nozzle,
         )
     )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 31)])
+def test_configure_nozzle_layout_raises_on_rear_partial_column_on_old_api(
+    subject: InstrumentContext,
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+) -> None:
+    """It should pass the correct configuration model to the engine client."""
+    decoy.when(mock_instrument_core.get_channels()).then_return(8)
+
+    with pytest.raises(
+        APIVersionError, match="Partial column beginning with nozzle `A1`"
+    ):
+        subject.configure_nozzle_layout(
+            style=NozzleLayout.PARTIAL_COLUMN,
+            start="A1",
+            end="B1",
+            front_right="A1",
+            back_left="B!",
+        )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 31)])
+def test_configure_nozzle_layout_style_string_raises(
+    subject: InstrumentContext,
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+) -> None:
+    """It should raise an API Version error for ."""
+    decoy.when(mock_instrument_core.get_channels()).then_return(8)
+
+    with pytest.raises(
+        APIVersionError,
+        match="Nozzle layout `style` parameter as `string` is not available until API version 2.32. You are currently using API version 2.31.",
+    ):
+        subject.configure_nozzle_layout(
+            style="PARTIAL_COLUMN",
+            start="A1",
+            end="B1",
+            front_right="B1",
+            back_left="A1",
+        )
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 15)])

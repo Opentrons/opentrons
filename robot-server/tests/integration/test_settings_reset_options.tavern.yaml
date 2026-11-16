@@ -1,12 +1,12 @@
 ---
-test_name: GET Settings Reset Options for OT-2
+test_name: GET Settings Reset Options for Flex
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: Reset Options GET request returns correct option
     request:
-      url: '{ot2_server_base_url}/settings/reset/options'
+      url: '{ot3_server_base_url}/settings/reset/options'
       method: GET
     response:
       status_code: 200
@@ -15,20 +15,23 @@ stages:
           - id: bootScripts
             name: Boot Scripts
             description: Clear custom boot scripts
-          - id: deckCalibration
-            name: Deck Calibration
-            description: !anystr
           - id: pipetteOffsetCalibrations
             name: Pipette Offset Calibrations
             description: !anystr
-          - id: tipLengthCalibrations
-            name: Tip Length Calibrations
+          - id: gripperOffsetCalibrations
+            name: Gripper Offset Calibrations
             description: !anystr
           - id: runsHistory
             name: Clear Robot Server Data
             description: !anystr
+          - id: onDeviceDisplay
+            name: On-Device Display Configuration
+            description: !anystr
           - id: deckConfiguration
             name: Deck Configuration
+            description: Clear deck configuration
+          - id: moduleCalibration
+            name: Module Calibrations
             description: !anystr
           - id: authorizedKeys
             name: SSH Authorized Keys
@@ -37,12 +40,13 @@ stages:
 ---
 test_name: POST Reset bootScripts option
 marks:
+  - ot3_only
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: POST Reset bootScripts true
     request:
-      url: '{ot2_server_base_url}/settings/reset'
+      url: '{ot3_server_base_url}/settings/reset'
       method: POST
       json:
         bootScripts: true
@@ -52,7 +56,7 @@ stages:
         message: "Options 'boot_scripts' were reset"
   - name: POST Reset bootScripts false
     request:
-      url: '{ot2_server_base_url}/settings/reset'
+      url: '{ot3_server_base_url}/settings/reset'
       method: POST
       json:
         bootScripts: false
@@ -61,40 +65,51 @@ stages:
       json:
         message: 'Nothing to do'
 ---
-test_name: POST Reset deck calibration option
+test_name: POST Reset deck calibration option for Flex raises
 marks:
+  - ot3_only
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
-  - name: POST Reset deckCalibration true
+  - name: POST Reset deckCalibration true fails on Flex
     request:
-      url: '{ot2_server_base_url}/settings/reset'
+      url: '{ot3_server_base_url}/settings/reset'
       method: POST
       json:
         deckCalibration: true
     response:
-      status_code: 200
+      status_code: 403
       json:
-        message: "Options 'deck_calibration' were reset"
-  - name: POST Reset deckCalibration false
+        message: 'deckCalibration is not a valid reset option.'
+        errorCode: '4000'
+---
+test_name: POST Reset tip length calibrations option for Flex raises
+marks:
+  - ot3_only
+  - usefixtures:
+      - ot3_server_base_url
+stages:
+  - name: POST Reset tipLengthCalibrations true fails on Flex
     request:
-      url: '{ot2_server_base_url}/settings/reset'
+      url: '{ot3_server_base_url}/settings/reset'
       method: POST
       json:
-        deckCalibration: false
+        tipLengthCalibrations: true
     response:
-      status_code: 200
+      status_code: 403
       json:
-        message: 'Nothing to do'
+        message: 'tipLengthCalibrations is not a valid reset option.'
+        errorCode: '4000'
 ---
 test_name: POST Reset deck configuration option
 marks:
+  - ot3_only
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
-  - name: POST Reset deckCalibration true
+  - name: POST Reset deckConfiguration true
     request:
-      url: '{ot2_server_base_url}/settings/reset'
+      url: '{ot3_server_base_url}/settings/reset'
       method: POST
       json:
         deckConfiguration: true
@@ -104,7 +119,7 @@ stages:
         message: "Options 'deck_configuration' were reset"
   - name: POST Reset deckConfiguration false
     request:
-      url: '{ot2_server_base_url}/settings/reset'
+      url: '{ot3_server_base_url}/settings/reset'
       method: POST
       json:
         deckConfiguration: false
@@ -115,12 +130,13 @@ stages:
 ---
 test_name: POST Reset pipette offset calibrations option
 marks:
+  - ot3_only
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: POST Reset pipetteOffsetCalibrations true
     request:
-      url: '{ot2_server_base_url}/settings/reset'
+      url: '{ot3_server_base_url}/settings/reset'
       method: POST
       json:
         pipetteOffsetCalibrations: true
@@ -130,7 +146,7 @@ stages:
         message: "Options 'pipette_offset' were reset"
   - name: POST Reset pipetteOffsetCalibrations false
     request:
-      url: '{ot2_server_base_url}/settings/reset'
+      url: '{ot3_server_base_url}/settings/reset'
       method: POST
       json:
         pipetteOffsetCalibrations: false
@@ -139,31 +155,69 @@ stages:
       json:
         message: 'Nothing to do'
 ---
-test_name: POST Reset gripper offset calibrations option for OT-2 raises
+test_name: POST Reset gripper offset calibrations option
 marks:
+  - ot3_only
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
-  - name: POST Reset gripperOffsetCalibrations true fails on OT-2
+  - name: POST Reset gripperOffsetCalibrations true
     request:
-      url: '{ot2_server_base_url}/settings/reset'
+      url: '{ot3_server_base_url}/settings/reset'
       method: POST
       json:
         gripperOffsetCalibrations: true
     response:
-      status_code: 403
+      status_code: 200
       json:
-        message: 'gripperOffsetCalibrations is not a valid reset option.'
-        errorCode: '4000'
+        message: "Options 'gripper_offset' were reset"
+  - name: POST Reset gripperOffsetCalibrations false
+    request:
+      url: '{ot3_server_base_url}/settings/reset'
+      method: POST
+      json:
+        gripperOffsetCalibrations: false
+    response:
+      status_code: 200
+      json:
+        message: 'Nothing to do'
+---
+test_name: POST Reset module calibration option
+marks:
+  - ot3_only
+  - usefixtures:
+      - ot3_server_base_url
+stages:
+  - name: POST Reset moduleCalibration true
+    request:
+      url: '{ot3_server_base_url}/settings/reset'
+      method: POST
+      json:
+        moduleCalibration: true
+    response:
+      status_code: 200
+      json:
+        message: "Options 'module_calibration' were reset"
+  - name: POST Reset moduleCalibration false
+    request:
+      url: '{ot3_server_base_url}/settings/reset'
+      method: POST
+      json:
+        moduleCalibration: false
+    response:
+      status_code: 200
+      json:
+        message: 'Nothing to do'
 ---
 test_name: POST Reset authorizedKeys option
 marks:
+  - ot3_only
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: POST Reset authorizedKeys true
     request:
-      url: '{ot2_server_base_url}/settings/reset'
+      url: '{ot3_server_base_url}/settings/reset'
       method: POST
       json:
         authorizedKeys: true
@@ -173,7 +227,7 @@ stages:
         message: "Options 'authorized_keys' were reset"
   - name: POST Reset authorizedKeys false
     request:
-      url: '{ot2_server_base_url}/settings/reset'
+      url: '{ot3_server_base_url}/settings/reset'
       method: POST
       json:
         authorizedKeys: false
@@ -182,14 +236,18 @@ stages:
       json:
         message: 'Nothing to do'
 ---
+# POSTing onDeviceDisplay is untested here because it writes to a part of the filesystem
+# outside of robot-server's control, which is not a good thing to do on a dev machine.
+# We rely on manual end-to-end tests (with the Opentrons App) to cover it.
 test_name: POST Reset non existant option
 marks:
+  - ot3_only
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: POST Reset non existant option
     request:
-      url: '{ot2_server_base_url}/settings/reset'
+      url: '{ot3_server_base_url}/settings/reset'
       method: POST
       json:
         doesNotExist: true

@@ -4,10 +4,10 @@ import without from 'lodash/without'
 
 import {
   getLabwareDisplayLocation,
+  getLabwareLocation,
   getLoadedLabware,
 } from '@opentrons/components'
 import {
-  FLEX_ROBOT_TYPE,
   getAllDefinitions,
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
@@ -57,6 +57,8 @@ interface UseFailedLabwareUtilsProps {
 interface RelevantFailedLabwareLocations {
   displayNameCurrentLoc: string
   displayNameNewLoc: string | null
+  currentSlotName: string
+  newSlotName: string | null
   currentLoc: LabwareLocation | null
   newLoc: LabwareLocation | null
 }
@@ -479,6 +481,35 @@ export type GetRelevantLwLocationsParams = Pick<
   errorKind: ErrorKind
 }
 
+function getSlotNameFromLocation(
+  location: LabwareLocation | null,
+  loadedModules: LoadedModule[],
+  loadedLabwares: LoadedLabware[]
+): string {
+  if (location == null) {
+    return ''
+  }
+
+  if (typeof location === 'object' && 'moduleId' in location) {
+    const moduleSlotName = loadedModules.find(
+      (m: LoadedModule) => m.id === location.moduleId
+    )?.location.slotName
+
+    if (moduleSlotName != null) {
+      return moduleSlotName
+    }
+  }
+
+  return (
+    getLabwareLocation({
+      location,
+      loadedModules,
+      loadedLabwares,
+      detailLevel: 'slot-only',
+    })?.slotName ?? ''
+  )
+}
+
 export function useRelevantFailedLwLocations({
   failedLabware,
   failedCommandByRunRecord,
@@ -488,10 +519,10 @@ export function useRelevantFailedLwLocations({
   const { t } = useTranslation('protocol_command_text')
 
   const loadedModules = runRecord?.data?.modules ?? []
+  const loadedLabwares = runRecord?.data?.labware ?? []
   const BASE_DISPLAY_PARAMS: Omit<DisplayLocationSlotOnlyParams, 'location'> = {
-    loadedLabwares: runRecord?.data?.labware ?? [],
+    loadedLabwares,
     loadedModules,
-    robotType: FLEX_ROBOT_TYPE,
     t,
     detailLevel: 'slot-only',
     isOnDevice: false, // Always return the "slot XYZ" copy, which is the desktop copy.
@@ -517,10 +548,15 @@ export function useRelevantFailedLwLocations({
     ...BASE_DISPLAY_PARAMS,
     location: location,
   })
+  const currentSlotName = getSlotNameFromLocation(
+    location,
+    loadedModules,
+    loadedLabwares
+  )
 
   const getNewLocation = (): Pick<
     RelevantFailedLabwareLocations,
-    'displayNameNewLoc' | 'newLoc'
+    'displayNameNewLoc' | 'newSlotName' | 'newLoc'
   > => {
     switch (failedCommandByRunRecord?.commandType) {
       case 'moveLabware':
@@ -529,27 +565,40 @@ export function useRelevantFailedLwLocations({
             ...BASE_DISPLAY_PARAMS,
             location: failedCommandByRunRecord.params.newLocation,
           }),
+          newSlotName: getSlotNameFromLocation(
+            failedCommandByRunRecord.params.newLocation,
+            loadedModules,
+            loadedLabwares
+          ),
           newLoc: failedCommandByRunRecord.params.newLocation,
         }
       case 'flexStacker/retrieve':
-      case 'flexStacker/store':
+      case 'flexStacker/store': {
+        const moduleLocation =
+          loadedModules.find(
+            (m: LoadedModule) =>
+              m.id === failedCommandByRunRecord?.params.moduleId
+          )?.location ?? 'offDeck'
         return {
           displayNameNewLoc: getLabwareDisplayLocation({
             ...BASE_DISPLAY_PARAMS,
-            location:
-              loadedModules.find(
-                (m: LoadedModule) =>
-                  m.id === failedCommandByRunRecord?.params.moduleId
-              )?.location ?? 'offDeck',
+            location: moduleLocation,
             includeSlotText: false,
           }),
+          newSlotName: getSlotNameFromLocation(
+            moduleLocation,
+            loadedModules,
+            loadedLabwares
+          ),
           newLoc: {
             moduleId: failedCommandByRunRecord?.params.moduleId,
           },
         }
+      }
       default:
         return {
           displayNameNewLoc: null,
+          newSlotName: null,
           newLoc: null,
         }
     }
@@ -557,6 +606,7 @@ export function useRelevantFailedLwLocations({
 
   return {
     displayNameCurrentLoc,
+    currentSlotName,
     currentLoc: failedLabware?.location ?? null,
     ...getNewLocation(),
   }

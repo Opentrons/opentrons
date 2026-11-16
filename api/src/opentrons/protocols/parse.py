@@ -6,23 +6,13 @@ import ast
 import enum
 import functools
 import itertools
-import json
 import logging
 import re
 import traceback
 from io import BytesIO
-from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Dict, Optional, Union
 from zipfile import ZipFile
 
-import jsonschema  # type: ignore
-
-from opentrons_shared_data.labware import load_schema as load_labware_schema
-from opentrons_shared_data.protocol import (
-    Schema as JSONProtocolSchema,
-)
-from opentrons_shared_data.protocol import (
-    load_schema as load_protocol_schema,
-)
 from opentrons_shared_data.robot.types import RobotType
 
 from .api_support.definitions import MIN_SUPPORTED_VERSION_FOR_FLEX
@@ -31,9 +21,7 @@ from .bundle import extract_bundle
 from .types import (
     RUN_FUNCTION_MESSAGE,
     ApiDeprecationError,
-    JsonProtocol,
     MalformedPythonProtocolError,
-    Protocol,
     PythonProtocol,
     PythonProtocolMetadata,
     PythonProtocolRequirements,
@@ -43,27 +31,11 @@ from opentrons.ordered_set import OrderedSet
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.types import LabwareDefinition
-    from opentrons_shared_data.protocol.types import JsonProtocol as JsonProtocolDef
 
 MODULE_LOG = logging.getLogger(__name__)
 
 # match e.g. "2.0" but not "hi", "2", "2.0.1"
 API_VERSION_RE = re.compile(r"^(\d+)\.(\d+)$")
-MAX_SUPPORTED_JSON_SCHEMA_VERSION = 5
-API_VERSION_FOR_JSON_V5_AND_BELOW = APIVersion(2, 8)
-
-
-class JSONSchemaVersionTooNewError(RuntimeError):
-    def __init__(self, attempted_schema_version: int) -> None:
-        super().__init__(attempted_schema_version)
-        self.attempted_schema_version = attempted_schema_version
-
-    def __str__(self) -> str:
-        return (
-            f"The protocol you are trying to open is a"
-            f" JSONv{self.attempted_schema_version} protocol,"
-            f" which is not supported by this software version."
-        )
 
 
 class PythonParseMode(enum.Enum):
@@ -193,23 +165,6 @@ def version_from_string(vstr: str) -> APIVersion:
     return APIVersion(major=int(matches.group(1)), minor=int(matches.group(2)))
 
 
-def _parse_json(
-    protocol_contents: Union[str, bytes], filename: Optional[str] = None
-) -> JsonProtocol:
-    """Parse a protocol known or at least suspected to be json"""
-    protocol_json = json.loads(protocol_contents)
-    version, validated = validate_json(protocol_json)
-    return JsonProtocol(
-        text=protocol_contents,
-        filename=filename,
-        contents=validated,
-        schema_version=version,
-        api_level=API_VERSION_FOR_JSON_V5_AND_BELOW,
-        metadata=validated["metadata"],
-        robot_type=validated["robot"]["model"],
-    )
-
-
 def _parse_python(
     protocol_contents: Union[str, bytes],
     python_parse_mode: PythonParseMode,
@@ -310,8 +265,8 @@ def parse(
     # TODO(mm, 2023-08-10): Remove python_parse_mode after the Flex launch, when the malformed
     # protocols are no longer on any robots. https://opentrons.atlassian.net/browse/RSS-306
     python_parse_mode: PythonParseMode = PythonParseMode.NORMAL,
-) -> Protocol:
-    """Parse a protocol from text.
+) -> PythonProtocol:
+    """Parse a Python protocol from text.
 
     :param protocol_file: The protocol file, or for single-file protocols, a
                         string of the protocol contents.
@@ -342,7 +297,9 @@ def parse(
         return result
     else:
         if filename and filename.endswith(".json"):
-            return _parse_json(protocol_file, filename)
+            raise NotImplementedError(
+                "JSON protocols are no longer supported through this interface."
+            )
         elif filename and filename.endswith(".py"):
             return _parse_python(
                 protocol_contents=protocol_file,
@@ -368,7 +325,9 @@ def parse(
         # which I think is a little nicer, if any of the above can be called
         # "nice".
         if protocol_file and protocol_file[0] in ("{", b"{"[0]):
-            return _parse_json(protocol_file, filename)
+            raise NotImplementedError(
+                "JSON protocols are no longer supported through this interface."
+            )
         else:
             return _parse_python(
                 protocol_contents=protocol_file,
@@ -578,95 +537,3 @@ def _get_version(
                 )
             )
         return APIVersion(1, 0)
-
-
-def _get_protocol_schema_version(protocol_json: Dict[Any, Any]) -> int:
-    # v3 and above uses `schemaVersion: integer`
-    version = protocol_json.get("schemaVersion")
-    if version:
-        return int(version)
-    # v1 uses 1.x.x and v2 uses 2.x.x
-    legacyKebabVersion = protocol_json.get("protocol-schema")
-    # No minor/patch schemas ever were released,
-    # do not permit protocols with nonexistent schema versions to load
-    if legacyKebabVersion == "1.0.0":
-        return 1
-    elif legacyKebabVersion == "2.0.0":
-        return 2
-    elif legacyKebabVersion:
-        raise RuntimeError(
-            f'No such schema version: "{legacyKebabVersion}". Did you mean '
-            + '"1.0.0" or "2.0.0"?'
-        )
-    # no truthy value for schemaVersion or protocol-schema
-    raise RuntimeError(
-        "Could not determine schema version for protocol. "
-        + 'Make sure there is a version number under "schemaVersion"'
-    )
-
-
-def _get_schema_for_protocol(version_num: int) -> JSONProtocolSchema:
-    """Retrieve the json schema for a protocol schema version"""
-    # TODO(IL, 2020/03/05): use $otSharedSchema, but maybe wait until
-    # deprecating v1/v2 JSON protocols?
-    if version_num > MAX_SUPPORTED_JSON_SCHEMA_VERSION:
-        raise RuntimeError(
-            f"JSON Protocol version {version_num} is not yet "
-            + "supported in this version of the API"
-        )
-    try:
-        return load_protocol_schema(version=version_num)
-    except FileNotFoundError:
-        raise RuntimeError(
-            'JSON Protocol schema "{}" does not exist'.format(version_num)
-        ) from None
-
-
-def validate_json(protocol_json: Dict[Any, Any]) -> Tuple[int, "JsonProtocolDef"]:
-    """Validates a json protocol and returns its schema version"""
-    # Check if this is actually a labware
-    labware_schema_v2 = load_labware_schema()
-    try:
-        jsonschema.validate(protocol_json, labware_schema_v2)
-    except jsonschema.ValidationError:
-        pass
-    else:
-        MODULE_LOG.error("labware uploaded instead of protocol")
-        raise RuntimeError(
-            "The file you are trying to open is a JSON labware definition, "
-            "and therefore can not be opened here. Please try "
-            "uploading a JSON protocol file instead."
-        )
-
-    # this is now either a protocol or something corrupt
-    version_num = _get_protocol_schema_version(protocol_json)
-    if version_num <= 2:
-        raise RuntimeError(
-            f"JSON protocol version {version_num} is "
-            "deprecated. Please upload your protocol into Protocol "
-            "Designer and save it to migrate the protocol to a later "
-            "version. This error might mean a labware "
-            "definition was specified instead of a protocol."
-        )
-    if version_num > MAX_SUPPORTED_JSON_SCHEMA_VERSION:
-        raise JSONSchemaVersionTooNewError(attempted_schema_version=version_num)
-    protocol_schema = _get_schema_for_protocol(version_num)
-
-    # instruct schema how to resolve all $ref's used in protocol schemas
-    resolver = jsonschema.RefResolver(
-        protocol_schema.get("$id", ""),
-        protocol_schema,
-        store={"opentronsLabwareSchemaV2": labware_schema_v2},
-    )
-
-    # do the validation
-    try:
-        jsonschema.validate(protocol_json, protocol_schema, resolver=resolver)
-    except jsonschema.ValidationError:
-        MODULE_LOG.exception("JSON protocol validation failed")
-        raise RuntimeError(
-            "This may be a corrupted file or a JSON file that is not an "
-            "Opentrons JSON protocol."
-        )
-    else:
-        return version_num, protocol_json  # type: ignore

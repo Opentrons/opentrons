@@ -7,7 +7,7 @@ tested together, treating AddressableAreaState as a private implementation detai
 
 import pytest
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 
 from opentrons.protocol_engine.actions import (
     AddAddressableAreaAction,
@@ -50,7 +50,7 @@ def _dummy_command() -> Command:
 
 @pytest.fixture
 def simulated_subject(
-    ot3_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> AddressableAreaStore:
     """Get an AddressableAreaStore test subject, under simulated deck conditions."""
     return AddressableAreaStore(
@@ -83,7 +83,7 @@ def simulated_subject(
 
 @pytest.fixture
 def subject(
-    ot3_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> AddressableAreaStore:
     """Get an AddressableAreaStore test subject."""
     return AddressableAreaStore(
@@ -115,7 +115,7 @@ def subject(
 
 
 def test_initial_state_simulated(
-    ot3_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
     simulated_subject: AddressableAreaStore,
 ) -> None:
     """It should create the Addressable Area store with no loaded addressable areas."""
@@ -147,7 +147,7 @@ def test_initial_state_simulated(
 
 
 def test_initial_state(
-    ot3_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
     subject: AddressableAreaStore,
 ) -> None:
     """It should create the Addressable Area store with loaded addressable areas."""

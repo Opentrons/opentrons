@@ -239,7 +239,12 @@ export const ChoosePipette = (props: ChoosePipetteProps): ReactNode => {
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText forwardedAs="h1">{t('choose_pipette')}</StyledText>
+              <StyledText
+                desktopStyle="headingSmallBold"
+                oddStyle="level4HeaderSemiBold"
+              >
+                {t('choose_pipette')}
+              </StyledText>
               <Flex
                 margin={SPACING.spacing40}
                 justifyContent={JUSTIFY_SPACE_AROUND}
@@ -257,8 +262,8 @@ export const ChoosePipette = (props: ChoosePipetteProps): ReactNode => {
                     alt={singleMount}
                   />
                   <StyledText
-                    forwardedAs="h3"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    desktopStyle="bodyLargeSemiBold"
+                    oddStyle="bodyTextSemiBold"
                     textAlign={TYPOGRAPHY.textAlignCenter}
                   >
                     {singleMount}
@@ -277,8 +282,8 @@ export const ChoosePipette = (props: ChoosePipetteProps): ReactNode => {
                     alt={bothMounts}
                   />
                   <StyledText
-                    forwardedAs="h3"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    desktopStyle="bodyLargeSemiBold"
+                    oddStyle="bodyTextSemiBold"
                     textAlign={TYPOGRAPHY.textAlignCenter}
                   >
                     {bothMounts}

@@ -2,11 +2,11 @@
 test_name: GET Robot Settings
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: Settings Robot GET request returns correct settings
     request:
-      url: "{ot2_server_base_url}/settings/robot"
+      url: '{ot3_server_base_url}/settings/robot'
       method: GET
     response:
       status_code: 200
@@ -14,17 +14,17 @@ stages:
         name: !anystr
         model: !anystr
         version: !anyint
-        gantry_steps_per_mm: !anydict
-        acceleration: !anydict
-        serial_speed: !anyint
-        default_current: !anydict
-        low_current: !anydict
-        high_current: !anydict
-        default_max_speed: !anydict
         left_mount_offset:
-          - -34
-          - 0
-          - 0
-        log_level: !re_match "DEBUG|INFO|WARNING|ERROR"
-        default_pipette_configs: !anydict
-        z_retract_distance: 2
+          - -13.5
+          - -60.5
+          - 255.675
+        carriage_offset: !anylist
+        deck_transform: !anylist
+        motion_settings: !anydict
+        safe_home_distance: !anyfloat
+        calibration: !anydict
+        current_settings: !anydict
+        liquid_sense: !anydict
+        right_mount_offset: !anylist
+        gripper_mount_offset: !anylist
+        log_level: !re_match 'DEBUG|INFO|WARNING|ERROR'

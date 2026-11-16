@@ -2,14 +2,14 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
-
-import styles from './compliance_ready_settings.module.css'
 import {
   MAX_IDLE_LOGOUT_MINUTES,
   MAX_NUMBER_OF_LOGIN_ATTEMPTS,
   MIN_IDLE_LOGOUT_MINUTES,
   MIN_NUMBER_OF_LOGIN_ATTEMPTS,
-} from './constants'
+} from '/app/resources/auth'
+
+import styles from './compliance_ready_settings.module.css'
 import { NumericSettingPage } from './NumericSettingPage'
 import { PasswordChange } from './PasswordChange'
 import { PasswordComplexity } from './PasswordComplexity'

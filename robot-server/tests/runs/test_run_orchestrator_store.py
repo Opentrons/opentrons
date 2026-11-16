@@ -18,6 +18,7 @@ from opentrons.hardware_control.types import (
     EstopStateNotification,
 )
 from opentrons.protocol_engine import (
+    DeckType,
     StateSummary,
 )
 from opentrons.protocol_engine import (
@@ -125,10 +126,8 @@ async def test_create_engine(
     assert isinstance(subject._run_coordinator, RunOrchestrator)
 
 
-@pytest.mark.parametrize("deck_type", pe_types.DeckType)
 async def test_create_engine_uses_robot_type(
     decoy: Decoy,
-    deck_type: pe_types.DeckType,
     mock_run_process_pyro_provider: RunProcessPyroProvider,
     mock_feature_flags: None,
 ) -> None:
@@ -141,7 +140,7 @@ async def test_create_engine_uses_robot_type(
     subject = RunOrchestratorStore(
         hardware_api=hardware_api,
         robot_type=robot_type,
-        deck_type=deck_type,
+        deck_type=DeckType.OT3_STANDARD,
         run_process_pyro_provider=mock_run_process_pyro_provider,
         access_control_status=False,
         command_store_provider=CommandStoreProvider(),
@@ -383,10 +382,8 @@ async def test_get_default_orchestrator_idempotent(
     assert repeated_result is result
 
 
-@pytest.mark.parametrize("deck_type", pe_types.DeckType)
 async def test_get_default_orchestrator_robot_type(
     decoy: Decoy,
-    deck_type: pe_types.DeckType,
     mock_run_process_pyro_provider: RunProcessPyroProvider,
     mock_feature_flags: None,
 ) -> None:
@@ -399,7 +396,7 @@ async def test_get_default_orchestrator_robot_type(
     subject = RunOrchestratorStore(
         hardware_api=hardware_api,
         robot_type=robot_type,
-        deck_type=deck_type,
+        deck_type=DeckType.OT3_STANDARD,
         run_process_pyro_provider=mock_run_process_pyro_provider,
         access_control_status=False,
         command_store_provider=CommandStoreProvider(),

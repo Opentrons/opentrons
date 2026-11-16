@@ -38,6 +38,8 @@ describe('LeftColumnLabwareInfo', () => {
         failedLabwareLocations: {
           displayNameCurrentLoc: 'slot A1',
           displayNameNewLoc: 'slot B2',
+          currentSlotName: 'A1',
+          newSlotName: 'B2',
         },
         relevantPickUpTipLwLocs: {
           displayNameCurrentLoc: 'slot C3',
@@ -137,7 +139,7 @@ describe('LeftColumnLabwareInfo', () => {
           type: 'location',
           labwareName: 'MOCK_LW_NAME',
           labwareNickname: 'MOCK_LW_NICKNAME',
-          currentLocationProps: { deckLabel: 'STACKER s' },
+          currentLocationProps: { deckLabel: 'STACKER B' },
           newLocationProps: { deckLabel: 'SLOT B2' },
           subText: undefined,
           tagText: 'Quantity: 4',
@@ -167,7 +169,7 @@ describe('LeftColumnLabwareInfo', () => {
           type: 'location',
           labwareName: 'MOCK_LW_NAME',
           labwareNickname: 'MOCK_LW_NICKNAME',
-          currentLocationProps: { deckLabel: 'STACKER s' },
+          currentLocationProps: { deckLabel: 'STACKER B' },
           newLocationProps: { deckLabel: 'SLOT B2' },
           subText: undefined,
           tagText: 'Quantity: 5',
@@ -211,6 +213,8 @@ describe('LeftColumnLabwareInfo', () => {
     props.failedLabwareUtils.failedLabwareLocations = {
       displayNameCurrentLoc: 'slot A1',
       displayNameNewLoc: 'slot B2',
+      currentSlotName: 'A1',
+      newSlotName: 'B2',
       newLoc: {} as any,
       currentLoc: {} as any,
     }
@@ -222,6 +226,32 @@ describe('LeftColumnLabwareInfo', () => {
         infoProps: expect.objectContaining({
           currentLocationProps: { deckLabel: 'SLOT A1' },
           newLocationProps: { deckLabel: 'SLOT B2' },
+        }),
+      }),
+      {}
+    )
+  })
+
+  it(`renders shuttle slot for ${RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE} step`, () => {
+    props.recoveryMap = {
+      route: RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE,
+      step: RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE,
+    }
+    props.failedLabwareUtils.failedLabwareLocations = {
+      displayNameCurrentLoc: 'slot D3',
+      displayNameNewLoc: 'D3',
+      currentSlotName: 'D3',
+      newSlotName: 'D3',
+      newLoc: {} as any,
+      currentLoc: {} as any,
+    }
+
+    render(props)
+
+    expect(vi.mocked(InterventionContent)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        infoProps: expect.objectContaining({
+          currentLocationProps: { deckLabel: 'SLOT D4' },
         }),
       }),
       {}

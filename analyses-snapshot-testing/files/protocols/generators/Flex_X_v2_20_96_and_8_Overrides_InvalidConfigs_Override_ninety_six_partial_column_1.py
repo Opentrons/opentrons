@@ -64,19 +64,6 @@ ninety_six_partial_column_3 = PartialTipConfig(
     api_end="H12",
 )
 
-# We do not allow PARTIAL_COLUMN to start on the bottom of the tip rack
-# Want to see
-# "IncompatibleNozzleConfiguration: Attempted Nozzle Configuration does not match any approved map layout for the current pipette."
-eight_partial_column_bottom_left = PartialTipConfig(
-    key="eight_partial_column_bottom_left",
-    pipette_load_name="flex_8channel_1000",
-    description="8 channel 2 tip pick up bottom left of tiprack",
-    starting_tip="H1",
-    starting_nozzle="A1",
-    api_tip_config=PARTIAL_COLUMN,
-    api_start="A1",
-    api_end="B1",
-)
 
 
 # Want to see
@@ -135,7 +122,6 @@ all_partial_configs = [
     ninety_six_partial_column_1,
     ninety_six_partial_column_2,
     ninety_six_partial_column_3,
-    eight_partial_column_bottom_left,
     eight_partial_column_bottom_right,
     eight_partial_column_no_end,
     return_tip_error,

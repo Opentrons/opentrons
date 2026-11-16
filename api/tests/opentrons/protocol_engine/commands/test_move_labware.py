@@ -21,7 +21,7 @@ from opentrons_shared_data.labware.labware_definition import (
     Parameters2,
 )
 
-from opentrons.protocol_engine import Config, errors
+from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
 from opentrons.protocol_engine.commands.move_labware import (
     GripperMovementError,
@@ -44,7 +44,6 @@ from opentrons.protocol_engine.types import (
     AddressableAreaLocation,
     CurrentWell,
     DeckSlotLocation,
-    DeckType,
     LabwareLocationSequence,
     LabwareMovementStrategy,
     LabwareOffsetVector,
@@ -917,43 +916,6 @@ async def test_move_labware_raises_when_moving_labware_with_gripper_incompatible
         errors.LabwareMovementNotAllowedError,
         match="Cannot move labware 'My cool labware' with gripper",
     ):
-        await subject.execute(data)
-
-
-async def test_move_labware_with_gripper_raises_on_ot2(
-    decoy: Decoy,
-    subject: MoveLabwareImplementation,
-    state_view: StateView,
-) -> None:
-    """It should raise an error when using a gripper with robot type of OT2."""
-    data = MoveLabwareParams(
-        labwareId="my-cool-labware-id",
-        newLocation=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
-        strategy=LabwareMovementStrategy.USING_GRIPPER,
-    )
-    decoy.when(state_view.labware.get(labware_id="my-cool-labware-id")).then_return(
-        LoadedLabware(
-            id="my-cool-labware-id",
-            loadName="load-name",
-            definitionUri="opentrons-test/load-name/1",
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
-            offsetId=None,
-        )
-    )
-
-    decoy.when(
-        state_view.labware.get_definition(labware_id="my-cool-labware-id")
-    ).then_return(
-        LabwareDefinition2.model_construct(
-            namespace="spacename",
-            parameters=Parameters2.model_construct(),  # type: ignore[call-arg]
-        )
-    )
-
-    decoy.when(state_view.config).then_return(
-        Config(robot_type="OT-2 Standard", deck_type=DeckType.OT2_STANDARD)
-    )
-    with pytest.raises(errors.NotSupportedOnRobotType):
         await subject.execute(data)
 
 

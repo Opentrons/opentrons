@@ -132,7 +132,8 @@ class MotionView:
             elif self._labware.get_is_row_labware(labware_id):
                 return CriticalPoint.X_CENTER
             else:
-                return None
+                # Irregular ordering (extra barcode/cap wells, etc.).
+                return CriticalPoint.Y_CENTER
         elif self._labware.get_should_center_pipette_on_target_well(labware_id):
             return CriticalPoint.XY_CENTER
         else:

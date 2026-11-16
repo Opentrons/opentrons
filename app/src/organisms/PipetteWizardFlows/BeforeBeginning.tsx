@@ -1,7 +1,13 @@
 import { useEffect, useRef } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
-import { Banner, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+import {
+  Banner,
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  StyledText,
+} from '@opentrons/components'
 import {
   NINETY_SIX_CHANNEL,
   RIGHT,
@@ -244,7 +250,14 @@ export const BeforeBeginning = (
 
   return (
     <GenericWizardTile
-      header={t('before_you_begin')}
+      header={
+        <StyledText
+          desktopStyle="headingSmallBold"
+          oddStyle="level4HeaderSemiBold"
+        >
+          {t('before_you_begin')}
+        </StyledText>
+      }
       rightHandBody={rightHandBody}
       bodyText={
         <>

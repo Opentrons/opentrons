@@ -17,7 +17,6 @@ export function getLiquidProbeCommandText({
   allRunDefs,
   commandTextData,
   t,
-  robotType,
 }: HandlesCommands<LiquidProbeRunTimeCommands>): string {
   const { wellName, labwareId } = command.params
 
@@ -37,7 +36,6 @@ export function getLiquidProbeCommandText({
   const displayLocation = getLabwareDisplayLocation({
     loadedLabwares: commandTextData?.labware ?? [],
     location: labwareLocation?.locationSequence ?? labwareLocation?.location,
-    robotType,
     allRunDefs,
     loadedModules: commandTextData?.modules ?? [],
     t,

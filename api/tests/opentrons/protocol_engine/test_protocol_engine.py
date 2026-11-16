@@ -8,7 +8,7 @@ from unittest.mock import sentinel
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.robot.types import RobotType
 
@@ -1329,11 +1329,11 @@ def test_add_legacy_labware_offset(
         Config(robot_type=robot_type, deck_type=DeckType.OT3_STANDARD)
     )
     decoy.when(state_store.addressable_areas.deck_definition).then_return(
-        cast(DeckDefinitionV5, {})
+        cast(DeckDefinitionV6, {})
     )
     decoy.when(
         labware_offset_standardization.standardize_labware_offset_create(
-            request, robot_type, cast(DeckDefinitionV5, {})
+            request, robot_type, cast(DeckDefinitionV6, {})
         )
     ).then_return(standardized_request)
     decoy.when(model_utils.generate_id()).then_return(id)
@@ -1406,11 +1406,11 @@ def test_add_labware_offset(
         Config(robot_type=robot_type, deck_type=DeckType.OT3_STANDARD)
     )
     decoy.when(state_store.addressable_areas.deck_definition).then_return(
-        cast(DeckDefinitionV5, {})
+        cast(DeckDefinitionV6, {})
     )
     decoy.when(
         labware_offset_standardization.standardize_labware_offset_create(
-            request, robot_type, cast(DeckDefinitionV5, {})
+            request, robot_type, cast(DeckDefinitionV6, {})
         )
     ).then_return(standardized_request)
     decoy.when(model_utils.generate_id()).then_return(id)

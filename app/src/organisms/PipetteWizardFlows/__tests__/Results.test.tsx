@@ -51,6 +51,7 @@ describe('Results', () => {
       currentStepIndex: 2,
       totalStepCount: 6,
       isOnDevice: false,
+      selectedSlot: 'B2',
       isFetching: false,
       setFetching: vi.fn(),
       hasCalData: false,

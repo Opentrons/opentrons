@@ -20,7 +20,6 @@ import {
 import { LabwareLocationItem } from './LabwareLocationItem'
 import { OffsetTableHeaders } from './OffsetTableHeaders'
 
-import type { TFunction } from 'i18next'
 import type { ReactNode } from 'react'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
@@ -28,14 +27,9 @@ export function LocationSpecificOffsetsContainer(
   props: LPCWizardContentProps
 ): ReactNode {
   const { t } = useTranslation('labware_position_check')
-  const { t: commandTextT } = useTranslation('protocol_command_text')
   const { uri } = useSelector(selectSelectedLwOverview(props.runId))!
   const sortedDetailsBySlot = useSelector(
-    selectSortedLSOffsetDetailsWithCopy(
-      props.runId,
-      uri,
-      commandTextT as TFunction
-    )
+    selectSortedLSOffsetDetailsWithCopy(props.runId, uri)
   )
 
   return (

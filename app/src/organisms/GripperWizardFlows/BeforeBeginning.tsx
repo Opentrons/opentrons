@@ -157,7 +157,14 @@ export const BeforeBeginning = (
     />
   ) : (
     <GenericWizardTile
-      header={t('before_you_begin')}
+      header={
+        <StyledText
+          desktopStyle="headingSmallBold"
+          oddStyle="level4HeaderSemiBold"
+        >
+          {t('before_you_begin')}
+        </StyledText>
+      }
       rightHandBody={
         <WizardRequiredEquipmentList equipmentList={equipmentList} />
       }
@@ -165,7 +172,14 @@ export const BeforeBeginning = (
         <Trans
           t={t}
           i18nKey={bodyI18nKey}
-          components={{ block: <StyledText forwardedAs="p" /> }}
+          components={{
+            block: (
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                oddStyle="bodyTextRegular"
+              />
+            ),
+          }}
         />
       }
       proceedButtonText={t('move_gantry_to_front')}

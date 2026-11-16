@@ -1,13 +1,13 @@
-test_name: temperatureModuleV1 standalone commands
+test_name: temperatureModuleV2 standalone commands
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 
 stages:
   - name: Get tempModule id
     request:
-      url: '{ot2_server_base_url}/modules'
+      url: '{ot3_server_base_url}/modules'
       method: GET
     response:
       status_code: 200
@@ -15,10 +15,10 @@ stages:
         $ext:
           function: 'tests.integration.fixtures:get_module_id'
           extra_kwargs:
-            module_model: temperatureModuleV1
+            module_model: temperatureModuleV2
   - name: issue temperatureModule/setTargetTemperature Command
     request:
-      url: '{ot2_server_base_url}/commands'
+      url: '{ot3_server_base_url}/commands'
       method: POST
       params: # on simulations will return immediately
         waitUntilComplete: true
@@ -26,7 +26,7 @@ stages:
         data:
           commandType: 'temperatureModule/setTargetTemperature'
           params:
-            moduleId: '{temperatureModuleV1_id}'
+            moduleId: '{temperatureModuleV2_id}'
             celsius: 28
     response:
       strict:
@@ -40,7 +40,7 @@ stages:
           command_id_set_temp: data.id
   - name: issue temperatureModule/setTargetTemperature Command with error
     request:
-      url: '{ot2_server_base_url}/commands'
+      url: '{ot3_server_base_url}/commands'
       method: POST
       params:
         waitUntilComplete: true
@@ -48,7 +48,7 @@ stages:
         data:
           commandType: 'temperatureModule/setTargetTemperature'
           params:
-            moduleId: '{temperatureModuleV1_id}'
+            moduleId: '{temperatureModuleV2_id}'
             celsius: 100
     response:
       strict:
@@ -59,7 +59,7 @@ stages:
           commandType: temperatureModule/setTargetTemperature
           status: failed
           params:
-            moduleId: '{temperatureModuleV1_id}'
+            moduleId: '{temperatureModuleV2_id}'
             celsius: 100
           error:
             errorType: InvalidTargetTemperatureError
@@ -69,7 +69,7 @@ stages:
           command_id_set_temp_error: data.id
   - name: issue temperatureModule/deactivate Command
     request:
-      url: '{ot2_server_base_url}/commands'
+      url: '{ot3_server_base_url}/commands'
       method: POST
       params:
         waitUntilComplete: true
@@ -77,7 +77,7 @@ stages:
         data:
           commandType: 'temperatureModule/deactivate'
           params:
-            moduleId: '{temperatureModuleV1_id}'
+            moduleId: '{temperatureModuleV2_id}'
     response:
       strict:
         - json:off
@@ -90,7 +90,7 @@ stages:
           command_id_deactivate: data.id
   - name: Get command by id
     request:
-      url: '{ot2_server_base_url}/commands/{command_id_set_temp}'
+      url: '{ot3_server_base_url}/commands/{command_id_set_temp}'
       method: GET
     response:
       strict:
@@ -102,7 +102,7 @@ stages:
           status: succeeded
   - name: Get commands
     request:
-      url: '{ot2_server_base_url}/commands'
+      url: '{ot3_server_base_url}/commands'
       method: GET
     response:
       strict:
@@ -115,7 +115,7 @@ stages:
           - id: '{command_id_deactivate}'
   - name: Create Empty Run
     request:
-      url: '{ot2_server_base_url}/runs'
+      url: '{ot3_server_base_url}/runs'
       json:
         data: {}
       method: POST
@@ -133,7 +133,7 @@ stages:
           run_id: data.id
   - name: issue temperatureModule/setTargetTemperature Command
     request:
-      url: '{ot2_server_base_url}/commands'
+      url: '{ot3_server_base_url}/commands'
       method: POST
       params:
         waitUntilComplete: true
@@ -141,7 +141,7 @@ stages:
         data:
           commandType: temperatureModule/setTargetTemperature
           params:
-            moduleId: '{temperatureModuleV1_id}'
+            moduleId: '{temperatureModuleV2_id}'
             celsius: 55
     response:
       strict:

@@ -15,7 +15,6 @@ export function getUnsafeCommandText({
   allRunDefs,
   t,
   commandTextData,
-  robotType,
 }: HandlesCommands<UnsafeRunTimeCommand>): string {
   switch (command.commandType) {
     case 'unsafe/blowOutInPlace': {
@@ -48,7 +47,6 @@ export function getUnsafeCommandText({
       )?.displayName
       const locationText = getLabwareDisplayLocation({
         location,
-        robotType,
         allRunDefs,
         loadedLabwares: commandTextData?.labware ?? [],
         loadedModules: commandTextData?.modules ?? [],

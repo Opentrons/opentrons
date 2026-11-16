@@ -113,7 +113,7 @@ export function SignRunModal({
     <Modal
       title={t('sign_protocol_run')}
       closeOnOutsideClick={false}
-      zIndexOverlay={Z_INDEX.LOGIN_MODAL}
+      zIndexOverlay={Z_INDEX.BLOCKING_MODALS}
       childrenPadding="var(--spacing-24)"
       footer={footer}
     >

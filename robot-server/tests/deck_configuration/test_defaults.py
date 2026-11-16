@@ -8,7 +8,7 @@ from opentrons_shared_data import deck
 from robot_server.deck_configuration import defaults as subject
 from robot_server.deck_configuration import validation, validation_mapping
 
-DECK_DEFINITION_VERSION: Final = 5
+DECK_DEFINITION_VERSION: Final = 6
 
 
 @pytest.mark.parametrize(

@@ -23,10 +23,8 @@ import {
   selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
 } from '/app/redux/protocol-runs'
 
-import type { TFunction } from 'i18next'
 import type { ReactNode } from 'react'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
-import type { State } from '/app/redux/types'
 
 interface DesktopOffsetSuccessProps extends EditOffsetContentProps {
   handleAddConfirmedWorkingVector: () => void
@@ -36,13 +34,9 @@ export function DesktopOffsetSuccess(
   props: DesktopOffsetSuccessProps
 ): ReactNode {
   const { t } = useTranslation('labware_position_check')
-  const { t: commandTextT } = useTranslation('protocol_command_text')
   const flowType = useSelector(selectSelectedLwFlowType(props.runId))
   const mostRecentVectorOffset = useSelector(
     selectSelectedLwWithOffsetDetailsMostRecentVectorOffset(props.runId)
-  )
-  const { protocolData } = useSelector(
-    (state: State) => state.protocolRuns[props.runId]?.lpc!
   )
   const selectedLwInfo = useSelector(selectSelectedLwOverview(props.runId))!
   const moduleModel =
@@ -52,11 +46,7 @@ export function DesktopOffsetSuccess(
     selectSelectedLwDisplayName(props.runId)
   )
 
-  const slotOnlyDisplayLocation = getFlexSlotNameOnly(
-    offsetLocationDetails,
-    protocolData,
-    commandTextT as TFunction
-  )
+  const slotOnlyDisplayLocation = getFlexSlotNameOnly(offsetLocationDetails)
 
   const bodyText = (): string => {
     switch (flowType) {

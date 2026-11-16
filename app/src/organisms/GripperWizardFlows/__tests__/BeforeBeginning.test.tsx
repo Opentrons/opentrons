@@ -34,6 +34,7 @@ describe('BeforeBeginning', () => {
       isRobotMoving: false,
       setErrorMessage: vi.fn(),
       errorMessage: null,
+      selectedSlot: 'B2',
       createdMaintenanceRunId: null,
       documentationState: ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
     }

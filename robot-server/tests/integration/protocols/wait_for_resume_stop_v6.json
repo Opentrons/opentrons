@@ -9,8 +9,8 @@
     "tags": ["unitTest"]
   },
   "robot": {
-    "model": "OT-2 Standard",
-    "deckId": "ot2_standard"
+    "model": "OT-3 Standard",
+    "deckId": "ot3_standard"
   },
   "pipettes": {},
   "modules": {},

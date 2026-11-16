@@ -83,9 +83,8 @@ def _make_config(use_virtual_modules: bool) -> Config:
     return Config(
         use_virtual_modules=use_virtual_modules,
         use_virtual_peripherals=use_virtual_modules,
-        # Robot and deck type are arbitrary.
-        robot_type="OT-2 Standard",
-        deck_type=DeckType.OT2_STANDARD,
+        robot_type="OT-3 Standard",
+        deck_type=DeckType.OT3_STANDARD,
     )
 
 

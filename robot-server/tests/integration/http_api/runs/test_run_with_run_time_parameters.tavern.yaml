@@ -2,12 +2,12 @@ test_name: Test the run endpoints with run time parameters
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 
 stages:
   - name: Upload a protocol
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/basic_transfer_with_run_time_parameters.py'
@@ -19,7 +19,7 @@ stages:
 
   - name: Upload sample_plates.csv file
     request:
-      url: '{ot2_server_base_url}/dataFiles'
+      url: '{ot3_server_base_url}/dataFiles'
       method: POST
       files:
         file: 'tests/integration/data_files/sample_plates.csv'
@@ -32,13 +32,13 @@ stages:
       json:
         data:
           id: !anystr
-          name: "sample_plates.csv"
+          name: 'sample_plates.csv'
           createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-          source: "uploaded"
+          source: 'uploaded'
 
   - name: Create run from protocol
     request:
-      url: '{ot2_server_base_url}/runs'
+      url: '{ot3_server_base_url}/runs'
       method: POST
       json:
         data:
@@ -123,7 +123,7 @@ stages:
 
   - name: Play the run
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      url: '{ot3_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
@@ -140,7 +140,7 @@ stages:
     max_retries: 10
     delay_after: 0.1
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}'
+      url: '{ot3_server_base_url}/runs/{run_id}'
       method: GET
     response:
       status_code: 200
@@ -152,7 +152,7 @@ stages:
 
   - name: Verify the run contains the set run time parameters
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}'
+      url: '{ot3_server_base_url}/runs/{run_id}'
       method: GET
     response:
       status_code: 200
@@ -170,7 +170,7 @@ stages:
 
   - name: Mark the run as not-current
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}'
+      url: '{ot3_server_base_url}/runs/{run_id}'
       method: PATCH
       json:
         data:
@@ -180,7 +180,7 @@ stages:
 
   - name: Verify the archived run still contains the set run time parameters
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}'
+      url: '{ot3_server_base_url}/runs/{run_id}'
       method: GET
     response:
       status_code: 200

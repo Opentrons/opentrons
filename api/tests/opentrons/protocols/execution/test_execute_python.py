@@ -45,8 +45,7 @@ def test_api2_runfunc() -> None:
     execute_python._runfunc_ok(starargs)
 
 
-@pytest.mark.ot2_only
-@pytest.mark.parametrize("protocol_file", ["testosaur_v2.py"])
+@pytest.mark.parametrize("protocol_file", ["flex_testosaur.py"])
 def test_execute_ok(
     protocol: Protocol, protocol_file: str, ctx: ProtocolContext
 ) -> None:
@@ -107,8 +106,6 @@ metadata={"apiLevel": "2.0"};
     assert "Exception [line 5]: hi" in str(e.value)
 
 
-# TODO (spp, 2024-7-16): add a test for CSV rtp extraction
-@pytest.mark.ot2_only
 @pytest.mark.parametrize("protocol_file", ["testosaur_with_rtp.py"])
 def test_rtp_extraction(protocol: Protocol, protocol_file: str) -> None:
     """It should set the RTP definitions in protocol with override values from run."""

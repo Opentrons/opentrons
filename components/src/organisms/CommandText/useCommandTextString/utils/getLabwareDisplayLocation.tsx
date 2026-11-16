@@ -1,5 +1,6 @@
 import {
   changeAnyUseOfMeToPreserveStructure_thisIsAnOffDeckLocationInASlotName,
+  FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_TYPE,
   getModuleDeckLabel,
   getModuleDisplayName,
@@ -100,7 +101,7 @@ export function getLabwareDisplayLocation(
       : t('module_in_slot', {
           count: getOccludedSlotCountForModule(
             getModuleType(moduleModel),
-            params.robotType
+            FLEX_ROBOT_TYPE
           ),
           module: getModuleDisplayName(moduleModel),
           slot_name: moduleSlot,
@@ -117,7 +118,7 @@ export function getLabwareDisplayLocation(
       return t('adapter_in_mod_in_slot', {
         count: getOccludedSlotCountForModule(
           getModuleType(moduleModel),
-          params.robotType
+          FLEX_ROBOT_TYPE
         ),
         module: getModuleDisplayName(moduleModel),
         adapter: adapterName,

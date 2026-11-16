@@ -294,9 +294,9 @@ function PageContents(props: PageContentsProps): ReactNode {
         <CameraTab robotName={robotName} runId={runId} />
       </Flex>
       <Box
-        backgroundColor={COLORS.white}
+        backgroundColor={isSetupTab ? COLORS.transparent : COLORS.white}
         // remove left upper corner border radius when first tab is active
-        borderRadius={BORDERS.borderRadius8}
+        borderRadius={isSetupTab ? undefined : BORDERS.borderRadius8}
       >
         {isPendingRerunLoading ? (
           <Box margin={SPACING.spacing16}>

@@ -1,6 +1,6 @@
 import { Trans, useTranslation } from 'react-i18next'
 
-import { SPACING } from '@opentrons/components'
+import { SPACING, StyledText } from '@opentrons/components'
 import { LEFT } from '@opentrons/shared-data'
 
 import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
@@ -53,11 +53,18 @@ export const MountingPlate = (
   }
   return (
     <GenericWizardTile
-      header={t(
-        flowType === FLOWS.ATTACH
-          ? 'attach_mounting_plate'
-          : 'unscrew_and_detach'
-      )}
+      header={
+        <StyledText
+          desktopStyle="headingSmallBold"
+          oddStyle="level4HeaderSemiBold"
+        >
+          {t(
+            flowType === FLOWS.ATTACH
+              ? 'attach_mounting_plate'
+              : 'unscrew_and_detach'
+          )}
+        </StyledText>
+      }
       rightHandBody={getPipetteAnimations96({
         section: SECTIONS.MOUNTING_PLATE,
         flowType,

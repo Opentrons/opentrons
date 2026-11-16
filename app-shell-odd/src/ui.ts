@@ -88,9 +88,6 @@ export function waitForBackendAndShowMainWindow(
     mainWindow.webContents.send('window-type', 'odd-main')
   })
 
-  // prevent fullscreen for safe
-  mainWindow.setFullScreen(false)
-
   // prevent Electron shortcuts that Desktop app shows in menu
   mainWindow.webContents.on('before-input-event', (event, input) => {
     const key = input.key.toLowerCase()
@@ -132,18 +129,26 @@ export function waitForBackendAndShowMainWindow(
   })
 
   _NODE_ENV_ !== 'development' &&
-    setTimeout(function () {
-      systemd
-        .getIsBackendReady()
-        .then((isReady: boolean) => {
-          dispatch(sendReadyStatus(isReady))
-          if (!isReady) {
-            waitForBackendAndShowMainWindow(dispatch, mainWindow)
-          }
-        })
-        .catch(e => {
-          log.debug('Could not get status of backend services', { e })
-          waitForBackendAndShowMainWindow(dispatch, mainWindow)
-        })
+    setTimeout(() => {
+      void waitForBackendSendReady(dispatch)
     }, READY_POLL_INTERVAL_MS)
+}
+
+async function waitForBackendSendReady(dispatch: Dispatch): Promise<void> {
+  systemd
+    .getIsBackendReady()
+    .then((isReady: boolean) => {
+      dispatch(sendReadyStatus(isReady))
+      if (!isReady) {
+        setTimeout(() => {
+          void waitForBackendSendReady(dispatch)
+        }, READY_POLL_INTERVAL_MS)
+      }
+    })
+    .catch(e => {
+      log.debug('Could not get status of backend services', { e })
+      setTimeout(() => {
+        void waitForBackendSendReady(dispatch)
+      }, READY_POLL_INTERVAL_MS)
+    })
 }

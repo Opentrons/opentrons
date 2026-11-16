@@ -2,11 +2,11 @@ from tests.integration.robot_client import RobotClient
 
 
 async def test_upload_and_download_data_file(
-    ot2_server_base_url: str,
+    ot3_server_base_url: str,
 ) -> None:
     """Test uploading data files and downloading the contents."""
     async with RobotClient.make(
-        base_url=ot2_server_base_url, version="*"
+        base_url=ot3_server_base_url, version="*"
     ) as robot_client:
         response = await robot_client.post_data_files(
             req_body={"filePath": "./tests/integration/data_files/test.csv"}

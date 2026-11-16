@@ -8,12 +8,6 @@ from .api_support.types import APIVersion
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.types import LabwareDefinition
-    from opentrons_shared_data.protocol.types import (
-        JsonProtocol as JsonProtocolDef,
-    )
-    from opentrons_shared_data.protocol.types import (
-        Metadata as JsonProtocolMetadata,
-    )
 
 
 PythonProtocolMetadata = Optional[Dict[str, str]]
@@ -33,7 +27,7 @@ class StaticPythonInfo:
 
 
 @dataclass(frozen=True)
-class _ProtocolCommon:
+class PythonProtocol:
     text: Union[str, bytes]
     """The original text of the protocol file in the format it was specified with.
 
@@ -52,23 +46,9 @@ class _ProtocolCommon:
     This can be `None` if, for example, we've parsed the protocol from an in-memory text stream.
     """
 
-    # TODO(mm, 2023-06-22): Move api_level out of _ProtocolCommon and into PythonProtocol.
-    # JSON protocols do not have an intrinsic api_level, especially since JSONv6,
-    # where they are no longer executed via the Python Protocol API.
     api_level: "APIVersion"
 
     robot_type: RobotType
-
-
-@dataclass(frozen=True)
-class JsonProtocol(_ProtocolCommon):
-    schema_version: int
-    contents: "JsonProtocolDef"
-    metadata: "JsonProtocolMetadata"
-
-
-@dataclass(frozen=True)
-class PythonProtocol(_ProtocolCommon):
     contents: Any  # This is the output of compile() which we can't type
     metadata: PythonProtocolMetadata
     # these 'bundled_' attrs should only be included when the protocol is a zip
@@ -77,9 +57,6 @@ class PythonProtocol(_ProtocolCommon):
     bundled_python: Optional[Dict[str, str]]
     # this should only be included when the protocol is not a zip
     extra_labware: Optional[Dict[str, "LabwareDefinition"]]
-
-
-Protocol = Union[JsonProtocol, PythonProtocol]
 
 
 class BundleContents(NamedTuple):

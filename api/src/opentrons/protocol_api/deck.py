@@ -15,7 +15,6 @@ from .labware import Labware
 from .module_contexts import ModuleContext
 from opentrons.motion_planning import adjacent_slots_getters
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import DeckLocation, DeckSlotName, Location, Point, StagingSlotName
 
 DeckItem = Union[Labware, ModuleContext]
@@ -98,18 +97,6 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
         return item
 
     def __delitem__(self, key: DeckLocation) -> None:
-        if self._api_version == APIVersion(2, 14):
-            # __delitem__() support history:
-            #
-            # * PAPIv<=2.13 (non Protocol Engine): Yes, but that goes through a different Deck class
-            # * PAPIv2.14 (Protocol Engine): No
-            # * PAPIv2.15 (Protocol Engine): Yes
-            raise APIVersionError(
-                api_element="Deleting deck elements",
-                until_version="2.15",
-                current_version=f"{self._api_version}",
-            )
-
         slot_name = _get_slot_name(
             key, self._api_version, self._protocol_core.robot_type
         )

@@ -1,6 +1,7 @@
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 
 import { FLOWS, SECTIONS } from './constants'
+import { insertSelectSlotAfterAttachProbe } from './getPipetteWizardSteps'
 
 import type { Mount } from '@opentrons/api-client'
 import type { LoadedPipette } from '@opentrons/shared-data'
@@ -411,7 +412,8 @@ const fromEmptyMountAttachSingleMountOn = (
 export const getPipetteWizardStepsForProtocol = (
   attachedPipettes: AttachedPipettesFromInstrumentsQuery,
   pipetteInfo: LoadedPipette[],
-  mount: Mount
+  mount: Mount,
+  includeSlotSelect: boolean = true
 ): PipetteWizardStep[] | null => {
   const requiredPipette = pipetteInfo.find(pipette => pipette.mount === mount)
   const ninetySixChannelAttached =
@@ -424,47 +426,72 @@ export const getPipetteWizardStepsForProtocol = (
   if (requiredPipette == null) {
     //  return empty array if no pipette is required in the protocol
     return null
-  } else if (
-    requiredPipette?.pipetteName === attachedPipettes[mount]?.instrumentName
-  ) {
+  }
+
+  if (requiredPipette.pipetteName === attachedPipettes[mount]?.instrumentName) {
     // return calibration flow if correct pipette is attached
-    return calibrateAlreadyAttachedPipetteOn(mount)
-  } else if (!ninetySixChannelRequested && ninetySixChannelAttached) {
+    return insertSelectSlotAfterAttachProbe(
+      calibrateAlreadyAttachedPipetteOn(mount),
+      includeSlotSelect
+    )
+  }
+  if (!ninetySixChannelRequested && ninetySixChannelAttached) {
     // 96-channel pipette attached and need to attach single mount pipette
-    return detachNinetySixAndAttachSingleMountOn(mount)
-  } else if (!ninetySixChannelRequested && attachedPipettes[mount] != null) {
+    return insertSelectSlotAfterAttachProbe(
+      detachNinetySixAndAttachSingleMountOn(mount),
+      includeSlotSelect
+    )
+  }
+  if (!ninetySixChannelRequested && attachedPipettes[mount] != null) {
     // Single mount pipette attached and need to attach new single mount pipette
-    return detachSingleMountAndAttachSingleMountOn(mount)
-  } else if (
+    return insertSelectSlotAfterAttachProbe(
+      detachSingleMountAndAttachSingleMountOn(mount),
+      includeSlotSelect
+    )
+  }
+  if (
     ninetySixChannelRequested &&
     attachedPipettes[LEFT] != null &&
     attachedPipettes[RIGHT] != null
   ) {
     // Single mount pipette attached to both mounts and need to attach 96-channel pipette
-    return detachTwoSingleMountsAndAttachNinetySix()
-  } else if (
+    return insertSelectSlotAfterAttachProbe(
+      detachTwoSingleMountsAndAttachNinetySix(),
+      includeSlotSelect
+    )
+  }
+  if (
     ninetySixChannelRequested &&
     attachedPipettes[LEFT] != null &&
     attachedPipettes[RIGHT] == null
   ) {
     // Single mount pipette attached to left mount and need to attach 96-channel pipette
-    return detachSingleMountOnLeftAndAttachNinetySix()
-  } else if (
+    return insertSelectSlotAfterAttachProbe(
+      detachSingleMountOnLeftAndAttachNinetySix(),
+      includeSlotSelect
+    )
+  }
+  if (
     ninetySixChannelRequested &&
     attachedPipettes[LEFT] == null &&
     attachedPipettes[RIGHT] != null
   ) {
     // Single mount pipette attached to right mount and need to attach 96-channel pipette
-    return detachSingleMountOnRightAndAttachNinetySix()
-  } else {
-    // if no pipette is attached to gantry
-
-    if (ninetySixChannelRequested) {
-      // Gantry empty and need to attach 96-channel pipette
-      return fromEmptyGantryAttachNinetySix()
-    } else {
-      // Gantry empty and need to attach single mount pipette
-      return fromEmptyMountAttachSingleMountOn(mount)
-    }
+    return insertSelectSlotAfterAttachProbe(
+      detachSingleMountOnRightAndAttachNinetySix(),
+      includeSlotSelect
+    )
   }
+  if (ninetySixChannelRequested) {
+    // Gantry empty and need to attach 96-channel pipette
+    return insertSelectSlotAfterAttachProbe(
+      fromEmptyGantryAttachNinetySix(),
+      includeSlotSelect
+    )
+  }
+  // Gantry empty and need to attach single mount pipette
+  return insertSelectSlotAfterAttachProbe(
+    fromEmptyMountAttachSingleMountOn(mount),
+    includeSlotSelect
+  )
 }
