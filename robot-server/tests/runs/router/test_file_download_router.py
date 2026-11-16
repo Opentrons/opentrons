@@ -101,7 +101,7 @@ async def _stub_run_record_for_download(
     command = _make_home_command()
     empty_slice = JsonCommandSlice(commands=[], cursor=0, total_length=1)
     full_slice = JsonCommandSlice(
-        commands=[command.model_dump_json(by_alias=True, exclude_none=True)],
+        commands=[command.model_dump_json(by_alias=True)],
         cursor=0,
         total_length=1,
     )

@@ -154,8 +154,8 @@ async def test_get_commands_list(
     ).then_return(
         JsonCommandSlice(
             commands=[
-                command_1.model_dump_json(by_alias=True, exclude_none=True),
-                command_2.model_dump_json(by_alias=True, exclude_none=True),
+                command_1.model_dump_json(by_alias=True),
+                command_2.model_dump_json(by_alias=True),
             ],
             cursor=0,
             total_length=2,
@@ -169,8 +169,8 @@ async def test_get_commands_list(
     )
 
     expected_data = [
-        command_1.model_dump_json(by_alias=True, exclude_none=True),
-        command_2.model_dump_json(by_alias=True, exclude_none=True),
+        command_1.model_dump_json(by_alias=True),
+        command_2.model_dump_json(by_alias=True),
     ]
 
     assert result.content.data == [json.loads(command) for command in expected_data]

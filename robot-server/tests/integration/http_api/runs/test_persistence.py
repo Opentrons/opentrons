@@ -277,7 +277,16 @@ async def test_run_commands_persist(client_and_server: ClientServerFixture) -> N
     json_converted_command = json.loads(
         get_preserialized_commands_response.json()["data"][0]
     )
-    assert json_converted_command == expected_command
+
+    # TODO(chb, 2026-1116) This should start failing when we uniformly persist fields that contain None, as is the case with the Run Store
+    json_stripped_empty_fields = {
+        k: v for k, v in json_converted_command.items() if v is not None
+    }
+    json_stripped_empty_fields["params"] = {
+        k: v for k, v in json_stripped_empty_fields["params"].items() if v is not None
+    }
+
+    assert expected_command == json_stripped_empty_fields
 
 
 @pytest.mark.slow
