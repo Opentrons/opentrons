@@ -27,7 +27,6 @@ const UNCONFIRMABLE_MISSING_STEPS = new Set<StepKey>([
 interface UseMissingStepsModalProps {
   runStatus: RunStatus | null
   attachedModules: AttachedModule[]
-  totalOffsetsToApply: number
   runId: string
   handleProceedToRunClick: () => Promise<void>
   isRunStarting: boolean
