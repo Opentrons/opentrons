@@ -202,7 +202,6 @@ packages = ['src/opentrons']
 addopts = ["-m", "not stackup_testing", "--color=yes", "--strict-markers"]
 asyncio_mode = "auto"
 markers = [
-    "ot3_only: Test only functions using the OT3 hardware",
     "stackup_testing: marks tests as stackup regression tests",
 ]
 filterwarnings = [

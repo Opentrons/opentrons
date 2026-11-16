@@ -36,7 +36,6 @@ def subject(mock_estop_detector: "EstopDetector") -> "EstopStateMachine":
     return EstopStateMachine(detector=mock_estop_detector)
 
 
-@pytest.mark.ot3_only
 async def test_estop_state_no_detector(
     mock_estop_detector: "EstopDetector", decoy: Decoy
 ) -> None:
@@ -78,7 +77,6 @@ async def test_estop_state_no_detector(
     )
 
 
-@pytest.mark.ot3_only
 async def test_estop_state_listener(
     subject: "EstopStateMachine", mock_estop_detector: "EstopDetector", decoy: Decoy
 ) -> None:
@@ -138,7 +136,6 @@ async def test_estop_state_listener(
     assert events.pop().new_state == EstopState.DISENGAGED
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     argnames=["left_connected", "right_connected"],
     argvalues=[
@@ -185,7 +182,6 @@ async def test_estop_physical_status(
     )
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize("clear_to_disengaged", [True, False])
 async def test_estop_state_machine(
     subject: "EstopStateMachine", clear_to_disengaged: bool

@@ -28,16 +28,13 @@ def _mock_ot3_calibration(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None
         monkeypatch.setattr(calibration, name, decoy.mock(func=func))
 
 
-@pytest.mark.ot3_only
 async def test_calibrate_pipette_implementation(
     decoy: Decoy, hardware_api: HardwareControlAPI
 ) -> None:
     """Test Calibration command execution."""
     subject = CalibratePipetteImplementation(hardware_api=hardware_api)
 
-    params = CalibratePipetteParams(
-        mount=MountType.LEFT,
-    )
+    params = CalibratePipetteParams(mount=MountType.LEFT)
 
     decoy.when(
         await calibration.find_pipette_offset(
@@ -57,21 +54,17 @@ async def test_calibrate_pipette_implementation(
     assert result == SuccessData(
         public=CalibratePipetteResult(
             pipetteOffset=InstrumentOffsetVector(x=3, y=4, z=6)
-        ),
+        )
     )
 
 
-@pytest.mark.ot3_only
 async def test_calibrate_pipette_uses_provided_slot(
     decoy: Decoy, hardware_api: HardwareControlAPI
 ) -> None:
     """It should probe the requested deck slot."""
     subject = CalibratePipetteImplementation(hardware_api=hardware_api)
 
-    params = CalibratePipetteParams(
-        mount=MountType.LEFT,
-        slot=DeckSlotName.SLOT_C2,
-    )
+    params = CalibratePipetteParams(mount=MountType.LEFT, slot=DeckSlotName.SLOT_C2)
 
     decoy.when(
         await calibration.find_pipette_offset(
@@ -84,20 +77,17 @@ async def test_calibrate_pipette_uses_provided_slot(
     assert result == SuccessData(
         public=CalibratePipetteResult(
             pipetteOffset=InstrumentOffsetVector(x=3, y=4, z=6)
-        ),
+        )
     )
 
 
-@pytest.mark.ot3_only
 async def test_calibrate_pipette_does_not_save_during_error(
     decoy: Decoy, hardware_api: HardwareControlAPI
 ) -> None:
     """Data should not be saved when an error is raised."""
     subject = CalibratePipetteImplementation(hardware_api=hardware_api)
 
-    params = CalibratePipetteParams(
-        mount=MountType.LEFT,
-    )
+    params = CalibratePipetteParams(mount=MountType.LEFT)
 
     decoy.when(
         await calibration.find_pipette_offset(
