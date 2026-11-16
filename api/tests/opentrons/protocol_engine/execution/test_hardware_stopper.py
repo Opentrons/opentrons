@@ -57,9 +57,7 @@ def subject(
 
 
 async def test_hardware_halt(
-    decoy: Decoy,
-    hardware_api: HardwareControlAPI,
-    subject: HardwareStopper,
+    decoy: Decoy, hardware_api: HardwareControlAPI, subject: HardwareStopper
 ) -> None:
     """It should halt the hardware API."""
     await subject.do_halt()
@@ -94,8 +92,7 @@ async def test_hardware_stopping_sequence(
     decoy.when(hardware_api.attached_modules).then_return([])
 
     await subject.do_stop_and_recover(
-        drop_tips_after_run=True,
-        post_run_hardware_state=post_run_hardware_state,
+        drop_tips_after_run=True, post_run_hardware_state=post_run_hardware_state
     )
 
     decoy.verify(
@@ -181,7 +178,7 @@ async def test_hardware_stopping_sequence_no_pipette(
         mock_tip_handler.cache_tip(  # type: ignore[func-returns-value]
             pipette_id="pipette-id",
             tip=TipGeometry(length=1.0, volume=2.0, diameter=3.0),
-        ),
+        )
     ).then_raise(HwPipetteNotAttachedError("oh no"))
     decoy.when(hardware_api.attached_modules).then_return([])
 
@@ -202,7 +199,6 @@ async def test_hardware_stopping_sequence_no_pipette(
     )
 
 
-@pytest.mark.ot3_only
 async def test_hardware_stopping_sequence_with_gripper(
     decoy: Decoy,
     state_store: StateStore,
@@ -245,7 +241,6 @@ async def test_hardware_stopping_sequence_with_gripper(
     )
 
 
-@pytest.mark.ot3_only
 async def test_hardware_stopping_sequence_with_fixed_trash(
     decoy: Decoy,
     state_store: StateStore,
@@ -286,14 +281,9 @@ async def test_hardware_stopping_sequence_with_fixed_trash(
             tip=TipGeometry(length=1.0, volume=2.0, diameter=3.0),
         ),
         await movement.move_to_well(
-            pipette_id="pipette-id",
-            labware_id="fixedTrash",
-            well_name="A1",
+            pipette_id="pipette-id", labware_id="fixedTrash", well_name="A1"
         ),
-        await mock_tip_handler.drop_tip(
-            pipette_id="pipette-id",
-            home_after=False,
-        ),
+        await mock_tip_handler.drop_tip(pipette_id="pipette-id", home_after=False),
         await hardware_api.stop(home_after=False),
         await hardware_api.home_z(mount=OT3Mount.GRIPPER),
         await movement.home(
@@ -347,10 +337,7 @@ async def test_hardware_stopping_sequence_with_OT2_addressable_area(
             speed=None,
             minimum_z_height=None,
         ),
-        await mock_tip_handler.drop_tip(
-            pipette_id="pipette-id",
-            home_after=False,
-        ),
+        await mock_tip_handler.drop_tip(pipette_id="pipette-id", home_after=False),
         await hardware_api.stop(home_after=False),
         await movement.home(
             axes=[MotorAxis.X, MotorAxis.Y, MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]

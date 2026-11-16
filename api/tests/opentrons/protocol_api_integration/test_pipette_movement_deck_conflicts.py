@@ -8,7 +8,6 @@ from opentrons.protocol_api.core.engine.pipette_movement_conflict import (
 )
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.16", "Flex")], indirect=True
 )
@@ -108,7 +107,6 @@ def test_deck_conflicts_for_96_ch_a12_column_configuration(
     instrument.dispense(50, accessible_plate.wells_by_name()["A1"])
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.20", "Flex")], indirect=True
 )
@@ -137,15 +135,9 @@ def test_close_shave_deck_conflicts_for_96_ch_a12_column_configuration(
 
     hs.close_labware_latch()  # type: ignore[union-attr]
     # Note
-    p1000_96.distribute(
-        15,
-        res12["A6"],
-        deepwell.columns()[6],
-        disposal_volume=0,
-    )
+    p1000_96.distribute(15, res12["A6"], deepwell.columns()[6], disposal_volume=0)
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.16", "Flex")], indirect=True
 )
@@ -255,7 +247,6 @@ def test_deck_conflicts_for_96_ch_a1_column_configuration(
     instrument.dispense(50, badly_placed_plate.wells_by_name()["A1"].bottom())
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.20", "Flex")], indirect=True
 )

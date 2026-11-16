@@ -15,7 +15,6 @@ from opentrons.protocols.advanced_control.transfers.common import (
 from opentrons.types import Location, Point
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -87,7 +86,6 @@ def test_water_transfer_with_volume_more_than_tip_max(
         assert patched_pick_up_tip.call_count == 1
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -240,7 +238,6 @@ def test_order_of_water_transfer_steps(
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -361,7 +358,6 @@ def test_order_of_water_transfer_steps_with_new_tip_per_destination(
         )
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -518,7 +514,6 @@ def test_order_of_water_transfer_steps_with_return_tip(
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -646,7 +641,6 @@ def test_order_of_water_transfer_steps_with_no_new_tips(
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.26", "Flex")], indirect=True
 )
@@ -747,7 +741,6 @@ def test_transfer_steps_volume_split_in_low_volume_mode_in_older_apis(
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.29", "Flex")], indirect=True
 )
@@ -824,14 +817,12 @@ def test_transfer_steps_volume_split_in_low_volume_mode(
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
 @pytest.mark.parametrize("new_tip", ["once", "always"])
 def test_order_of_water_consolidate_steps(
-    simulated_protocol_context: ProtocolContext,
-    new_tip: TransferTipPolicyV2Type,
+    simulated_protocol_context: ProtocolContext, new_tip: TransferTipPolicyV2Type
 ) -> None:
     """It should run the consolidate steps without any errors.
 
@@ -958,7 +949,6 @@ def test_order_of_water_consolidate_steps(
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.29", "Flex")], indirect=True
 )
@@ -1068,7 +1058,6 @@ def test_consolidate_steps_with_20ul_tips_in_low_volume_mode(
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -1210,7 +1199,6 @@ def test_order_of_water_consolidate_steps_larger_volume_than_tip(
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -1363,7 +1351,6 @@ def test_order_of_water_consolidate_steps_larger_volume_than_tip_with_new_tip_al
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -1483,7 +1470,6 @@ def test_order_of_water_consolidate_steps_with_no_new_tips(
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -1617,7 +1603,6 @@ def test_order_of_water_consolidate_steps_with_return_tip(
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -1688,7 +1673,6 @@ def test_water_distribution_with_volume_more_than_tip_max(
         assert patched_pick_up_tip.call_count == 3
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -1905,7 +1889,6 @@ def test_order_of_water_distribution_steps_using_multi_dispense(
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -2129,7 +2112,6 @@ def test_order_of_water_distribution_steps_using_multi_dispense_without_conditio
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.29", "Flex")], indirect=True
 )
@@ -2329,7 +2311,6 @@ def test_distribution_steps_using_multi_dispense_with_20ul_tips_in_low_volume_mo
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -2493,7 +2474,6 @@ def test_order_of_water_distribute_steps_using_one_to_one_transfers(
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -2672,10 +2652,7 @@ def test_order_of_water_distribution_steps_using_mixed_dispense(
                 transfer_properties=mock.ANY,
                 transfer_type=TransferType.ONE_TO_MANY,
                 tip_contents=[
-                    LiquidAndAirGapPair(
-                        liquid=400,
-                        air_gap=expected_air_gap,
-                    )
+                    LiquidAndAirGapPair(liquid=400, air_gap=expected_air_gap)
                 ],
                 add_final_air_gap=True,
                 trash_location=mock.ANY,
@@ -2697,7 +2674,6 @@ def test_order_of_water_distribution_steps_using_mixed_dispense(
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -2771,7 +2747,6 @@ def test_water_distribute_steps_with_return_tip(
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -2806,7 +2781,6 @@ def test_water_distribution_raises_error_for_disposal_vol_without_blowout(
         )
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -2833,9 +2807,7 @@ def test_transfers_do_not_perform_lpd(
     water = simulated_protocol_context.get_liquid_class("water")
 
     with mock.patch.object(
-        InstrumentCore,
-        "liquid_probe_with_recovery",
-        autospec=True,
+        InstrumentCore, "liquid_probe_with_recovery", autospec=True
     ) as patched_liquid_probe:
         mock_manager = mock.Mock()
         mock_manager.attach_mock(patched_liquid_probe, "liquid_probe_with_recovery")
@@ -2866,7 +2838,6 @@ def test_transfers_do_not_perform_lpd(
         assert patched_liquid_probe.call_count == 0
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -2923,7 +2894,6 @@ def test_water_transfer_with_multi_channel_pipette(
         assert patched_dispense.call_count == 2
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -2981,7 +2951,6 @@ def test_raises_no_tips_available_error(
         )
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -3056,7 +3025,6 @@ def test_transfer_with_keep_last_tip(
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -3118,7 +3086,6 @@ def test_transfer_with_keep_last_tip_false(
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -3189,7 +3156,6 @@ def test_transfer_with_keep_last_tip_chained(
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -3253,7 +3219,6 @@ def test_return_tip_after_transfer_with_never(
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -3333,7 +3298,6 @@ def test_return_tip_after_chained_transfers(
         assert mock_manager.mock_calls == expected_calls
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -3371,7 +3335,6 @@ def test_return_tip_fails_after_new_tip_never_keep_last_tip_false(
         pipette_1k.return_tip()
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.27", "Flex")], indirect=True
 )
@@ -3384,8 +3347,7 @@ def test_water_transfer_with_selected_tips(
         "opentrons_flex_96_tiprack_50ul", "D1"
     )
     pipette_50 = simulated_protocol_context.load_instrument(
-        "flex_1channel_50",
-        mount="left",
+        "flex_1channel_50", mount="left"
     )
     nest_plate = simulated_protocol_context.load_labware(
         "nest_96_wellplate_200ul_flat", "C3"
@@ -3522,7 +3484,6 @@ def test_water_transfer_with_selected_tips(
 
 
 # Fix this test
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
