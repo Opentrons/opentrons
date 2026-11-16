@@ -15,15 +15,53 @@ from opentrons.types import Point
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
-MAX_X_BOUNDARY = 427
-MAX_Y_BOUNDARY = 408
-MAX_Z_BOUNDARY = 249
-PREP_POSITION_BLOCK_LOCATION = 188
-X_OFFSET = -65
-Y_OFFSET = 74
+TIP_LENGTH_MM = 57
+DEFAULT_Z_CURRENT = 1.5
+PARTIAL_PICK_UP_CURRENT = 0.75
 
-REAR_OFFSET = 21
-X_RIGHT_OFFSET = 1
+MAX_TRAVEL_MM = {
+    AXIS_X: 427,
+    AXIS_Y: 408,
+    AXIS_Z: 249,
+}
+
+PREP_POSITION_BLOCK_LOCATION = 188
+MIN_LEFT_X_OFFSET = -65
+MIN_LEFT_Y_OFFSET = 74
+
+MAX_REAR_Y_OFFSET = 21
+MAX_RIGHT_X_OFFSET = 1
+
+MAX_RIGHT_POINT = Point(x=MAX_TRAVEL_MM[AXIS_X] - MAX_RIGHT_X_  OFFSET, 
+                            y=MAX_TRAVEL_MM[AXIS_Y] - MAX_REAR_Y_OFFSET, 
+                            z = MAX_TRAVEL_MM[AXIS_Z])
+MIN_LEFT_POINT = Point(
+                        x=MIN_LEFT_X_OFFSET, 
+                        y=MIN_LEFT_Y_OFFSET, 
+                        z=MAX_RIGHT_POINT.z
+                    )
+
+BOWTIE_COORDINATES: Dict[Union[str, int], Point] = {
+    0: MAX_RIGHT_POINT,  # back right and up
+    1: MIN_LEFT_POINT._replace(z=MAX_RIGHT_POINT.z),  # front left and up
+    2: MIN_LEFT_POINT,  # front left and down
+    "Tip Pick Up - 1": Point(0, 0, 0),
+    3: MIN_LEFT_POINT._replace(y=MAX_RIGHT_POINT.y),  # back left and down
+    4: MAX_RIGHT_POINT._replace(x=MIN_LEFT_POINT.x),  # back left and up
+    5: MAX_RIGHT_POINT._replace(y=MIN_LEFT_POINT.y),  # front right and up
+    6: MIN_LEFT_POINT._replace(x=MAX_RIGHT_POINT.x),  # front right and down
+    "Tip Pick Up - 2": Point(0, 0, 0),
+    7: MAX_RIGHT_POINT._replace(z=MIN_LEFT_POINT.z),  # back right and down
+    8: MAX_RIGHT_POINT,  # back right and up
+}
+
+HEADER = ["Time (H:M:S)", "Test Robot", "Test Configuration", "Pick Up Current (A)", "Cycle",
+"XY Stall", "Y Stall", "Z_L Stall", "Z_R Stall", "Cycle Stalls", "Total Stalls", "", "Open-Loop Position",
+"Encoder Position", "Difference X (mm)", "Difference Y (mm)", "Difference Z (mm)", "",
+"Left Mount", "Right Mount", "Gripper Attached", "", "Axis",
+"Max Speed (mm/s)", "Acceleration (mm^2/s)", "Hold Current (A)", "Run Current (A)",
+"Max Speed Discontinuity", "Direction Change Speed Discontinuity",
+]
 
 def convert(seconds):
     weeks, seconds = divmod(seconds, 7 * 24 * 60 * 60)
@@ -34,38 +72,14 @@ def convert(seconds):
     return "%02d:%02d:%02d:%02d:%02d" % (weeks, days, hours, minutes, seconds)
 
 async def _bowtie_move(api) -> tuple:
-    homed_position_left = Point(MAX_X_BOUNDARY, MAX_Y_BOUNDARY, MAX_Z_BOUNDARY)
-    print(f"homed_position_left: {homed_position_left}\n")  # 427-1, 408-21, 249-1
-    pos_max_right = Point(x=MAX_X_BOUNDARY - X_RIGHT_OFFSET, y=MAX_Y_BOUNDARY - REAR_OFFSET, z = MAX_Z_BOUNDARY)
-    print(f"pos_max_right: {pos_max_right}\n")
-    pos_min_left = Point(
-        x=X_OFFSET, y=Y_OFFSET, z=pos_max_right.z
-    )  
-    print(f"pos_min_left: {pos_min_left}\n")  # -65, 74, 249
-    # stay above deck to be safe
-
+    # initialize stall counts for each axis
     stall_count = xy_count = y_count = z_l_count = z_r_count = 0
 
-    high_tp_points: Dict[Union[str, int], Point] = {
-        0: pos_max_right,  # back right and up
-        1: pos_min_left._replace(z=pos_max_right.z),  # front left and up
-        2: pos_min_left,  # front left and down
-        "Tip Pick Up - 1": Point(0, 0, 0),
-        3: pos_min_left._replace(y=pos_max_right.y),  # back left and down
-        4: pos_max_right._replace(x=pos_min_left.x),  # back left and up
-        5: pos_max_right._replace(y=pos_min_left.y),  # front right and up
-        6: pos_min_left._replace(x=pos_max_right.x),  # front right and down
-        "Tip Pick Up - 2": Point(0, 0, 0),
-        7: pos_max_right._replace(z=pos_min_left.z),  # back right and down
-        8: pos_max_right,  # back right and up
-    }
-    print(f"high_tp_points: {high_tp_points}\n")
-
-    for key in high_tp_points.keys():
+    for key in BOWTIE_COORDINATES.keys():
         if isinstance(key, int):
             print(f">> Move {key} <<\n")
             try:
-                await api.move_to(OT3Mount.LEFT, high_tp_points[key])
+                await api.move_to(OT3Mount.LEFT, BOWTIE_COORDINATES[key])
                 print(f"Moved to {key} successfully\n")
             except StallOrCollisionDetectedError:
                 print("--STALL DETECTED--\n")
@@ -77,12 +91,12 @@ async def _bowtie_move(api) -> tuple:
                 await api.move_to(
                     OT3Mount.LEFT,
                     Point(
-                        high_tp_points[key][0],
-                        float(high_tp_points[key][1]),
+                        BOWTIE_COORDINATES[key][0],
+                        float(BOWTIE_COORDINATES[key][1]),
                         home_z_pos[Axis.Z_L],
                     ),
                 )
-                await api.move_to(OT3Mount.LEFT, high_tp_points[key])
+                await api.move_to(OT3Mount.LEFT, BOWTIE_COORDINATES[key])
 
         else:
             print(f">> {key} <<\n")
@@ -163,75 +177,46 @@ async def _main(is_simulating: bool, cycles: int, mount: OT3Mount) -> None:
         print(f"Left mount: {lm}\n")
         print(f"Right mount (should be empty): {rm}\n")
 
-    for i in range(len(AXES)):
+    load = GANTRY
+
+
+    for AXIS in AXES:
         MAX_SPEED.append(
             helpers_ot3.get_gantry_per_axis_setting_ot3(
-                api.config.motion_settings.default_max_speed, AXES[i], load
+                api.config.motion_settings.default_max_speed, AXIS, load
             )
         )
         ACCEL.append(
             helpers_ot3.get_gantry_per_axis_setting_ot3(
-                api.config.motion_settings.acceleration, AXES[i], load
+                api.config.motion_settings.acceleration, AXIS, load
             )
         )
         HOLD_CURRENT.append(
             helpers_ot3.get_gantry_per_axis_setting_ot3(
-                api.config.current_settings.hold_current, AXES[i], load
+                api.config.current_settings.hold_current, AXIS, load
             )
         )
         RUN_CURRENT.append(
             helpers_ot3.get_gantry_per_axis_setting_ot3(
-                api.config.current_settings.run_current, AXES[i], load
+                api.config.current_settings.run_current, AXIS, load
             )
         )
         MAX_DISCONTINUITY.append(
             helpers_ot3.get_gantry_per_axis_setting_ot3(
-                api.config.motion_settings.max_speed_discontinuity, AXES[i], load
+                api.config.motion_settings.max_speed_discontinuity, AXIS, load
             )
         )
         DIRECTION_CHANGE_DISCONTINUITY.append(
             helpers_ot3.get_gantry_per_axis_setting_ot3(
                 api.config.motion_settings.direction_change_speed_discontinuity,
-                AXES[i],
+                AXIS,
                 load,
             )
         )
     print(f"MAX_SPEED: {MAX_SPEED}\nACCEL: {ACCEL}\nHOLD_CURRENT: {HOLD_CURRENT}\nRUN_CURRENT: {RUN_CURRENT}\nMAX_DISCONTINUITY: {MAX_DISCONTINUITY}\nDIRECTION_CHANGE_DISCONTINUITY: {DIRECTION_CHANGE_DISCONTINUITY}\n")
     run_id = data.create_run_id()
     file_name = data.create_file_name(test_name=test_name, run_id=run_id, tag=test_tag)
-
-    header = [
-        "Time (H:M:S)",
-        "Test Robot",
-        "Test Configuration",
-        "Pick Up Current (A)",
-        "Cycle",
-        "XY Stall",
-        "Y Stall",
-        "Z_L Stall",
-        "Z_R Stall",
-        "Cycle Stalls",
-        "Total Stalls",
-        "",
-        "Open-Loop Position",
-        "Encoder Position",
-        "Difference X (mm)",
-        "Difference Y (mm)",
-        "Difference Z (mm)",
-        "",
-        "Left Mount",
-        "Right Mount",
-        "Gripper Attached",
-        "",
-        "Axis",
-        "Max Speed (mm/s)",
-        "Acceleration (mm^2/s)",
-        "Hold Current (A)",
-        "Run Current (A)",
-        "Max Speed Discontinuity",
-        "Direction Change Speed Discontinuity",
-    ]
-    header_str = data.convert_list_to_csv_line(header)
+    header_str = data.convert_list_to_csv_line(HEADER)
     data.append_data_to_file(
         test_name=test_name,
         run_id=run_id,
@@ -240,12 +225,6 @@ async def _main(is_simulating: bool, cycles: int, mount: OT3Mount) -> None:
     )
 
     start_time = time.perf_counter()
-    
-    # homed_pos_left = await api.gantry_position(OT3Mount.LEFT)
-    # homed_pos_right = await api.gantry_position(OT3Mount.RIGHT)
-
-    # print(f"homed_pos_left: {homed_pos_left}\n")
-    # print(f"homed_pos_right: {homed_pos_right}\n")
     total_stalls = 0
 
     await api.update_nozzle_configuration_for_mount(mount = OT3Mount.LEFT, 
@@ -253,17 +232,17 @@ async def _main(is_simulating: bool, cycles: int, mount: OT3Mount) -> None:
         front_right_nozzle = 'H1'
     )
 
-    for i in range(cycles):
-        print(f"\n========== Cycle {i + 1}/{cycles} ==========\n")
+    for cycle in range(cycles):
+        print(f"\n========== Cycle {cycle + 1}/{cycles} ==========\n")
 
-        if (i + 1) % 10 == 0:
+        if (cycle + 1) % 10 == 0:
             # set current to 1.5A
             print("Setting pick up current to 1.5A\n")
-            test_current = 1.5
+            test_current = DEFAULT_Z_CURRENT
         else:
             # set current to 0.75A
             print("Setting pick up current to 0.75A\n")
-            test_current = 0.75
+            test_current = PARTIAL_PICK_UP_CURRENT
 
         helpers_ot3.update_pick_up_current(api, mount, test_current)
 
@@ -300,13 +279,13 @@ async def _main(is_simulating: bool, cycles: int, mount: OT3Mount) -> None:
             + str(final_encoder_pos[Axis.Z_L])
         )
 
-        if i == 0 or i == 1 or i == 2:
+        if cycle == 0 or cycle == 1 or cycle == 2:
             cycle_data = [
                 convert(time.perf_counter() - start_time),
                 test_robot,
                 test_config,
                 test_current,
-                i + 1,
+                cycle + 1,
                 xy_count,
                 y_count,
                 z_l_count,
@@ -324,13 +303,13 @@ async def _main(is_simulating: bool, cycles: int, mount: OT3Mount) -> None:
                 rm,
                 gripper,
                 "",
-                Axis.to_kind(AXES[i]),
-                MAX_SPEED[i],
-                ACCEL[i],
-                HOLD_CURRENT[i],
-                RUN_CURRENT[i],
-                MAX_DISCONTINUITY[i],
-                DIRECTION_CHANGE_DISCONTINUITY[i],
+                Axis.to_kind(AXIS),
+                MAX_SPEED[AXIS],
+                ACCEL[AXIS],
+                HOLD_CURRENT[AXIS],
+                RUN_CURRENT[AXIS],
+                MAX_DISCONTINUITY[AXIS],
+                DIRECTION_CHANGE_DISCONTINUITY[AXIS],
             ]
             print(f"CYCLE DATA: {cycle_data}\n")
             rm = ""
@@ -342,7 +321,7 @@ async def _main(is_simulating: bool, cycles: int, mount: OT3Mount) -> None:
                 test_robot,
                 test_config,
                 test_current,
-                i + 1,
+                cycle + 1,
                 xy_count,
                 y_count,
                 z_l_count,
