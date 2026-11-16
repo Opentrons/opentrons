@@ -264,7 +264,7 @@ async def get_run_data_from_url(
     responses={
         status.HTTP_201_CREATED: {"model": SimpleBody[Run]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[ProtocolNotFound]},
-        status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorBody[FileIdNotFound]},
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {"model": ErrorBody[FileIdNotFound]},
         status.HTTP_409_CONFLICT: {
             "model": ErrorBody[
                 Union[RunAlreadyActive, RunSignoffRequired, NoCurrentAuditLogFound]
@@ -344,7 +344,7 @@ async def create_run(  # noqa: C901
             }
     except FileIdNotFoundError as e:
         raise FileIdNotFound(detail=str(e)).as_error(
-            status.HTTP_422_UNPROCESSABLE_ENTITY
+            status.HTTP_422_UNPROCESSABLE_CONTENT
         )
 
     protocol_resource = None

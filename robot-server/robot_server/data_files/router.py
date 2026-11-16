@@ -159,7 +159,7 @@ class DataFileInUse(ErrorDetails):
     responses={
         status.HTTP_200_OK: {"model": SimpleBody[DataFile]},
         status.HTTP_201_CREATED: {"model": SimpleBody[DataFile]},
-        status.HTTP_422_UNPROCESSABLE_ENTITY: {
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {
             "model": ErrorBody[
                 Union[
                     MultipleDataFileSources,
@@ -200,11 +200,11 @@ async def upload_data_file(
     if all([file, file_path]):
         raise MultipleDataFileSources(
             detail="Can accept either a file or a file path, not both."
-        ).as_error(status.HTTP_422_UNPROCESSABLE_ENTITY)
+        ).as_error(status.HTTP_422_UNPROCESSABLE_CONTENT)
     if file is None and file_path is None:
         raise NoDataFileSourceProvided(
             detail="You must provide either a file or a file_path in the request."
-        ).as_error(status.HTTP_422_UNPROCESSABLE_ENTITY)
+        ).as_error(status.HTTP_422_UNPROCESSABLE_CONTENT)
     try:
         [buffered_file] = await file_reader_writer.read(
             files=[file or Path(sanitize_path(file_path))]  # type: ignore[arg-type, list-item]
@@ -214,7 +214,7 @@ async def upload_data_file(
     # TODO (spp, 2024-06-18): probably also validate CSV file *contents*
     if not buffered_file.name.endswith(".csv"):
         raise UnexpectedFileFormat(detail="Only CSV file format is accepted.").as_error(
-            status.HTTP_422_UNPROCESSABLE_ENTITY
+            status.HTTP_422_UNPROCESSABLE_CONTENT
         )
     file_hash = await file_hasher.hash([buffered_file])
     existing_file_info = data_files_store.get_file_info_by_hash(file_hash)

@@ -189,7 +189,7 @@ async def post_external_log_message(
                 " could not be signed."
             ),
         },
-        fastapi.status.HTTP_422_UNPROCESSABLE_ENTITY: {
+        fastapi.status.HTTP_422_UNPROCESSABLE_CONTENT: {
             "description": "One of the two required files was not provided, or the supporting info did not meet requirements."
         },
     },
@@ -210,7 +210,7 @@ async def store_robot_log(  # noqa: C901
 
     if supporting_message_data.fileType != "runrecord":
         raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=fastapi.status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Only run records are accepted by this endpoint",
         )
 

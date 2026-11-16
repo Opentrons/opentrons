@@ -22,7 +22,7 @@ dependencies = [
     "pydantic-settings==2.4.0",
     "uvicorn==0.54.0",
     "systemd-python==234; sys_platform == 'linux'",
-    "fastapi==0.100.0",
+    "fastapi==0.162.2",
 ]
 dynamic = ['version']
 
@@ -36,7 +36,7 @@ robot = [
     "pydantic-settings==2.4.0",
     "uvicorn==0.54.0",
     "systemd-python==234; sys_platform == 'linux'",
-    "fastapi==0.100.0",
+    "fastapi==0.162.2",
 ]
 dev = [
     "ruff==0.17.4",
