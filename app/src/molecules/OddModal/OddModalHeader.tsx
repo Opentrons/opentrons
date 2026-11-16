@@ -5,6 +5,7 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
+  JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
   SPACING,
@@ -42,6 +43,7 @@ export function OddModalHeader(props: OddModalHeaderBaseProps): ReactNode {
         flexDirection={DIRECTION_ROW}
         gridGap={SPACING.spacing16}
         alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_FLEX_START}
         overflow="hidden"
         flex="1 1 auto"
       >
@@ -59,12 +61,15 @@ export function OddModalHeader(props: OddModalHeaderBaseProps): ReactNode {
           fontWeight={TYPOGRAPHY.fontWeightBold}
           fontSize={TYPOGRAPHY.fontSize28}
           lineHeight={TYPOGRAPHY.lineHeight36}
+          textAlign={TYPOGRAPHY.textAlignLeft}
           css={{
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
             flex: '1 1 auto',
             minWidth: '0',
+            width: '100%',
+            textAlign: 'left',
           }}
         >
           {title}
