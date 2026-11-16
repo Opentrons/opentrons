@@ -14,6 +14,10 @@ The second step in building your protocol is to add modules or fixtures to the d
   <figcaption>Click an open Flex deck slot to add compatible modules and fixtures.</figcaption>
 </figure>
 
+Protocol Designer automatically enforces slot compatibility and prevents hardware conflicts as you place modules and fixtures on the deck. For example, some Flex modules, like the Temperature and Heater-Shaker Modules, can't be placed in column 3 next to a Stacker Module in column 4.
+
+Similarly, the Vacuum Module adapter requires two deck slots, A3 and A4. Because Protocol Designer places the Trash Bin in slot A3 by default, you must remove it to make this location available for the Vacuum Module deck adapter. If your protocol requires waste handling, move the bin to another location on the deck or attach the [external Waste Chute](https://opentrons.com/products/opentrons-flex-waste-chute-gen2-1yok) to your Flex.
+
 ## Module compatibility
 
 Protocol Designer protocols can control Opentrons modules on the Flex or OT-2, as shown below. Flex lets you use multiple modules of the same type, except for the Thermocycler.
@@ -128,7 +132,7 @@ Protocol Designer protocols can control Opentrons modules on the Flex or OT-2, a
         <ul>
           <li>Only 1 module</li>
           <li>GEN1 only</li>
-          <li>Slots A3–A4 only (dual-slot deck adapter)</li>
+          <li>Slots A3–A4</li>
         </ul>
       </td>
       <td>Not compatible</td>
@@ -141,6 +145,9 @@ Protocol Designer protocols can control Opentrons modules on the Flex or OT-2, a
 To optimize deck space on the Flex, you can also customize fixtures such as the waste chute, trash bin, and staging areas.
 
 Click **Deck hardware** in the left sidebar, then click :material-plus-circle: on a compatible slot to add a fixture.
+
+!!! tip
+    You can create additional space on the Flex deck by adding as many as four staging areas in slots A4-D4.
 
 <table>
   <thead>
@@ -188,12 +195,3 @@ Click **Deck hardware** in the left sidebar, then click :material-plus-circle: o
     </tr>
   </tbody>
 </table>
-
-!!! tip
-    You can create additional space on the Flex deck by adding as many as four staging areas in slots A4-D4.
-
-## Preventing hardware conflicts
-
-Protocol Designer automatically adjusts your deck hardware to avoid conflicts. For example, some Flex modules, like the Temperature and Heater-Shaker Modules, can't be placed in column 3 next to a Stacker Module in column 4.
-
-Similarly, the Vacuum Module adapter requires two deck slots, A3 and A4. Because Protocol Designer places the Trash Bin in slot A3 by default, you must remove it to make this location available for the Vacuum Module deck adapter. If your protocol requires waste handling, you can move the bin to another location on the deck or attach the [external Waste Chute](https://opentrons.com/products/opentrons-flex-waste-chute-gen2-1yok) to your Flex.
