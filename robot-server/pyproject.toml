@@ -62,7 +62,7 @@ dev = [
     "click==8.5.1",
     "decoy==2.6.0",
     "hypothesis==6.168.5",
-    "httpx==0.27.2",
+    "httpx==0.28.1",
     "idna==3.20",
     "mock==5.2.0",
     "mypy==2.4.1",
