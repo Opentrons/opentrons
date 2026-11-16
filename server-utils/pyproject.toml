@@ -13,7 +13,7 @@ dependencies = [
     "aiohttp>=3.12.14,<4",
     "anyio==4.9.0",
     "fastapi==0.100.0",
-    "python-dotenv==1.0.1",
+    "python-dotenv==1.2.4",
     "pydantic>2.0.0,<3",
     "pydantic-settings>=2.0.0,<3",
     "typing-extensions>=4.0.0,<5",
