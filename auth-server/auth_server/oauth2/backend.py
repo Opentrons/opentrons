@@ -295,7 +295,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
         if client_id == _CLIENT_ID:
             # The docs say setting `.client` here is optional,
             # but it seems to cause internal errors if we don't.
-            request.client = _Client(client_id=client_id)  # type: ignore[attr-defined]
+            request.client = _Client(client_id=client_id)
             return True
         else:
             self.__send_audit_log("login failed", f"unrecognized client id {client_id}")
@@ -375,7 +375,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
 
         # If the credentials pass the gauntlet above, it's a successful login.
         self.__user_store.clear_failed_logins(username)
-        request.user = user  # type: ignore[attr-defined]
+        request.user = user
         return True
 
     @override
@@ -465,7 +465,7 @@ class _RequestValidator(oauthlib.oauth2.RequestValidator):
             if user is None or user.deactivated:
                 return False
             # Set `.user` per the oauthlib docs.
-            request.user = user  # type: ignore[attr-defined]
+            request.user = user
             return True
         else:
             self.__send_audit_log(
