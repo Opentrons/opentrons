@@ -14,6 +14,9 @@ from typing import Tuple
 
 from hardware_testing.data import ui, get_git_description
 from hardware_testing.data.csv_report import CSVReport
+from hardware_testing.drivers.data_center_client import (
+    upload_data_to_google_drive,
+)
 
 from .config import TestSection, TestConfig, build_report, TESTS
 from ...common.utils import find_module_port
@@ -81,8 +84,24 @@ async def _main(cfg: TestConfig) -> None:
 
     # SAVE REPORT
     ui.print_title("DONE")
-    report.save_to_disk()
+    report_path = report.save_to_disk()
     report.print_results()
+
+    # Upload results to the production data center (skip during simulation).
+    if not cfg.simulate:
+        ui.print_title("UPLOAD")
+        try:
+            uploaded = upload_data_to_google_drive(report_path)
+            if uploaded:
+                ui.print_info("Upload succeeded.")
+            else:
+                ui.print_error(
+                    "Failed to upload data to the production data center."
+                )
+        except Exception as exc:
+            ui.print_error(
+                f"Failed to upload data to the production data center: {exc}"
+            )
 
 
 if __name__ == "__main__":
