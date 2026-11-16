@@ -1,6 +1,5 @@
 """Test file for command validations."""
 
-import pytest
 from decoy import Decoy
 
 from opentrons.hardware_control.protocols.types import FlexRobotType
