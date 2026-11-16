@@ -15,6 +15,15 @@ from opentrons.types import Point
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
+MAX_X_BOUNDARY = 427
+MAX_Y_BOUNDARY = 408
+MAX_Z_BOUNDARY = 249
+PREP_POSITION_BLOCK_LOCATION = 188
+X_OFFSET = -65
+Y_OFFSET = 74
+
+REAR_OFFSET = 21
+X_RIGHT_OFFSET = 1
 
 def convert(seconds):
     weeks, seconds = divmod(seconds, 7 * 24 * 60 * 60)
@@ -24,43 +33,35 @@ def convert(seconds):
 
     return "%02d:%02d:%02d:%02d:%02d" % (weeks, days, hours, minutes, seconds)
 
-
 async def _bowtie_move(api) -> tuple:
-    x_max = 427
-    y_max = 408
-    z_max = 249
-    prep_position_block_location = 188
-
-    homed_position_left = Point(x_max, y_max, z_max)
+    homed_position_left = Point(MAX_X_BOUNDARY, MAX_Y_BOUNDARY, MAX_Z_BOUNDARY)
     print(f"homed_position_left: {homed_position_left}\n")  # 427-1, 408-21, 249-1
-    pos_max_left = Point(x=x_max -1, y=y_max - 21, z = z_max)
-    print(f"pos_max_left: {pos_max_left}\n")  # 426-1, 387-21, 248-1
-    # 427-1, 408-21, 249-1
+    pos_max_right = Point(x=MAX_X_BOUNDARY - X_RIGHT_OFFSET, y=MAX_Y_BOUNDARY - REAR_OFFSET, z = MAX_Z_BOUNDARY)
+    print(f"pos_max_right: {pos_max_right}\n")
     pos_min_left = Point(
-        x=-65, y=75, z=pos_max_left.z
+        x=X_OFFSET, y=Y_OFFSET, z=pos_max_right.z
     )  
-    print(f"pos_min_left: {pos_min_left}\n")  # 0, 75, 98
+    print(f"pos_min_left: {pos_min_left}\n")  # -65, 74, 249
     # stay above deck to be safe
 
     stall_count = xy_count = y_count = z_l_count = z_r_count = 0
 
     high_tp_points: Dict[Union[str, int], Point] = {
-        0: pos_max_left,  # back right and up
-        1: pos_min_left._replace(z=pos_max_left.z),  # front left and up
+        0: pos_max_right,  # back right and up
+        1: pos_min_left._replace(z=pos_max_right.z),  # front left and up
         2: pos_min_left,  # front left and down
         "Tip Pick Up - 1": Point(0, 0, 0),
-        3: pos_min_left._replace(y=pos_max_left.y),  # back left and down
-        4: pos_max_left._replace(x=pos_min_left.x),  # back left and up
-        5: pos_max_left._replace(y=pos_min_left.y),  # front right and up
-        6: pos_min_left._replace(x=pos_max_left.x),  # front right and down
+        3: pos_min_left._replace(y=pos_max_right.y),  # back left and down
+        4: pos_max_right._replace(x=pos_min_left.x),  # back left and up
+        5: pos_max_right._replace(y=pos_min_left.y),  # front right and up
+        6: pos_min_left._replace(x=pos_max_right.x),  # front right and down
         "Tip Pick Up - 2": Point(0, 0, 0),
-        7: pos_max_left._replace(z=pos_min_left.z),  # back right and down
-        8: pos_max_left,  # back right and up
+        7: pos_max_right._replace(z=pos_min_left.z),  # back right and down
+        8: pos_max_right,  # back right and up
     }
     print(f"high_tp_points: {high_tp_points}\n")
 
     for key in high_tp_points.keys():
-        print(f"key: {key}\n")
         if isinstance(key, int):
             print(f">> Move {key} <<\n")
             try:
@@ -95,7 +96,7 @@ async def _bowtie_move(api) -> tuple:
                 Point(
                     tip_pick_up_pos[Axis.X],
                     tip_pick_up_pos[Axis.Y],
-                    tip_pick_up_pos[Axis.Z_L] - prep_position_block_location,
+                    tip_pick_up_pos[Axis.Z_L] - PREP_POSITION_BLOCK_LOCATION,
                 ),
             )
             tip_len = 57
