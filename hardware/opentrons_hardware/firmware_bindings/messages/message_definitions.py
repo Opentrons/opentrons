@@ -3,7 +3,7 @@
 import threading
 from dataclasses import dataclass, field
 from logging import Logger
-from typing import Any, Type
+from typing import ClassVar, Type
 
 from typing_extensions import Literal
 
@@ -15,11 +15,14 @@ from . import payloads
 class SingletonMessageIndexGenerator(object):
     """Singleton class that generates uinque index values."""
 
-    def __new__(cls) -> Any:
+    _instance: ClassVar["SingletonMessageIndexGenerator | None"] = None
+    __current_index: ClassVar[int] = 0
+
+    def __new__(cls) -> "SingletonMessageIndexGenerator":
         """Either generate or return the singleton instance."""
-        if not hasattr(cls, "instance"):
-            cls.instance = super(SingletonMessageIndexGenerator, cls).__new__(cls)
-        return cls.instance
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
 
     def __init__(self) -> None:
         """Initalize the lock."""
@@ -29,11 +32,9 @@ class SingletonMessageIndexGenerator(object):
         """Return the next index."""
         # increment before returning so we never return 0 as a value
         self._lock.acquire(timeout=1)
-        self.__current_index += 1
+        type(self).__current_index += 1
         self._lock.release()
-        return self.__current_index
-
-    __current_index = 0
+        return type(self).__current_index
 
 
 @dataclass

@@ -432,9 +432,7 @@ def _provide_item_in_state(
         module_id = f"module-id-{_mod_index}"
         _mod_index += 1
         decoy.when(mock_state_view.modules.get_connected_model(module_id)).then_return(
-            # this type ignore makes up for a narrowing failure - mypy thinks item_type can
-            # still be one of the literals
-            item_type  # type: ignore[arg-type]
+            item_type
         )
         decoy.when(mock_state_view.modules.get_location(module_id)).then_return(
             DeckSlotLocation(slotName=DeckSlotName.SLOT_5)
