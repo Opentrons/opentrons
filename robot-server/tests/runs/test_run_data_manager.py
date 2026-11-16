@@ -1280,7 +1280,7 @@ async def test_get_commands_slice_from_db(
 
     expected_command_slice = JsonCommandSlice(
         commands=[
-            command.model_dump_json(by_alias=True, exclude_none=True)
+            command.model_dump_json(by_alias=True)
             for command in expected_commands_result
         ],
         cursor=1,
@@ -1319,7 +1319,7 @@ async def test_get_commands_slice_current_run(
 
     expected_command_slice = JsonCommandSlice(
         commands=[
-            command.model_dump_json(by_alias=True, exclude_none=True)
+            command.model_dump_json(by_alias=True)
             for command in expected_commands_result
         ],
         cursor=1,
@@ -1448,7 +1448,7 @@ def test_get_current_command_not_current_run(
     )
 
     command_slice = JsonCommandSlice(
-        commands=[last_command_slice.model_dump_json(by_alias=True, exclude_none=True)],
+        commands=[last_command_slice.model_dump_json(by_alias=True)],
         cursor=0,
         total_length=1,
     )
@@ -1519,7 +1519,7 @@ def test_get_last_completed_command_not_current_run(
     )
 
     command_slice = JsonCommandSlice(
-        commands=[last_command_slice.model_dump_json(by_alias=True, exclude_none=True)],
+        commands=[last_command_slice.model_dump_json(by_alias=True)],
         cursor=1,
         total_length=1,
     )
