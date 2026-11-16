@@ -2529,7 +2529,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     (types.Location(types.Point(), labware=well), well._core)
                     for well in transfer_args.dest
                 ],
-                new_tip=transfer_args.tip_policy,  # type: ignore[arg-type]
+                new_tip=transfer_args.tip_policy,
                 tip_racks=[
                     (types.Location(types.Point(), labware=rack), rack._core)
                     for rack in transfer_args.tip_racks
@@ -2725,7 +2725,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     for well in transfer_args.source
                 ],
                 dest=verified_dest,
-                new_tip=transfer_args.tip_policy,  # type: ignore[arg-type]
+                new_tip=transfer_args.tip_policy,
                 tip_racks=[
                     (types.Location(types.Point(), labware=rack), rack._core)
                     for rack in transfer_args.tip_racks
