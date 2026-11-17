@@ -118,6 +118,7 @@
 
   /* from legacy --modal-contents */
   padding: 1rem;
+  /* stylelint-disable-next-line declaration-block-no-redundant-longhand-properties */
   padding-top: 1rem;
 
   /* from legacy --modal-contents */
