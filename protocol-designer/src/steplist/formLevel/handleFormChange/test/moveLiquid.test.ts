@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
-  fixtureP10SingleV2Specs,
-  fixtureP300SingleV2Specs,
   fixture_tiprack_10_ul,
   fixture_tiprack_300_ul,
+  fixtureP10SingleV2Specs,
+  fixtureP300SingleV2Specs,
 } from '@opentrons/shared-data'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
