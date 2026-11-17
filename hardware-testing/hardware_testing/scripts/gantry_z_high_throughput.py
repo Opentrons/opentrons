@@ -27,7 +27,7 @@ MAX_TRAVEL_MM = {
 }
 
 PREP_POSITION_BLOCK_LOCATION = 188
-MIN_LEFT_X_OFFSET = 70
+MIN_LEFT_X_OFFSET = -70
 MIN_LEFT_Y_OFFSET = 74
 
 MAX_REAR_Y_OFFSET = 21
@@ -194,7 +194,6 @@ async def _main(is_simulating: bool, cycles: int, mount: OT3Mount) -> None:
     await api.home()
     load = api.gantry_load
     robot_name = 'TEST_ROBOT'
-    test_robot = f"gantry lifetime {robot_name}"
     test_name = f"gantry-z-lifetime-test-{robot_name}"
     test_config = load.value
     test_tag = load.value
