@@ -96,9 +96,7 @@ async def enable_oem_mode_endpoint(
     responses={
         status.HTTP_201_CREATED: {"message": "OEM Mode splash screen uploaded"},
         status.HTTP_400_BAD_REQUEST: {"message": "OEM Mode splash screen not set"},
-        status.HTTP_413_CONTENT_TOO_LARGE: {
-            "message": "File is larger than 5mb"
-        },
+        status.HTTP_413_CONTENT_TOO_LARGE: {"message": "File is larger than 5mb"},
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE: {"message": "Invalid file type"},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {
             "message": "OEM Mode splash unhandled exception."

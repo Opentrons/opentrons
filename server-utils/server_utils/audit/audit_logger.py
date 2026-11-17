@@ -256,7 +256,7 @@ class AuditLogger:
             self._message_chunks.append("Response body: none")
             return self
         self._message_chunks.append(
-            f"Response body: {self._decode_body(response.body, response.headers['content-type'])}"
+            f"Response body: {self._decode_body(bytes(response.body), response.headers['content-type'])}"
         )
         return self
 
