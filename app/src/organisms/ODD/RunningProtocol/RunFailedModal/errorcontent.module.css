@@ -1,5 +1,6 @@
 .error_info_text {
   font-weight: var(--font-weight-bold);
+  text-align: left;
 }
 
 .error_container {
