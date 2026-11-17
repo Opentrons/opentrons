@@ -27,12 +27,12 @@ async def test_get_device_info(
 ) -> None:
     """It should send a get device info command"""
     connection.send_command.side_effect = [
-        "M115 FW:0.0.1 HW:Opentrons-vacuum-module-nff SerialNo:VMA120230605001",
+        "M115 FW:0.0.1 HW:Opentrons-vacuum-module-nff SerialNo:VMC120230605001",
         "M114 R:0",
     ]
     response = await subject.get_device_info()
     assert response == {
-        "serial": "VMA120230605001",
+        "serial": "VMC120230605001",
         "version": "0.0.1",
         "model": types.HardwareRevision.NFF.value,
         "reset_reason": "0",
@@ -46,7 +46,7 @@ async def test_get_device_info(
 
     # Test invalid response
     connection.send_command.side_effect = [
-        "M115 FW:0.0.1 SerialNo:VMA120230605001",
+        "M115 FW:0.0.1 SerialNo:VMC120230605001",
         "M114 R:0",
     ]
 
@@ -66,7 +66,7 @@ async def test_set_serial_number(
     """It should send a set serial number command"""
     connection.send_command.return_value = "M996"
 
-    serial_number = "VMA1020250119001"
+    serial_number = "VMC1020250119001"
     await subject.set_serial_number(serial_number)
 
     set_serial_number = types.GCODE.SET_SERIAL_NUMBER.build_command().add_element(

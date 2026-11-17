@@ -246,9 +246,9 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
 
     async def set_serial_number(self, sn: str) -> None:
         """Set Serial Number."""
-        if not re.match(r"^VM[\w]{1}[\d]{2}[\d]{8}[\d]+$", sn):
+        if not re.match(r"^VMC[\w]{1}[\d]{2}[\d]{8}[\d]+$", sn):
             raise ValueError(
-                f"Invalid serial number: ({sn}) expected format: VMA1020250119001"
+                f"Invalid serial number: ({sn}) expected format: VMC1020250119001"
             )
         resp = await self._connection.send_command(
             GCODE.SET_SERIAL_NUMBER.build_command().add_element(sn)
