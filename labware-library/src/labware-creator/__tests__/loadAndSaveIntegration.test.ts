@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { DEFAULT_CUSTOM_NAMESPACE } from '@opentrons/shared-data'
 import {
+  DEFAULT_CUSTOM_NAMESPACE,
   fixture_12_trough,
   fixture_24_tuberack,
   fixture_96_plate,

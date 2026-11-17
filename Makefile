@@ -238,7 +238,7 @@ test-js-%:
 
 # lints and typechecks
 .PHONY: lint
-lint: lint-py lint-js lint-json lint-css check-js check-css circular-dependencies-js
+lint: lint-py lint-js lint-css check-js check-css circular-dependencies-js
 
 PYTHON_LINT_TARGETS  = $(addsuffix -py-lint, $(PYTHON_DIRS))
 
@@ -252,7 +252,7 @@ $(SHARED_DATA_DIR)-py-lint:
 	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
 
 .PHONY: lint-js
-lint-js: check-mutating-api-client-exports lint-js-oxlint lint-js-eslint lint-js-prettier
+lint-js: check-mutating-api-client-exports lint-js-oxlint lint-js-prettier
 
 # Regenerate the denylist used by opentrons/no-direct-mutating.
 .PHONY: generate-mutating-api-client-exports
@@ -266,20 +266,12 @@ check-mutating-api-client-exports:
 
 .PHONY: lint-js-oxlint
 lint-js-oxlint:
-	pnpm exec oxlint
-
-.PHONY: lint-js-eslint
-lint-js-eslint:
-	NODE_OPTIONS="--max-old-space-size=8192 $(NODE_OPTIONS)" pnpm exec eslint --quiet=$(quiet) .
+	pnpm exec oxlint $(if $(filter true,$(quiet)),--quiet)
 
 .PHONY: lint-js-prettier
 lint-js-prettier:
 	pnpm exec prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
 
-
-.PHONY: lint-json
-lint-json:
-	NODE_OPTIONS="--max-old-space-size=8192 $(NODE_OPTIONS)" pnpm exec eslint --ignore-pattern "abr-testing/protocols/" --ignore-pattern ".oxlintrc.json" --max-warnings 0 "**/*.json"
 
 .PHONY: lint-css
 lint-css:

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { ALL } from '@opentrons/shared-data'
 import {
+  ALL,
   fixture_96_plate,
   fixture_tiprack_10_ul,
   fixture_tiprack_300_ul,
