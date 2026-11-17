@@ -35,6 +35,7 @@ class TestConfig:
     """Test Config."""
 
     simulate: bool
+    upload: bool
     tests: Dict[TestSection, Callable]
 
 

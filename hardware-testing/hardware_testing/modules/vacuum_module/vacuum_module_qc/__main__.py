@@ -14,6 +14,9 @@ from typing import Tuple
 
 from hardware_testing.data import ui, get_git_description
 from hardware_testing.data.csv_report import CSVReport
+from hardware_testing.drivers.data_center_client import (
+    upload_data_to_google_drive,
+)
 
 from .config import TestSection, TestConfig, build_report, TESTS
 from ...common.utils import find_module_port
@@ -80,13 +83,28 @@ async def _main(cfg: TestConfig) -> None:
 
     # SAVE REPORT
     ui.print_title("DONE")
-    report.save_to_disk()
+    report_path = report.save_to_disk()
     report.print_results()
+
+    # Upload results to the production data center
+    if cfg.upload and not cfg.simulate:
+        ui.print_title("UPLOAD")
+        try:
+            uploaded = upload_data_to_google_drive(report_path)
+            if uploaded:
+                ui.print_info("Upload succeeded.")
+            else:
+                ui.print_error("Failed to upload data to the production data center.")
+        except Exception as exc:
+            ui.print_error(
+                f"Failed to upload data to the production data center: {exc}"
+            )
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
+    parser.add_argument("--no-upload", action="store_true")
     # add each test-section as a skippable argument (eg: --skip-connectivity)
     for s in TestSection:
         parser.add_argument(f"--skip-{s.value.lower()}", action="store_true")
@@ -101,5 +119,5 @@ if __name__ == "__main__":
         _t_sections = {
             s: f for s, f in TESTS if not getattr(args, f"skip_{s.value.lower()}")
         }
-    _config = TestConfig(simulate=args.simulate, tests=_t_sections)
+    _config = TestConfig(args.simulate, not args.no_upload, _t_sections)
     asyncio.run(_main(_config))
