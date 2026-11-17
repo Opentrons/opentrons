@@ -10,9 +10,11 @@ from opentrons.motion_planning.adjacent_slots_getters import (
     _MixedTypeSlots,
     get_adjacent_slots,
     get_adjacent_staging_slot,
+    get_cardinal_neighbor_slots,
     get_east_slot,
     get_east_west_slots,
     get_north_slot,
+    get_north_south_neighbor_slots,
     get_north_south_slots,
     get_north_south_staging_slots,
     get_north_staging_slot,
@@ -253,3 +255,80 @@ def test_get_surrounding_slots(
         get_surrounding_slots(slot=slot, robot_type=robot_type)
         == expected_surrounding_slots
     )
+
+
+@pytest.mark.parametrize(
+    ("slot", "expected"),
+    [
+        (
+            DeckSlotName.SLOT_A3,
+            [
+                DeckSlotName.SLOT_A2,
+                DeckSlotName.SLOT_B3,
+                StagingSlotName.SLOT_A4,
+            ],
+        ),
+        (
+            DeckSlotName.SLOT_B3,
+            [
+                DeckSlotName.SLOT_B2,
+                DeckSlotName.SLOT_A3,
+                DeckSlotName.SLOT_C3,
+                StagingSlotName.SLOT_B4,
+            ],
+        ),
+        (
+            DeckSlotName.SLOT_B2,
+            [
+                DeckSlotName.SLOT_B3,
+                DeckSlotName.SLOT_B1,
+                DeckSlotName.SLOT_A2,
+                DeckSlotName.SLOT_C2,
+            ],
+        ),
+        (
+            StagingSlotName.SLOT_A4,
+            [StagingSlotName.SLOT_B4, DeckSlotName.SLOT_A3],
+        ),
+        (
+            StagingSlotName.SLOT_B4,
+            [
+                StagingSlotName.SLOT_A4,
+                StagingSlotName.SLOT_C4,
+                DeckSlotName.SLOT_B3,
+            ],
+        ),
+    ],
+)
+def test_get_cardinal_neighbor_slots(
+    slot: DeckSlotName | StagingSlotName,
+    expected: List[DeckSlotName | StagingSlotName],
+) -> None:
+    """Cardinal neighbors include the staging column and skip diagonals."""
+    assert get_cardinal_neighbor_slots(slot) == expected
+
+
+@pytest.mark.parametrize(
+    ("slot", "expected"),
+    [
+        (DeckSlotName.SLOT_A3, [DeckSlotName.SLOT_B3]),
+        (
+            DeckSlotName.SLOT_B3,
+            [DeckSlotName.SLOT_A3, DeckSlotName.SLOT_C3],
+        ),
+        (DeckSlotName.SLOT_B2, [DeckSlotName.SLOT_A2, DeckSlotName.SLOT_C2]),
+        (StagingSlotName.SLOT_A4, [StagingSlotName.SLOT_B4]),
+        (
+            StagingSlotName.SLOT_B4,
+            [StagingSlotName.SLOT_A4, StagingSlotName.SLOT_C4],
+        ),
+        (DeckSlotName.from_primitive("12"), [DeckSlotName.SLOT_B3]),
+        (None, []),
+    ],
+)
+def test_get_north_south_neighbor_slots(
+    slot: DeckSlotName | StagingSlotName | None,
+    expected: List[DeckSlotName | StagingSlotName],
+) -> None:
+    """North/south neighbors are the same-column slice of the cardinal set."""
+    assert get_north_south_neighbor_slots(slot) == expected
