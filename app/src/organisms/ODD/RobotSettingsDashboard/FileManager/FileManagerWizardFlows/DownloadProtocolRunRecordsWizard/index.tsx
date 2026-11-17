@@ -9,7 +9,7 @@ import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import { DownloadDeleteRecordFlow } from '../shared/DownloadDeleteRecordFlow'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type { RunData } from '@opentrons/api-client'
 
 interface DownloadProtocolRunRecordsWizardProps {
@@ -18,14 +18,14 @@ interface DownloadProtocolRunRecordsWizardProps {
 
 export function DownloadProtocolRunRecordsWizard({
   onClose,
-}: DownloadProtocolRunRecordsWizardProps): JSX.Element {
+}: DownloadProtocolRunRecordsWizardProps): ReactNode {
   const { t } = useTranslation('device_details')
   const robotName = useSelector(getLocalRobot)?.name ?? ''
   const { data: runData } = useNotifyAllRunsQuery()
   const allRuns = runData?.data ?? []
 
   const documentationState = useDocumentationState()
-  const { downloadRuns } = useDownloadSelectedRuns(robotName)
+  const { mutateAsync: downloadRuns } = useDownloadSelectedRuns(robotName)
   const { deleteSelectedRuns } = useDeleteSelectedRuns(documentationState)
 
   const copyProps: ComponentProps<typeof DownloadDeleteRecordFlow>['copy'] = {
@@ -44,7 +44,7 @@ export function DownloadProtocolRunRecordsWizard({
       copy={copyProps}
       showChoiceScreen
       initialDeleteAfterDownload
-      onDownload={path => downloadRuns(allRuns, path)}
+      onDownload={path => downloadRuns({ runs: allRuns, destination: path })}
       onDelete={downloadedRuns =>
         deleteSelectedRuns(downloadedRuns).then(() => 'deleted' as const)
       }

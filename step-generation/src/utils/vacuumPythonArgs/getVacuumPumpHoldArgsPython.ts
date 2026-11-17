@@ -1,13 +1,13 @@
-import { formatPyValue } from '../pythonFormat'
+import { formatPyRuntimeValue } from '../pythonFormat'
 
 export const getVacuumPumpHoldArgsPython = (
-  duration: number,
-  ventAfter?: boolean
+  duration: number | string,
+  ventAfter?: boolean | string
 ): string[] => {
   return [
-    `duration_s=${formatPyValue(duration)}`,
-    ...(typeof ventAfter === 'boolean'
-      ? [`vent_after=${formatPyValue(ventAfter)}`]
+    `duration_s=${formatPyRuntimeValue(duration)}`,
+    ...(ventAfter != null
+      ? [`vent_after=${formatPyRuntimeValue(ventAfter)}`]
       : []),
   ]
 }

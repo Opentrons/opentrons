@@ -1,16 +1,17 @@
 import { useTranslation } from 'react-i18next'
 
 import ShuttleLabware from '/app/assets/videos/error-recovery/FlexStacker_LoadLabwareOnShuttle.webm'
-import { TwoColumn } from '/app/molecules/InterventionModal'
+import { TwoColumn } from '/app/components/ODD/modals/InterventionModal'
 
 import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { RightColumnAnimation } from './RightColumnAnimation'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
-export function StackerShuttleLwInfo(props: RecoveryContentProps): JSX.Element {
+export function StackerShuttleLwInfo(props: RecoveryContentProps): ReactNode {
   const { t } = useTranslation('error_recovery')
 
   return (

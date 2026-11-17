@@ -3,6 +3,7 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import { DocumentationRequired } from './DocumentationRequired'
 import styles from './documentationrequired.module.css'
 
+import type { ReactNode } from 'react'
 import type {
   DocumentationReport,
   DocumentedAction,
@@ -21,7 +22,7 @@ const DocumentationRequiredModalImpl = NiceModal.create(
     minReportLength: number
     onCancel?: () => void
     initialDocreport?: DocumentationReport
-  }): JSX.Element => {
+  }): ReactNode => {
     const modal = useModal()
 
     const handleConfirm = (note: string): void => {

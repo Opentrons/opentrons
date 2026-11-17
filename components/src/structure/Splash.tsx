@@ -1,10 +1,11 @@
 /** A full-page icon in a muted color */
 import cx from 'classnames'
 
-import { Icon } from '../icons'
+import { Icon } from '../helix/icons'
 import styles from './splash.module.css'
 
-import type { IconName } from '../icons'
+import type { ReactNode } from 'react'
+import type { IconName } from '../helix/icons'
 
 export interface SplashProps {
   /** optional alternative icon name. Defaults to 'logo'. */
@@ -13,7 +14,7 @@ export interface SplashProps {
   className?: string
 }
 
-export function Splash(props: SplashProps): JSX.Element {
+export function Splash(props: SplashProps): ReactNode {
   return (
     <div className={cx(styles.splash, props.className)}>
       <Icon name={props.iconName || 'ot-logo'} />

@@ -35,6 +35,7 @@ import { EditLabwareQuantityModal } from '../EditLabwareQuantityModal'
 import { LabwareCardOverflowMenu } from '../LabwareCardOverflowMenu'
 import { getCanModifyLabwareQuantity, getLiquidText } from './utils'
 
+import type { ReactNode } from 'react'
 import type { LabwareOnDeck } from '/protocol-designer/step-forms'
 import type { ThunkDispatch } from '/protocol-designer/types'
 
@@ -45,7 +46,7 @@ interface LabwareCardProps {
   lidId?: string
 }
 
-export function LabwareCard(props: LabwareCardProps): JSX.Element {
+export function LabwareCard(props: LabwareCardProps): ReactNode {
   const { labware, lidId, quantity, location } = props
   const navigate = useNavigate()
   const dispatch = useDispatch<ThunkDispatch<any>>()
@@ -192,7 +193,7 @@ interface LiquidInfoDisplayProps {
   text: string
 }
 
-function LiquidInfoDisplay({ text }: LiquidInfoDisplayProps): JSX.Element {
+function LiquidInfoDisplay({ text }: LiquidInfoDisplayProps): ReactNode {
   return (
     <Flex width={FLEX_MAX_CONTENT}>
       <Tag type="default" text={text} />

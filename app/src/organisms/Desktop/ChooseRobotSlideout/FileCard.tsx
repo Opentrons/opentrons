@@ -9,11 +9,14 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   truncateString,
 } from '@opentrons/components'
 
+import styles from './filecard.module.css'
+
+import type { ReactNode } from 'react'
 import type { CsvFileParameter, RunTimeParameter } from '@opentrons/shared-data'
 
 interface FileCardProps {
@@ -23,7 +26,7 @@ interface FileCardProps {
   setRunTimeParametersOverrides?: (rtpOverrides: RunTimeParameter[]) => void
 }
 
-export function FileCard(props: FileCardProps): JSX.Element {
+export function FileCard(props: FileCardProps): ReactNode {
   const {
     error,
     fileRunTimeParameter,
@@ -45,15 +48,9 @@ export function FileCard(props: FileCardProps): JSX.Element {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
       >
-        <LegacyStyledText
-          forwardedAs="p"
-          css={css`
-            overflow: hidden;
-            white-space: nowrap;
-          `}
-        >
+        <StyledText forwardedAs="p" className={styles.file_name}>
           {truncateString(fileRunTimeParameter?.file?.file?.name ?? '', 35, 18)}
-        </LegacyStyledText>
+        </StyledText>
         <Flex alignItems={ALIGN_CENTER}>
           <Btn
             data-testid="close_button"
@@ -88,9 +85,9 @@ export function FileCard(props: FileCardProps): JSX.Element {
         </Flex>
       </Flex>
       {error != null ? (
-        <LegacyStyledText forwardedAs="label" color={COLORS.red50}>
+        <StyledText forwardedAs="label" color={COLORS.red50}>
           {error}
-        </LegacyStyledText>
+        </StyledText>
       ) : null}
     </Flex>
   )

@@ -7,6 +7,7 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
+  useAttachedInstrumentDisplayName,
   useGripperDisplayName,
   usePipetteModelSpecs,
 } from '/app/local-resources/instruments'
@@ -112,6 +113,14 @@ describe('InstrumentDetail', () => {
       displayName: 'mockPipette',
     } as any)
     vi.mocked(useGripperDisplayName).mockReturnValue('mockGripper')
+    vi.mocked(useAttachedInstrumentDisplayName).mockImplementation(
+      instrument => {
+        if (instrument == null || !instrument.ok) return null
+        return instrument.instrumentType === 'gripper'
+          ? 'mockGripper'
+          : 'mockPipette'
+      }
+    )
     vi.mocked(useParams).mockReturnValue({ mount: 'left' })
     vi.mocked(useIsOEMMode).mockReturnValue(false)
     vi.mocked(useDropTipWizardFlows).mockReturnValue({

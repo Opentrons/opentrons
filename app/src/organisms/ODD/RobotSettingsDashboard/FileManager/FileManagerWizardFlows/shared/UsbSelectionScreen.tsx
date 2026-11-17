@@ -4,13 +4,14 @@ import { useSelector } from 'react-redux'
 
 import { INFO_TOAST, RadioButton, StyledText } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddInfoScreen } from '/app/components/ODD/ODDInfoScreen'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { getShellUsbMassStorageMountPaths } from '/app/redux/shell'
 
 import styles from './shared.module.css'
 
+import type { ReactNode } from 'react'
 import type { State } from '/app/redux/types'
 
 interface UsbSelectionScreenProps {
@@ -31,7 +32,7 @@ const getVolumeLabel = (path: string): string | null => {
 export function UsbSelectionScreen({
   question,
   onContinue,
-}: UsbSelectionScreenProps): JSX.Element {
+}: UsbSelectionScreenProps): ReactNode {
   const { t, i18n } = useTranslation(['device_details', 'shared'])
   // only single-function USB mass-storage devices
   const usbMountPaths = useSelector((state: State) =>
@@ -45,7 +46,10 @@ export function UsbSelectionScreen({
   useEffect(() => {
     // if previously selected path is not in the updated mount paths,
     // ensure the selected path is reset
-    if (selectedPath != null && !usbMountPaths.includes(selectedPath)) {
+    if (
+      selectedPath == null ||
+      (selectedPath != null && !usbMountPaths.includes(selectedPath))
+    ) {
       setSelectedPath(usbMountPaths.length > 0 ? usbMountPaths[0] : null)
     }
   }, [usbMountPaths, selectedPath])

@@ -12,9 +12,9 @@ import {
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
+import { ModuleInfo } from '/app/components/adhoc/shared/ModuleInfo'
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 import { useModuleUSBPort } from '/app/local-resources/modules'
-import { ModuleInfo } from '/app/molecules/ModuleInfo'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useAttachedModules } from '/app/resources/modules'

@@ -10,15 +10,15 @@ import {
 } from '@opentrons/components'
 import { getAllDefinitions } from '@opentrons/shared-data'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { WellSelection } from '/app/organisms/WellSelection'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_WELL_SELECTION_DURATION } from '/app/redux/analytics'
 
 import { ACTIONS } from './constants'
 
-import type { ComponentProps, Dispatch, MouseEvent } from 'react'
-import type { SmallButton } from '/app/atoms/buttons'
+import type { ComponentProps, Dispatch, MouseEvent, ReactNode } from 'react'
+import type { SmallButton } from '/app/components/ODD/buttons'
 import type {
   QuickTransferWizardAction,
   QuickTransferWizardState,
@@ -36,7 +36,7 @@ export const CIRCULAR_WELL_96_PLATE_DEFINITION_URI =
 export const RECTANGULAR_WELL_96_PLATE_DEFINITION_URI =
   'opentrons/usascientific_96_wellplate_2.4ml_deep/1'
 
-export function SelectSourceWells(props: SelectSourceWellsProps): JSX.Element {
+export function SelectSourceWells(props: SelectSourceWellsProps): ReactNode {
   const { onNext, onBack, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()

@@ -2,9 +2,11 @@ import { useTranslation } from 'react-i18next'
 
 import { RadioButton, StyledText } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 
 import styles from './shared.module.css'
+
+import type { ReactNode } from 'react'
 
 interface Choice<T> {
   value: T
@@ -25,7 +27,7 @@ export function SimpleChoiceScreen<T>({
   selected,
   onSelect,
   onContinue,
-}: SimpleChoiceScreenProps<T>): JSX.Element {
+}: SimpleChoiceScreenProps<T>): ReactNode {
   const { t, i18n } = useTranslation('shared')
 
   return (

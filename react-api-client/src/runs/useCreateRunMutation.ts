@@ -1,3 +1,5 @@
+import { useQueryClient } from 'react-query'
+
 import { createRun } from '@opentrons/api-client'
 
 import { useDocumentedMutation } from '../accessControl'
@@ -39,6 +41,7 @@ export function useCreateRunMutation(
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
+  const queryClient = useQueryClient()
   const mutation = useDocumentedMutation<Run, AxiosError, CreateRunData>(
     documentationState,
     [...(actionsToDocument ?? []), 'create_run'],
@@ -48,7 +51,18 @@ export function useCreateRunMutation(
       userNotes,
     }: DocumentedMutationParameters<CreateRunData>) =>
       createRun(host!, createRunData, userNotes)
-        .then(response => response.data)
+        .then(response => {
+          queryClient.setQueryData(
+            getQueryKey(host, 'runs', response.data.data.id, 'details'),
+            response.data
+          )
+          queryClient
+            .invalidateQueries(getQueryKey(host, 'runs', 'details'))
+            .catch((e: Error) => {
+              console.error(`error invalidating runs query: ${e.message}`)
+            })
+          return response.data
+        })
         .catch(e => {
           throw e
         }),

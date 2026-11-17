@@ -4,6 +4,7 @@ import re
 from typing import Literal
 
 from playwright.sync_api import Page
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 from automation.base_page import BasePage
 
@@ -25,9 +26,17 @@ class PlateReaderPage(BasePage):
         self.page.get_by_test_id("Modules").click()
         self.page.get_by_test_id(module).click()
 
-    def dimiss_deck_hardware_modal(self) -> None:
-        """Dismiss the deck hardware modal if it appears."""
-        self.page.get_by_test_id("Toast_info").get_by_role("button").click()
+    def dismiss_deck_hardware_modal(self) -> None:
+        """Dismiss the deck hardware toast if it appears."""
+
+        toast = self.page.get_by_test_id("Toast_info").filter(has_text="We've added your deck hardware!")
+        try:
+            toast.wait_for(state="visible", timeout=5000)
+        except PlaywrightTimeoutError:
+            return
+
+        toast.locator("button").click()
+        toast.wait_for(state="hidden", timeout=5000)
 
     def define_initialization(
         self,

@@ -50,7 +50,7 @@ vi.mock(
 vi.mock('/app/organisms/LabwarePositionCheck/LPCContentContainer', () => ({
   LPCContentContainer: MockLPCContentContainer,
 }))
-vi.mock('/app/molecules/InterventionModal', () => ({
+vi.mock('/app/components/ODD/modals/InterventionModal', () => ({
   TwoColumn: vi
     .fn()
     .mockImplementation(({ children }) => (

@@ -168,7 +168,7 @@ class CommandExecutor:
             # TODO(mc, 2022-11-14): mark command as stopped rather than failed
             # https://opentrons.atlassian.net/browse/RCORE-390
             if isinstance(error, asyncio.CancelledError):
-                error = RunStoppedError("Run was cancelled")
+                error = RunStoppedError(f"Run was cancelled {str(error)}")
             elif isinstance(error, EStopActivatedError):
                 error = PE_EStopActivatedError(wrapping=[error])
             elif not isinstance(error, EnumeratedError):

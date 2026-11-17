@@ -1,9 +1,10 @@
-import * as Fixtures from '../../../../app/src/molecules/Command/__fixtures__'
+import * as Fixtures from '../../../../app/src/components/adhoc/shared/Command/__fixtures__'
 import { Box } from '../../primitives'
 import { CommandText as CommandTextComponent } from './index'
 import { getLabwareDefinitionsFromCommands } from './useCommandTextString/utils'
 
 import type { Meta, StoryObj } from '@storybook/react'
+import type { ReactNode } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 
 interface StorybookArgs {
@@ -12,7 +13,7 @@ interface StorybookArgs {
   commandIndex: number
 }
 
-function Wrapper(props: StorybookArgs): JSX.Element {
+function Wrapper(props: StorybookArgs): ReactNode {
   const allRunDefs = getLabwareDefinitionsFromCommands(
     Fixtures.mockDoItAllTextData.commands
   )

@@ -1,118 +1,110 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import clsx from 'clsx'
 
 import {
-  ERROR_TOAST,
+  BasicButton,
   Icon,
   Modal,
   PrimaryButton,
+  SPACING,
   StyledText,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { useInsufficientPermissionsToast } from '/app/local-resources/access-control/useInsufficientPermissionsToast'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { showLoginModal } from '/app/organisms/Desktop/LoginModal'
-import { useToaster } from '/app/organisms/ToasterOven'
 import { useCurrentRobotName } from '/app/redux/robot-auth'
 import { useSignRunFlow } from '/app/resources/access-control/useSignRunFlow'
 import { useCurrentRunId, useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import styles from './signrunmodal.module.css'
 
-// Above typical desktop modal overlays so the toast remains visible on login.
-const TOAST_ABOVE_LOGIN_Z_INDEX = 10002
+import type { ReactNode } from 'react'
+import type { DocumentationState } from '@opentrons/react-api-client'
 
 export interface SignRunModalProps {
   runId: string
   robotName: string
+  documentationState: DocumentationState
   onSigned?: () => void
 }
 
 export function SignRunModal({
   runId,
   robotName,
+  documentationState,
   onSigned,
-}: SignRunModalProps): JSX.Element {
-  const { t, i18n } = useTranslation(['access_control', 'shared'])
+}: SignRunModalProps): ReactNode {
+  const { t } = useTranslation('access_control')
 
-  const [name, setName] = useState('')
-  const [nameError, setNameError] = useState(false)
+  const [signed, setSigned] = useState(false)
+  const [signError, setSignError] = useState(false)
 
-  const inputRef = useRef<HTMLInputElement>(null)
-  const permissionToastIdRef = useRef<string | null>(null)
+  const { popToast, eatToast } = useInsufficientPermissionsToast()
 
-  const { makeToast, eatToast: eatToasterToast } = useToaster()
-
-  const popToast = (): void => {
-    permissionToastIdRef.current = makeToast(
-      '' + t('sign_protocol_run_permission_required'),
-      ERROR_TOAST,
-      {
-        closeButton: true,
-        buttonText: i18n.format(t('shared:close'), 'capitalize'),
-        disableTimeout: true,
-        zIndex: TOAST_ABOVE_LOGIN_Z_INDEX,
-      }
+  const { signRun, isLoading, loginGate, name, logout, isSigned } =
+    useSignRunFlow(
+      runId,
+      robotName,
+      showLoginModal,
+      popToast,
+      eatToast,
+      documentationState,
+      false,
+      onSigned
     )
-  }
-
-  const eatToast = (): void => {
-    if (permissionToastIdRef.current != null) {
-      eatToasterToast(permissionToastIdRef.current)
-      permissionToastIdRef.current = null
-    }
-  }
-
-  const { signRun, isLoading, loginGate, correctName } = useSignRunFlow(
-    runId,
-    robotName,
-    showLoginModal,
-    popToast,
-    eatToast,
-    onSigned
-  )
-
-  const trimmedName = name.trim()
-
-  // Focus only once login is settled — not while Login is layered above and
-  // would lose keystrokes to this input.
-  useEffect(() => {
-    if (!isLoading && loginGate === 'done' && inputRef.current != null) {
-      inputRef.current.focus()
-    }
-  }, [isLoading, loginGate])
-
-  const handleNameChange = (value: string): void => {
-    setName(value)
-    setNameError(false)
-  }
 
   const handleSign = (): void => {
-    if (trimmedName === '') {
+    if (!signed) {
+      setSignError(true)
       return
     }
 
-    if (trimmedName !== correctName) {
-      setNameError(true)
-      return
-    }
-
-    setNameError(false)
-    signRun(trimmedName)
+    setSignError(false)
+    signRun()
   }
+
+  useEffect(() => {
+    if (signed && loginGate !== 'done') {
+      setSigned(false)
+    }
+  }, [loginGate, signed])
+
+  useEffect(() => {
+    if (!isLoading && isSigned) {
+      onSigned?.()
+    }
+  }, [isLoading, isSigned, onSigned])
 
   const footer = (
     <div className={styles.modal_footer_container}>
-      <PrimaryButton
-        onClick={handleSign}
-        disabled={
-          trimmedName === '' || isLoading || nameError || loginGate !== 'done'
-        }
+      <BasicButton
+        type="button"
+        underLine
+        onClick={() => {
+          setSigned(false)
+          setSignError(false)
+          logout()
+        }}
       >
-        {t('sign')}
+        {t('log_out')}
+      </BasicButton>
+      <PrimaryButton onClick={handleSign} disabled={isLoading}>
+        {t('submit')}
+        {isLoading ? (
+          <Icon
+            size="1rem"
+            name="ot-spinner"
+            spin
+            marginLeft={SPACING.spacing8}
+            alignSelf="center"
+          />
+        ) : null}
       </PrimaryButton>
     </div>
   )
@@ -121,97 +113,97 @@ export function SignRunModal({
     <Modal
       title={t('sign_protocol_run')}
       closeOnOutsideClick={false}
-      zIndexOverlay={1000}
+      zIndexOverlay={Z_INDEX.BLOCKING_MODALS}
       childrenPadding="var(--spacing-24)"
-      footer={isLoading ? null : footer}
+      footer={footer}
     >
-      {isLoading ? (
-        <div className={styles.loading_container}>
-          <Icon
-            name="ot-spinner"
-            className={styles.spinner}
-            aria-label="spinner"
-            spin
-          />
-        </div>
-      ) : (
-        <div className={styles.content_container}>
-          <StyledText desktopStyle="bodyDefaultRegular">
-            {t('sign_protocol_run_description')}
-          </StyledText>
-          <div className={styles.signature_field_container}>
-            <div
-              className={clsx(styles.signature_field, {
-                [styles.signature_field_error]: nameError,
-              })}
+      <div className={styles.content_container}>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('sign_protocol_run_description')}
+        </StyledText>
+        <div className={styles.signature_field_container}>
+          <div
+            className={clsx(styles.signature_field, {
+              [styles.signature_field_error]: signError,
+            })}
+          >
+            <button
+              type="button"
+              className={styles.signature_input_wrap}
+              aria-label={t('legal_name')}
+              aria-invalid={signError}
+              onClick={() => {
+                if (loginGate === 'done') {
+                  setSigned(true)
+                  setSignError(false)
+                }
+              }}
             >
-              <div className={styles.signature_input_wrap}>
-                <input
-                  ref={inputRef}
-                  className={styles.signature_input}
-                  type="text"
-                  value={name}
-                  placeholder={t('tap_to_sign')}
-                  aria-label={t('legal_name')}
-                  aria-invalid={nameError}
-                  onChange={event => {
-                    handleNameChange(event.target.value)
-                  }}
-                  onKeyDown={event => {
-                    if (event.key === 'Enter') {
-                      handleSign()
-                    }
-                  }}
-                />
-              </div>
-            </div>
-            {nameError ? (
-              <span className={styles.signature_error_text} role="alert">
-                {t('sign_protocol_run_name_mismatch')}
+              <span
+                className={clsx(styles.signature_text, {
+                  [styles.signature_text_signed]: signed,
+                })}
+              >
+                {signed ? name : t('click_to_sign')}
               </span>
-            ) : null}
+            </button>
+            <span className={styles.signature_name}>{name}</span>
           </div>
+          {signError ? (
+            <span className={styles.signature_error_text} role="alert">
+              {t('signature_required')}
+            </span>
+          ) : null}
         </div>
-      )}
+      </div>
     </Modal>,
     getTopPortalEl()
   )
 }
 
-const SignRunModalImpl = NiceModal.create((): JSX.Element | null => {
-  const modal = useModal()
-  const robotName = useCurrentRobotName()
+const SignRunModalImpl = NiceModal.create(
+  ({
+    documentationState,
+  }: {
+    documentationState: DocumentationState
+  }): JSX.Element | null => {
+    const modal = useModal()
+    const robotName = useCurrentRobotName()
 
-  useEffect(() => {
+    useEffect(() => {
+      if (robotName == null) {
+        modal.resolve(false)
+        modal.remove()
+      }
+    }, [modal, robotName])
+
     if (robotName == null) {
-      modal.resolve(false)
-      modal.remove()
+      return null
     }
-  }, [modal, robotName])
 
-  if (robotName == null) {
-    return null
+    return (
+      <ApiHostProvider robotName={robotName}>
+        <SignRunModalCurrentRun
+          robotName={robotName}
+          onSigned={() => {
+            modal.resolve(true)
+            modal.remove()
+          }}
+          documentationState={documentationState}
+        />
+      </ApiHostProvider>
+    )
   }
-
-  return (
-    <ApiHostProvider robotName={robotName}>
-      <SignRunModalCurrentRun
-        robotName={robotName}
-        onSigned={() => {
-          modal.resolve(true)
-          modal.remove()
-        }}
-      />
-    </ApiHostProvider>
-  )
-})
+)
 
 function SignRunModalCurrentRun({
   robotName,
   onSigned,
+  documentationState,
 }: {
   robotName: string
   onSigned: () => void
+  documentationState: DocumentationState
 }): JSX.Element | null {
   const modal = useModal()
   const runId = useCurrentRunId()
@@ -229,10 +221,16 @@ function SignRunModalCurrentRun({
   }
 
   return (
-    <SignRunModal runId={runId} robotName={robotName} onSigned={onSigned} />
+    <SignRunModal
+      runId={runId}
+      robotName={robotName}
+      documentationState={documentationState}
+      onSigned={onSigned}
+    />
   )
 }
 
 /** Open the desktop sign-run modal and await whether the run was signed. */
-export const showSignRunModal = (): Promise<boolean> =>
-  NiceModal.show(SignRunModalImpl)
+export const showSignRunModal = (
+  documentationState: DocumentationState
+): Promise<boolean> => NiceModal.show(SignRunModalImpl, { documentationState })

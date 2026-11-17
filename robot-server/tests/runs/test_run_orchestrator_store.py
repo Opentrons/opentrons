@@ -1,22 +1,24 @@
 """Tests for the EngineStore interface."""
 
-import inspect
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
+from typing import Literal
 
 import pytest
 from decoy import Decoy, matchers
 
 from opentrons.config import feature_flags
-from opentrons.hardware_control import API, HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules.types import TemperatureModuleModel
+from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import (
     AsynchronousModuleErrorNotification,
     EstopState,
     EstopStateNotification,
 )
 from opentrons.protocol_engine import (
+    DeckType,
     StateSummary,
 )
 from opentrons.protocol_engine import (
@@ -25,11 +27,13 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.error_recovery_policy import never_recover
 from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
 from opentrons.protocol_engine.resources import CameraProvider, FileProvider
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner import RunOrchestrator, RunResult
 from opentrons.types import DeckSlotName
 from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
-from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource
@@ -42,7 +46,7 @@ from robot_server.runs.run_orchestrator_store import (
 from robot_server.runs.run_process_pyro_provider import RunProcessPyroProvider
 
 
-def mock_notify_publishers() -> None:
+async def mock_notify_publishers() -> None:
     """A mock notify_publishers."""
     return None
 
@@ -64,10 +68,11 @@ async def subject(
         hardware_api=hardware_api,
         # Arbitrary choice of robot and deck type. Tests where these matter should
         # construct their own EngineStore.
-        robot_type="OT-2 Standard",
-        deck_type=pe_types.DeckType.OT2_SHORT_TRASH,
+        robot_type="OT-3 Standard",
+        deck_type=pe_types.DeckType.OT3_STANDARD,
         run_process_pyro_provider=mock_run_process_pyro_provider,
         access_control_status=False,
+        command_store_provider=CommandStoreProvider(),
     )
 
 
@@ -76,15 +81,13 @@ async def bad_python_protocol_source(tmp_path: Path) -> ProtocolResource:
     """Get a protocol source for a bad python protocol."""
     with open(tmp_path / "bad_protocol.py", "w") as proto:
         proto.write(
-            dedent(
-                """
+            dedent("""
     requirements = {'apiLevel': '2.20', 'robotType': 'Flex'}
     a = 1/0
 
     def run(ctx):
         pass
-    """
-            )
+    """)
         )
     return ProtocolResource(
         protocol_id="protocol-id",
@@ -97,19 +100,6 @@ async def bad_python_protocol_source(tmp_path: Path) -> ProtocolResource:
         protocol_kind=ProtocolKind.STANDARD,
         protocol_key="some-name",
     )
-
-
-@pytest.fixture
-def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Get a mocked feature flags."""
-    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
-        params = inspect.getfullargspec(func)
-        mock_get_ff = decoy.mock(func=func)
-        if any("robot_type" in p for p in params.args):
-            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
-        else:
-            decoy.when(mock_get_ff()).then_return(False)
-        monkeypatch.setattr(feature_flags, name, mock_get_ff)
 
 
 async def test_create_engine(
@@ -136,26 +126,24 @@ async def test_create_engine(
     assert isinstance(subject._run_coordinator, RunOrchestrator)
 
 
-@pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
-@pytest.mark.parametrize("deck_type", pe_types.DeckType)
 async def test_create_engine_uses_robot_type(
     decoy: Decoy,
-    robot_type: RobotType,
-    deck_type: pe_types.DeckType,
     mock_run_process_pyro_provider: RunProcessPyroProvider,
     mock_feature_flags: None,
 ) -> None:
     """It should create ProtocolEngines with the given robot and deck type."""
+    robot_type: Literal["OT-3 Standard"] = "OT-3 Standard"
     decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    hardware_api = decoy.mock(cls=API)
+    hardware_api = decoy.mock(cls=OT3API)
     subject = RunOrchestratorStore(
         hardware_api=hardware_api,
         robot_type=robot_type,
-        deck_type=deck_type,
+        deck_type=DeckType.OT3_STANDARD,
         run_process_pyro_provider=mock_run_process_pyro_provider,
         access_control_status=False,
+        command_store_provider=CommandStoreProvider(),
     )
 
     await subject.create(
@@ -183,7 +171,7 @@ async def test_create_engine_with_labware_offsets(
     decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     labware_offset = pe_types.LegacyLabwareOffsetCreate(
         definitionUri="namespace/load_name/version",
-        location=pe_types.LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_5),
+        location=pe_types.LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_C2),
         vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
     )
 
@@ -205,10 +193,12 @@ async def test_create_engine_with_labware_offsets(
             id=matchers.IsA(str),
             createdAt=matchers.IsA(datetime),
             definitionUri="namespace/load_name/version",
-            location=pe_types.LegacyLabwareOffsetLocation(slotName=DeckSlotName.SLOT_5),
+            location=pe_types.LegacyLabwareOffsetLocation(
+                slotName=DeckSlotName.SLOT_C2
+            ),
             locationSequence=[
                 pe_types.OnAddressableAreaOffsetLocationSequenceComponent(
-                    addressableAreaName="5"
+                    addressableAreaName="C2"
                 )
             ],
             vector=pe_types.LabwareOffsetVector(x=1, y=2, z=3),
@@ -297,6 +287,13 @@ async def test_clear_engine(
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_coordinator is not None
+    subject._run_result = RunResult(
+        commands=await subject._run_coordinator.get_all_commands(),
+        state_summary=await subject._run_coordinator.get_state_summary(),
+        parameters=await subject._run_coordinator.get_run_time_parameters(),
+        command_annotations=await subject._run_coordinator.get_all_command_annotations(),
+        command_preconditions=await subject._run_coordinator.get_preconditions(),
+    )
     engine = subject._run_coordinator._protocol_engine  # type: ignore[union-attr]
     engine.state_view.state.commands.command_history._queued_command_ids.add("1231")
     result = await subject.clear()
@@ -331,7 +328,7 @@ async def test_clear_engine_not_stopped_or_idle(
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_coordinator is not None
-    subject._run_coordinator.play(deck_configuration=[])
+    await subject._run_coordinator.play(deck_configuration=[])
     with pytest.raises(RunConflictError):
         await subject.clear()
 
@@ -356,6 +353,13 @@ async def test_clear_idle_engine(
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_coordinator is not None
+    subject._run_result = RunResult(
+        commands=await subject._run_coordinator.get_all_commands(),
+        state_summary=await subject._run_coordinator.get_state_summary(),
+        parameters=await subject._run_coordinator.get_run_time_parameters(),
+        command_annotations=await subject._run_coordinator.get_all_command_annotations(),
+        command_preconditions=await subject._run_coordinator.get_preconditions(),
+    )
 
     await subject.clear()
 
@@ -378,26 +382,24 @@ async def test_get_default_orchestrator_idempotent(
     assert repeated_result is result
 
 
-@pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
-@pytest.mark.parametrize("deck_type", pe_types.DeckType)
 async def test_get_default_orchestrator_robot_type(
     decoy: Decoy,
-    robot_type: RobotType,
-    deck_type: pe_types.DeckType,
     mock_run_process_pyro_provider: RunProcessPyroProvider,
     mock_feature_flags: None,
 ) -> None:
     """It should create default ProtocolEngines with the given robot and deck type."""
+    robot_type: Literal["OT-3 Standard"] = "OT-3 Standard"
     decoy.when(feature_flags.protocol_subprocess_enabled()).then_return(False)
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    hardware_api = decoy.mock(cls=API)
+    hardware_api = decoy.mock(cls=OT3API)
     subject = RunOrchestratorStore(
         hardware_api=hardware_api,
         robot_type=robot_type,
-        deck_type=deck_type,
+        deck_type=DeckType.OT3_STANDARD,
         run_process_pyro_provider=mock_run_process_pyro_provider,
         access_control_status=False,
+        command_store_provider=CommandStoreProvider(),
     )
 
     result = await subject.get_default_orchestrator()
@@ -448,7 +450,7 @@ async def test_get_default_orchestrator_conflict(
         camera_provider=CameraProvider(),
         notify_publishers=mock_notify_publishers,
     )
-    subject.play()
+    await subject.play()
 
     with pytest.raises(RunConflictError):
         await subject.get_default_orchestrator()
@@ -499,7 +501,7 @@ async def test_estop_callback(
     await handle_hardware_event(run_orchestrator_store, disengage_event)
     assert run_orchestrator_store.run_coordinator is not None
     decoy.verify(
-        run_orchestrator_store.run_coordinator.estop(),
+        await run_orchestrator_store.run_coordinator.estop(),
         ignore_extra_args=True,
         times=0,
     )
@@ -513,7 +515,7 @@ async def test_estop_callback(
     await handle_hardware_event(run_orchestrator_store, engage_event)
     assert run_orchestrator_store._run_coordinator is not None
     decoy.verify(
-        run_orchestrator_store.run_coordinator.estop(),
+        await run_orchestrator_store.run_coordinator.estop(),
         await run_orchestrator_store.run_coordinator.finish(
             error=matchers.IsA(EStopActivatedError)
         ),

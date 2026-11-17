@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 
 import { getLabwareLocation } from '@opentrons/components'
 import {
-  FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_TYPE,
   getDeckDefFromRobotType,
   getFixedTrashLabwareDefinition,
@@ -439,7 +438,6 @@ export function getSlotNameAndLwLocFrom(
     detailLevel: 'slot-only',
     loadedLabwares: runData?.labware ?? [],
     loadedModules: runData?.modules ?? [],
-    robotType: FLEX_ROBOT_TYPE,
   })
   const onModuleModel = labwareLocationObject?.moduleModel ?? null
 
@@ -485,7 +483,6 @@ export function getIsLabwareMatch(
       detailLevel: 'slot-only',
       loadedLabwares: runRecord?.data?.labware ?? [],
       loadedModules: runRecord?.data?.modules ?? [],
-      robotType: FLEX_ROBOT_TYPE,
     })?.slotName ?? null
 
   if (location == null) {

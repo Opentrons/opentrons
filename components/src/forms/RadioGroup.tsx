@@ -1,6 +1,6 @@
 import cx from 'classnames'
 
-import { Icon } from '../icons'
+import { Icon } from '../helix/icons'
 import styles from './forms.module.css'
 
 import type { ChangeEventHandler, FocusEventHandler, ReactNode } from 'react'
@@ -34,7 +34,7 @@ export interface RadioGroupProps {
   useBlueChecked?: boolean
 }
 
-export function RadioGroup(props: RadioGroupProps): JSX.Element {
+export function RadioGroup(props: RadioGroupProps): ReactNode {
   const error = props.error != null
 
   const outerClassName = cx({

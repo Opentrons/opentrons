@@ -12,26 +12,26 @@ import type {
   UseMutationResult,
 } from 'react-query'
 import type {
-  AuthSettingsResponse,
   PatchAuthSettingsRequest,
+  PatchAuthSettingsResponse,
 } from '@opentrons/api-client'
 import type { DocumentationState } from '../../accessControl'
 import type { DocumentedMutationParameters } from '../../accessControl/types'
 
 export type UseAuthSettingsMutationResult = UseMutationResult<
-  AuthSettingsResponse,
+  PatchAuthSettingsResponse,
   AxiosError,
   PatchAuthSettingsRequest
 > & {
   patchAuthSettings: UseMutateFunction<
-    AuthSettingsResponse,
+    PatchAuthSettingsResponse,
     AxiosError,
     PatchAuthSettingsRequest
   >
 }
 
 export type UseAuthSettingsMutationOptions = UseMutationOptions<
-  AuthSettingsResponse,
+  PatchAuthSettingsResponse,
   AxiosError,
   PatchAuthSettingsRequest
 >
@@ -43,7 +43,7 @@ export function useAuthSettingsMutation(
   const host = useHost()
   const queryClient = useQueryClient()
   const mutation = useDocumentedMutation<
-    AuthSettingsResponse,
+    PatchAuthSettingsResponse,
     AxiosError,
     PatchAuthSettingsRequest
   >(
@@ -56,13 +56,10 @@ export function useAuthSettingsMutation(
     }: DocumentedMutationParameters<PatchAuthSettingsRequest>) =>
       patchAuthSettings(host!, body, userNotes)
         .then(response => {
-          queryClient
-            .invalidateQueries(getQueryKey(host, 'auth', 'settings'))
-            .catch((e: Error) => {
-              console.error(
-                `error invalidating auth settings query: ${e.message}`
-              )
-            })
+          queryClient.setQueryData(
+            getQueryKey(host, 'auth', 'settings'),
+            response.data
+          )
           return response.data
         })
         .catch((e: AxiosError) => {

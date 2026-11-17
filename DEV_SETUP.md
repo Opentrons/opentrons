@@ -13,7 +13,7 @@ You will need the following tools installed to develop on the Opentrons platform
 - curl
 - ssh
 - Python v3.12.12
-- Node.js v22.22.0
+- Node.js v24.22.1
 - [uv][] (Python package manager) - required for all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`)
 
 ### macOS
@@ -146,18 +146,18 @@ eval "$(pyenv init -)"
 
 #### 3. Install `uv`
 
-[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`).
+[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `hardware`, `usb-bridge`, `system-server`).
 
-Install `uv` using the official installer:
+Install the pinned `uv` version from the repo-root [`uv.toml`](./uv.toml) (`required-version`) using the official installer:
 
 ```shell
-curl -LsSf https://astral.sh/uv/install.sh | sh
+curl -LsSf https://astral.sh/uv/0.12.1/install.sh | sh
 ```
 
-Close and re-open your terminal to verify that `uv` is installed:
+Close and re-open your terminal to verify that `uv` is installed and matches the pin:
 
 ```shell
-uv --version
+uv --version  # should report 0.12.1
 ```
 
 If the `uv` command isn't working, make sure `~/.local/bin` (or `~/.cargo/bin` on some systems) is in your `PATH`. You may need to add it to your `~/.zprofile`:
@@ -193,18 +193,18 @@ On Windows, we rely on:
 
 #### 3. Install `uv`
 
-[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`).
+[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `hardware`, `usb-bridge`, `system-server`).
 
-Install `uv` using the official installer:
+Install the pinned `uv` version from the repo-root [`uv.toml`](./uv.toml) (`required-version`) using the official installer:
 
 ```powershell
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/0.12.1/install.ps1 | iex"
 ```
 
-Close and re-open your terminal to verify that `uv` is installed:
+Close and re-open your terminal to verify that `uv` is installed and matches the pin:
 
 ```powershell
-uv --version
+uv --version  # should report 0.12.1
 ```
 
 #### 4. Install build tools via Visual Studio Installer
@@ -223,18 +223,18 @@ Linux setup is broadly similar to macOS setup, but it will depend heavily on you
 
 #### 3. Install `uv`
 
-[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`).
+[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `hardware`, `usb-bridge`, `system-server`).
 
-Install `uv` using the official installer:
+Install the pinned `uv` version from the repo-root [`uv.toml`](./uv.toml) (`required-version`) using the official installer:
 
 ```shell
-curl -LsSf https://astral.sh/uv/install.sh | sh
+curl -LsSf https://astral.sh/uv/0.12.1/install.sh | sh
 ```
 
-Close and re-open your terminal to verify that `uv` is installed:
+Close and re-open your terminal to verify that `uv` is installed and matches the pin:
 
 ```shell
-uv --version
+uv --version  # should report 0.12.1
 ```
 
 If the `uv` command isn't working, make sure `~/.local/bin` (or `~/.cargo/bin` on some systems) is in your `PATH`. You may need to add it to your `~/.bashrc` or `~/.profile`:
@@ -259,7 +259,7 @@ Once you are inside the repository for the first time, you should do two things:
 3. Run `python --version` to confirm your chosen version. If you get the incorrect version and you're using an Apple silicon Mac, try running `eval "$(pyenv init --path)"` and then `pyenv local 3.12.12`. Then check `python --version` again.
 
 ```shell
-# confirm Node v22.22.0 or greater
+# confirm Node v24.22.1 or greater
 node --version
 
 # set Python version, and confirm

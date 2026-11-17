@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { COLORS, StorageBar, StyledText } from '@opentrons/components'
 import { useHealth } from '@opentrons/react-api-client'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { OddModal } from '/app/molecules/OddModal'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 
 import styles from './robotoutofstoragemodal.module.css'
 

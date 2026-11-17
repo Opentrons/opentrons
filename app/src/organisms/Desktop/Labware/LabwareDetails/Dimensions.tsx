@@ -7,6 +7,7 @@ import { getSchema2Dimensions } from '@opentrons/shared-data'
 import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
 import { LabeledValue } from './StyledComponents/LabeledValue'
 
+import type { ReactNode } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
@@ -17,7 +18,7 @@ export interface DimensionsProps {
   insertCategory?: string
 }
 
-export function Dimensions(props: DimensionsProps): JSX.Element {
+export function Dimensions(props: DimensionsProps): ReactNode {
   const { t } = useTranslation('labware_details')
   const { definition, irregular, insertCategory } = props
   const { displayCategory, displayName } = definition.metadata

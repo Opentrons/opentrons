@@ -7,14 +7,16 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import abstractImage from '/app/assets/images/on-device-display/empty_protocol_dashboard.png'
 
-export function EmptyRecentRun(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function EmptyRecentRun(): ReactNode {
   const { t } = useTranslation('device_details')
   return (
     <Flex
@@ -31,21 +33,21 @@ export function EmptyRecentRun(): JSX.Element {
         width="284px"
         height="166px"
       />
-      <LegacyStyledText
+      <StyledText
         forwardedAs="h3"
         fontWeight={TYPOGRAPHY.fontWeightBold}
         marginTop={SPACING.spacing16}
         marginBottom={SPACING.spacing8}
       >
         {t('no_recent_runs')}
-      </LegacyStyledText>
-      <LegacyStyledText
+      </StyledText>
+      <StyledText
         forwardedAs="h4"
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         color={COLORS.grey60}
       >
         {t('no_recent_runs_description')}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }

@@ -5,10 +5,8 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useHomePipettes } from '/app/local-resources/instruments'
 
-import {
-  ProtocolDropTipModal,
-  useProtocolDropTipModal,
-} from '../ProtocolDropTipModal'
+import { ProtocolDropTipModal } from '../ProtocolDropTipModal'
+import { useProtocolDropTipModal } from '../useProtocolDropTipModal'
 
 import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
@@ -21,11 +19,11 @@ describe('useProtocolDropTipModal', () => {
 
   beforeEach(() => {
     props = {
-      areTipsAttached: true,
+      hasPipetteWithTip: true,
+      isPromptDismissed: false,
+      isWizardActive: false,
       enableDTWiz: vi.fn(),
-      isRunCurrent: true,
       onSkipAndHome: vi.fn(),
-      currentRunId: 'MOCK_ID',
       pipetteInfo: {
         pipetteId: '123',
         pipetteName: 'MOCK_NAME',
@@ -48,27 +46,48 @@ describe('useProtocolDropTipModal', () => {
       modalProps: {
         onSkip: expect.any(Function),
         onBeginRemoval: expect.any(Function),
-        isDisabled: false,
+        isPressed: false,
+        mount: 'left',
+        is96Channel: false,
       },
     })
   })
 
-  it('should update showDTModal when areTipsAttached changes', () => {
+  it('should update showDTModal when hasPipetteWithTip changes', () => {
     const { result, rerender } = renderHook(() =>
       useProtocolDropTipModal(props)
     )
 
     expect(result.current.showModal).toBe(true)
 
-    props.areTipsAttached = false
+    props.hasPipetteWithTip = false
     rerender()
 
     expect(result.current.showModal).toBe(false)
   })
 
-  it('should not show modal when isRunCurrent is false', () => {
-    props.isRunCurrent = false
+  it('should show modal when the run is no longer current if a pipette still has a tip', () => {
     const { result } = renderHook(() => useProtocolDropTipModal(props))
+
+    expect(result.current.showModal).toBe(true)
+  })
+
+  it('should not show modal when the drop tip prompt is dismissed', () => {
+    props.isPromptDismissed = true
+    const { result } = renderHook(() => useProtocolDropTipModal(props))
+
+    expect(result.current.showModal).toBe(false)
+  })
+
+  it('should hide an open modal when the prompt is later dismissed', () => {
+    const { result, rerender } = renderHook(() =>
+      useProtocolDropTipModal(props)
+    )
+
+    expect(result.current.showModal).toBe(true)
+
+    props.isPromptDismissed = true
+    rerender()
 
     expect(result.current.showModal).toBe(false)
   })
@@ -83,7 +102,7 @@ describe('useProtocolDropTipModal', () => {
     expect(mockHomePipettes).toHaveBeenCalled()
   })
 
-  it('should dismiss the modal and call onSkipAndHome on home success', () => {
+  it('should call onSkipAndHome on home success', () => {
     let onSuccess: (() => void) | undefined
     vi.mocked(useHomePipettes).mockImplementation(homeProps => {
       onSuccess = homeProps.onSuccess
@@ -93,16 +112,29 @@ describe('useProtocolDropTipModal', () => {
       }
     })
 
-    const { result } = renderHook(() => useProtocolDropTipModal(props))
-
-    expect(result.current.showModal).toBe(true)
+    renderHook(() => useProtocolDropTipModal(props))
 
     act(() => {
       onSuccess?.()
     })
 
-    expect(result.current.showModal).toBe(false)
     expect(props.onSkipAndHome).toHaveBeenCalled()
+  })
+
+  it('should hide the modal while the drop tip wizard is open and show it again after', () => {
+    const { result, rerender } = renderHook(
+      ({ isWizardActive }) =>
+        useProtocolDropTipModal({ ...props, isWizardActive }),
+      { initialProps: { isWizardActive: false } }
+    )
+
+    expect(result.current.showModal).toBe(true)
+
+    rerender({ isWizardActive: true })
+    expect(result.current.showModal).toBe(false)
+
+    rerender({ isWizardActive: false })
+    expect(result.current.showModal).toBe(true)
   })
 
   it('should call toggleDTWiz when onDTModalRemoval is called', () => {
@@ -115,7 +147,7 @@ describe('useProtocolDropTipModal', () => {
     expect(props.enableDTWiz).toHaveBeenCalled()
   })
 
-  it('should set isDisabled to true when isHomingPipettes is true', () => {
+  it('should set isPressed to true when isHomingPipettes is true', () => {
     vi.mocked(useHomePipettes).mockReturnValue({
       homePipettes: mockHomePipettes,
       isHoming: true,
@@ -123,7 +155,7 @@ describe('useProtocolDropTipModal', () => {
 
     const { result } = renderHook(() => useProtocolDropTipModal(props))
 
-    expect(result.current.modalProps?.isDisabled).toBe(true)
+    expect(result.current.modalProps?.isPressed).toBe(true)
   })
 })
 
@@ -141,7 +173,7 @@ describe('ProtocolDropTipModal', () => {
       onSkip: vi.fn(),
       onBeginRemoval: vi.fn(),
       mount: 'left',
-      isDisabled: false,
+      isPressed: false,
     }
   })
 
@@ -149,11 +181,37 @@ describe('ProtocolDropTipModal', () => {
     render(props)
 
     screen.getByText('Remove any attached tips')
-    screen.queryByText(
-      /Homing the .* pipette with liquid in the tips may damage it\. You must remove all tips before using the pipette again\./
+    screen.getByText('left pipette')
+    screen.getByText(
+      /with liquid in the tips may damage it\. You must remove all tips before using the pipette again\./
     )
     screen.getByText('Begin removal')
     screen.getByText('Skip and home pipette')
+  })
+
+  it('does not name a mount for a 96-Channel pipette', () => {
+    render({ ...props, is96Channel: true })
+
+    expect(screen.queryByText('left pipette', { exact: false })).toBeNull()
+    screen.getByText(
+      'Homing the pipette with liquid in the tips may damage it. You must remove all tips before using the pipette again.'
+    )
+  })
+
+  it('renders a spinner and pressed loading state on Begin removal while homing', () => {
+    render({ ...props, isPressed: true })
+
+    const beginRemoval = screen.getByRole('button', { name: /Begin removal/i })
+    expect(beginRemoval).toHaveAttribute('aria-disabled', 'true')
+    expect(beginRemoval).not.toBeDisabled()
+  })
+
+  it('does not call onBeginRemoval while loading', () => {
+    render({ ...props, isPressed: true })
+
+    fireEvent.click(screen.getByRole('button', { name: /Begin removal/i }))
+
+    expect(props.onBeginRemoval).not.toHaveBeenCalled()
   })
 
   it('calls onSkip when skip button is clicked', () => {

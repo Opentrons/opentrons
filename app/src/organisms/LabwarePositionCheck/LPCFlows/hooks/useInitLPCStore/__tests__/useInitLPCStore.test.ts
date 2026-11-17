@@ -2,8 +2,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-
 import { sortRunRecordOffsets } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/useInitLPCStore/sortRunRecordOffsets'
 import { getActivePipetteId } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/utils'
 import {
@@ -69,7 +67,6 @@ describe('useInitLPCStore', () => {
     renderHook(() => {
       useInitLPCStore({
         runId: RUN_ID,
-        isFlex: true,
         analysis: MOCK_ANALYSIS,
         protocolName: PROTOCOL_NAME,
         deckConfig: MOCK_DECK_CONFIG,
@@ -77,7 +74,7 @@ describe('useInitLPCStore', () => {
         labwareDefs: MOCK_LABWARE_DEFS,
         labwareInfo: MOCK_LABWARE_INFO,
         runRecord: MOCK_RUN_RECORD,
-        flexStoredOffsets: MOCK_STORED_OFFSETS,
+        storedOffsets: MOCK_STORED_OFFSETS,
       } as any)
     })
 
@@ -95,7 +92,7 @@ describe('useInitLPCStore', () => {
         labwareDefs: MOCK_LABWARE_DEFS,
         labwareInfo: MOCK_LABWARE_INFO,
         runRecord: MOCK_RUN_RECORD,
-        flexStoredOffsets: MOCK_STORED_OFFSETS,
+        storedOffsets: MOCK_STORED_OFFSETS,
       } as any)
     })
 
@@ -113,7 +110,7 @@ describe('useInitLPCStore', () => {
         labwareDefs: MOCK_LABWARE_DEFS,
         labwareInfo: MOCK_LABWARE_INFO,
         runRecord: MOCK_RUN_RECORD,
-        flexStoredOffsets: MOCK_STORED_OFFSETS,
+        storedOffsets: MOCK_STORED_OFFSETS,
       } as any)
     })
 
@@ -131,7 +128,7 @@ describe('useInitLPCStore', () => {
         labwareDefs: MOCK_LABWARE_DEFS,
         labwareInfo: MOCK_LABWARE_INFO,
         runRecord: MOCK_RUN_RECORD,
-        flexStoredOffsets: MOCK_STORED_OFFSETS,
+        storedOffsets: MOCK_STORED_OFFSETS,
       } as any)
     })
 
@@ -149,14 +146,14 @@ describe('useInitLPCStore', () => {
         labwareDefs: MOCK_LABWARE_DEFS,
         labwareInfo: MOCK_LABWARE_INFO,
         runRecord: MOCK_RUN_RECORD,
-        flexStoredOffsets: MOCK_STORED_OFFSETS,
+        storedOffsets: MOCK_STORED_OFFSETS,
       } as any)
     })
 
     expect(MOCK_DISPATCH).not.toHaveBeenCalled()
   })
 
-  it('should not dispatch updateLPC when flexStoredOffsets is undefined', () => {
+  it('should not dispatch updateLPC when storedOffsets is undefined', () => {
     renderHook(() => {
       useInitLPCStore({
         runId: RUN_ID,
@@ -167,7 +164,7 @@ describe('useInitLPCStore', () => {
         labwareDefs: MOCK_LABWARE_DEFS,
         labwareInfo: MOCK_LABWARE_INFO,
         runRecord: MOCK_RUN_RECORD,
-        flexStoredOffsets: undefined,
+        storedOffsets: undefined,
       } as any)
     })
 
@@ -185,14 +182,14 @@ describe('useInitLPCStore', () => {
         labwareDefs: MOCK_LABWARE_DEFS,
         labwareInfo: MOCK_LABWARE_INFO,
         runRecord: { data: {} } as any,
-        flexStoredOffsets: MOCK_STORED_OFFSETS,
+        storedOffsets: MOCK_STORED_OFFSETS,
       } as any)
     })
 
     expect(MOCK_DISPATCH).not.toHaveBeenCalled()
   })
 
-  it('should not dispatch updateLPC for OT2 robot type', () => {
+  it('should dispatch updateLPC when all required conditions are met', () => {
     renderHook(() => {
       useInitLPCStore({
         runId: RUN_ID,
@@ -203,27 +200,7 @@ describe('useInitLPCStore', () => {
         labwareDefs: MOCK_LABWARE_DEFS,
         labwareInfo: MOCK_LABWARE_INFO,
         runRecord: MOCK_RUN_RECORD,
-        robotType: OT2_ROBOT_TYPE,
-        flexStoredOffsets: MOCK_STORED_OFFSETS,
-      } as any)
-    })
-
-    expect(MOCK_DISPATCH).not.toHaveBeenCalled()
-  })
-
-  it('should dispatch updateLPC when all required conditions are met for the Flex', () => {
-    renderHook(() => {
-      useInitLPCStore({
-        runId: RUN_ID,
-        isFlex: true,
-        analysis: MOCK_ANALYSIS,
-        protocolName: PROTOCOL_NAME,
-        deckConfig: MOCK_DECK_CONFIG,
-        maintenanceRunId: MAINTENANCE_RUN_ID,
-        labwareDefs: MOCK_LABWARE_DEFS,
-        labwareInfo: MOCK_LABWARE_INFO,
-        runRecord: MOCK_RUN_RECORD,
-        flexStoredOffsets: MOCK_STORED_OFFSETS,
+        storedOffsets: MOCK_STORED_OFFSETS,
       } as any)
     })
 
@@ -261,7 +238,6 @@ describe('useInitLPCStore', () => {
     renderHook(() => {
       useInitLPCStore({
         runId: RUN_ID,
-        isFlex: true,
         analysis: MOCK_ANALYSIS,
         protocolName: PROTOCOL_NAME,
         deckConfig: MOCK_DECK_CONFIG,
@@ -269,7 +245,7 @@ describe('useInitLPCStore', () => {
         labwareDefs: MOCK_LABWARE_DEFS,
         labwareInfo: MOCK_LABWARE_INFO,
         runRecord: MOCK_RUN_RECORD,
-        flexStoredOffsets: MOCK_STORED_OFFSETS,
+        storedOffsets: MOCK_STORED_OFFSETS,
       } as any)
     })
 

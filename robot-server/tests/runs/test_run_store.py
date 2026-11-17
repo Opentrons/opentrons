@@ -1,5 +1,6 @@
 """Tests for robot_server.runs.run_store."""
 
+import json
 import warnings
 from datetime import datetime, timezone
 from pathlib import Path
@@ -11,9 +12,9 @@ from decoy import Decoy
 from sqlalchemy.engine import Engine
 
 from opentrons.protocol_engine import (
-    CommandSlice,
     EngineStatus,
     ErrorOccurrence,
+    JsonCommandSlice,
     Liquid,
     StateSummary,
 )
@@ -359,10 +360,17 @@ async def test_update_run_state(
     )
     subject.insert_action(run_id="run-id", action=action)
 
+    await subject.insert_batch_commands(
+        run_id="run-id",
+        batch_commands=[
+            (protocol_commands.index(command), command.model_dump_json(by_alias=True))
+            for command in protocol_commands
+        ],
+    )
     result = subject.update_run_state(
         run_id="run-id",
         summary=state_summary,
-        commands=protocol_commands,
+        commands=None,
         command_annotations=command_annotations,
         run_time_parameters=run_time_parameters,
     )
@@ -386,7 +394,9 @@ async def test_update_run_state(
     )
     assert run_summary_result == state_summary
     assert parameters_result == run_time_parameters
-    assert commands_result.commands == protocol_commands
+    assert commands_result.commands == [
+        command.model_dump_json(by_alias=True) for command in protocol_commands
+    ]
     mock_runs_publisher.publish_runs_advise_refetch.assert_called_once_with(
         run_id="run-id"
     )
@@ -417,11 +427,21 @@ async def test_update_run_state_command_with_errors(
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         log_period_id=None,
     )
+    await subject.insert_batch_commands(
+        run_id="run-id",
+        batch_commands=[
+            (
+                protocol_commands_errors.index(command),
+                command.model_dump_json(by_alias=True),
+            )
+            for command in protocol_commands_errors
+        ],
+    )
 
     subject.update_run_state(
         run_id="run-id",
         summary=state_summary,
-        commands=protocol_commands_errors,
+        commands=None,
         command_annotations=[],
         run_time_parameters=run_time_parameters,
     )
@@ -476,17 +496,16 @@ async def test_insert_and_get_csv_rtp(
     ]
 
 
-def test_update_state_run_not_found(
+async def test_update_state_run_not_found(
     subject: RunStore,
     state_summary: StateSummary,
-    protocol_commands: List[pe_commands.Command],
 ) -> None:
     """It should be able to catch the exception raised by insert."""
     with pytest.raises(RunNotFoundError, match="run-not-found"):
         subject.update_run_state(
             run_id="run-not-found",
             summary=state_summary,
-            commands=protocol_commands,
+            commands=None,
             command_annotations=[],
             run_time_parameters=[],
         )
@@ -746,7 +765,7 @@ async def test_remove_run(
     subject.update_run_state(
         run_id="run-id",
         summary=state_summary,
-        commands=[],
+        commands=None,
         command_annotations=command_annotations,
         run_time_parameters=[],
     )
@@ -803,7 +822,7 @@ def test_get_state_summary(
     subject.update_run_state(
         run_id="run-id",
         summary=state_summary,
-        commands=[],
+        commands=None,
         command_annotations=[],
         run_time_parameters=[],
     )
@@ -836,7 +855,7 @@ def test_get_state_summary_failure(
         subject.update_run_state(
             run_id="run-id",
             summary=invalid_state_summary,
-            commands=[],
+            commands=None,
             command_annotations=[],
             run_time_parameters=[],
         )
@@ -874,7 +893,7 @@ def test_get_run_time_parameters(
     subject.update_run_state(
         run_id="run-id",
         summary=state_summary,
-        commands=[],
+        commands=None,
         command_annotations=[],
         run_time_parameters=run_time_parameters,
     )
@@ -897,7 +916,7 @@ def test_get_run_time_parameters_invalid(
     subject.update_run_state(
         run_id="run-id",
         summary=state_summary,
-        commands=[],
+        commands=None,
         command_annotations=[],
         run_time_parameters=bad_parameters,  # type: ignore[arg-type]
     )
@@ -938,7 +957,7 @@ def test_has_no_run_id(subject: RunStore) -> None:
     assert result is False
 
 
-def test_get_command(
+async def test_get_command(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
     command_annotations: List[pe_types.CommandAnnotation],
@@ -951,10 +970,17 @@ def test_get_command(
         created_at=datetime.now(timezone.utc),
         log_period_id=None,
     )
+    await subject.insert_batch_commands(
+        run_id="run-id",
+        batch_commands=[
+            (protocol_commands.index(command), command.model_dump_json(by_alias=True))
+            for command in protocol_commands
+        ],
+    )
     subject.update_run_state(
         run_id="run-id",
         summary=state_summary,
-        commands=protocol_commands,
+        commands=None,
         command_annotations=command_annotations,
         run_time_parameters=[],
     )
@@ -963,7 +989,7 @@ def test_get_command(
     assert result == protocol_commands[1]
 
 
-def test_get_command_annotation(
+async def test_get_command_annotation(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
     command_annotations: List[pe_types.CommandAnnotation],
@@ -976,10 +1002,17 @@ def test_get_command_annotation(
         created_at=datetime.now(timezone.utc),
         log_period_id=None,
     )
+    await subject.insert_batch_commands(
+        run_id="run-id",
+        batch_commands=[
+            (protocol_commands.index(command), command.model_dump_json(by_alias=True))
+            for command in protocol_commands
+        ],
+    )
     subject.update_run_state(
         run_id="run-id",
         summary=state_summary,
-        commands=protocol_commands,
+        commands=None,
         command_annotations=command_annotations,
         run_time_parameters=[],
     )
@@ -989,7 +1022,7 @@ def test_get_command_annotation(
     assert result == command_annotations[1]
 
 
-def test_get_command_annotation_missing(
+async def test_get_command_annotation_missing(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
     command_annotations: List[pe_types.CommandAnnotation],
@@ -1002,10 +1035,17 @@ def test_get_command_annotation_missing(
         created_at=datetime.now(timezone.utc),
         log_period_id=None,
     )
+    await subject.insert_batch_commands(
+        run_id="run-id",
+        batch_commands=[
+            (protocol_commands.index(command), command.model_dump_json(by_alias=True))
+            for command in protocol_commands
+        ],
+    )
     subject.update_run_state(
         run_id="run-id",
         summary=state_summary,
-        commands=protocol_commands,
+        commands=None,
         command_annotations=command_annotations,
         run_time_parameters=[],
     )
@@ -1017,7 +1057,7 @@ def test_get_command_annotation_missing(
         )
 
 
-def test_get_total_command_annotations_count(
+async def test_get_total_command_annotations_count(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
     command_annotations: List[pe_types.CommandAnnotation],
@@ -1030,10 +1070,17 @@ def test_get_total_command_annotations_count(
         created_at=datetime.now(timezone.utc),
         log_period_id=None,
     )
+    await subject.insert_batch_commands(
+        run_id="run-id",
+        batch_commands=[
+            (protocol_commands.index(command), command.model_dump_json(by_alias=True))
+            for command in protocol_commands
+        ],
+    )
     subject.update_run_state(
         run_id="run-id",
         summary=state_summary,
-        commands=protocol_commands,
+        commands=None,
         command_annotations=command_annotations,
         run_time_parameters=[],
     )
@@ -1093,7 +1140,7 @@ _many_command_annotations = [
         ),
     ],
 )
-def test_get_command_annotations_slice(
+async def test_get_command_annotations_slice(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
     state_summary: StateSummary,
@@ -1108,10 +1155,17 @@ def test_get_command_annotations_slice(
         created_at=datetime.now(timezone.utc),
         log_period_id=None,
     )
+    await subject.insert_batch_commands(
+        run_id="run-id",
+        batch_commands=[
+            (protocol_commands.index(command), command.model_dump_json(by_alias=True))
+            for command in protocol_commands
+        ],
+    )
     subject.update_run_state(
         run_id="run-id",
         summary=state_summary,
-        commands=protocol_commands,
+        commands=None,
         command_annotations=_many_command_annotations,
         run_time_parameters=[],
     )
@@ -1130,7 +1184,7 @@ def test_get_command_annotations_slice(
         ("run-id", "not-command-id", CommandNotFoundError),
     ],
 )
-def test_get_command_raise_exception(
+async def test_get_command_raise_exception(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
     command_annotations: List[pe_types.CommandAnnotation],
@@ -1146,10 +1200,17 @@ def test_get_command_raise_exception(
         created_at=datetime.now(timezone.utc),
         log_period_id=None,
     )
+    await subject.insert_batch_commands(
+        run_id="run-id",
+        batch_commands=[
+            (protocol_commands.index(command), command.model_dump_json(by_alias=True))
+            for command in protocol_commands
+        ],
+    )
     subject.update_run_state(
         run_id="run-id",
         summary=state_summary,
-        commands=protocol_commands,
+        commands=None,
         command_annotations=command_annotations,
         run_time_parameters=[],
     )
@@ -1157,7 +1218,7 @@ def test_get_command_raise_exception(
         subject.get_command(run_id=input_run_id, command_id=input_command_id)
 
 
-def test_get_command_slice(
+async def test_get_command_slice(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
     command_annotations: List[pe_types.CommandAnnotation],
@@ -1170,10 +1231,17 @@ def test_get_command_slice(
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         log_period_id=None,
     )
+    await subject.insert_batch_commands(
+        run_id="run-id",
+        batch_commands=[
+            (protocol_commands.index(command), command.model_dump_json(by_alias=True))
+            for command in protocol_commands
+        ],
+    )
     subject.update_run_state(
         run_id="run-id",
         summary=state_summary,
-        commands=protocol_commands,
+        commands=None,
         command_annotations=command_annotations,
         run_time_parameters=[],
     )
@@ -1184,10 +1252,12 @@ def test_get_command_slice(
         include_fixit_commands=True,
     )
 
-    assert result == CommandSlice(
+    assert result == JsonCommandSlice(
         cursor=0,
         total_length=len(protocol_commands),
-        commands=protocol_commands,
+        commands=[
+            command.model_dump_json(by_alias=True) for command in protocol_commands
+        ],
     )
 
 
@@ -1206,7 +1276,7 @@ def test_get_command_slice(
         (999, 2, 3, ["fixit-pause-1"]),
     ],
 )
-def test_get_commands_slice_clamping(
+async def test_get_commands_slice_clamping(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
     command_annotations: List[pe_types.CommandAnnotation],
@@ -1223,10 +1293,17 @@ def test_get_commands_slice_clamping(
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         log_period_id=None,
     )
+    await subject.insert_batch_commands(
+        run_id="run-id",
+        batch_commands=[
+            (protocol_commands.index(command), command.model_dump_json(by_alias=True))
+            for command in protocol_commands
+        ],
+    )
     subject.update_run_state(
         run_id="run-id",
         summary=state_summary,
-        commands=protocol_commands,
+        commands=None,
         command_annotations=command_annotations,
         run_time_parameters=[],
     )
@@ -1240,7 +1317,7 @@ def test_get_commands_slice_clamping(
     assert result.cursor == expected_cursor
     assert result.total_length == len(protocol_commands)
     assert [
-        result_command.id for result_command in result.commands
+        json.loads(result_command)["id"] for result_command in result.commands
     ] == expected_command_ids
 
 
@@ -1256,7 +1333,7 @@ def test_get_run_command_slice_none(subject: RunStore) -> None:
     result = subject.get_commands_slice(
         run_id="run-id", length=999, cursor=None, include_fixit_commands=True
     )
-    assert result == CommandSlice(commands=[], cursor=0, total_length=0)
+    assert result == JsonCommandSlice(commands=[], cursor=0, total_length=0)
 
 
 def test_get_commands_slice_run_not_found(subject: RunStore) -> None:
@@ -1273,7 +1350,7 @@ def test_get_commands_slice_run_not_found(subject: RunStore) -> None:
         )
 
 
-def test_get_commands_slice_no_fixit_commands(
+async def test_get_commands_slice_no_fixit_commands(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
     command_annotations: List[pe_types.CommandAnnotation],
@@ -1286,10 +1363,17 @@ def test_get_commands_slice_no_fixit_commands(
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         log_period_id=None,
     )
+    await subject.insert_batch_commands(
+        run_id="run-id",
+        batch_commands=[
+            (protocol_commands.index(command), command.model_dump_json(by_alias=True))
+            for command in protocol_commands
+        ],
+    )
     subject.update_run_state(
         run_id="run-id",
         summary=state_summary,
-        commands=protocol_commands,
+        commands=None,
         command_annotations=command_annotations,
         run_time_parameters=[],
     )
@@ -1302,14 +1386,14 @@ def test_get_commands_slice_no_fixit_commands(
 
     assert result.cursor == 0
     assert result.total_length == 3
-    assert [result_command.id for result_command in result.commands] == [
+    assert [json.loads(result_command)["id"] for result_command in result.commands] == [
         "pause-1",
         "pause-2",
         "pause-3",
     ]
 
 
-def test_get_all_commands_as_preserialized_list(
+async def test_get_all_commands_as_preserialized_list(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
     command_annotations: List[pe_types.CommandAnnotation],
@@ -1322,10 +1406,17 @@ def test_get_all_commands_as_preserialized_list(
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         log_period_id=None,
     )
+    await subject.insert_batch_commands(
+        run_id="run-id",
+        batch_commands=[
+            (protocol_commands.index(command), command.model_dump_json(by_alias=True))
+            for command in protocol_commands
+        ],
+    )
     subject.update_run_state(
         run_id="run-id",
         summary=state_summary,
-        commands=protocol_commands,
+        commands=None,
         command_annotations=command_annotations,
         run_time_parameters=[],
     )
@@ -1335,20 +1426,20 @@ def test_get_all_commands_as_preserialized_list(
     assert result == [
         '{"id":"pause-1","createdAt":"2021-01-01T00:00:00","commandType":"waitForResume",'
         '"key":"command-key","status":"succeeded","params":{"message":"hello world"},"result":{},'
-        '"intent":"protocol","commandAnnotationIds":["annotation-1"]}',
+        '"error":null,"startedAt":null,"completedAt":null,"intent":"protocol","notes":null,"commandAnnotationIds":["annotation-1"],"failedCommandId":null}',
         '{"id":"pause-2","createdAt":"2022-02-02T00:00:00","commandType":"waitForResume",'
         '"key":"command-key","status":"succeeded","params":{"message":"hey world"},"result":{},'
-        '"intent":"protocol","commandAnnotationIds":[]}',
+        '"error":null,"startedAt":null,"completedAt":null,"intent":"protocol","notes":null,"commandAnnotationIds":[],"failedCommandId":null}',
         '{"id":"pause-3","createdAt":"2023-03-03T00:00:00","commandType":"waitForResume",'
         '"key":"command-key","status":"succeeded","params":{"message":"sup world"},"result":{},'
-        '"commandAnnotationIds":["annotation-1","annotation-2"]}',
+        '"error":null,"startedAt":null,"completedAt":null,"intent":null,"notes":null,"commandAnnotationIds":["annotation-1","annotation-2"],"failedCommandId":null}',
         '{"id":"fixit-pause-1","createdAt":"2021-01-01T00:00:00","commandType":"waitForResume",'
         '"key":"command-key","status":"succeeded","params":{"message":"hello world"},"result":{},'
-        '"intent":"fixit","commandAnnotationIds":[]}',
+        '"error":null,"startedAt":null,"completedAt":null,"intent":"fixit","notes":null,"commandAnnotationIds":[],"failedCommandId":null}',
     ]
 
 
-def test_get_all_commands_as_preserialized_list_no_fixit(
+async def test_get_all_commands_as_preserialized_list_no_fixit(
     subject: RunStore,
     protocol_commands: List[pe_commands.Command],
     command_annotations: List[pe_types.CommandAnnotation],
@@ -1361,10 +1452,17 @@ def test_get_all_commands_as_preserialized_list_no_fixit(
         created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
         log_period_id=None,
     )
+    await subject.insert_batch_commands(
+        run_id="run-id",
+        batch_commands=[
+            (protocol_commands.index(command), command.model_dump_json(by_alias=True))
+            for command in protocol_commands
+        ],
+    )
     subject.update_run_state(
         run_id="run-id",
         summary=state_summary,
-        commands=protocol_commands,
+        commands=None,
         command_annotations=command_annotations,
         run_time_parameters=[],
     )
@@ -1374,11 +1472,11 @@ def test_get_all_commands_as_preserialized_list_no_fixit(
     assert result == [
         '{"id":"pause-1","createdAt":"2021-01-01T00:00:00","commandType":"waitForResume",'
         '"key":"command-key","status":"succeeded","params":{"message":"hello world"},"result":{},'
-        '"intent":"protocol","commandAnnotationIds":["annotation-1"]}',
+        '"error":null,"startedAt":null,"completedAt":null,"intent":"protocol","notes":null,"commandAnnotationIds":["annotation-1"],"failedCommandId":null}',
         '{"id":"pause-2","createdAt":"2022-02-02T00:00:00","commandType":"waitForResume",'
         '"key":"command-key","status":"succeeded","params":{"message":"hey world"},"result":{},'
-        '"intent":"protocol","commandAnnotationIds":[]}',
+        '"error":null,"startedAt":null,"completedAt":null,"intent":"protocol","notes":null,"commandAnnotationIds":[],"failedCommandId":null}',
         '{"id":"pause-3","createdAt":"2023-03-03T00:00:00","commandType":"waitForResume",'
         '"key":"command-key","status":"succeeded","params":{"message":"sup world"},"result":{},'
-        '"commandAnnotationIds":["annotation-1","annotation-2"]}',
+        '"error":null,"startedAt":null,"completedAt":null,"intent":null,"notes":null,"commandAnnotationIds":["annotation-1","annotation-2"],"failedCommandId":null}',
     ]

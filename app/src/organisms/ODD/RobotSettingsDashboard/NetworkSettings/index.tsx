@@ -11,14 +11,14 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type { ChipType, IconName } from '@opentrons/components'
 import type { NetworkConnection } from '/app/resources/networking/hooks/useNetworkConnection'
 import type { SetSettingOption } from '../types'
@@ -33,7 +33,7 @@ interface NetworkSettingsProps {
 export function NetworkSettings({
   networkConnection,
   setCurrentOption,
-}: NetworkSettingsProps): JSX.Element {
+}: NetworkSettingsProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const { isWifiConnected, isEthernetConnected, activeSsid } = networkConnection
 
@@ -103,7 +103,7 @@ function NetworkSettingButton({
   chipText,
   networkName,
   onClick,
-}: NetworkSettingButtonProps): JSX.Element {
+}: NetworkSettingButtonProps): ReactNode {
   const PUSHED_STATE_STYLE = css`
     &:active {
       background-color: ${
@@ -127,23 +127,21 @@ function NetworkSettingButton({
           <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing24}>
             <Icon name={iconName} size="3rem" />
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
-              <LegacyStyledText
-                fontSize={TYPOGRAPHY.fontSize28}
-                lineHeight={TYPOGRAPHY.lineHeight36}
+              <StyledText
+                forwardedAs="h4"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 textAlign={TYPOGRAPHY.textAlignLeft}
               >
                 {buttonTitle}
-              </LegacyStyledText>
+              </StyledText>
               {networkName != null ? (
-                <LegacyStyledText
-                  fontSize={TYPOGRAPHY.fontSize28}
-                  lineHeight={TYPOGRAPHY.lineHeight36}
+                <StyledText
+                  forwardedAs="h4"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   color={COLORS.grey60}
                 >
                   {networkName}
-                </LegacyStyledText>
+                </StyledText>
               ) : null}
             </Flex>
           </Flex>

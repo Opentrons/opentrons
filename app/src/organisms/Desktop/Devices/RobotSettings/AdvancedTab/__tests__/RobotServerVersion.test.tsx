@@ -15,7 +15,13 @@ import { handleUpdateBuildroot } from '../../UpdateBuildroot'
 import { RobotServerVersion } from '../RobotServerVersion'
 
 vi.mock('/app/redux-resources/robots')
-vi.mock('/app/redux/robot-update/selectors')
+vi.mock('/app/redux/robot-update/selectors', async () => {
+  const actual = await vi.importActual('/app/redux/robot-update/selectors')
+  return {
+    ...actual,
+    getRobotUpdateDisplayInfo: vi.fn(),
+  }
+})
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('../../UpdateBuildroot')
 
@@ -42,7 +48,7 @@ describe('RobotSettings RobotServerVersion', () => {
 
   it('should render title and description', () => {
     render()
-    screen.getByText('Robot Server Version')
+    screen.getByText('Robot server version')
     screen.getByText('View latest release notes on')
     screen.getByText('v7.7.7')
   })

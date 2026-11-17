@@ -5,9 +5,11 @@ import { useTranslation } from 'react-i18next'
 import { StyledText } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { TertiaryButton } from '/app/atoms/buttons'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import { CameraControls } from '/app/organisms/Desktop/Camera/CameraControls'
 import styles from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/setupcamera.module.css'
+
+import type { ReactNode } from 'react'
 
 export interface SetupRunCameraControlsProps {
   cameraConfirmed: boolean
@@ -17,7 +19,7 @@ export interface SetupRunCameraControlsProps {
 export function SetupRunCameraControls({
   cameraConfirmed,
   runId,
-}: SetupRunCameraControlsProps): JSX.Element {
+}: SetupRunCameraControlsProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const [showControls, setShowControls] = useState(false)
   const toggleControls = (): void => {

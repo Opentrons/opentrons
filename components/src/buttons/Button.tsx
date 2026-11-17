@@ -1,12 +1,12 @@
 import cx from 'classnames'
 import omit from 'lodash/omit'
 
-import { Icon } from '../icons'
+import { Icon } from '../helix/icons'
 import { BUTTON_TYPE_BUTTON } from '../primitives'
 import styles from './buttons.module.css'
 
 import type { ComponentType, MouseEventHandler, ReactNode } from 'react'
-import type { IconName } from '../icons'
+import type { IconName } from '../helix/icons'
 import type { BUTTON_TYPE_RESET, BUTTON_TYPE_SUBMIT } from '../primitives'
 import type { UseHoverTooltipTargetProps } from '../tooltips'
 
@@ -67,7 +67,7 @@ const STRIP_PROPS = [
  * ```
  * @deprecated Use {@link Btn}
  */
-export function Button(props: ButtonProps): JSX.Element {
+export function Button(props: ButtonProps): ReactNode {
   const { id, name, title, disabled, hover, tabIndex, form } = props
   const className = cx(props.className, { [styles.hover]: hover })
   const onClick = !disabled ? props.onClick : undefined

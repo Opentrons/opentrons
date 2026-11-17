@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Annotated
 from fastapi import Depends, status
 
 from opentrons.config import feature_flags as ff
-from opentrons.hardware_control import HardwareControlAPI
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 from server_utils.audit.fastapi import get_audit_logger
 from server_utils.auth.resource_server.fastapi import require_scopes
@@ -23,7 +22,6 @@ from robot_server.errors.robot_errors import NotSupportedOnOT2
 from robot_server.hardware import (
     HardwareStateStore,
     get_estop_handler,
-    get_hardware,
     get_hardware_state_store,
     get_robot_type,
 )
@@ -38,11 +36,7 @@ async def _get_estop_status_response(
     estop_handler: EstopHandler,
 ) -> PydanticResponse[SimpleBody[EstopStatusModel]]:
     """Helper to generate the current Estop Status as a response model."""
-    data = EstopStatusModel.model_construct(
-        status=estop_handler.get_state(),
-        leftEstopPhysicalStatus=estop_handler.get_left_physical_status(),
-        rightEstopPhysicalStatus=estop_handler.get_right_physical_status(),
-    )
+    data = await estop_handler.get_status()
     return await PydanticResponse.create(content=SimpleBody.model_construct(data=data))
 
 
@@ -82,7 +76,7 @@ async def put_acknowledge_estop_disengage(
     estop_handler: Annotated[EstopHandler, Depends(get_estop_handler)],
 ) -> PydanticResponse[SimpleBody[EstopStatusModel]]:
     """Transition from the `logically_engaged` status if applicable."""
-    estop_handler.acknowledge_and_clear()
+    await estop_handler.acknowledge_and_clear()
     return await _get_estop_status_response(estop_handler)
 
 
@@ -100,7 +94,6 @@ def get_door_switch_required(
     responses={status.HTTP_200_OK: {"model": SimpleBody[DoorStatusModel]}},
 )
 async def get_door_status(
-    hardware: Annotated[HardwareControlAPI, Depends(get_hardware)],
     hardware_store: Annotated[HardwareStateStore, Depends(get_hardware_state_store)],
     door_required: Annotated[bool, Depends(get_door_switch_required)],
 ) -> PydanticResponse[SimpleBody[DoorStatusModel]]:
@@ -109,7 +102,7 @@ async def get_door_status(
             data=DoorStatusModel.model_construct(
                 status=DoorState.from_hw_physical_status(hardware_store.door_state),
                 doorRequiredClosedForProtocol=door_required,
-                moduleSerial=hardware.module_door_serial,
+                moduleSerial=hardware_store.module_door_serial,
             )
         )
     )

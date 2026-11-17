@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import { useAllRunsQuery } from '@opentrons/react-api-client'
 
 import { useNotifyDataReady } from '../useNotifyDataReady'
@@ -19,7 +21,7 @@ export function useNotifyAllRunsQuery(
   options: UseNotifyAllRunsQueryOptions = {},
   hostOverride?: HostConfig | null
 ): UseQueryResult<Runs, AxiosError> {
-  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
+  const { refetch, queryOptionsNotify } = useNotifyDataReady({
     topic: 'robot-server/runs',
     options,
     hostOverride,
@@ -30,10 +32,13 @@ export function useNotifyAllRunsQuery(
     queryOptionsNotify as UseAllRunsQueryOptions,
     hostOverride
   )
+  const { refetch: refetchQuery } = httpQueryResult
 
-  if (shouldRefetch) {
-    void httpQueryResult.refetch()
-  }
+  useEffect(() => {
+    if (refetch > 0) {
+      void refetchQuery()
+    }
+  }, [refetch, refetchQuery])
 
   return httpQueryResult
 }

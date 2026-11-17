@@ -6,11 +6,11 @@ import {
   orderRuntimeParameterRangeOptions,
 } from '@opentrons/shared-data'
 
-import { Chip } from '../../atoms/Chip'
 import { StyledText } from '../../atoms/StyledText'
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { TYPOGRAPHY } from '../../helix-design-system/product'
-import { Icon } from '../../icons'
+import { Chip } from '../../helix/Chip'
+import { Icon } from '../../helix/icons'
 import { Flex } from '../../primitives'
 import { DISPLAY_INLINE, FLEX_MAX_CONTENT } from '../../styles'
 import { LegacyTooltip, useHoverTooltip } from '../../tooltips'
@@ -19,6 +19,7 @@ import {
   SPACING,
 } from '../../ui-style-constants/index'
 
+import type { ReactNode } from 'react'
 import type { RunTimeParameter } from '@opentrons/shared-data'
 
 interface ProtocolParameterItemsProps {
@@ -32,7 +33,7 @@ interface ProtocolParameterItemsProps {
 export function ParametersTable({
   runTimeParameters,
   t,
-}: ProtocolParameterItemsProps): JSX.Element {
+}: ProtocolParameterItemsProps): ReactNode {
   const formatRange = (runTimeParameter: RunTimeParameter): string => {
     const { type } = runTimeParameter
     const minMax = formatRunTimeParameterMinMax(runTimeParameter)
@@ -121,7 +122,7 @@ interface ParameterNameProps {
   index: number
 }
 
-const ParameterName = (props: ParameterNameProps): JSX.Element => {
+const ParameterName = (props: ParameterNameProps): ReactNode => {
   const { displayName, description, isLast, index } = props
   const [targetProps, tooltipProps] = useHoverTooltip()
 

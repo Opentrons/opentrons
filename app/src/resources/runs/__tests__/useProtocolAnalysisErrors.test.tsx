@@ -1,6 +1,5 @@
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import {
   useProtocolAnalysisAsDocumentQuery,
@@ -23,13 +22,13 @@ vi.mock('../useNotifyRunQuery')
 
 describe('useProtocolAnalysisErrors hook', () => {
   beforeEach(() => {
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(null, { staleTime: Infinity })
       .thenReturn({} as UseQueryResult<Run>)
-    when(vi.mocked(useProtocolQuery))
+    vi.when(vi.mocked(useProtocolQuery))
       .calledWith(null)
       .thenReturn({} as UseQueryResult<Protocol>)
-    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+    vi.when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(null, null, { enabled: false })
       .thenReturn({
         data: null,
@@ -37,7 +36,7 @@ describe('useProtocolAnalysisErrors hook', () => {
   })
 
   it('returns null when protocol id is null', () => {
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID_2, { staleTime: Infinity })
       .thenReturn({
         data: { data: { protocolId: null } } as any,
@@ -54,19 +53,19 @@ describe('useProtocolAnalysisErrors hook', () => {
       id: 'fake analysis',
       status: 'completed',
     } as CompletedProtocolAnalysis
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID_2, { staleTime: Infinity })
       .thenReturn({
         data: { data: { protocolId: PROTOCOL_ID } } as any,
       } as UseQueryResult<Run>)
-    when(vi.mocked(useProtocolQuery))
+    vi.when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID)
       .thenReturn({
         data: {
           data: { analysisSummaries: [{ id: PROTOCOL_ANALYSIS.id }] },
         } as any,
       } as UseQueryResult<Protocol>)
-    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+    vi.when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, PROTOCOL_ANALYSIS.id, { enabled: true })
       .thenReturn({
         data: PROTOCOL_ANALYSIS,
@@ -83,19 +82,19 @@ describe('useProtocolAnalysisErrors hook', () => {
       id: 'fake analysis',
       status: 'pending',
     } as PendingProtocolAnalysis
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID_2, { staleTime: Infinity })
       .thenReturn({
         data: { data: { protocolId: PROTOCOL_ID } } as any,
       } as UseQueryResult<Run>)
-    when(vi.mocked(useProtocolQuery))
+    vi.when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID)
       .thenReturn({
         data: {
           data: { analysisSummaries: [{ id: PROTOCOL_ANALYSIS.id }] },
         } as any,
       } as UseQueryResult<Protocol>)
-    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+    vi.when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, PROTOCOL_ANALYSIS.id, { enabled: true })
       .thenReturn({
         data: PROTOCOL_ANALYSIS,
@@ -113,12 +112,12 @@ describe('useProtocolAnalysisErrors hook', () => {
       status: 'completed',
       errors: [{ detail: 'fake error' }],
     } as CompletedProtocolAnalysis
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID_2, { staleTime: Infinity })
       .thenReturn({
         data: { data: { protocolId: PROTOCOL_ID } } as any,
       } as UseQueryResult<Run>)
-    when(vi.mocked(useProtocolQuery))
+    vi.when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID)
       .thenReturn({
         data: {
@@ -127,7 +126,7 @@ describe('useProtocolAnalysisErrors hook', () => {
           },
         } as any,
       } as UseQueryResult<Protocol>)
-    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+    vi.when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, PROTOCOL_ANALYSIS_WITH_ERRORS.id, {
         enabled: true,
       })

@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import { useClientData } from '@opentrons/react-api-client'
 
 import { useNotifyDataReady } from '../../useNotifyDataReady'
@@ -14,7 +16,7 @@ export function useNotifyClientDataEncryptionKeys(
     AxiosError
   > = {}
 ): UseQueryResult<ClientDataResponse<ClientDataEncryptionKeys>, AxiosError> {
-  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
+  const { refetch, queryOptionsNotify } = useNotifyDataReady({
     topic: `robot-server/clientData/${KEYS.ENCRYPTION_KEYS}`,
     options,
   })
@@ -23,10 +25,13 @@ export function useNotifyClientDataEncryptionKeys(
     KEYS.ENCRYPTION_KEYS,
     queryOptionsNotify
   )
+  const { refetch: refetchQuery } = httpQueryResult
 
-  if (shouldRefetch) {
-    void httpQueryResult.refetch()
-  }
+  useEffect(() => {
+    if (refetch > 0) {
+      void refetchQuery()
+    }
+  }, [refetch, refetchQuery])
 
   return httpQueryResult
 }

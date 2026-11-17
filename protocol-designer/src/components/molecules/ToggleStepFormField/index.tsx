@@ -14,6 +14,8 @@ import {
 
 import { ToggleButton } from '/protocol-designer/components/atoms'
 
+import type { ReactNode } from 'react'
+
 interface ToggleStepFormFieldProps {
   title: string
   isSelected: boolean
@@ -27,7 +29,7 @@ interface ToggleStepFormFieldProps {
 }
 export function ToggleStepFormField(
   props: ToggleStepFormFieldProps
-): JSX.Element {
+): ReactNode {
   const {
     title,
     isSelected,

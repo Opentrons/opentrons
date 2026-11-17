@@ -5,14 +5,14 @@ import {
   HOPPER_FAKE_LOCATIONS,
 } from '@opentrons/step-generation'
 
-import { SlotDetailsEmptyState } from '/app/molecules/SlotDetailsEmptyState'
-
 import { ModuleContainer } from '../ModuleContainer'
 import { LabwareSlot } from '../SecondWindow/LabwareSlot'
 import { TipDisposalSlot } from '../SecondWindow/TipDisposalSlot'
 import { TipPickupSlot } from '../SecondWindow/TipPickupSlot'
 import styles from './slotdetails.module.css'
+import { SlotDetailsEmptyState } from './SlotDetailsEmptyState'
 
+import type { ReactNode } from 'react'
 import type {
   Liquid,
   LoadLabwareRunTimeCommand,
@@ -32,7 +32,7 @@ interface SlotDetailsProps {
   analysis: ProtocolAnalysisOutput
   liquids: Liquid[]
 }
-export function SlotDetails(props: SlotDetailsProps): JSX.Element {
+export function SlotDetails(props: SlotDetailsProps): ReactNode {
   const { slotId, robotState, invariantContext, analysis, liquids } = props
   const { labware, modules } = robotState
   const {

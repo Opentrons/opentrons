@@ -2,19 +2,19 @@ import { useTranslation } from 'react-i18next'
 
 import {
   ALIGN_CENTER,
-  Box,
+  DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useUpdateRobotSettingMutation } from '@opentrons/react-api-client'
 
-import { ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { RobotSettingsField } from '@opentrons/api-client'
 
 interface GantryHomingProps {
@@ -25,7 +25,7 @@ interface GantryHomingProps {
 export function GantryHoming({
   settings,
   isRobotBusy,
-}: GantryHomingProps): JSX.Element {
+}: GantryHomingProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const documentationState = useDocumentationState()
   const { updateRobotSetting } =
@@ -40,24 +40,33 @@ export function GantryHoming({
   }
 
   return (
-    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-      <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.pSemiBold}
-          paddingBottom={SPACING.spacing4}
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+      <StyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        {t('usage_settings')}
+      </StyledText>
+      <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing4}
+          width="70%"
         >
-          {t('gantry_homing')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
-          {t('gantry_homing_description')}
-        </LegacyStyledText>
-      </Box>
-      <ToggleButton
-        label="gantry_homing"
-        toggledOn={!value}
-        onClick={handleClick}
-        disabled={isRobotBusy}
-      />
+          <StyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
+            {t('gantry_homing')}
+          </StyledText>
+          <StyledText forwardedAs="p">
+            {t('gantry_homing_description')}
+          </StyledText>
+        </Flex>
+        <ToggleButton
+          label="gantry_homing"
+          toggledOn={!value}
+          onClick={handleClick}
+          disabled={isRobotBusy}
+        />
+      </Flex>
     </Flex>
   )
 }

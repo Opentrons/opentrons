@@ -10,10 +10,10 @@ import {
 } from '@opentrons/components'
 
 import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
-import { InterventionModal } from '/app/molecules/InterventionModal'
+import { InterventionModal } from '/app/components/ODD/modals/InterventionModal'
 
-import type { ComponentProps } from 'react'
-import type { ModalType } from '/app/molecules/InterventionModal'
+import type { ComponentProps, ReactNode } from 'react'
+import type { ModalType } from '/app/components/ODD/modals/InterventionModal'
 import type { DesktopSizeType } from '../types'
 
 export type RecoveryInterventionModalProps = Omit<
@@ -31,7 +31,7 @@ export function RecoveryInterventionModal({
   desktopType,
   isOnDevice,
   ...rest
-}: RecoveryInterventionModalProps): JSX.Element {
+}: RecoveryInterventionModalProps): ReactNode {
   const restProps = {
     ...rest,
     type: 'error' as ModalType,

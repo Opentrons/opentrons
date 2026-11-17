@@ -6,13 +6,14 @@ import {
   FLEX_STACKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
+} from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { isMaintenanceDoorOpenError } from '/app/local-resources/maintenance_runs/utils/isDoorOpenError'
 
+import type { ReactNode } from 'react'
 import type { CreateCommand, DeckConfiguration } from '@opentrons/shared-data'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
 
@@ -20,7 +21,7 @@ interface CloseDoorProps extends ModuleSetupWizardMaybePipetteStepProps {
   deckConfig: DeckConfiguration
 }
 
-export function CloseDoor(props: CloseDoorProps): JSX.Element {
+export function CloseDoor(props: CloseDoorProps): ReactNode {
   const {
     proceed,
     isRobotMoving,

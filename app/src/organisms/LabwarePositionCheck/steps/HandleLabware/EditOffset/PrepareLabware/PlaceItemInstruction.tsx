@@ -6,14 +6,14 @@ import {
   DIRECTION_COLUMN,
   Flex,
   InlineNotification,
-  LegacyStyledText,
   RESPONSIVENESS,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { DescriptionContent } from '/app/molecules/InterventionModal'
-import { UnorderedList } from '/app/molecules/UnorderedList'
+import { UnorderedList } from '/app/components/adhoc/shared/UnorderedList'
+import { DescriptionContent } from '/app/components/ODD/modals/InterventionModal'
 import {
   getFlexSlotNameOnly,
   OFFSET_KIND_DEFAULT,
@@ -23,24 +23,17 @@ import {
   selectSelectedLwOverview,
 } from '/app/redux/protocol-runs'
 
-import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type {
   LabwareStackupDetail,
   SelectedLwOverview,
 } from '/app/redux/protocol-runs'
-import type { State } from '/app/redux/types'
 
-export function PlaceItemInstruction(
-  props: EditOffsetContentProps
-): JSX.Element {
+export function PlaceItemInstruction(props: EditOffsetContentProps): ReactNode {
   const { runId } = props
-  const { t: commandTextT } = useTranslation('protocol_command_text')
   const { t } = useTranslation('labware_position_check')
-  const { protocolData } = useSelector(
-    (state: State) => state.protocolRuns[runId]?.lpc!
-  )
   const isActivePipette96ch =
     useSelector(selectActivePipetteChannelCount(runId)) === 96
   const isLwTiprack = useSelector(selectIsSelectedLwTipRack(runId))
@@ -54,11 +47,7 @@ export function PlaceItemInstruction(
       location: slotOnlyDisplayLocation,
     })
 
-  const slotOnlyDisplayLocation = getFlexSlotNameOnly(
-    offsetLocationDetails,
-    protocolData,
-    commandTextT as TFunction
-  )
+  const slotOnlyDisplayLocation = getFlexSlotNameOnly(offsetLocationDetails)
 
   // The "clear deck" copy handles the module case.
   const lwOnlyLocSeq = offsetLocationDetails.lwModOnlyStackupDetails.filter(
@@ -135,7 +124,7 @@ function ClearDeckCopy({
 }: Pick<
   PlaceItemInstructionContentProps,
   'labwareInfo' | 'slotOnlyDisplayLocation'
->): JSX.Element {
+>): ReactNode {
   const { t } = useTranslation('labware_position_check')
 
   const { kind: offsetKind, closestBeneathModuleModel } =
@@ -162,7 +151,7 @@ function PlaceItemInstructionContent({
   isFirstItemInStackup,
   isActivePipette96ch,
   isDefaultOffset,
-}: PlaceItemInstructionContentProps): JSX.Element {
+}: PlaceItemInstructionContentProps): ReactNode {
   const { t } = useTranslation('labware_position_check')
 
   const displayName = useSelector(
@@ -190,7 +179,7 @@ function PlaceItemInstructionContent({
         }}
         components={{
           bold: (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="span"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             />
@@ -213,7 +202,7 @@ function PlaceItemInstructionContent({
         }}
         components={{
           bold: (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="span"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             />

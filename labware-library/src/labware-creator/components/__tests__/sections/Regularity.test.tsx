@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
 import { render, screen } from '@testing-library/react'
-import { when } from 'vitest-when'
 
 import { getDefaultFormState, getInitialStatus } from '../../../fields'
 import { getLabwareName, isEveryFieldHidden } from '../../../utils'
@@ -25,7 +24,7 @@ describe('Regularity', () => {
       onSubmit: vi.fn(),
     }
 
-    when(vi.mocked(isEveryFieldHidden))
+    vi.when(vi.mocked(isEveryFieldHidden))
       .calledWith(
         ['homogeneousWells', 'hasLpcQuirk'],
         formikConfig.initialValues
@@ -38,7 +37,7 @@ describe('Regularity', () => {
   })
 
   it('should render radio fields when fields are visible', () => {
-    when(vi.mocked(getLabwareName))
+    vi.when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, true)
       .thenReturn('FAKE LABWARE NAME PLURAL')
 
@@ -55,6 +54,22 @@ describe('Regularity', () => {
     expect(radioElements).toHaveLength(4)
   })
 
+  it('does not ask about labware position check for a filter plate', () => {
+    formikConfig.initialValues.labwareType = 'filterPlate'
+    vi.when(vi.mocked(getLabwareName))
+      .calledWith(formikConfig.initialValues, true)
+      .thenReturn('wells')
+
+    render(wrapInFormik(<Regularity />, formikConfig))
+
+    expect(
+      screen.queryByText(
+        'Do you want to exclude this labware from Labware Position Check?'
+      )
+    ).toBeNull()
+    expect(screen.getAllByRole('radio')).toHaveLength(2)
+  })
+
   it('should render alert when error is present', () => {
     const FAKE_ERROR = 'ahh'
     formikConfig.initialErrors = {
@@ -69,7 +84,7 @@ describe('Regularity', () => {
   })
 
   it('should not render when all of the fields are hidden', () => {
-    when(vi.mocked(isEveryFieldHidden))
+    vi.when(vi.mocked(isEveryFieldHidden))
       .calledWith(['homogeneousWells'], formikConfig.initialValues)
       .thenReturn(true)
 

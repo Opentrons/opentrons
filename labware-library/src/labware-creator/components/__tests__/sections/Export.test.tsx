@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -27,7 +26,7 @@ describe('Export', () => {
 
     onExportClick = vi.fn()
 
-    when(vi.mocked(isEveryFieldHidden))
+    vi.when(vi.mocked(isEveryFieldHidden))
       .calledWith(['loadName'], formikConfig.initialValues)
       .thenReturn(false)
   })

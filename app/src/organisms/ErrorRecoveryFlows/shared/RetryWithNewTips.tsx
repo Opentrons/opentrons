@@ -1,13 +1,14 @@
 import { Trans, useTranslation } from 'react-i18next'
 
-import { LegacyStyledText } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
 import { TwoColTextAndFailedStepNextStep } from './TwoColTextAndFailedStepNextStep'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '/app/organisms/ErrorRecoveryFlows/types'
 
-export function RetryWithNewTips(props: RecoveryContentProps): JSX.Element {
+export function RetryWithNewTips(props: RecoveryContentProps): ReactNode {
   const { recoveryCommands, routeUpdateActions } = props
   const { retryFailedCommand, resumeRun } = recoveryCommands
   const { handleMotionRouting } = routeUpdateActions
@@ -28,7 +29,7 @@ export function RetryWithNewTips(props: RecoveryContentProps): JSX.Element {
         t={t}
         i18nKey="robot_will_retry_with_new_tips"
         components={{
-          block: <LegacyStyledText forwardedAs="p" />,
+          block: <StyledText forwardedAs="p" />,
         }}
       />
     )

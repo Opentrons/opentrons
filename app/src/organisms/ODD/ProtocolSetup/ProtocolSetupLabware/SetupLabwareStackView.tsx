@@ -24,11 +24,12 @@ import {
   getWellFillFromLabwareId,
 } from '@opentrons/shared-data'
 
-import { LabwareStackContents } from '/app/molecules/LabwareStackContents'
-import { ODDBackButton } from '/app/molecules/ODDBackButton'
+import { ODDBackButton } from '/app/components/adhoc/ODD/ODDBackButton'
+import { LabwareStackContents } from '/app/components/adhoc/shared/LabwareStackContents'
 
 import { LabwareLiquidsDetailModal } from './LabwareLiquidsDetailModal'
 
+import type { ReactNode } from 'react'
 import type {
   CompletedProtocolAnalysis,
   LabwareByLiquidId,
@@ -58,7 +59,7 @@ export function SetupLabwareStackView({
   stackedItems,
   labwareByLiquidId,
   mostRecentAnalysis,
-}: SetupLabwareStackViewProps): JSX.Element {
+}: SetupLabwareStackViewProps): ReactNode {
   const labwareDefinitionsByURI = useMemo(
     () => getLabwareDefinitionsByURIForProtocol(mostRecentAnalysis.commands),
     [mostRecentAnalysis]

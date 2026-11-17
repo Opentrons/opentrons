@@ -139,4 +139,12 @@ describe('DisposalVolume', () => {
     await user.click(screen.getByTestId('ChildNavigation_Back_Button'))
     expect(props.onBack).toHaveBeenCalled()
   })
+
+  it('shows an error and disables continue for invalid volume input', async () => {
+    const user = userEvent.setup()
+    render(props)
+    await user.type(screen.getByLabelText('Disposal volume (µL)'), 'abc')
+    screen.getByText('Enter a valid number')
+    expect(screen.getByTestId('ChildNavigation_Primary_Button')).toBeDisabled()
+  })
 })

@@ -4,11 +4,12 @@ import { useTranslation } from 'react-i18next'
 import { format } from 'date-fns'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { OddModal } from '/app/molecules/OddModal'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 
 import styles from './cameracontrols.module.css'
 
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { ReactNode } from 'react'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 export interface ImagePreviewModalProps {
   imgPath: string
@@ -18,7 +19,7 @@ export interface ImagePreviewModalProps {
 export function ImagePreviewModal({
   imgPath,
   toggleModal,
-}: ImagePreviewModalProps): JSX.Element {
+}: ImagePreviewModalProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   const displayTimestamp = useMemo(() => {

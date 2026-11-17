@@ -1,5 +1,6 @@
 import { WellSelection } from '../../WellSelection'
 
+import type { ReactNode } from 'react'
 import type { WellGroup } from '@opentrons/components'
 import type { NozzleLayoutDetails } from '@opentrons/shared-data'
 import type { RecoveryContentProps } from '../types'
@@ -8,7 +9,7 @@ export type TipSelectionProps = RecoveryContentProps & {
   allowTipSelection: boolean
 }
 
-export function TipSelection(props: TipSelectionProps): JSX.Element {
+export function TipSelection(props: TipSelectionProps): ReactNode {
   const { failedLabwareUtils, failedPipetteUtils, allowTipSelection } = props
   const { tipSelectorDef, selectedTipLocations, selectTips, deselectTips } =
     failedLabwareUtils

@@ -10,9 +10,9 @@ import {
 } from '@opentrons/react-api-client'
 import { OT_SYSTEM_CAMERA } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { ODDBackButton } from '/app/components/adhoc/ODD/ODDBackButton'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
-import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { CameraSettings } from '/app/organisms/ODD/CameraSettings'
 import { useToaster } from '/app/organisms/ToasterOven'
 import {
@@ -25,7 +25,7 @@ import {
 
 import styles from './setupcamera.module.css'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { SetupScreens } from '/app/organisms/ODD/ProtocolSetup'
 import type { State } from '/app/redux/types'
 import type { RobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
@@ -44,7 +44,7 @@ export interface ProtocolSetupCameraProps {
 
 export function ProtocolSetupCamera(
   props: ProtocolSetupCameraProps
-): JSX.Element {
+): ReactNode {
   const { runId, confirmCameraSettings, cameraConfirmed } = props
   const { t } = useTranslation('protocol_setup')
   const dispatch = useDispatch()
@@ -165,7 +165,7 @@ function SetupCameraHeader({
   onConfirmPreferences,
   cameraEnabled,
   isConfirmPending,
-}: SetupCameraHeaderProps): JSX.Element {
+}: SetupCameraHeaderProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
 
   return (

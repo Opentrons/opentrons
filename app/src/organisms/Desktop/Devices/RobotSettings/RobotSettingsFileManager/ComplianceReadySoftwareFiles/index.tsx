@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -12,12 +12,16 @@ import {
 } from '@opentrons/components'
 import {
   isDocumentedMutationError,
+  useGetRobotServerAccessControlSettingsQuery,
   useLogPeriodSummariesQuery,
 } from '@opentrons/react-api-client'
 
-import { Skeleton } from '/app/atoms/Skeleton'
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
+import { isInsufficientScopeError } from '/app/local-resources/access-control/utils'
+import { DownloadAuditLogsModal } from '/app/organisms/Desktop/DownloadAuditLogsModal'
 import { useToaster } from '/app/organisms/ToasterOven'
+import { useEnsureAuditLogAuthorization } from '/app/resources/audit/useEnsureAuditLogAuthorization'
 import { useDeleteSelectedLogPeriods } from '/app/resources/devices/hooks/useDeleteSelectedLogPeriods'
 import { useDownloadSelectedLogPeriods } from '/app/resources/devices/hooks/useDownloadSelectedLogPeriods'
 
@@ -29,14 +33,15 @@ import styles from './compliancereadysoftwarefiles.module.css'
 import { LogPeriodRow } from './LogPeriodRow'
 
 import type { ReactNode } from 'react'
+import type { LogPeriodSummary } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
-import type { MakeToastOptions } from '/app/organisms/ToasterOven/ToasterContext'
+import type { DocumentedAction } from '@opentrons/react-api-client'
 import type { DownloadedLogPeriod } from '/app/resources/devices/hooks/useDownloadSelectedLogPeriods'
 
-const TOAST_STYLE: MakeToastOptions = {
-  closeButton: true,
-  width: '80%',
-}
+const DELETE_LOG_PERIODS_ACTIONS: DocumentedAction[] = [
+  'download_log_period',
+  'delete_log_periods',
+]
 
 interface ComplianceReadySoftwareFilesProps {
   robotName: string
@@ -48,18 +53,39 @@ export function ComplianceReadySoftwareFiles({
   const { t } = useTranslation('device_details')
   const { data: logPeriodSummariesData, status: logPeriodSummaryStatus } =
     useLogPeriodSummariesQuery()
-  const documentationState = useDocumentationState()
+  const { documentationState } = useLinkedDocumentationState(
+    DELETE_LOG_PERIODS_ACTIONS,
+    robotName,
+    robotName
+  )
+  const ensureAuthorized = useEnsureAuditLogAuthorization(
+    documentationState,
+    DELETE_LOG_PERIODS_ACTIONS
+  )
   const downloadLogPeriodsMutation = useDownloadSelectedLogPeriods(robotName)
-  const { deleteSelectedLogPeriods, deletingIds } =
-    useDeleteSelectedLogPeriods(documentationState)
+  const {
+    deleteSelectedLogPeriods,
+    deletingIds,
+    isLoading: isDeleting,
+  } = useDeleteSelectedLogPeriods(documentationState)
   const { makeToast, eatToast } = useToaster()
   const observer = useRef<HTMLDivElement>(null)
+
+  const { data: accessControlSettings } =
+    useGetRobotServerAccessControlSettingsQuery()
+  const requireDownloadSetting =
+    accessControlSettings?.data.requireLogsToBeSavedInApp ?? false
 
   // API returns periods oldest-to-newest; reverse for newest-first display.
   const periods = useMemo(
     () => [...(logPeriodSummariesData?.data ?? [])].reverse(),
     [logPeriodSummariesData?.data]
   )
+
+  const [downloadModalDismissed, setDownloadModalDismissed] = useState(false)
+
+  const showRequiredDownloadModal =
+    requireDownloadSetting && periods.length > 1 && !downloadModalDismissed
 
   const {
     selectedIds,
@@ -69,50 +95,59 @@ export function ComplianceReadySoftwareFiles({
     toggleOne: togglePeriod,
   } = useRecordSelection(periods)
 
+  const requiredDownloadPeriods = useMemo(() => {
+    return periods.filter(period => period.endedAt != null)
+  }, [periods])
+
+  const selectedPeriods = useMemo(
+    () => periods.filter(period => selectedIds.has(period.id)),
+    [periods, selectedIds]
+  )
+
   const [showDeleteRecordsModal, setShowDeleteRecordsModal] =
     useState<boolean>(false)
+  const [isAuthorizing, setIsAuthorizing] = useState(false)
 
-  const handleNoLogsSelected = (type: 'delete' | 'download'): void => {
-    makeToast(t(`select_entry_to_${type}`) as string, WARNING_TOAST, {
-      closeButton: true,
-    })
-  }
+  const handleNoLogsSelected = useCallback(
+    (type: 'delete' | 'download'): void => {
+      makeToast(t(`select_entry_to_${type}`) as string, WARNING_TOAST, {
+        closeButton: true,
+      })
+    },
+    [t, makeToast]
+  )
 
-  const handleDownloadSelected = (): void => {
-    if (selectedIds.size === 0) {
-      handleNoLogsSelected('download')
-      return
-    }
-    if (downloadLogPeriodsMutation.status !== 'loading') {
-      const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
-      const toastId = makeToast(
-        t('downloading_log_periods') as string,
-        INFO_TOAST,
-        {
-          disableTimeout: true,
-          icon: toastIcon,
-          ...TOAST_STYLE,
-        }
-      )
-      downloadLogPeriodsMutation
-        .mutateAsync({
-          logPeriods: periods.filter(period => selectedIds.has(period.id)),
-        })
-        .catch((error: Error) => {
-          makeToast(error.message, ERROR_TOAST, TOAST_STYLE)
-        })
-        .then(() => {
-          makeToast(
-            t('files_successfully_downloaded') as string,
-            SUCCESS_TOAST,
-            TOAST_STYLE
-          )
-        })
-        .finally(() => {
-          eatToast(toastId)
-        })
-    }
-  }
+  const handleDownload = useCallback(
+    async (logPeriods: LogPeriodSummary[]): Promise<void> => {
+      if (logPeriods.length === 0) {
+        handleNoLogsSelected('download')
+        return
+      }
+      if (downloadLogPeriodsMutation.status !== 'loading') {
+        const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
+        const toastId = makeToast(
+          t('downloading_log_periods') as string,
+          INFO_TOAST,
+          { disableTimeout: true, icon: toastIcon }
+        )
+        await downloadLogPeriodsMutation
+          .mutateAsync({ logPeriods })
+          .then(() => {
+            makeToast(
+              t('files_successfully_downloaded') as string,
+              SUCCESS_TOAST
+            )
+          })
+          .catch((error: Error) => {
+            makeToast(error.message, ERROR_TOAST, { closeButton: true })
+          })
+          .finally(() => {
+            eatToast(toastId)
+          })
+      }
+    },
+    [downloadLogPeriodsMutation, t, makeToast, eatToast, handleNoLogsSelected]
+  )
 
   const handleClickDeleteSelected = (): void => {
     if (selectedIds.size === 0) {
@@ -122,49 +157,121 @@ export function ComplianceReadySoftwareFiles({
     setShowDeleteRecordsModal(true)
   }
 
-  const handleConfirmDeleteSelected = (): void => {
-    setShowDeleteRecordsModal(false)
-    const selectedPeriods = periods.filter(period => selectedIds.has(period.id))
-    void downloadLogPeriodsMutation
-      .mutateAsync({ logPeriods: selectedPeriods })
-      .then(downloadedPeriods => {
-        // only chain a delete for periods that actually came back with a
-        // deletion key; a period downloaded without one can't be deleted yet
-        const deletableDownloads = downloadedPeriods.filter(
-          (
-            downloaded
-            // enforcing that deletionKey is non-null
-          ): downloaded is DownloadedLogPeriod & { deletionKey: string } =>
-            downloaded.deletionKey != null
-        )
-        if (deletableDownloads.length < selectedPeriods.length) {
-          makeToast(t('some_logs_not_deleted') as string, WARNING_TOAST, {
-            closeButton: true,
-          })
-        }
-        if (deletableDownloads.length === 0) {
-          return
-        }
-        const deletionKeysByLogPeriodId = deletableDownloads.reduce<
-          Record<string, string>
-        >((acc, { logPeriod, deletionKey }) => {
-          acc[logPeriod.id] = deletionKey
-          return acc
-        }, {})
-        return deleteSelectedLogPeriods(
-          deletableDownloads.map(({ logPeriod }) => logPeriod),
-          deletionKeysByLogPeriodId
-        )
-      })
-      .catch((e: Error) => {
-        if (!isDocumentedMutationError(e)) {
-          makeToast(e.message, ERROR_TOAST)
-        } else {
-          // reopen the delete modal if we fail; no flicker in practice
+  const handleConfirmDelete = useCallback(
+    async (
+      logPeriods: LogPeriodSummary[],
+      showModal: boolean
+    ): Promise<void> => {
+      if (showModal) {
+        setShowDeleteRecordsModal(false)
+      }
+      const restoreDeleteModal = (): void => {
+        if (showModal) {
           setShowDeleteRecordsModal(true)
         }
-      })
-  }
+      }
+      setIsAuthorizing(true)
+      try {
+        await ensureAuthorized()
+      } catch (error) {
+        if (!isDocumentedMutationError(error)) {
+          makeToast((error as Error).message, ERROR_TOAST)
+        }
+        restoreDeleteModal()
+        return
+      } finally {
+        setIsAuthorizing(false)
+      }
+      const toastId = makeToast(
+        t('downloading_log_periods') as string,
+        INFO_TOAST,
+        {
+          disableTimeout: true,
+          icon: { name: 'ot-spinner', spin: true },
+        }
+      )
+      void downloadLogPeriodsMutation
+        .mutateAsync({ logPeriods })
+        .then(downloadedPeriods => {
+          makeToast(t('files_successfully_downloaded') as string, SUCCESS_TOAST)
+          // only chain a delete for periods that actually came back with a
+          // deletion key; a period downloaded without one can't be deleted yet
+          const deletableDownloads = downloadedPeriods.filter(
+            (
+              downloaded
+              // enforcing that deletionKey is non-null
+            ): downloaded is DownloadedLogPeriod & { deletionKey: string } =>
+              downloaded.deletionKey != null
+          )
+          if (deletableDownloads.length < logPeriods.length) {
+            const allDownloaded = downloadedPeriods.length === logPeriods.length
+            makeToast(
+              (allDownloaded
+                ? t('in_progress_logs_cannot_be_deleted')
+                : t('some_logs_not_deleted')) as string,
+              WARNING_TOAST,
+              {
+                ...(allDownloaded
+                  ? { heading: t('unable_to_delete_audit_logs') }
+                  : {}),
+                closeButton: true,
+              }
+            )
+          }
+          if (deletableDownloads.length === 0) {
+            return
+          }
+          const deletionKeysByLogPeriodId = deletableDownloads.reduce<
+            Record<string, string>
+          >((acc, { logPeriod, deletionKey }) => {
+            acc[logPeriod.id] = deletionKey
+            return acc
+          }, {})
+          return deleteSelectedLogPeriods(
+            deletableDownloads.map(({ logPeriod }) => logPeriod),
+            deletionKeysByLogPeriodId
+          )
+        })
+        .then(() => {
+          setDownloadModalDismissed(true)
+        })
+        .catch((e: unknown) => {
+          if (isDocumentedMutationError(e)) {
+            restoreDeleteModal()
+          } else if (!isInsufficientScopeError(e)) {
+            const fallbackMessage =
+              e instanceof Error && e.message.length > 0
+                ? e.message
+                : t('some_logs_not_deleted')
+            makeToast(fallbackMessage as string, ERROR_TOAST)
+          }
+        })
+        .finally(() => {
+          eatToast(toastId)
+        })
+    },
+    [
+      deleteSelectedLogPeriods,
+      downloadLogPeriodsMutation,
+      eatToast,
+      ensureAuthorized,
+      makeToast,
+      t,
+    ]
+  )
+
+  const handleDownloadSelected = useCallback(async (): Promise<void> => {
+    await handleDownload(selectedPeriods)
+  }, [handleDownload, selectedPeriods])
+  const handleConfirmDeleteSelected = useCallback(async (): Promise<void> => {
+    await handleConfirmDelete(selectedPeriods, true)
+  }, [handleConfirmDelete, selectedPeriods])
+
+  const handleDownloadAndDeleteRequired =
+    useCallback(async (): Promise<void> => {
+      await handleConfirmDelete(requiredDownloadPeriods, false)
+    }, [handleConfirmDelete, requiredDownloadPeriods])
+
   const [width, setWidth] = useState(0)
 
   // width updates on mount only right now; known limitation that should be fine in practice
@@ -253,6 +360,18 @@ export function ComplianceReadySoftwareFiles({
           }}
           onConfirm={handleConfirmDeleteSelected}
           type="selectedLogs"
+        />
+      )}
+      {showRequiredDownloadModal && (
+        <DownloadAuditLogsModal
+          onDownload={handleDownloadAndDeleteRequired}
+          isLoading={
+            isAuthorizing || downloadLogPeriodsMutation.isLoading || isDeleting
+          }
+          onClose={() => {
+            setDownloadModalDismissed(true)
+          }}
+          closeOnOutsideClick
         />
       )}
       <div className={fileManagerStyles.file_management_group}>

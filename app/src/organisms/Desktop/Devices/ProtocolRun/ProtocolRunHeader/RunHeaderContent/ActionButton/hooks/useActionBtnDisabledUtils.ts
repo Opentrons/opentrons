@@ -17,6 +17,7 @@ import {
 import { useIsDoorOpen } from '../../../hooks'
 import { useIsFixtureMismatch } from './useIsFixtureMismatch'
 
+import type { RunControls } from '/app/organisms/RunTimeControl'
 import type { BaseActionButtonProps } from '..'
 import type { DoorResult } from '../../../../../../../DoorOpenControl/useIsDoorOpen'
 
@@ -30,6 +31,7 @@ interface UseActionButtonDisabledUtilsProps extends BaseActionButtonProps {
   isRobotOnWrongVersionOfSoftware: boolean
   isClosingCurrentRun: boolean
   isCameraReadyToRun: boolean
+  protocolRunControls: RunControls
 }
 
 type UseActionButtonDisabledUtilsResult =

@@ -7,12 +7,14 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-export function DisplaySearchNetwork(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function DisplaySearchNetwork(): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared'])
   return (
     <Flex
@@ -28,14 +30,14 @@ export function DisplaySearchNetwork(): JSX.Element {
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
       >
-        <LegacyStyledText
+        <StyledText
           forwardedAs="h3"
           color={COLORS.grey60}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing40}
         >
           {t('searching_for_networks')}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
     </Flex>
   )

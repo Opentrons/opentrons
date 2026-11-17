@@ -1,19 +1,21 @@
 import { useTranslation } from 'react-i18next'
 
-import { Chip, LegacyStyledText, TYPOGRAPHY } from '@opentrons/components'
+import { Chip, StyledText, TYPOGRAPHY } from '@opentrons/components'
 import { useAccessControlEnabledQuery } from '@opentrons/react-api-client'
 
-import { TertiaryButton } from '/app/atoms/buttons'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import { handleEnableCRSWizard } from '/app/organisms/Desktop/EnableCRSWizard'
 
 import styles from './index.module.css'
+
+import type { ReactNode } from 'react'
 
 interface Props {
   isRobotBusy: boolean
   robotName: string
 }
 
-export function EnableComplianceReadySoftware(props: Props): JSX.Element {
+export function EnableComplianceReadySoftware(props: Props): ReactNode {
   const { isRobotBusy, robotName } = props
   const { t } = useTranslation('device_settings')
 
@@ -28,9 +30,12 @@ export function EnableComplianceReadySoftware(props: Props): JSX.Element {
     <div className={styles.container}>
       <div className={styles.text_container}>
         <div className={styles.title_row}>
-          <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+          <StyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {t('crs_title')}
-          </LegacyStyledText>
+          </StyledText>
           {isCRSEnabledQuerySuccessful ? (
             <Chip
               chipSize="small"
@@ -40,9 +45,7 @@ export function EnableComplianceReadySoftware(props: Props): JSX.Element {
             />
           ) : null}
         </div>
-        <LegacyStyledText forwardedAs="p">
-          {t('crs_description')}
-        </LegacyStyledText>
+        <StyledText forwardedAs="p">{t('crs_description')}</StyledText>
       </div>
       <TertiaryButton
         onClick={() => {

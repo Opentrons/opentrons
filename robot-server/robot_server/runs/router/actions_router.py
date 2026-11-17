@@ -160,7 +160,7 @@ async def create_run_action(
         if action_type == RunActionType.PLAY:
             deck_configuration = await deck_configuration_store.get_deck_configuration()
 
-        action = run_controller.create_action(
+        action = await run_controller.create_action(
             action_id=action_id,
             action_type=action_type,
             created_at=created_at,

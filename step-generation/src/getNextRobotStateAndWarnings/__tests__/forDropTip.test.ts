@@ -43,9 +43,65 @@ describe('dropTip', () => {
         },
       }
       const params = {
-        pipetteId: DEFAULT_PIPETTE,
-        labwareId: TIPRACK_ID,
+        pipette: DEFAULT_PIPETTE,
+        dropTipLocation: TIPRACK_ID,
         wellName: 'A1',
+      }
+      const result = forDropTip(params, invariantContext, prevRobotState)
+      expect(result.robotState.tipState.pipettes).toEqual({
+        p300SingleId: {
+          hasTip: false,
+          tiprackURI: null,
+        },
+        p300MultiId: {
+          hasTip: true,
+          tiprackURI: 'tiprackId',
+        },
+      })
+    })
+    it('drop tip if there is a tip from runtime parameters', () => {
+      prevRobotState = {
+        ...prevRobotState,
+        tipState: {
+          pipettes: {
+            p300SingleId: {
+              hasTip: true,
+              tiprackURI: 'tiprackId',
+            },
+            p300MultiId: {
+              hasTip: true,
+              tiprackURI: 'tiprackId',
+            },
+          },
+          tipracks: {
+            tiprack1Id: {},
+          } as any,
+        },
+      }
+      invariantContext.runtimeParameters = {
+        selected_pipette: {
+          variableName: 'selected_pipette',
+          displayName: 'Selected pipette',
+          type: 'string',
+          default: DEFAULT_PIPETTE,
+        },
+        drop_location: {
+          variableName: 'drop_location',
+          displayName: 'Drop location',
+          type: 'string',
+          default: TIPRACK_ID,
+        },
+        selected_well: {
+          variableName: 'selected_well',
+          displayName: 'Selected well',
+          type: 'string',
+          default: 'A1',
+        },
+      }
+      const params = {
+        pipette: 'selected_pipette',
+        dropTipLocation: 'drop_location',
+        wellName: 'selected_well',
       }
       const result = forDropTip(params, invariantContext, prevRobotState)
       expect(result.robotState.tipState.pipettes).toEqual({
@@ -83,8 +139,8 @@ describe('dropTip', () => {
         },
       }
       const params = {
-        pipetteId: 'p300MultiId',
-        labwareId: TIPRACK_ID,
+        pipette: 'p300MultiId',
+        dropTipLocation: TIPRACK_ID,
         wellName: 'A1',
       }
       const result = forDropTip(params, invariantContext, prevRobotState)

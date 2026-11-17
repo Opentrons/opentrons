@@ -1,3 +1,4 @@
+import { resolveStringRuntimeValue } from '../utils'
 import { waitingForNonexistentTask } from '../warningCreators'
 import { handleWaitForTaskForThermocyclers } from './thermocyclerUpdates'
 import { handleWaitForTaskForVacuums } from './vacuumUpdates'
@@ -10,8 +11,17 @@ export function forWaitForTasks(
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
+  const { runtimeParameters } = invariantContext
   for (const taskId of params.task_ids) {
-    const handled = handleWaitForTaskForModules(taskId, robotStateAndWarnings)
+    const resolvedTaskId = resolveStringRuntimeValue(taskId, runtimeParameters)
+    if (resolvedTaskId == null) {
+      console.error(
+        `forWaitForTasks: arg resolved to null (taskId=${String(resolvedTaskId)})`
+      )
+    }
+    const handled =
+      resolvedTaskId != null &&
+      handleWaitForTaskForModules(resolvedTaskId, robotStateAndWarnings)
 
     if (!handled) {
       robotStateAndWarnings.warnings.push(waitingForNonexistentTask())

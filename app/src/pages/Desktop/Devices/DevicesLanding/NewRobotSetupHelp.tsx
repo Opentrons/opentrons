@@ -13,14 +13,16 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { ExternalLink } from '/app/components/adhoc/desktop/Link/ExternalLink'
 
 import styles from './newrobotsetuphelp.module.css'
+
+import type { ReactNode } from 'react'
 
 const NEW_FLEX_SETUP_SUPPORT_ARTICLE_HREF =
   'https://insights.opentrons.com/hubfs/Products/Flex/Opentrons%20Flex%20Quickstart%20Guide.pdf'
 
-export function NewRobotSetupHelp(): JSX.Element {
+export function NewRobotSetupHelp(): ReactNode {
   const { t } = useTranslation(['devices_landing', 'shared', 'branded'])
   const [showNewRobotHelpModal, setShowNewRobotHelpModal] = useState(false)
 

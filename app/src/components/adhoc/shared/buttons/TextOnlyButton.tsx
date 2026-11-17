@@ -1,0 +1,60 @@
+import { css } from 'styled-components'
+
+import { Btn, COLORS, RESPONSIVENESS, StyledText } from '@opentrons/components'
+
+import type { ReactNode } from 'react'
+import type { StyleProps } from '@opentrons/components'
+
+const GO_BACK_BUTTON_STYLE = css`
+  color: ${COLORS.grey50};
+
+  &:hover {
+    opacity: 70%;
+  }
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    &:hover {
+      opacity: 100%;
+    }
+    &:active {
+      opacity: 70%;
+    }
+  }
+`
+
+const GO_BACK_BUTTON_DISABLED_STYLE = css`
+  color: ${COLORS.grey60};
+`
+
+interface TextOnlyButtonProps extends StyleProps {
+  onClick: () => void
+  buttonText: ReactNode
+  disabled?: boolean
+}
+
+// TODO (jj, 2026-10-29): this component is weird.
+// It doesn't match the styling of the Helix textbutton figma component, but its used in its place on desktop.
+// On the ODD, in the figma designs, the correct button is a broken link.
+// someone should figure this out.
+export function TextOnlyButton({
+  onClick,
+  buttonText,
+  disabled = false,
+  ...styleProps
+}: TextOnlyButtonProps): ReactNode {
+  return (
+    <Btn
+      onClick={onClick}
+      disabled={disabled}
+      css={disabled ? GO_BACK_BUTTON_DISABLED_STYLE : GO_BACK_BUTTON_STYLE}
+      {...styleProps}
+    >
+      <StyledText
+        desktopStyle="bodyDefaultSemiBold"
+        oddStyle="bodyTextSemiBold"
+      >
+        {buttonText}
+      </StyledText>
+    </Btn>
+  )
+}

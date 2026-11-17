@@ -7,6 +7,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
+from robot_server.disk_monitor.models import DiskDetails
 from robot_server.disk_monitor.monitor import (
     _FALLBACK_DEFAULT_DISK_SPACE_MB,
     DiskMonitor,
@@ -154,3 +155,21 @@ def test_is_run_start_limit_respected(
     mock_settings.system_low_space_threshold_mb = 500
     with patch.object(subject, "get_available_disk_space_mb", return_value=2040):
         assert subject.is_disk_space_below_run_start_limit()
+
+
+def test_get_details(subject: DiskMonitor, mock_settings: RobotServerSettings) -> None:
+    """It should return correct disk details."""
+    mock_settings.run_start_limit_free_space_mb = 2048
+    mock_settings.system_low_space_threshold_mb = 500
+    with (
+        patch.object(subject, "get_available_disk_space_mb", return_value=2040),
+        patch.object(subject, "get_total_disk_space_mb", return_value=8096),
+        patch.object(subject, "get_images_directory_size_mb", return_value=1024),
+    ):
+        assert subject.get_details() == DiskDetails(
+            systemAvailableMb=2040,
+            systemTotalMb=8096,
+            imagesDirectorySizeMb=1024,
+            runStartLimitFreeSpaceMb=2048,
+            isDiskSpaceBelowRunStartLimit=True,
+        )

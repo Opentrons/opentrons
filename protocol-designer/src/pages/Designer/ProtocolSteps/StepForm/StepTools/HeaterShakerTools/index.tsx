@@ -23,9 +23,10 @@ import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 import { usePriorModuleState } from '../../hooks/usePriorModuleState'
 import { PriorHeaterShakerState } from './PriorHeaterShakerState'
 
+import type { ReactNode } from 'react'
 import type { StepFormProps } from '../../types'
 
-export function HeaterShakerTools(props: StepFormProps): JSX.Element {
+export function HeaterShakerTools(props: StepFormProps): ReactNode {
   const { propsForFields, formData } = props
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const moduleLabwareOptions = useSelector(getHeaterShakerLabwareOptions)

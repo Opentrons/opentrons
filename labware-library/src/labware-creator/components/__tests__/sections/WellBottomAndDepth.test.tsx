@@ -3,8 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { when } from 'vitest-when'
-
 import { getDefaultFormState, getInitialStatus } from '../../../fields'
 import { getLabwareName } from '../../../utils'
 import { WellBottomAndDepth } from '../../sections/WellBottomAndDepth'
@@ -39,10 +37,10 @@ describe('WellBottomAndDepth', () => {
   labwareTypes.forEach(labwareType => {
     it(`should render with the correct information ${labwareType}`, () => {
       formikConfig.initialValues.labwareType = labwareType
-      when(vi.mocked(getLabwareName))
+      vi.when(vi.mocked(getLabwareName))
         .calledWith(formikConfig.initialValues, false)
         .thenReturn('FAKE LABWARE NAME SINGULAR')
-      when(vi.mocked(getLabwareName))
+      vi.when(vi.mocked(getLabwareName))
         .calledWith(formikConfig.initialValues, true)
         .thenReturn('FAKE LABWARE NAME PLURAL')
 
@@ -53,7 +51,7 @@ describe('WellBottomAndDepth', () => {
       )
 
       screen.getByText(
-        'Depth informs the robot how far down it can go inside a FAKE LABWARE NAME SINGULAR.'
+        /Depth informs the robot how far down it can go inside a FAKE LABWARE NAME SINGULAR/i
       )
       const radioElements = screen.getAllByRole('radio')
       expect(radioElements).toHaveLength(3)

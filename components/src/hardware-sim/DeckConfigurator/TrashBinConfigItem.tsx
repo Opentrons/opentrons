@@ -4,7 +4,7 @@ import { SINGLE_LEFT_CUTOUTS } from '@opentrons/shared-data'
 
 import { StyledText } from '../../atoms/StyledText/StyledText'
 import { COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
+import { Icon } from '../../helix/icons'
 import { Btn } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
@@ -20,6 +20,7 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
+import type { ReactNode } from 'react'
 import type {
   AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
@@ -40,9 +41,7 @@ interface TrashBinConfigItemProps {
   selected?: boolean
 }
 
-export function TrashBinConfigItem(
-  props: TrashBinConfigItemProps
-): JSX.Element {
+export function TrashBinConfigItem(props: TrashBinConfigItemProps): ReactNode {
   const { t } = useTranslation('deck_configuration')
 
   const {

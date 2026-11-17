@@ -9,17 +9,19 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { OddModal } from '/app/molecules/OddModal'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 
 import { NameQuickTransfer } from './NameQuickTransfer'
+
+import type { ReactNode } from 'react'
 
 interface SaveOrRunModalProps {
   onSave: (protocolName: string) => void
   onRun: () => void
 }
 
-export const SaveOrRunModal = (props: SaveOrRunModalProps): JSX.Element => {
+export const SaveOrRunModal = (props: SaveOrRunModalProps): ReactNode => {
   const { t } = useTranslation('quick_transfer')
   const [showNameTransfer, setShowNameTransfer] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)

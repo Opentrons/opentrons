@@ -12,7 +12,7 @@ from opentrons.protocols.api_support.util import UnsupportedAPIError
 class NozzleLayoutArgs(NamedTuple):
     """Arguments to use in `configure_nozzle_layout`."""
 
-    style: NozzleLayout
+    style: NozzleLayout | str
     start: Optional[str]
     end: Optional[str]
     front_right: Optional[str]
@@ -413,6 +413,7 @@ PIPETTE_RELIANT_TEST_SPECS = [
 class ExpectedCoreArgs(NamedTuple):
     """The converted arguments expected to be passed to instrument core."""
 
+    style: NozzleLayout
     primary_nozzle: Optional[str]
     front_right_nozzle: Optional[str]
     back_left_nozzle: Optional[str]
@@ -437,6 +438,23 @@ INSTRUMENT_CORE_NOZZLE_LAYOUT_TEST_SPECS = [
             back_left=None,
         ),
         expected_core_args=ExpectedCoreArgs(
+            style=NozzleLayout.SINGLE,
+            primary_nozzle="A1",
+            front_right_nozzle=None,
+            back_left_nozzle=None,
+        ),
+    ),
+    InstrumentCoreNozzleConfigSpec(
+        pipette_channels=8,
+        nozzle_layout_args=NozzleLayoutArgs(
+            style="SINGLE",
+            start="A1",
+            end=None,
+            front_right=None,
+            back_left=None,
+        ),
+        expected_core_args=ExpectedCoreArgs(
+            style=NozzleLayout.SINGLE,
             primary_nozzle="A1",
             front_right_nozzle=None,
             back_left_nozzle=None,
@@ -452,6 +470,23 @@ INSTRUMENT_CORE_NOZZLE_LAYOUT_TEST_SPECS = [
             back_left=None,
         ),
         expected_core_args=ExpectedCoreArgs(
+            style=NozzleLayout.PARTIAL_COLUMN,
+            primary_nozzle="A1",
+            front_right_nozzle="D1",
+            back_left_nozzle="A1",
+        ),
+    ),
+    InstrumentCoreNozzleConfigSpec(
+        pipette_channels=8,
+        nozzle_layout_args=NozzleLayoutArgs(
+            style="PARTIAL_COLUMN",
+            start="A1",
+            end="D1",
+            front_right=None,
+            back_left=None,
+        ),
+        expected_core_args=ExpectedCoreArgs(
+            style=NozzleLayout.PARTIAL_COLUMN,
             primary_nozzle="A1",
             front_right_nozzle="D1",
             back_left_nozzle="A1",
@@ -467,6 +502,23 @@ INSTRUMENT_CORE_NOZZLE_LAYOUT_TEST_SPECS = [
             back_left=None,
         ),
         expected_core_args=ExpectedCoreArgs(
+            style=NozzleLayout.COLUMN,
+            primary_nozzle="H1",
+            front_right_nozzle=None,
+            back_left_nozzle=None,
+        ),
+    ),
+    InstrumentCoreNozzleConfigSpec(
+        pipette_channels=96,
+        nozzle_layout_args=NozzleLayoutArgs(
+            style="COLUMN",
+            start="H1",
+            end=None,
+            front_right=None,
+            back_left=None,
+        ),
+        expected_core_args=ExpectedCoreArgs(
+            style=NozzleLayout.COLUMN,
             primary_nozzle="H1",
             front_right_nozzle=None,
             back_left_nozzle=None,
@@ -482,6 +534,23 @@ INSTRUMENT_CORE_NOZZLE_LAYOUT_TEST_SPECS = [
             back_left=None,
         ),
         expected_core_args=ExpectedCoreArgs(
+            style=NozzleLayout.ROW,
+            primary_nozzle="A12",
+            front_right_nozzle=None,
+            back_left_nozzle=None,
+        ),
+    ),
+    InstrumentCoreNozzleConfigSpec(
+        pipette_channels=96,
+        nozzle_layout_args=NozzleLayoutArgs(
+            style="ROW",
+            start="A12",
+            end=None,
+            front_right=None,
+            back_left=None,
+        ),
+        expected_core_args=ExpectedCoreArgs(
+            style=NozzleLayout.ROW,
             primary_nozzle="A12",
             front_right_nozzle=None,
             back_left_nozzle=None,
@@ -497,6 +566,23 @@ INSTRUMENT_CORE_NOZZLE_LAYOUT_TEST_SPECS = [
             back_left=None,
         ),
         expected_core_args=ExpectedCoreArgs(  # These args are eventually ignored
+            style=NozzleLayout.ALL,
+            primary_nozzle="A12",
+            front_right_nozzle="D3",
+            back_left_nozzle=None,
+        ),
+    ),
+    InstrumentCoreNozzleConfigSpec(
+        pipette_channels=96,
+        nozzle_layout_args=NozzleLayoutArgs(
+            style="ALL",
+            start="A12",
+            end=None,
+            front_right="D3",
+            back_left=None,
+        ),
+        expected_core_args=ExpectedCoreArgs(  # These args are eventually ignored
+            style=NozzleLayout.ALL,
             primary_nozzle="A12",
             front_right_nozzle="D3",
             back_left_nozzle=None,

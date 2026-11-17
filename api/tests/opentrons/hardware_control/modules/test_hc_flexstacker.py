@@ -12,6 +12,7 @@ from opentrons_shared_data.errors.exceptions import (
     FlexStackerShuttleNotEmptyError,
 )
 
+from . import require_live_data_real_string
 from opentrons.drivers.flex_stacker.simulator import SimulatingDriver
 from opentrons.drivers.flex_stacker.types import (
     Direction,
@@ -27,7 +28,7 @@ from opentrons.drivers.flex_stacker.types import (
     TOFSensorState,
     TOFSensorStatus,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 from opentrons.hardware_control import ExecutionManager, modules
 from opentrons.hardware_control.modules.flex_stacker import (
     HOME_OFFSET_MD,
@@ -125,6 +126,7 @@ async def test_sim_state(subject: modules.FlexStacker) -> None:
     assert status["serial"] == "dummySerialFS"
     assert status["model"] == "a1"
     assert status["version"] == "stacker-fw"
+    require_live_data_real_string(subject)
 
 
 async def test_set_run_hold_current(

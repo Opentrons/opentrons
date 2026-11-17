@@ -6,7 +6,7 @@ interface Props {
 }
 
 // replace Portal with a pass-through React.Fragment
-export const Portal = ({ children }: Props): JSX.Element => <>{children}</>
+export const Portal = ({ children }: Props): ReactNode => <>{children}</>
 
-export const PortalRoot = (): JSX.Element => <></>
-export const TopPortalRoot = (): JSX.Element => <></>
+export const PortalRoot = (): ReactNode => <></>
+export const TopPortalRoot = (): ReactNode => <></>

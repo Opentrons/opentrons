@@ -35,17 +35,19 @@ import {
 import {
   getRobotUpdateAvailable,
   getRobotUpdateInfoForRobot,
+  isRobotSoftwareUpdateAvailable,
 } from '/app/redux/robot-update'
 import { GIT_BRANCH_NAME, GIT_COMMIT_HASH } from '/app/redux/shell'
 import { useNetworkConnection, useWifiList } from '/app/resources/networking'
 
 import { RobotSettingsList } from './RobotSettingsList'
 
+import type { ReactNode } from 'react'
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { SettingOption } from '/app/organisms/ODD/RobotSettingsDashboard'
 import type { Dispatch, State } from '/app/redux/types'
 
-export function RobotSettingsDashboard(): JSX.Element {
+export function RobotSettingsDashboard(): ReactNode {
   const { i18n, t } = useTranslation('shared')
 
   // GENERAL ROBOT INFORMATION
@@ -59,7 +61,7 @@ export function RobotSettingsDashboard(): JSX.Element {
       ? getRobotUpdateAvailable(state, localRobot)
       : null
   })
-  const isUpdateAvailable = robotUpdateType === 'upgrade'
+  const isUpdateAvailable = isRobotSoftwareUpdateAvailable(robotUpdateType)
   const robotUpdateInfo = useSelector((state: State) =>
     localRobot != null && localRobot.status !== UNREACHABLE
       ? getRobotUpdateInfoForRobot(state, localRobot)

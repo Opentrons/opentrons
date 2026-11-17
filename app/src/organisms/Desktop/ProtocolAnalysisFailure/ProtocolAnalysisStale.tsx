@@ -7,15 +7,15 @@ import {
   Btn,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
   WRAP_REVERSE,
 } from '@opentrons/components'
 
 import { analyzeProtocol } from '/app/redux/protocol-storage'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
 interface ProtocolAnalysisStaleProps {
@@ -24,7 +24,7 @@ interface ProtocolAnalysisStaleProps {
 
 export function ProtocolAnalysisStale(
   props: ProtocolAnalysisStaleProps
-): JSX.Element {
+): ReactNode {
   const { protocolKey } = props
   const { t } = useTranslation(['protocol_list', 'shared'])
   const dispatch = useDispatch<Dispatch>()
@@ -44,10 +44,10 @@ export function ProtocolAnalysisStale(
         alignItems={ALIGN_CENTER}
         width="100%"
       >
-        <LegacyStyledText forwardedAs="p">
+        <StyledText forwardedAs="p">
           {t('protocol_analysis_outdated')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        </StyledText>
+        <StyledText forwardedAs="p">
           <Trans
             t={t}
             i18nKey="reanalyze_to_view"
@@ -61,7 +61,7 @@ export function ProtocolAnalysisStale(
               ),
             }}
           />
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
     </Banner>
   )

@@ -30,6 +30,7 @@ from typing import (
 
 from typing_extensions import Literal
 
+from opentrons_shared_data.errors.exceptions import UnsupportedHardwareCommand
 from opentrons_shared_data.labware.labware_definition import (
     labware_definition_type_adapter,
 )
@@ -39,9 +40,6 @@ import opentrons
 from .util import entrypoint_util
 from opentrons import protocol_api, should_use_ot3
 from opentrons.config import IS_ROBOT
-from opentrons.hardware_control import (
-    API as OT2API,
-)
 from opentrons.hardware_control import (
     ThreadManagedHardware,
     ThreadManager,
@@ -71,13 +69,11 @@ from opentrons.protocols.api_support.deck_type import (
     should_load_fixed_trash,
     should_load_fixed_trash_labware_for_python_protocol,
 )
+from opentrons.protocols.api_support.definitions import MIN_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.duration import DurationEstimator
-from opentrons.protocols.execution import execute
 from opentrons.protocols.types import (
     ApiDeprecationError,
     BundleContents,
-    Protocol,
     PythonProtocol,
 )
 
@@ -87,16 +83,6 @@ if TYPE_CHECKING:
     )
 
     from opentrons.protocol_engine import ProtocolEngine
-
-
-# See Jira RCORE-535.
-_JSON_TOO_NEW_MESSAGE = (
-    "Protocols created by recent versions of Protocol Designer"
-    " cannot currently be simulated with"
-    " the opentrons_simulate command-line tool"
-    " or the opentrons.simulate.simulate() function."
-    " Use the Opentrons App instead."
-)
 
 
 # When a ProtocolContext is using a ProtocolEngine to control the robot,
@@ -271,7 +257,7 @@ def get_protocol_api(
             it's a hardware simulator instance to reuse instead of creating a fresh one.
         robot_type: The type of robot to simulate: either `"Flex"` or `"OT-2"`.
             If you're running this function on a robot, the default is the type of that
-            robot. Otherwise, the default is `"OT-2"`, for backwards compatibility.
+            robot. Otherwise, the default is `"Flex"`.
         use_virtual_hardware: This is only for internal use by Opentrons.
             If `True`, use the Protocol Engine's virtual hardware. If `False`, use the
             lower level hardware simulator.
@@ -289,7 +275,7 @@ def get_protocol_api(
     current_robot_type = _get_current_robot_type()
     if robot_type is None:
         if current_robot_type is None:
-            parsed_robot_type: RobotType = "OT-2 Standard"
+            parsed_robot_type: RobotType = "OT-3 Standard"
         else:
             parsed_robot_type = current_robot_type
     else:
@@ -310,34 +296,29 @@ def get_protocol_api(
         override=hardware_simulator, robot_type=parsed_robot_type
     )
 
-    if checked_version < ENGINE_CORE_API_VERSION:
-        context = _create_live_context_non_pe(
-            api_version=checked_version,
-            deck_type=deck_type,
-            hardware_api=checked_hardware,
-            bundled_labware=bundled_labware,
-            bundled_data=bundled_data,
-            extra_labware=extra_labware,
-            clean_up_hardware=(hardware_simulator is None),
+    if checked_version < MIN_SUPPORTED_VERSION:
+        raise NotImplementedError(
+            f"This protocol requests API level {checked_version}, but this simulator "
+            f"can only simulate protocols of API level {MIN_SUPPORTED_VERSION} or higher"
         )
-    else:
-        if bundled_labware is not None:
-            # Protocol Engine has a deep assumption that standard labware definitions are always
-            # implicitly loadable.
-            raise NotImplementedError(
-                f"The bundled_labware argument is not currently supported for Python protocols"
-                f" with apiLevel {ENGINE_CORE_API_VERSION} or newer."
-            )
-        context = _create_live_context_pe(
-            api_version=checked_version,
-            robot_type=parsed_robot_type,
-            deck_type=deck_type,
-            hardware_api=checked_hardware,
-            bundled_data=bundled_data,
-            extra_labware=extra_labware,
-            use_pe_virtual_hardware=use_virtual_hardware,
-            clean_up_hardware=(hardware_simulator is None),
+
+    if bundled_labware is not None:
+        # Protocol Engine has a deep assumption that standard labware definitions are always
+        # implicitly loadable.
+        raise NotImplementedError(
+            f"The bundled_labware argument is not currently supported for Python protocols"
+            f" with apiLevel {ENGINE_CORE_API_VERSION} or newer."
         )
+    context = _create_live_context_pe(
+        api_version=checked_version,
+        robot_type=parsed_robot_type,
+        deck_type=deck_type,
+        hardware_api=checked_hardware,
+        bundled_data=bundled_data,
+        extra_labware=extra_labware,
+        use_pe_virtual_hardware=use_virtual_hardware,
+        clean_up_hardware=(hardware_simulator is None),
+    )
 
     # Intentional difference from execute.get_protocol_api():
     # For the caller's convenience, we home the virtual hardware so they don't get MustHomeErrors.
@@ -367,10 +348,7 @@ def _make_hardware_simulator(
             feature_flags=HardwareFeatureFlags.build_from_ff(),
         )
     elif robot_type == "OT-2 Standard":
-        return ThreadManager(
-            OT2API.build_hardware_simulator,
-            feature_flags=HardwareFeatureFlags.build_from_ff(),
-        )
+        raise UnsupportedHardwareCommand(message="simulate is not supported for OT-2")
 
 
 @contextmanager
@@ -450,7 +428,6 @@ def simulate(
     custom_data_paths: Optional[List[str]] = None,
     propagate_logs: bool = False,
     hardware_simulator_file_path: Optional[str] = None,
-    duration_estimator: Optional[DurationEstimator] = None,
     log_level: str = "warning",
 ) -> _SimulateResult:
     """
@@ -511,8 +488,6 @@ def simulate(
         hardware_simulator_file_path: A path to a JSON file defining the simulated
             hardware. This is mainly for internal use by Opentrons, and is not necessary
             to simulate protocols.
-        duration_estimator: For internal use only.
-            Optional duration estimator object.
         propagate_logs: Whether this function should allow logs from the
             Opentrons stack to propagate up to the root handler.
             This can be useful if you're integrating this
@@ -549,20 +524,14 @@ def simulate(
         extra_data = {}
 
     contents = protocol_file.read()
-    try:
-        protocol = parse.parse(
-            contents,
-            file_name,
-            extra_labware={
-                uri: details.definition for uri, details in extra_labware.items()
-            },
-            extra_data=extra_data,
-        )
-    except parse.JSONSchemaVersionTooNewError as e:
-        # opentrons.protocols.parse() doesn't support new JSON protocols.
-        # The code to do that should be moved from opentrons.protocol_reader.
-        # See https://opentrons.atlassian.net/browse/PLAT-94.
-        raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
+    protocol = parse.parse(
+        contents,
+        file_name,
+        extra_labware={
+            uri: details.definition for uri, details in extra_labware.items()
+        },
+        extra_data=extra_data,
+    )
 
     if protocol.api_level < APIVersion(2, 0):
         raise ApiDeprecationError(version=protocol.api_level)
@@ -585,30 +554,27 @@ def simulate(
         ),
         robot_type=protocol.robot_type,
     ) as hardware_simulator:
-        if protocol.api_level < ENGINE_CORE_API_VERSION:
-            return _run_file_non_pe(
-                protocol=protocol,
-                hardware_api=hardware_simulator,
-                logger=stack_logger,
-                level=log_level,
-                duration_estimator=duration_estimator,
+        if protocol.api_level < MIN_SUPPORTED_VERSION:
+            raise NotImplementedError(
+                f"This protocol requests API level {protocol.api_level}, but this simulator "
+                f"can only simulate protocols of API level {MIN_SUPPORTED_VERSION} or higher"
             )
-        else:
-            # TODO(mm, 2023-07-06): Once these NotImplementedErrors are resolved, consider removing
-            # the enclosing if-else block and running everything through _run_file_pe() for simplicity.
-            if custom_data_paths:
-                raise NotImplementedError(
-                    f"The custom_data_paths argument is not currently supported for Python protocols"
-                    f" with apiLevel {ENGINE_CORE_API_VERSION} or newer."
-                )
-            protocol_file.seek(0)
-            return _run_file_pe(
-                protocol=protocol,
-                robot_type=protocol.robot_type,
-                hardware_api=hardware_simulator,
-                stack_logger=stack_logger,
-                log_level=log_level,
+
+        # TODO(mm, 2023-07-06): Once these NotImplementedErrors are resolved, consider removing
+        # the enclosing if-else block and running everything through _run_file_pe() for simplicity.
+        if custom_data_paths:
+            raise NotImplementedError(
+                f"The custom_data_paths argument is not currently supported for Python protocols"
+                f" with apiLevel {ENGINE_CORE_API_VERSION} or newer."
             )
+        protocol_file.seek(0)
+        return _run_file_pe(
+            protocol=protocol,
+            robot_type=protocol.robot_type,
+            hardware_api=hardware_simulator,
+            stack_logger=stack_logger,
+            log_level=log_level,
+        )
 
 
 def format_runlog(runlog: List[Mapping[str, Any]]) -> str:
@@ -750,15 +716,6 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
         parser = _get_bundle_args(parser)
 
     parser.add_argument(
-        "-e",
-        "--estimate-duration",
-        action="store_true",
-        # TODO (AL, 2021-07-26): Better wording.
-        help="Estimate how long the protocol will take to complete."
-        " This is an experimental feature.",
-    )
-
-    parser.add_argument(
         "protocol",
         metavar="PROTOCOL",
         type=argparse.FileType("rb"),
@@ -801,42 +758,6 @@ def _get_bundle_dest(
         return open(bundle_name, "wb")
     else:
         return None
-
-
-def _create_live_context_non_pe(
-    api_version: APIVersion,
-    hardware_api: ThreadManagedHardware,
-    deck_type: str,
-    extra_labware: Optional[Dict[str, "LabwareDefinitionDict"]],
-    bundled_labware: Optional[Dict[str, "LabwareDefinitionDict"]],
-    bundled_data: Optional[Dict[str, bytes]],
-    clean_up_hardware: bool,
-) -> ProtocolContext:
-    """Return a live ProtocolContext.
-
-    This controls the robot through the older infrastructure, instead of through Protocol Engine.
-    """
-    assert api_version < ENGINE_CORE_API_VERSION
-
-    ctx = protocol_api.create_protocol_context(
-        api_version=api_version,
-        deck_type=deck_type,
-        hardware_api=hardware_api,
-        bundled_labware=bundled_labware,
-        bundled_data=bundled_data,
-        extra_labware=extra_labware,
-    )
-    # Hack: we need to hook the protocol context cleanup in a way that isn't safe to put
-    # in the context generally, so we can do it like this and feel sad
-    original_cleanup = ctx.cleanup
-
-    def _cleanup_hook() -> None:
-        if clean_up_hardware:
-            ctx._hw_manager.hardware.clean_up()
-        original_cleanup()
-
-    ctx.cleanup = _cleanup_hook  # type: ignore[method-assign]
-    return ctx
 
 
 def _create_live_context_pe(
@@ -907,67 +828,8 @@ def _create_live_context_pe(
     )
 
 
-def _run_file_non_pe(
-    protocol: Protocol,
-    hardware_api: ThreadManagedHardware,
-    logger: logging.Logger,
-    level: str,
-    duration_estimator: Optional[DurationEstimator],
-) -> _SimulateResult:
-    """Run a protocol file without Protocol Engine, with the older infrastructure instead."""
-    if isinstance(protocol, PythonProtocol):
-        extra_labware = protocol.extra_labware
-        bundled_labware = protocol.bundled_labware
-        bundled_data = protocol.bundled_data
-    else:
-        # JSON protocols do have "bundled labware" embedded in them, but those aren't represented in
-        # the parsed Protocol object and we don't need to create the ProtocolContext with them.
-        # execute_apiv2.run_protocol() will pull them out of the JSON and load them into the
-        # ProtocolContext.
-        extra_labware = None
-        bundled_labware = None
-        bundled_data = None
-
-    context = _create_live_context_non_pe(
-        api_version=protocol.api_level,
-        hardware_api=hardware_api,
-        deck_type=deck_type_for_simulation(protocol.robot_type),
-        extra_labware=extra_labware,
-        bundled_labware=bundled_labware,
-        bundled_data=bundled_data,
-        clean_up_hardware=False,
-    )
-
-    scraper = _CommandScraper(logger=logger, level=level, broker=context.broker)
-    if duration_estimator:
-        context.broker.subscribe(command_types.COMMAND, duration_estimator.on_message)
-
-    context.home()
-    with scraper.scrape():
-        try:
-            execute.run_protocol(
-                protocol, context, run_time_parameters_with_overrides=None
-            )
-            if (
-                isinstance(protocol, PythonProtocol)
-                and protocol.api_level >= APIVersion(2, 0)
-                and protocol.bundled_labware is None
-                and allow_bundle()
-            ):
-                bundle_contents: Optional[BundleContents] = bundle_from_sim(
-                    protocol, context
-                )
-            else:
-                bundle_contents = None
-
-        finally:
-            context.cleanup()
-
-    return scraper.commands, bundle_contents
-
-
 def _run_file_pe(
-    protocol: Protocol,
+    protocol: PythonProtocol,
     robot_type: RobotType,
     hardware_api: ThreadManagedHardware,
     stack_logger: logging.Logger,
@@ -1075,16 +937,12 @@ def main() -> int:
 
     args = parser.parse_args()
 
-    # TODO(mm, 2022-12-01): Configure the DurationEstimator with the correct deck type.
-    duration_estimator = DurationEstimator() if args.estimate_duration else None
-
     try:
         runlog, maybe_bundle = simulate(
             protocol_file=args.protocol,
             file_name=args.protocol.name,
             custom_labware_paths=args.custom_labware_path,
             custom_data_paths=(args.custom_data_path + args.custom_data_file),
-            duration_estimator=duration_estimator,
             hardware_simulator_file_path=getattr(
                 args, "custom_hardware_simulator_file"
             ),
@@ -1106,15 +964,6 @@ def main() -> int:
 
     if args.output == "runlog":
         print(format_runlog(runlog))
-
-    if duration_estimator:
-        duration_seconds = duration_estimator.get_total_duration()
-        hours = int(duration_seconds / 60 / 60)
-        minutes = int((duration_seconds % (60 * 60)) / 60)
-        print("--------------------------------------------------------------")
-        print(f"Estimated protocol duration: {hours}h:{minutes}m")
-        print("--------------------------------------------------------------")
-        print("WARNING: Protocol duration estimation is an experimental feature")
 
     return 0
 

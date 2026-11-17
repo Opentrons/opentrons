@@ -1,7 +1,6 @@
 import { legacy_configureStore } from 'redux-mock-store'
 import { thunk } from 'redux-thunk'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { getSavedStepHierarchy } from '../../step-forms/selectors'
 import { deleteMultipleSteps } from '../actions/actions'
@@ -16,7 +15,7 @@ describe('step list actions', () => {
     let store: any
     beforeEach(() => {
       store = mockStore()
-      when(vi.mocked(getSavedStepHierarchy))
+      vi.when(vi.mocked(getSavedStepHierarchy))
         .calledWith(expect.anything())
         .thenReturn({ topLevelItems: [] })
     })
@@ -35,7 +34,7 @@ describe('step list actions', () => {
 
         const stepsToDelete = ['1', '2']
 
-        when(vi.mocked(getSavedStepHierarchy))
+        vi.when(vi.mocked(getSavedStepHierarchy))
           .calledWith(expect.anything())
           .thenReturn(allSteps)
 
@@ -64,7 +63,7 @@ describe('step list actions', () => {
         }
         const stepsToDelete = ['4', '1']
 
-        when(vi.mocked(getSavedStepHierarchy))
+        vi.when(vi.mocked(getSavedStepHierarchy))
           .calledWith(expect.anything())
           .thenReturn(allSteps)
 
@@ -93,7 +92,7 @@ describe('step list actions', () => {
         }
         const stepsToDelete = ['4', '5']
 
-        when(vi.mocked(getSavedStepHierarchy))
+        vi.when(vi.mocked(getSavedStepHierarchy))
           .calledWith(expect.anything())
           .thenReturn(allSteps)
 
@@ -122,7 +121,7 @@ describe('step list actions', () => {
         }
         const stepsToDelete = ['5', '4', '1']
 
-        when(vi.mocked(getSavedStepHierarchy))
+        vi.when(vi.mocked(getSavedStepHierarchy))
           .calledWith(expect.anything())
           .thenReturn(allSteps)
 
@@ -158,7 +157,7 @@ describe('step list actions', () => {
         }
         const stepsToDelete = ['2']
 
-        when(vi.mocked(getSavedStepHierarchy))
+        vi.when(vi.mocked(getSavedStepHierarchy))
           .calledWith(expect.anything())
           .thenReturn(allSteps)
 
@@ -189,7 +188,7 @@ describe('step list actions', () => {
         }
         const stepsToDelete = ['1', '2', '3', '4', '5']
 
-        when(vi.mocked(getSavedStepHierarchy))
+        vi.when(vi.mocked(getSavedStepHierarchy))
           .calledWith(expect.anything())
           .thenReturn(allSteps)
 

@@ -10,7 +10,6 @@ from automation.pd_pages import (
     ProtocolEditorPage,
     TransferPage,
 )
-from eyes import Eyes
 from utility import import_protocol_and_open_editor
 
 SOURCE_LABWARE = "Opentrons Tough 300 mL 1 Well Reservoir"
@@ -19,7 +18,7 @@ DESTINATION_LABWARE = "Greiner 384 Well Plate 240 µL"
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-def test_96_channel_workflow(page: Page, eyes: Eyes | None) -> None:
+def test_96_channel_workflow(page: Page) -> None:
     import_protocol_and_open_editor(page, "fixtures/protocol/9/Liquid_Class_96_Channel_Test.py", migration=True)
     editor = ProtocolEditorPage(page)
     editor.open_add_step_menu()
@@ -40,20 +39,16 @@ def test_96_channel_workflow(page: Page, eyes: Eyes | None) -> None:
     liquid_classes = ["Aqueous", "Viscous", "Volatile"]
 
     for liquid in liquid_classes:
-        # todo 12/24/25 add no liquid class when implementing snapshot
         transfer_page.part_2_transfer_form_liquid_class(liquid)
 
         transfer_page.transfer_continue_to_next_step()
-        # Take snapshot here for visual regression testing: {liquid}
         if liquid != "Aqueous":
             transfer_page.update_or_keep_liquid_class_settings("Update settings")
         else:
             pass
 
         transfer_page.select_aspirate_or_dispense_advanced_settings("Dispense")
-        # Take snapshot here for visual regression testing: {liquid}
         transfer_page.select_aspirate_or_dispense_advanced_settings("Aspirate")
-        # Take snapshot here for visual regression testing: {liquid}
 
         transfer_page.go_back_to_previous_step()
 
@@ -91,8 +86,6 @@ def test_96_channel_workflow(page: Page, eyes: Eyes | None) -> None:
         blowout_location="Source well",
         blowout_flow_rate=150,
     )
-    if eyes is not None:
-        eyes.check(checkpoint_name="Dispense Advanced Settings")
     transfer_page.set_mix_settings(mix_times=2, mix_volume=20, aspirate=False)
     transfer_page.transfer_continue_to_next_step()
     transfer_page.tip_change_strategy("Once", drop_location="Tip rack")

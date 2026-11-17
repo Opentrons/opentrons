@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import {
   IRREGULAR_LABWARE_ERROR,
@@ -20,11 +19,11 @@ describe('FormAlerts', () => {
     vi.restoreAllMocks()
   })
   it('should render a warning when an input is not valid', () => {
-    when(vi.mocked(getIsHidden))
+    vi.when(vi.mocked(getIsHidden))
       .calledWith('labwareType', {} as any)
       .thenReturn(false)
 
-    when(vi.mocked(getIsHidden))
+    vi.when(vi.mocked(getIsHidden))
       .calledWith('tubeRackInsertLoadName', {} as any)
       .thenReturn(false)
 
@@ -42,11 +41,11 @@ describe('FormAlerts', () => {
     expect(alertItem).toHaveTextContent('some warning')
   })
   it('should render an incompatible labware error when the labware is not compatible with labware creator', () => {
-    when(vi.mocked(getIsHidden))
+    vi.when(vi.mocked(getIsHidden))
       .calledWith('labwareType', {} as any)
       .thenReturn(false)
 
-    when(vi.mocked(getIsHidden))
+    vi.when(vi.mocked(getIsHidden))
       .calledWith('tubeRackInsertLoadName', {} as any)
       .thenReturn(false)
 
@@ -67,10 +66,10 @@ describe('FormAlerts', () => {
   })
 
   it('should render a loose tip fit error when hand placed fit is loose', () => {
-    when(vi.mocked(getIsHidden))
+    vi.when(vi.mocked(getIsHidden))
       .calledWith('labwareType', {} as any)
       .thenReturn(false)
-    when(vi.mocked(getIsHidden))
+    vi.when(vi.mocked(getIsHidden))
       .calledWith('tubeRackInsertLoadName', {} as any)
       .thenReturn(false)
 
@@ -91,10 +90,10 @@ describe('FormAlerts', () => {
   })
 
   it('should render labware too small error when labware footprint is too small', () => {
-    when(vi.mocked(getIsHidden))
+    vi.when(vi.mocked(getIsHidden))
       .calledWith('labwareType', {} as any)
       .thenReturn(false)
-    when(vi.mocked(getIsHidden))
+    vi.when(vi.mocked(getIsHidden))
       .calledWith('tubeRackInsertLoadName', {} as any)
       .thenReturn(false)
 
@@ -115,10 +114,10 @@ describe('FormAlerts', () => {
   })
 
   it('should render labware too large error when labware footprint is too large', () => {
-    when(vi.mocked(getIsHidden))
+    vi.when(vi.mocked(getIsHidden))
       .calledWith('labwareType', {} as any)
       .thenReturn(false)
-    when(vi.mocked(getIsHidden))
+    vi.when(vi.mocked(getIsHidden))
       .calledWith('tubeRackInsertLoadName', {} as any)
       .thenReturn(false)
 

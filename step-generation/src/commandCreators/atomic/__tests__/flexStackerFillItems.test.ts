@@ -386,4 +386,96 @@ mock_flex_stacker_1.fill_items(
       type: 'HOPPER_FULL',
     })
   })
+  it('resolves runtime parameters into the command and python', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: moduleId,
+      },
+      labware_id: {
+        variableName: 'labware_id',
+        displayName: 'Labware',
+        type: 'string',
+        default: labwareId,
+      },
+      message: {
+        variableName: 'message',
+        displayName: 'Message',
+        type: 'string',
+        default: 'a fill message',
+      },
+    }
+    const result = flexStackerFillItems(
+      {
+        moduleId: 'selected_module',
+        commandCreatorFnName: 'flexStackerFillItems',
+        interventionMessage: 'message',
+        fillLabwareUri: 'mockURI',
+        fillLabwareIds: ['labware_id'],
+      },
+      invariantContext,
+      robotState
+    )
+    expect(result).toEqual({
+      commands: [
+        {
+          commandType: 'flexStacker/fillItems',
+          key: expect.any(String),
+          params: {
+            moduleId,
+            labware: [labwareId],
+            message: 'a fill message',
+          },
+        },
+      ],
+      python: `
+mock_flex_stacker_1.fill_items(
+    labware=[mock_labware_1],
+    message=message,
+)`.trimStart(),
+    })
+  })
+  it('returns errors if runtime parameters are not valid', () => {
+    invariantContext.runtimeParameters = {
+      mock_rtp: {
+        variableName: 'mock_rtp',
+        displayName: 'mock rtp',
+        type: 'boolean',
+        default: false,
+      },
+      mock_int_rtp: {
+        variableName: 'mock_int_rtp',
+        displayName: 'mock int rtp',
+        type: 'int',
+        default: 1,
+      },
+    }
+    const result = flexStackerFillItems(
+      {
+        moduleId: 'mock_rtp',
+        commandCreatorFnName: 'flexStackerFillItems',
+        interventionMessage: 'mock_int_rtp',
+        fillLabwareUri: 'mockURI',
+        fillLabwareIds: ['mock_rtp'],
+      },
+      invariantContext,
+      robotState
+    )
+    expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_int_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+    ])
+  })
 })

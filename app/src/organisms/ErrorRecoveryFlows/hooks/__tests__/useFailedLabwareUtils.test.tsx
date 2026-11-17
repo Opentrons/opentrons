@@ -467,7 +467,9 @@ describe('useRelevantFailedLwLocations', () => {
     )
 
     expect(result.current.currentLoc).toStrictEqual({ slotName: 'D1' })
+    expect(result.current.currentSlotName).toBe('D1')
     expect(result.current.newLoc).toBeNull()
+    expect(result.current.newSlotName).toBeNull()
   })
 
   it('should return current location for flex stacker commands', () => {
@@ -489,7 +491,9 @@ describe('useRelevantFailedLwLocations', () => {
     )
 
     expect(result.current.currentLoc).toStrictEqual({ slotName: 'D1' })
+    expect(result.current.currentSlotName).toBe('D1')
     expect(result.current.newLoc).toStrictEqual({ moduleId: 'module-id' })
+    expect(result.current.newSlotName).toBe('D1')
   })
 
   it('should return current and new locations for moveLabware commands', () => {
@@ -510,7 +514,9 @@ describe('useRelevantFailedLwLocations', () => {
     )
 
     expect(result.current.currentLoc).toStrictEqual({ slotName: 'D1' })
+    expect(result.current.currentSlotName).toBe('D1')
     expect(result.current.newLoc).toStrictEqual({ slotName: 'C2' })
+    expect(result.current.newSlotName).toBe('C2')
   })
 })
 

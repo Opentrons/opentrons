@@ -86,6 +86,7 @@
   "distribute": "Distribute",
   "distribute_volume_error": "The selected source well is too small to distribute from. Try distributing to fewer wells.",
   "do_not_use_liquid_class": "Don't use liquid class settings",
+  "enter_a_valid_number": "Enter a valid number",
   "enter_characters": "Enter up to 60 characters",
   "error_analyzing": "<block>An error occurred while attempting to analyze <bold>{{transferName}}.</bold></block>",
   "exit_quick_transfer": "Exit quick transfer?",

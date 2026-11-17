@@ -2,11 +2,11 @@ import { useTranslation } from 'react-i18next'
 
 import { DIRECTION_COLUMN, Flex } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 
 import { SelectAuthenticationType } from '../../NetworkSettings'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { SetSettingOption } from '../types'
 
@@ -25,7 +25,7 @@ export function RobotSettingsSelectAuthenticationType({
   selectedAuthType,
   setCurrentOption,
   setSelectedAuthType,
-}: RobotSettingsSelectAuthenticationTypeProps): JSX.Element {
+}: RobotSettingsSelectAuthenticationTypeProps): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
 
   return (

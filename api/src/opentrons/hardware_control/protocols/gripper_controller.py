@@ -25,6 +25,10 @@ class GripperController(Protocol):
         """
         ...
 
+    async def hold_jaw_width(self, jaw_width_mm: int) -> None:
+        """Move the gripper jaw to a specific width in mm."""
+        ...
+
     async def idle_gripper(self) -> None:
         """Move gripper to its idle, gripped position."""
         ...

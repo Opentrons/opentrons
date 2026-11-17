@@ -364,7 +364,7 @@ metadata = {
     "source": "OpentronsAI",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.22"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 def run(protocol: protocol_api.ProtocolContext):
     # Load modules first for proper deck space management
@@ -476,7 +476,7 @@ it automatically defaults to FULL 96-tip pickup mode (ALL).
 ```python
 from opentrons import protocol_api
 
-requirements = {"robotType": "Flex", "apiLevel": "2.22"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 def run(protocol: protocol_api.ProtocolContext):
     """Add 100µL reagent to all 96 wells using 8-channel pipette"""
@@ -516,7 +516,7 @@ def run(protocol: protocol_api.ProtocolContext):
 ```python
 from opentrons import protocol_api
 
-requirements = {"robotType": "Flex", "apiLevel": "2.22"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 def run(protocol: protocol_api.ProtocolContext):
     """Add 100µL reagent to all 96 wells using 96-channel pipette"""
@@ -558,7 +558,7 @@ def run(protocol: protocol_api.ProtocolContext):
 from opentrons import protocol_api
 from opentrons.protocol_api import COLUMN
 
-requirements = {"robotType": "Flex", "apiLevel": "2.22"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 def run(protocol: protocol_api.ProtocolContext):
     """Add 100µL reagent using 96-channel in column mode (8 tips at a time)"""
@@ -759,7 +759,7 @@ metadata = {
     'description': "OD-600 Normalization Protocol using Custom CSV File.\nThe protocol normalizes Culture plate OD taken at 600nm.\n Note: With 96-ch pipette, the tips cannot be returned to the tiprack."
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.20"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 def add_parameters(parameters):
 
@@ -879,7 +879,7 @@ metadata = {
 }
 requirements = {
     'robotType': 'Flex',
-    'apiLevel': '2.19'
+    'apiLevel': '2.28'
 }
 
 def add_parameters(parameters):
@@ -1040,7 +1040,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.16",
+    "apiLevel": "2.28",
 }
 
 
@@ -1190,7 +1190,7 @@ def run(ctx):
             ctx.delay(minutes=0.01666667)
 
     def remove_supernatant(vol,waste):
-        pip.pick_up_tip(tips)v
+        pip.pick_up_tip(tips)
         if vol > 1000:
             x = 2
         else:

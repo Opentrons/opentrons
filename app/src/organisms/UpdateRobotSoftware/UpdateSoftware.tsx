@@ -8,17 +8,17 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
+import type { ReactNode } from 'react'
 
 interface UpdateSoftwareProps {
   updateType: 'downloading' | 'validating' | 'sendingFile' | 'installing' | null
 }
-export function UpdateSoftware({
-  updateType,
-}: UpdateSoftwareProps): JSX.Element {
+export function UpdateSoftware({ updateType }: UpdateSoftwareProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const renderText = (): string | null => {
     switch (updateType) {
@@ -59,19 +59,16 @@ export function UpdateSoftware({
         gridGap={SPACING.spacing4}
         alignItems={ALIGN_CENTER}
       >
-        <LegacyStyledText
-          forwardedAs="h2"
-          fontWeight={TYPOGRAPHY.fontWeightBold}
-        >
+        <StyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('update_found')}
-        </LegacyStyledText>
-        <LegacyStyledText
+        </StyledText>
+        <StyledText
           forwardedAs="h3"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={COLORS.grey60}
         >
           {renderText()}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
     </Flex>
   )

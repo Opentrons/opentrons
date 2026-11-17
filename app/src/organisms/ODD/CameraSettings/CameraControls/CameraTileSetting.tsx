@@ -3,10 +3,12 @@ import clamp from 'lodash/clamp'
 
 import { StyledText } from '@opentrons/components'
 
-import { IconButton } from '/app/atoms/buttons/IconButton'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { SimpleIconButton } from '/app/components/ODD/buttons/SimpleIconButton'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 
 import styles from './cameracontrols.module.css'
+
+import type { ReactNode } from 'react'
 
 const SETTING_TILE = [1, 2, 3, 4]
 // Each tile adjusts the setting by 25%.
@@ -30,7 +32,7 @@ export function CameraTileSetting({
   subtext,
   adjustValue,
   isLoading,
-}: CameraTileSettingProps): JSX.Element {
+}: CameraTileSettingProps): ReactNode {
   const adjustedValue = roundValueToValidPercentage(value)
 
   // We intentionally avoid adjusting pre-existing values to a number divisible
@@ -52,7 +54,7 @@ export function CameraTileSetting({
       <div className={styles.content_container}>
         <StyledText oddStyle="level4HeaderRegular">{subtext}</StyledText>
         <div className={styles.tile_setting_container}>
-          <IconButton
+          <SimpleIconButton
             disabled={adjustedValue === LOWEST_VALUE}
             onClick={() => {
               handleClick('down')
@@ -68,7 +70,7 @@ export function CameraTileSetting({
               />
             ))}
           </div>
-          <IconButton
+          <SimpleIconButton
             disabled={adjustedValue === HIGHEST_VALUE}
             onClick={() => {
               handleClick('up')
@@ -82,7 +84,7 @@ export function CameraTileSetting({
   )
 }
 
-function SettingTile({ isActive }: { isActive: boolean }): JSX.Element {
+function SettingTile({ isActive }: { isActive: boolean }): ReactNode {
   return (
     <div
       className={clsx(

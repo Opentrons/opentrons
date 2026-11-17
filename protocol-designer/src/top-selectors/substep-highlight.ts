@@ -97,8 +97,8 @@ function _getSelectedWellsForStep(
       pipetteEntity,
       labwareEntity,
       wells,
-      nozzles,
-      primaryNozzle
+      nozzles as NozzleConfigurationStyle,
+      primaryNozzle as PrimaryNozzleConfigurationStyle
     )
 
   const wells = []

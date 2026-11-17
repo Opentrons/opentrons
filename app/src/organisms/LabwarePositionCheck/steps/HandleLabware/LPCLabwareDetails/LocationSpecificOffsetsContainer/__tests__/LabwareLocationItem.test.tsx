@@ -35,7 +35,7 @@ vi.mock(
     },
   })
 )
-vi.mock('/app/molecules/MultiDeckLabelTagBtns', () => ({
+vi.mock('/app/components/adhoc/shared/MultiDeckLabelTagBtns', () => ({
   MultiDeckLabelTagBtns: (props: any) => {
     MultiDeckLabelTagBtnsMock(props)
     return <div data-testid="multi-deck-btns" />

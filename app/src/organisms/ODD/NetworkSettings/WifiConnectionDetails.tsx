@@ -12,18 +12,19 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { MediumButton } from '/app/atoms/buttons'
+import { MediumButton } from '/app/components/ODD/buttons'
 import { RobotSetupHeader } from '/app/organisms/ODD/RobotSetupHeader'
 import { getLocalRobot } from '/app/redux/discovery'
 import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 
 import { NetworkDetailsModal } from '../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 
+import type { ReactNode } from 'react'
 import type { WifiSecurityType } from '@opentrons/api-client'
 
 interface WifiConnectionDetailsProps {
@@ -35,7 +36,7 @@ interface WifiConnectionDetailsProps {
 export function WifiConnectionDetails({
   ssid,
   authType,
-}: WifiConnectionDetailsProps): JSX.Element {
+}: WifiConnectionDetailsProps): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const navigate = useNavigate()
   const localRobot = useSelector(getLocalRobot)
@@ -101,7 +102,7 @@ interface DisplayConnectionStatusProps {
 
 const DisplayConnectionStatus = ({
   ssid,
-}: DisplayConnectionStatusProps): JSX.Element => {
+}: DisplayConnectionStatusProps): ReactNode => {
   const { t } = useTranslation('device_settings')
   return (
     <Flex
@@ -114,12 +115,9 @@ const DisplayConnectionStatus = ({
       justifyContent={JUSTIFY_CENTER}
     >
       <Icon size="3rem" name="ot-check" color={COLORS.green50} />
-      <LegacyStyledText
-        forwardedAs="h3"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <StyledText forwardedAs="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('successfully_connected_to_network', { ssid })}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }

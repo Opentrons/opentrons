@@ -3,7 +3,6 @@ import { Provider } from 'react-redux'
 import { renderHook, waitFor } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { hash } from '/app/redux/analytics/hash'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
@@ -88,10 +87,10 @@ describe('useProtocolRunAnalyticsData hook', () => {
     vi.mocked(getStoredProtocol).mockReturnValue({
       srcFiles: Buffer.from('protocol content'),
     } as any)
-    when(vi.mocked(useStoredProtocolAnalysis))
+    vi.when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(STORED_PROTOCOL_ANALYSIS as any)
-    when(vi.mocked(useProtocolDetailsForRun))
+    vi.when(vi.mocked(useProtocolDetailsForRun))
       .calledWith(RUN_ID)
       .thenReturn({ protocolData: null } as any)
     vi.mocked(useProtocolMetadata).mockReturnValue({
@@ -121,7 +120,7 @@ describe('useProtocolRunAnalyticsData hook', () => {
   })
 
   it('getProtocolRunAnalyticsData returns robot data when available', async () => {
-    when(vi.mocked(useProtocolDetailsForRun))
+    vi.when(vi.mocked(useProtocolDetailsForRun))
       .calledWith(RUN_ID_2)
       .thenReturn({ protocolData: ROBOT_PROTOCOL_ANALYSIS } as any)
     const { result } = renderHook(

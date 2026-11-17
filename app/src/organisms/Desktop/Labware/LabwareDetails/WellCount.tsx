@@ -5,17 +5,19 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
+import type { ReactNode } from 'react'
 
 export interface WellCountProps {
   count: number
   wellLabel: string
 }
 
-export function WellCount(props: WellCountProps): JSX.Element {
+export function WellCount(props: WellCountProps): ReactNode {
   const { t } = useTranslation('labware_details')
   const { count, wellLabel } = props
 
@@ -26,13 +28,10 @@ export function WellCount(props: WellCountProps): JSX.Element {
       alignItems={ALIGN_CENTER}
       marginBottom={SPACING.spacing16}
     >
-      <LegacyStyledText
-        forwardedAs="p"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t(wellLabel)} {t('count')}
-      </LegacyStyledText>
-      <LegacyStyledText forwardedAs="p">{count}</LegacyStyledText>
+      </StyledText>
+      <StyledText forwardedAs="p">{count}</StyledText>
     </Flex>
   )
 }

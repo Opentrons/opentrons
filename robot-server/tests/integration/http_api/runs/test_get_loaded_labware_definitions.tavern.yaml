@@ -2,12 +2,12 @@ test_name: Get the definitions of a run's loaded labware
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 
 stages:
   - name: Upload simple JSONv6 protocol
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/simple_v6.json'
@@ -17,9 +17,50 @@ stages:
         json:
           protocol_id: data.id
 
+  - name: Set a deck configuration with the module
+    request:
+      url: '{ot3_server_base_url}/deck_configuration'
+      method: PUT
+      json:
+        data:
+          cutoutFixtures:
+            - cutoutFixtureId: singleLeftSlot
+              cutoutId: cutoutA1
+            - cutoutFixtureId: singleLeftSlot
+              cutoutId: cutoutB1
+            - cutoutFixtureId: singleLeftSlot
+              cutoutId: cutoutC1
+            - cutoutFixtureId: temperatureModuleV2
+              cutoutId: cutoutD1
+              opentronsModuleSerialNumber: temp-123
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutA2
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutB2
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutC2
+            - cutoutFixtureId: singleCenterSlot
+              cutoutId: cutoutD2
+            - cutoutFixtureId: stagingAreaRightSlot
+              cutoutId: cutoutA3
+            - cutoutFixtureId: singleRightSlot
+              cutoutId: cutoutB3
+            - cutoutFixtureId: stagingAreaRightSlot
+              cutoutId: cutoutC3
+            - cutoutFixtureId: magneticBlockV1
+              cutoutId: cutoutD3
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          cutoutFixtures: !anylist
+          lastModifiedAt: !anystr
+
   - name: Create run from protocol
     request:
-      url: '{ot2_server_base_url}/runs'
+      url: '{ot3_server_base_url}/runs'
       method: POST
       json:
         data:
@@ -32,7 +73,7 @@ stages:
 
   - name: Issue a play action
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      url: '{ot3_server_base_url}/runs/{run_id}/actions'
       json:
         data:
           actionType: play
@@ -44,7 +85,7 @@ stages:
     max_retries: 10
     delay_after: 0.1
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}'
+      url: '{ot3_server_base_url}/runs/{run_id}'
       method: GET
     response:
       status_code: 200
@@ -56,7 +97,7 @@ stages:
 
   - name: Fetch run labware definitions
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/loaded_labware_definitions'
+      url: '{ot3_server_base_url}/runs/{run_id}/loaded_labware_definitions'
       method: GET
     response:
       strict:
@@ -71,4 +112,4 @@ stages:
           - metadata:
               displayName: 'Foo 8 Well Plate 33uL'
           - metadata:
-              displayName: 'Opentrons 96 Tip Rack 10 µL'
+              displayName: 'Opentrons Flex 96 Tip Rack 1000 µL'

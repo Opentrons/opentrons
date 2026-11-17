@@ -7,8 +7,19 @@
 }
 
 .app_container {
+  display: flex;
   max-width: 90rem;
+  height: 100%;
+  box-sizing: border-box;
+  flex-direction: column;
   padding: var(--spacing-16);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
 }
 
 .demo_header {
@@ -72,5 +83,13 @@
 
 .protocol_visualization_demo {
   width: 100%;
-  height: 700px;
+  min-height: 0;
+  flex: 1;
+}
+
+.protocol_visualization_section {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
 }

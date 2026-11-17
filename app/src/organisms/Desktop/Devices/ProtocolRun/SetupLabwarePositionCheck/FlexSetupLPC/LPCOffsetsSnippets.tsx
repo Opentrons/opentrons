@@ -24,9 +24,10 @@ import {
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getModalPortalEl } from '/app/App/portal'
-import { LabwareOffsetSnippet } from '/app/molecules/LabwareOffsetSnippet'
+import { LabwareOffsetSnippet } from '/app/components/desktop/chips/LabwareOffsetSnippet'
 import { LearnAboutOffsetsLink } from '/app/organisms/Desktop/Devices/ProtocolRun/LearnAboutOffsetsLink'
 
+import type { ReactNode } from 'react'
 import type { LabwareOffsetCreateData } from '@opentrons/api-client'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { SetupLabwarePositionCheckProps } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupLabwarePositionCheck'
@@ -36,9 +37,7 @@ interface LPCOffsetsSnippetsProps extends SetupLabwarePositionCheckProps {
   lwOffsetsForRun: LabwareOffsetCreateData[]
 }
 
-export function LPCOffsetsSnippets(
-  props: LPCOffsetsSnippetsProps
-): JSX.Element {
+export function LPCOffsetsSnippets(props: LPCOffsetsSnippetsProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
 
   const [showModal, setShowModal] = useState(false)
@@ -76,7 +75,7 @@ function LPCOffsetsSnippetsModal({
   toggleModal,
   protocolData,
   lwOffsetsForRun,
-}: LPCOffsetsSnippetsModalProps): JSX.Element {
+}: LPCOffsetsSnippetsModalProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
   const [activeSnippet, setActiveSnippet] =
     useState<SnippetButtonType>('jupyter')

@@ -1149,7 +1149,7 @@ export const replaceCutoutFixtureWithComboFixture = (
           }
         }
       } else {
-        console.log(
+        console.error(
           'Invalid deck config match for:',
           aaCutoutItem.cutoutFixtureId
         )

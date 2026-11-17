@@ -23,7 +23,7 @@
   },
   "metadata": {
     "displayName": "Millipore 96 Well Plate 300µL HTS",
-    "displayCategory": "wellPlate",
+    "displayCategory": "filterPlate",
     "displayVolumeUnits": "\u00b5L",
     "tags": []
   },
@@ -1019,6 +1019,8 @@
     "y": 0,
     "z": 0
   },
+  "gripForce": 15,
+  "gripHeightFromLabwareBottom": 11.95,
   "stackingOffsetWithLabware": {
     "default": {
       "x": 0,

@@ -2,12 +2,12 @@ test_name: Test the protocol analysis endpoints with run time parameters
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 
 stages:
   - name: Upload a protocol
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/basic_transfer_with_run_time_parameters.py'
@@ -16,7 +16,6 @@ stages:
         json:
           protocol_id: data.id
           analysis_id: data.analysisSummaries[0].id
-          run_time_parameters_data1: data.analysisSummaries[0].runTimeParameters
       strict:
         - json:off
       status_code: 201
@@ -26,54 +25,13 @@ stages:
           analysisSummaries:
             - id: !anystr
               status: pending
-              runTimeParameters:
-                - displayName: Sample count
-                  variableName: sample_count
-                  type: int
-                  default: 6.0
-                  min: 1.0
-                  max: 12.0
-                  value: 6.0
-                  description: How many samples to process.
-                - displayName: Pipette volume
-                  variableName: volume
-                  type: float
-                  default: 20.1
-                  choices:
-                    - displayName: Low Volume
-                      value: 10.23
-                    - displayName: Medium Volume
-                      value: 20.1
-                    - displayName: High Volume
-                      value: 50.5
-                  value: 20.1
-                  description: How many microliters to pipette of each sample.
-                - displayName: Dry Run
-                  variableName: dry_run
-                  type: bool
-                  default: false
-                  value: false
-                  description: Skip aspirate and dispense steps.
-                - displayName: Pipette Name
-                  variableName: pipette
-                  type: str
-                  choices:
-                    - displayName: Single channel 50µL
-                      value: flex_1channel_50
-                    - displayName: Eight Channel 50µL
-                      value: flex_8channel_50
-                  default: flex_1channel_50
-                  value: flex_1channel_50
-                  description: What pipette to use during the protocol.
-                - displayName: Liquid handling CSV file
-                  variableName: liq_handling_csv_file
-                  description: A CSV file that contains wells to use for pipetting
+              runTimeParameters: []
 
   - name: Check that the analysis summary is present in /protocols/:id; retry until it says it's completed
     max_retries: 5
     delay_after: 1
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}'
     response:
       status_code: 200
       json:
@@ -82,6 +40,7 @@ stages:
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
+              result: ok
           id: !anything
           protocolType: !anything
           files: !anything
@@ -93,14 +52,55 @@ stages:
 
   - name: Check that the analysis data is present in /protocols/:id/analyses/:id
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id}'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id}'
     response:
       strict:
         - json:off
       json:
         data:
           id: '{analysis_id}'
-          runTimeParameters: !force_original_structure '{run_time_parameters_data1}'
+          runTimeParameters:
+            - displayName: Sample count
+              variableName: sample_count
+              type: int
+              default: 6.0
+              min: 1.0
+              max: 12.0
+              value: 6.0
+              description: How many samples to process.
+            - displayName: Pipette volume
+              variableName: volume
+              type: float
+              default: 20.1
+              choices:
+                - displayName: Low Volume
+                  value: 10.23
+                - displayName: Medium Volume
+                  value: 20.1
+                - displayName: High Volume
+                  value: 50.5
+              value: 20.1
+              description: How many microliters to pipette of each sample.
+            - displayName: Dry Run
+              variableName: dry_run
+              type: bool
+              default: false
+              value: false
+              description: Skip aspirate and dispense steps.
+            - displayName: Pipette Name
+              variableName: pipette
+              type: str
+              choices:
+                - displayName: Single channel 50µL
+                  value: flex_1channel_50
+                - displayName: Eight Channel 50µL
+                  value: flex_8channel_50
+              default: flex_1channel_50
+              value: flex_1channel_50
+              description: What pipette to use during the protocol.
+            - displayName: Liquid handling CSV file
+              variableName: liq_handling_csv_file
+              description: A CSV file that contains wells to use for pipetting
           commands:
             # Check for this command's presence as a smoke test that the analysis isn't empty.
             - commandType: loadPipette
@@ -108,7 +108,7 @@ stages:
   - name: Check that uploading same protocol with new run time parameter values re-triggers analysis
     # This test must be executed after the analysis of the previous upload is completed.
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       data:
         runTimeParameterValues: '{{"sample_count": 10, "volume": 10.23, "dry_run": true}}'
@@ -125,7 +125,7 @@ stages:
       json:
         data:
           id: '{protocol_id}'
-          analyses: [ ]
+          analyses: []
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
@@ -174,12 +174,11 @@ stages:
                   variableName: liq_handling_csv_file
                   description: A CSV file that contains wells to use for pipetting
 
-
   - name: Check that the new analysis uses run time parameter values from client; retry until analysis is completed
     max_retries: 5
     delay_after: 1
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id2}'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id2}'
     response:
       strict:
         - json:off
@@ -193,7 +192,7 @@ stages:
 
   - name: Check that a new analysis is started for the protocol because of new RTP values
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses'
       method: POST
       json:
         data:
@@ -265,7 +264,7 @@ stages:
     max_retries: 5
     delay_after: 1
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id3}'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id3}'
     response:
       strict:
         - json:off
@@ -276,7 +275,7 @@ stages:
 
   - name: Check that a new analysis is NOT started for the protocol when RTP values are same
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses'
       method: POST
       json:
         data:

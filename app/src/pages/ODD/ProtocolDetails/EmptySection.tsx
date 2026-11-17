@@ -8,16 +8,18 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
+import type { ReactNode } from 'react'
 
 interface EmptySectionProps {
   section: 'hardware' | 'labware' | 'liquids' | 'parameters'
 }
 
-export const EmptySection = (props: EmptySectionProps): JSX.Element => {
+export const EmptySection = (props: EmptySectionProps): ReactNode => {
   const { section } = props
   const { t, i18n } = useTranslation('protocol_details')
 
@@ -45,12 +47,9 @@ export const EmptySection = (props: EmptySectionProps): JSX.Element => {
         marginBottom={SPACING.spacing32}
         aria-label="EmptySection_ot-alert"
       />
-      <LegacyStyledText
-        forwardedAs="h3"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-      >
+      <StyledText forwardedAs="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {i18n.format(sectionText, 'capitalize')}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }

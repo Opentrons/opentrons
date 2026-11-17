@@ -1,5 +1,6 @@
-import { mkdir, rmdir } from 'fs/promises'
+import { mkdir, rm } from 'fs/promises'
 import path from 'path'
+import { dialog } from 'electron'
 
 import {
   logPeriodDownloadCanceled,
@@ -16,16 +17,24 @@ import {
   OPENTRONS_USB,
 } from '../constants'
 import { showOpenDirectoryDialog } from '../dialogs'
+import { resolveUniqueFilePath, zipDirectory } from '../fs/utils'
 import { fetchToFile } from '../http'
+import { createLogger } from '../log'
 import { buildRobotHttpUrl } from '../robot-update/httpUrl'
 import { getSerialPortHttpAgent } from '../usb'
 
-import type { BrowserWindow } from 'electron'
+import type {
+  BrowserWindow,
+  OpenDialogOptions,
+  OpenDialogReturnValue,
+} from 'electron'
 import type {
   DownloadAuditLogPayload,
   DownloadAuditLogsPayload,
 } from '@opentrons/app/src/redux/audit/types'
 import type { Action, Dispatch } from '../types'
+
+const log = createLogger('audit')
 
 export const AUDIT_LOG_DIRECTORY_CONFIG_PATH = 'audit.logDirectory'
 
@@ -69,8 +78,7 @@ async function downloadAuditLog(
   const usb = hostname === OPENTRONS_USB
   const url = buildRobotHttpUrl(
     { ip: hostname, port },
-    `/audit/external/logPeriods/${logPeriodId}/download`,
-    { forceHttp: usb }
+    `/audit/external/logPeriods/${logPeriodId}/download`
   )
   const agent = usb ? getSerialPortHttpAgent() : undefined
   const requestInit = !!agent ? { agent } : undefined
@@ -81,12 +89,20 @@ async function downloadAuditLog(
 
   if (!directory) {
     const defaultDirectory = config.audit.logDirectory
-    const dialogOptions = {
+    const dialogOptions: OpenDialogOptions = {
       defaultPath: defaultDirectory ?? '',
+      buttonLabel: 'Save',
       properties: ['openDirectory', 'createDirectory'],
     }
-    const filePaths = await showOpenDirectoryDialog(mainWindow, dialogOptions)
-    directory = filePaths[0]?.toString()
+
+    const filePaths = await dialog
+      .showOpenDialog(mainWindow, dialogOptions)
+      .then((result: OpenDialogReturnValue) => {
+        return result.canceled ? [] : result.filePaths
+      })
+
+    directory = filePaths[0]
+
     if (!directory) {
       dispatch(logPeriodDownloadCanceled({ logPeriodId }) as Action)
       return false
@@ -94,7 +110,7 @@ async function downloadAuditLog(
   }
 
   try {
-    const filePath = path.join(directory, fileName)
+    const filePath = await resolveUniqueFilePath(directory, fileName)
     let deletionKey: string | null = null
 
     await fetchToFile(url, filePath, {
@@ -103,16 +119,6 @@ async function downloadAuditLog(
       },
       requestInit,
     })
-
-    if (deletionKey == null) {
-      dispatch(
-        logPeriodDownloadFailed({
-          logPeriodId,
-          error: 'Missing deletion key in download response',
-        }) as Action
-      )
-      return false
-    }
 
     dispatch(logPeriodDownloadSucceeded({ logPeriodId, deletionKey }) as Action)
     return true
@@ -140,12 +146,54 @@ async function downloadAuditLogs(
 
   if (!directory) {
     const defaultDirectory = config.audit.logDirectory
-    const dialogOptions = {
+    const dialogOptions: OpenDialogOptions = {
       defaultPath: defaultDirectory ?? '',
+      buttonLabel: 'Save',
       properties: ['openDirectory', 'createDirectory'],
     }
-    const filePaths = await showOpenDirectoryDialog(mainWindow, dialogOptions)
-    directory = filePaths[0]?.toString()
+
+    const filePaths = await dialog
+      .showOpenDialog(mainWindow, dialogOptions)
+      .then((result: OpenDialogReturnValue) => {
+        return result.canceled ? [] : result.filePaths
+      })
+
+    directory = filePaths[0]
+  }
+
+  // If there is only one log period to download, don't make a folder for it.
+  if (logPeriodSummaries.length === 1) {
+    const logPeriodSummary = logPeriodSummaries[0]
+    const fileName = `logperiod_${logPeriodSummary.startedAt.replaceAll(':', '_')}.zip`
+
+    if (!directory) {
+      dispatch(
+        logPeriodDownloadCanceled({
+          logPeriodId: logPeriodSummary.id,
+        })
+      )
+      return
+    }
+
+    await downloadAuditLog(
+      {
+        logPeriodId: logPeriodSummary.id,
+        fileName,
+        hostname,
+        port,
+        destination: directory,
+      },
+      mainWindow,
+      dispatch
+    )
+    return
+  }
+
+  if (!directory) {
+    for (const logPeriodSummary of logPeriodSummaries) {
+      dispatch(logPeriodDownloadCanceled({ logPeriodId: logPeriodSummary.id }))
+    }
+    return
   }
 
   const folderName =
@@ -153,21 +201,12 @@ async function downloadAuditLogs(
       /[^a-zA-Z0-9._-]/g,
       '_'
     )
-  const outputDirectory = !directory ? null : path.join(directory, folderName)
-  if (outputDirectory != null) {
-    await mkdir(outputDirectory, { recursive: true })
-  }
+  const outputDirectory = await resolveUniqueFilePath(directory, folderName)
+  await mkdir(outputDirectory, { recursive: true })
 
   const results = await Promise.all(
-    logPeriodSummaries.map(logPeriodSummary => {
-      if (!outputDirectory) {
-        dispatch(
-          logPeriodDownloadCanceled({ logPeriodId: logPeriodSummary.id })
-        )
-        return Promise.resolve()
-      }
-
-      return downloadAuditLog(
+    logPeriodSummaries.map(logPeriodSummary =>
+      downloadAuditLog(
         {
           logPeriodId: logPeriodSummary.id,
           fileName: `logperiod_${logPeriodSummary.startedAt.replaceAll(':', '_')}.zip`,
@@ -178,10 +217,22 @@ async function downloadAuditLogs(
         mainWindow,
         dispatch
       )
-    })
+    )
   )
 
-  if (!!outputDirectory && results.every(succeeded => !succeeded)) {
-    await rmdir(outputDirectory)
+  const anySucceeded = results.some(succeeded => succeeded)
+  if (!anySucceeded) {
+    await rm(outputDirectory, { recursive: true, force: true })
+    return
+  }
+
+  const zipName = `${path.basename(outputDirectory)}.zip`
+  const zipPath = await resolveUniqueFilePath(directory, zipName)
+  try {
+    await zipDirectory(outputDirectory, zipPath)
+    await rm(outputDirectory, { recursive: true, force: true })
+  } catch (error) {
+    // Downloads already succeeded; leave the folder if zipping fails.
+    log.error('Failed to zip audit log folder', { error, outputDirectory })
   }
 }

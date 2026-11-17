@@ -20,8 +20,8 @@ import {
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getModalPortalEl, getTopPortalEl } from '/app/App/portal'
-import { SmallButton } from '/app/atoms/buttons'
-import { OddModal } from '/app/molecules/OddModal'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useLPCAnalytics } from '/app/organisms/LabwarePositionCheck'
 import {
   selectConflictTimestampInfo,
@@ -30,8 +30,9 @@ import {
 } from '/app/redux/protocol-runs'
 import { formatTimestamp } from '/app/transformations/runs'
 
+import type { ReactNode } from 'react'
 import type { IconProps } from '@opentrons/components'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 export interface OffsetsConflictModalProps {
   runId: string
@@ -41,7 +42,7 @@ export interface OffsetsConflictModalProps {
 export function LabwareOffsetsConflictModal({
   runId,
   isOnDevice,
-}: OffsetsConflictModalProps): JSX.Element {
+}: OffsetsConflictModalProps): ReactNode {
   const dispatch = useDispatch()
   const tsInfo = useSelector(selectConflictTimestampInfo(runId))
   const tsFormatted = formatTimestamp(tsInfo.timestamp ?? '')
@@ -88,7 +89,7 @@ function OffsetsConflictODD({
   lastFreshRunTs,
   onDatabaseOffsets,
   onRunRecordOffsets,
-}: OffsetsConflictContentProps): JSX.Element {
+}: OffsetsConflictContentProps): ReactNode {
   const { t } = useTranslation(['protocol_setup', 'branded'])
 
   const header: OddModalHeaderBaseProps = {
@@ -134,7 +135,7 @@ function OffsetsConflictDesktop({
   lastFreshRunTs,
   onDatabaseOffsets,
   onRunRecordOffsets,
-}: OffsetsConflictContentProps): JSX.Element {
+}: OffsetsConflictContentProps): ReactNode {
   const { t } = useTranslation(['protocol_setup', 'branded'])
 
   const buildIcon = (): IconProps => {

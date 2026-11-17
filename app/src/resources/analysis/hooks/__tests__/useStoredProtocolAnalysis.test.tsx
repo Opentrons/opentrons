@@ -3,7 +3,6 @@ import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { useProtocolQuery } from '@opentrons/react-api-client'
 import {
@@ -75,13 +74,13 @@ describe('useStoredProtocolAnalysis hook', () => {
       </Provider>
     )
 
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(null, { staleTime: Infinity })
       .thenReturn({} as UseQueryResult<Run>)
-    when(vi.mocked(useProtocolQuery))
+    vi.when(vi.mocked(useProtocolQuery))
       .calledWith(null, { staleTime: Infinity })
       .thenReturn({} as UseQueryResult<Protocol>)
-    when(vi.mocked(getStoredProtocol))
+    vi.when(vi.mocked(getStoredProtocol))
       .calledWith(undefined as any)
       .thenReturn(null)
     vi.mocked(parseRequiredModulesEntity).mockReturnValue([MODULE_ENTITY])
@@ -101,17 +100,17 @@ describe('useStoredProtocolAnalysis hook', () => {
   })
 
   it('returns null when there is no stored protocol analysis for a protocol key', () => {
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, { staleTime: Infinity })
       .thenReturn({
         data: { data: { protocolId: PROTOCOL_ID } },
       } as UseQueryResult<Run>)
-    when(vi.mocked(useProtocolQuery))
+    vi.when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity })
       .thenReturn({
         data: { data: { key: PROTOCOL_KEY } },
       } as UseQueryResult<Protocol>)
-    when(vi.mocked(getStoredProtocol))
+    vi.when(vi.mocked(getStoredProtocol))
       .calledWith(undefined as any, PROTOCOL_KEY)
       .thenReturn(null)
 
@@ -123,17 +122,17 @@ describe('useStoredProtocolAnalysis hook', () => {
   })
 
   it('returns a stored protocol analysis when one exists for a protocol key', () => {
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, { staleTime: Infinity })
       .thenReturn({
         data: { data: { protocolId: PROTOCOL_ID } },
       } as UseQueryResult<Run>)
-    when(vi.mocked(useProtocolQuery))
+    vi.when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity })
       .thenReturn({
         data: { data: { key: PROTOCOL_KEY } },
       } as UseQueryResult<Protocol>)
-    when(vi.mocked(getStoredProtocol))
+    vi.when(vi.mocked(getStoredProtocol))
       .calledWith(undefined as any, PROTOCOL_KEY)
       .thenReturn(modifiedStoredProtocolData as StoredProtocolData)
 

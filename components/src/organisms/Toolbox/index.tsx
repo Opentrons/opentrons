@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { PrimaryButton } from '../../atoms'
 import { BORDERS, COLORS } from '../../helix-design-system'
+import { PrimaryButton } from '../../helix/buttons'
 import { Box, Btn, Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
@@ -33,7 +33,7 @@ export interface ToolboxProps extends StyleProps {
   secondaryHeaderButton?: JSX.Element
 }
 
-export function Toolbox(props: ToolboxProps): JSX.Element {
+export function Toolbox(props: ToolboxProps): ReactNode {
   const {
     title,
     children,

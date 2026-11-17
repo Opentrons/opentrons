@@ -50,12 +50,29 @@ export function useUpdateSubsystemMutation(
     ['update_subsystem'],
     ({ variables: subsystem, userNotes }) =>
       updateSubsystem(host!, subsystem, userNotes).then(response => {
-        queryClient.removeQueries(getQueryKey(host, 'subsystems/updates'))
+        queryClient.setQueryData(
+          getQueryKey(
+            host,
+            'subsystems',
+            'updates',
+            'all',
+            response.data.data.id
+          ),
+          response.data
+        )
+        queryClient.setQueryData(
+          getQueryKey(host, 'subsystems', 'updates', 'current', subsystem),
+          response.data
+        )
         queryClient
-          .invalidateQueries(getQueryKey(host, 'subsystems/updates'))
+          .invalidateQueries(
+            getQueryKey(host, 'subsystems', 'updates', 'current'),
+            { exact: true }
+          )
           .catch((e: Error) => {
             console.error(`error invalidating subsystems query: ${e.message}`)
           })
+
         return response.data
       }),
     options

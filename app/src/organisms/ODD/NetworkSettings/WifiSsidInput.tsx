@@ -5,17 +5,17 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   POSITION_FIXED,
   SPACING,
-  TouchInputField,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
+import { TouchInputField } from '/app/components/ODD/input/TouchInputField'
+import { FullKeyboard } from '/app/components/ODD/keyboard'
 import { useIsUnboxingFlowOngoing } from '/app/redux-resources/config'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 
 interface WifiSsidInputProps {
   errorMessage?: string | null
@@ -27,9 +27,10 @@ export function WifiSsidInput({
   errorMessage,
   inputSsid,
   setInputSsid,
-}: WifiSsidInputProps): JSX.Element {
+}: WifiSsidInputProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared'])
   const keyboardRef = useRef(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
 
   return (
@@ -40,14 +41,15 @@ export function WifiSsidInput({
         gridGap={SPACING.spacing8}
         marginTop={isUnboxingFlowOngoing ? undefined : '7.75rem'}
       >
-        <LegacyStyledText
+        <StyledText
           forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={errorMessage != null ? COLORS.red50 : COLORS.black90}
         >
           {t('enter_network_name')}
-        </LegacyStyledText>
+        </StyledText>
         <TouchInputField
+          ref={inputRef}
           autoFocus
           aria-label="wifi_ssid"
           value={inputSsid}
@@ -56,18 +58,10 @@ export function WifiSsidInput({
           }}
           type="text"
           error={errorMessage}
-          onBlur={e => {
-            e.target.focus()
-          }}
         />
       </Flex>
       <Flex width="100%" position={POSITION_FIXED} left="0" bottom="0">
-        <FullKeyboard
-          onChange={e => {
-            e != null && setInputSsid(e)
-          }}
-          keyboardRef={keyboardRef}
-        />
+        <FullKeyboard inputElementRef={inputRef} keyboardRef={keyboardRef} />
       </Flex>
     </>
   )

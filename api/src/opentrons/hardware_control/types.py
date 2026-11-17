@@ -670,6 +670,7 @@ class ModuleConnectedNotification:
 
 @dataclass(frozen=True)
 class SubsystemConnectionNotification:
+    tracked_subsystems: dict[SubSystem, SubSystemState]
     event: Literal[HardwareEventType.SUBSYSTEM_CONNECTION] = (
         HardwareEventType.SUBSYSTEM_CONNECTION
     )
@@ -680,6 +681,9 @@ class SubsystemConnectionNotification:
         return {
             "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
             "event": obj.event,
+            "tracked_subsystems": {
+                k.value: v for k, v in obj.tracked_subsystems.items()
+            },
         }
 
     @staticmethod
@@ -689,6 +693,10 @@ class SubsystemConnectionNotification:
         """Consumed by Serpent, convert from a Pyro Dictionary."""
         return SubsystemConnectionNotification(
             event=HardwareEventType(data["event"]["value"]),  # type: ignore
+            tracked_subsystems={
+                SubSystem(k): SubSystemState.model_validate(v)
+                for k, v in data["tracked_subsystems"].items()
+            },
         )
 
 
@@ -1118,3 +1126,30 @@ class PipetteSensorData:
 
 
 PipetteSensorResponseQueue = Queue[Dict[PipetteSensorId, List[PipetteSensorData]]]
+
+
+@dataclass(frozen=True)
+class HardwareSystemInfo:
+    fw_version: str
+    board_revision: str
+    serial_number: str | None
+
+    @staticmethod
+    def to_pyro_dict(obj: "HardwareSystemInfo") -> dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        pyro_dict = {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "fw_version": obj.fw_version,
+            "board_revision": obj.board_revision,
+            "serial_number": obj.serial_number,
+        }
+        return pyro_dict
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "HardwareSystemInfo":
+        """Consumed by Serpent, Convert from a Pyro Dictionary."""
+        return HardwareSystemInfo(
+            fw_version=data["fw_version"],
+            board_revision=data["board_revision"],
+            serial_number=data["serial_number"],
+        )

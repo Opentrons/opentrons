@@ -116,14 +116,13 @@ describe('Submerge', () => {
     await user.click(screen.getByRole('button', { name: '5' }))
     await user.click(screen.getByText('Continue'))
     await user.click(screen.getByRole('button', { name: '2' }))
-    await user.click(screen.getByRole('button', { name: '2' }))
     await user.click(screen.getByText('Save'))
     expect(props.dispatch).toHaveBeenCalledWith({
       type: 'SET_SUBMERGE_ASPIRATE',
       submergeSettings: {
         speed: 11,
         delayDuration: 0.5,
-        position: 22,
+        position: 2,
         positionReference: 'well-top',
       },
     })

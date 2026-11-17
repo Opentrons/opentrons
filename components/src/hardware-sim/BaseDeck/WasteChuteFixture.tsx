@@ -8,18 +8,18 @@ import {
   WASTE_CHUTE_Y,
 } from '../../hardware-sim'
 import { COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
-import { DeckLabelSet } from '../../organisms'
+import { DeckLabelSet } from '../../helix/deck'
+import { Icon } from '../../helix/icons'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import styles from './basedeck.module.css'
 
-import type { SVGProps } from 'react'
+import type { ReactNode, SVGProps } from 'react'
 import type {
   DeckDefinition,
   ModuleType,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import type { DeckLabelProps } from '../../molecules'
+import type { DeckLabelProps } from '../../helix/deck'
 
 const TAG_HEIGHT = 28
 interface WasteChuteFixtureProps extends SVGProps<SVGGElement> {
@@ -91,7 +91,7 @@ interface WasteChuteProps {
 /**
  * a deck map foreign object representing the physical location of the waste chute connected to the deck
  */
-export function WasteChute(props: WasteChuteProps): JSX.Element {
+export function WasteChute(props: WasteChuteProps): ReactNode {
   const {
     wasteIconColor,
     backgroundColor,

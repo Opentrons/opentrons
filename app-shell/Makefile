@@ -59,7 +59,7 @@ no_python_bundle ?=
 
 builder := pnpm electron-builder \
 	--config electron-builder.config.js \
-	--config.electronVersion=39.1.2 \
+	--config.electronVersion=45.0.0 \
 	--publish never
 
 # Resolve the API python interpreter lazily so `make setup` (and other targets

@@ -120,7 +120,7 @@ export interface AttachingModuleAction {
  * DocumentedActions for one-off mutations without more needed context.
  * These should match keys in audit_log.json
  */
-type AuditLogAction =
+export type AuditLogAction =
   | 'acknowledge_estop'
   | 'stop_run'
   | 'play_run'
@@ -135,6 +135,7 @@ type AuditLogAction =
   | 'detach_gripper'
   | 'recalibrate_gripper'
   | 'lpc_flow'
+  | 'jog_pipette'
   | 'drop_tips'
   | 'end_calibration'
   | 'add_module'
@@ -147,7 +148,6 @@ type AuditLogAction =
   | 'attach_pipette_left'
   | 'attach_pipette_right'
   | 'create_protocol'
-  | 'create_protocol_analysis'
   | 'launching_error_recovery'
   | 'resume_run_from_recovery'
   | 'create_run'
@@ -200,6 +200,8 @@ type AuditLogAction =
   | 'change_language'
   | 'toggle_analytics'
   | 'download_log_period'
+  | 'unlock_user'
+  | 'set_log_level'
 
 /**
  * Type used for DocumentedActions - keys and info to enable correct rendering of actions in the 'list actions' popup in the Documentation Required Modal.

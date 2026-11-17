@@ -124,7 +124,7 @@ describe('getPositionFromSlotId()', () => {
   it('returns coordinates for vacuum module main addressable area', () => {
     expect(
       getPositionFromSlotId('vacuumModuleV1A3', OT3_DECK_DEF)
-    ).toStrictEqual([328, 321, 19])
+    ).toStrictEqual([328.4, 321, 18.75])
   })
 })
 

@@ -20,7 +20,7 @@
   },
   "metadata": {
     "displayName": "Thermo Scientific Nunc 96 Well Plate 1000 \u00b5L Filter",
-    "displayCategory": "wellPlate",
+    "displayCategory": "filterPlate",
     "displayVolumeUnits": "\u00b5L",
     "tags": []
   },
@@ -1112,6 +1112,8 @@
     "y": 0,
     "z": 0
   },
+  "gripForce": 15,
+  "gripHeightFromLabwareBottom": 29.1,
   "stackingOffsetWithLabware": {
     "default": {
       "x": 0,

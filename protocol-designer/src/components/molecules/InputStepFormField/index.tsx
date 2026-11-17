@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Flex, InputField, SPACING } from '@opentrons/components'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 interface InputStepFormFieldProps extends FieldProps {
@@ -20,9 +20,7 @@ interface InputStepFormFieldProps extends FieldProps {
   fillQuantityLocalState?: string | null
 }
 
-export function InputStepFormField(
-  props: InputStepFormFieldProps
-): JSX.Element {
+export function InputStepFormField(props: InputStepFormFieldProps): ReactNode {
   const {
     errorToShow,
     onFieldBlur,

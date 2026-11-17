@@ -20,12 +20,13 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
-import { OddModal } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { ReactNode } from 'react'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 interface DeleteTransferConfirmationModalProps {
   transferId: string
@@ -35,7 +36,7 @@ interface DeleteTransferConfirmationModalProps {
 export function DeleteTransferConfirmationModal({
   transferId,
   setShowDeleteConfirmationModal,
-}: DeleteTransferConfirmationModalProps): JSX.Element {
+}: DeleteTransferConfirmationModalProps): ReactNode {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const navigate = useNavigate()
   const { makeSnackbar } = useToaster()

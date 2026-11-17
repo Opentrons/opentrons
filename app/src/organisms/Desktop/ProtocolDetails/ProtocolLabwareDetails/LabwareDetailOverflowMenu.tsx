@@ -13,7 +13,7 @@ import { LabwareDetails } from '/app/organisms/Desktop/Labware/LabwareDetails'
 
 import styles from './labwareretailoverflowmenu.module.css'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { LabwareDefAndDate } from '/app/local-resources/labware'
 
 interface LabwareDetailOverflowMenuProps {
@@ -22,7 +22,7 @@ interface LabwareDetailOverflowMenuProps {
 
 export const LabwareDetailOverflowMenu = ({
   labware,
-}: LabwareDetailOverflowMenuProps): JSX.Element => {
+}: LabwareDetailOverflowMenuProps): ReactNode => {
   const { t } = useTranslation('protocol_details')
   const {
     menuOverlay,

@@ -1,0 +1,37 @@
+.container {
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.notes {
+  color: var(--grey-60);
+  font-size: var(--font-size-9);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-12);
+  text-transform: uppercase;
+}
+
+.message {
+  font-size: var(--font-size-13);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-20);
+}
+
+@media (height = 600px) and (width = 1024px) {
+  .container {
+    gap: 0;
+  }
+
+  .notes {
+    color: var(--black-90);
+    font-size: var(--font-size-20);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-24);
+    text-transform: capitalize;
+  }
+
+  .message {
+    font-size: var(--font-size-20);
+    line-height: var(--line-height-24);
+  }
+}

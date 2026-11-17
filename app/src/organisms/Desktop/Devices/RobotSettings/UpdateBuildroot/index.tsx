@@ -38,6 +38,13 @@ const UpdateBuildroot = NiceModal.create(
       hasSeenSessionOnce.current = true
     }
 
+    // Dismiss so the progress modal cannot stay up with no close control.
+    useEffect(() => {
+      if (hasSeenSessionOnce.current && session == null) {
+        modal.remove()
+      }
+    }, [session, modal])
+
     useEffect(
       () => {
         if (robotName.current) {
@@ -61,23 +68,27 @@ const UpdateBuildroot = NiceModal.create(
       [robotName, close]
     )
 
-    if (hasSeenSessionOnce.current) {
+    if (hasSeenSessionOnce.current && session != null) {
       return (
         <ApiHostProvider robotName={robotName.current}>
           <RobotUpdateProgressModal
             robotName={robotName.current}
             session={session}
-            closeUpdateBuildroot={modal.remove}
+            closeRobotUpdate={modal.remove}
           />
         </ApiHostProvider>
       )
+    } else if (hasSeenSessionOnce.current) {
+      return null
     } else if (robot != null && robot.status !== UNREACHABLE) {
       return (
-        <ViewUpdateModal
-          robotName={robotName.current}
-          robot={robot}
-          closeModal={ignoreUpdate}
-        />
+        <ApiHostProvider robotName={robotName.current}>
+          <ViewUpdateModal
+            robotName={robotName.current}
+            robot={robot}
+            closeModal={ignoreUpdate}
+          />
+        </ApiHostProvider>
       )
     } else {
       return null

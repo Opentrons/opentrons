@@ -1,6 +1,5 @@
 """Tests for the ProtocolAnalyzer."""
 
-import inspect
 from datetime import datetime
 from pathlib import Path
 
@@ -13,11 +12,10 @@ import opentrons.util.helpers as datetime_helper
 from opentrons.config import feature_flags
 from opentrons.protocol_engine import (
     EngineStatus,
+    JsonCommandSlice,
     StateSummary,
 )
-from opentrons.protocol_engine import (
-    commands as pe_commands,
-)
+from opentrons.protocol_engine import commands as pe_commands
 from opentrons.protocol_engine import (
     errors as pe_errors,
 )
@@ -34,7 +32,7 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import DeckSlotName, MountType
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes
 from opentrons_shared_data.pipette.types import PipetteNameType
-from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
+from opentrons_shared_data.robot.types import RobotType
 
 import robot_server.errors.error_mappers as em
 from robot_server.protocols.analysis_store import AnalysisStore
@@ -81,17 +79,33 @@ def run_process_pyro_provider(decoy: Decoy) -> RunProcessPyroProvider:
     return decoy.mock(cls=RunProcessPyroProvider)
 
 
-@pytest.fixture
-def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Get a mocked feature flags."""
-    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
-        params = inspect.getfullargspec(func)
-        mock_get_ff = decoy.mock(func=func)
-        if any("robot_type" in p for p in params.args):
-            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
-        else:
-            decoy.when(mock_get_ff()).then_return(False)
-        monkeypatch.setattr(feature_flags, name, mock_get_ff)
+async def test_get_verified_run_time_parameters_without_coordinator(
+    analysis_store: AnalysisStore,
+    run_process_pyro_provider: RunProcessPyroProvider,
+) -> None:
+    """Init failure before load must not assert when reading RTPs."""
+    robot_type: RobotType = "OT-3 Standard"
+    subject = ProtocolAnalyzer(
+        analysis_store=analysis_store,
+        protocol_resource=ProtocolResource(
+            protocol_id="protocol-id",
+            created_at=datetime(year=2021, month=1, day=1),
+            source=ProtocolSource(
+                directory=Path("/dev/null"),
+                main_file=Path("/dev/null/abc.json"),
+                config=JsonProtocolConfig(schema_version=123),
+                files=[],
+                metadata={},
+                robot_type=robot_type,
+                content_hash="abc123",
+            ),
+            protocol_key="dummy-data-111",
+            protocol_kind=ProtocolKind.STANDARD,
+        ),
+        run_process_pyro_provider=run_process_pyro_provider,
+    )
+
+    assert await subject.get_verified_run_time_parameters() == []
 
 
 async def test_load_orchestrator(
@@ -131,6 +145,7 @@ async def test_load_orchestrator(
         await simulating_runner.create_simulating_orchestrator(
             robot_type=robot_type,
             protocol_config=PythonProtocolConfig(api_version=APIVersion(100, 200)),
+            analysis_store_provider=analysis_store.get_analysis_store_provider(),
         )
     ).then_return(run_orchestrator)
     await subject.load_orchestrator(
@@ -229,6 +244,7 @@ async def test_analyze(
         await simulating_runner.create_simulating_orchestrator(
             robot_type=robot_type,
             protocol_config=JsonProtocolConfig(schema_version=123),
+            analysis_store_provider=analysis_store.get_analysis_store_provider(),
         )
     ).then_return(orchestrator)
     subject = ProtocolAnalyzer(
@@ -244,8 +260,7 @@ async def test_analyze(
             deck_configuration=[],
         )
     ).then_return(
-        protocol_runner.RunResult(
-            commands=[analysis_command],
+        protocol_runner.EngineRunResult(
             state_summary=StateSummary(
                 status=EngineStatus.SUCCEEDED,
                 errors=[],
@@ -261,20 +276,60 @@ async def test_analyze(
                 hasEverEnteredErrorRecovery=False,
             ),
             parameters=[bool_parameter],
-            command_annotations=[new_command_annotation],
             command_preconditions=command_preconditions,
         )
     )
+    decoy.when(await orchestrator.get_length()).then_return(len([analysis_command]))
+    decoy.when(
+        await orchestrator.get_command_slice(
+            cursor=max(0, len([analysis_command]) - 100),
+            length=100,
+            include_fixit_commands=True,
+        )
+    ).then_return(
+        JsonCommandSlice(
+            commands=[analysis_command.model_dump_json(by_alias=True)],
+            cursor=0,
+            total_length=len([analysis_command]),
+        )
+    )
+    decoy.when(await orchestrator.get_state_summary()).then_return(
+        StateSummary(
+            status=EngineStatus.SUCCEEDED,
+            errors=[],
+            labware=[analysis_labware],
+            pipettes=[analysis_pipette],
+            modules=[],
+            peripherals=[],
+            labwareOffsets=[offset],
+            liquids=[],
+            liquidClasses=[],
+            wells=[],
+            files=[],
+            hasEverEnteredErrorRecovery=False,
+        ),
+    )
+    decoy.when(await orchestrator.get_run_time_parameters()).then_return(
+        [bool_parameter]
+    )
+    decoy.when(await orchestrator.get_all_command_annotations()).then_return(
+        [new_command_annotation]
+    )
+    decoy.when(await orchestrator.get_preconditions()).then_return(
+        command_preconditions
+    )
+    decoy.when(await orchestrator.get_is_okay_to_clear()).then_return(True)
 
     await subject.analyze(
         analysis_id="analysis-id",
     )
+    decoy.when(await orchestrator.get_length()).then_return(0)
     decoy.verify(
         await analysis_store.update(
             analysis_id="analysis-id",
             robot_type=robot_type,
             run_time_parameters=[bool_parameter],
-            commands=[analysis_command],
+            commands=None,
             labware=[analysis_labware],
             modules=[],
             pipettes=[analysis_pipette],
@@ -334,6 +389,7 @@ async def test_analyze_updates_pending_on_error(
         await simulating_runner.create_simulating_orchestrator(
             robot_type=robot_type,
             protocol_config=JsonProtocolConfig(schema_version=123),
+            analysis_store_provider=analysis_store.get_analysis_store_provider(),
         )
     ).then_return(orchestrator)
 
@@ -347,7 +403,7 @@ async def test_analyze_updates_pending_on_error(
             deck_configuration=[],
         )
     ).then_raise(raised_exception)
-    decoy.when(orchestrator.get_run_time_parameters()).then_return([])
+    decoy.when(await orchestrator.get_run_time_parameters()).then_return([])
     decoy.when(em.map_unexpected_error(error=raised_exception)).then_return(
         enumerated_error
     )
@@ -355,6 +411,7 @@ async def test_analyze_updates_pending_on_error(
     decoy.when(datetime_helper.utc_now()).then_return(
         datetime(year=2023, month=3, day=3)
     )
+    decoy.when(await orchestrator.get_is_okay_to_clear()).then_return(True)
     await subject.load_orchestrator(
         run_time_param_values={"rtp_var": 123}, run_time_param_paths={}
     )

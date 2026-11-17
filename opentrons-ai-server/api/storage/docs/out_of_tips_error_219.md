@@ -18,7 +18,7 @@ metadata = {
     'protocolName': 'Single Tip Rack Exhaustion Example',
     'author': 'Opentrons',
     'description': 'A protocol that runs out of tips after exceeding tip rack capacity',
-    'apiLevel': '2.13'
+    'apiLevel': '2.28'
 }
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -56,7 +56,7 @@ metadata = {
     'protocolName': 'Multi-Channel Tip Rack Exhaustion Example',
     'author': 'Opentrons',
     'description': 'A protocol where a multi-channel pipette runs out of tips',
-    'apiLevel': '2.13'
+    'apiLevel': '2.28'
 }
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -92,7 +92,7 @@ metadata = {
     'protocolName': 'Multi-Channel Tip Rack Exhaustion Example - Solved',
     'author': 'Opentrons',
     'description': 'Multi-channel pipette avoids running out of tips and index errors',
-    'apiLevel': '2.13'
+    'apiLevel': '2.28'
 }
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -128,7 +128,7 @@ metadata = {
     'protocolName': 'Nested Loops Tip Exhaustion Example',
     'author': 'Opentrons',
     'description': 'A protocol demonstrating tip exhaustion due to nested loops',
-    'apiLevel': '2.13'
+    'apiLevel': '2.28'
 }
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -214,7 +214,7 @@ metadata = {
     'protocolName': 'Multi-Channel Index Error Example',
     'author': 'Opentrons',
     'description': 'A protocol that causes index errors due to invalid column access',
-    'apiLevel': '2.13'
+    'apiLevel': '2.28'
 }
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -247,7 +247,7 @@ metadata = {
     'protocolName': 'Multi-Channel Index Error Example - Solved',
     'author': 'Opentrons',
     'description': 'A protocol that avoids index errors by validating column indices',
-    'apiLevel': '2.13'
+    'apiLevel': '2.28'
 }
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -324,7 +324,7 @@ from opentrons import protocol_api
 
 requirements = {
     'robotType': 'OT-2',
-    'apiLevel': '2.16'
+    'apiLevel': '2.28'
 }
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -356,7 +356,7 @@ from opentrons import protocol_api
 
 requirements = {
     'robotType': 'OT-2',
-    'apiLevel': '2.16'
+    'apiLevel': '2.28'
 }
 
 def run(protocol: protocol_api.ProtocolContext):

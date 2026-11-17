@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useCloseCurrentRun } from '/app/resources/runs'
 
 import { AnalysisFailedModal } from '../AnalysisFailedModal'
@@ -18,9 +17,6 @@ const mockNavigate = vi.fn()
 const mockCloseCurrentRun = vi.fn()
 
 vi.mock('/app/resources/runs')
-vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
-  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
-}))
 vi.mock('react-router-dom', async importOriginal => {
   const reactRouterDom = await importOriginal<NavigateFunction>()
   return {

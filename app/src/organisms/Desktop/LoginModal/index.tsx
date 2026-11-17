@@ -1,9 +1,10 @@
-import { useId, useState } from 'react'
+import { useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
+import { getUserLoginStatus } from '@opentrons/api-client'
 import {
   BasicButton,
   COLORS,
@@ -16,10 +17,14 @@ import {
   StyledText,
   SUCCESS_TOAST,
   Toast,
+  Z_INDEX,
 } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { PasswordVisibilityToggle } from '/app/components/adhoc/shared/PasswordVisibilityToggle'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { usePlaceCaretAtEndOnToggle } from '/app/local-resources/access-control/usePlaceCaretAtEndOnToggle'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { logOut } from '/app/redux/robot-auth'
 import { useStoreLoginState } from '/app/resources/access-control/useStoreLoginState'
@@ -32,7 +37,18 @@ import { isSSLError } from '/app/resources/auth/hooks/isSSLError'
 import { RobotCertImportModal } from '../RobotCertImport'
 import styles from './loginmodal.module.css'
 
-import type { ComponentProps, Dispatch, SetStateAction } from 'react'
+import type {
+  ComponentProps,
+  Dispatch,
+  FormEvent,
+  ReactNode,
+  SetStateAction,
+} from 'react'
+import type {
+  HostConfig,
+  UserLoginStatus,
+  UserLoginStatusReason,
+} from '@opentrons/api-client'
 
 interface LoginFormState {
   username: string
@@ -57,7 +73,11 @@ type LoginModalScreen =
       passwordResetSuccess?: boolean
     }
   | { kind: 'forgotPassword'; formData: LoginFormState }
-  | { kind: 'setNewPassword'; formData: SetNewPasswordFormState }
+  | {
+      kind: 'setNewPassword'
+      formData: SetNewPasswordFormState
+      reason: UserLoginStatusReason | null
+    }
 
 const INITIAL_LOGIN_FORM: LoginFormState = {
   username: '',
@@ -74,6 +94,21 @@ function setNewPasswordStateForm(username: string): SetNewPasswordFormState {
     confirmPassword: '',
     confirmPasswordError: null,
     error: null,
+  }
+}
+
+async function fetchLoginStatus(
+  host: HostConfig | null,
+  username: string
+): Promise<UserLoginStatus | null> {
+  if (host == null || username.trim() === '') {
+    return null
+  }
+  try {
+    const response = await getUserLoginStatus(host, username.trim())
+    return response.data.data
+  } catch {
+    return null
   }
 }
 
@@ -95,6 +130,7 @@ function updateSetNewPasswordFormData(
     if (prev.kind !== 'setNewPassword') return prev
     return {
       kind: 'setNewPassword',
+      reason: prev.reason,
       formData: { ...prev.formData, ...updates },
     }
   })
@@ -126,7 +162,7 @@ interface LoginModalImplProps {
   uncloseable?: boolean
 }
 
-function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
+function LoginModalImpl(props: LoginModalImplProps): ReactNode {
   const { robotName, uncloseable } = props
   const modal = useModal()
   const dispatch = useDispatch()
@@ -136,6 +172,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
     kind: 'login',
     formData: INITIAL_LOGIN_FORM,
   })
+  const [loginStatus, setLoginStatus] = useState<UserLoginStatus | null>(null)
   const storeLoginState = useStoreLoginState()
 
   const loginFormId = useId()
@@ -144,6 +181,9 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
     useState<boolean>(false)
 
   const handleClose = (): void => {
+    if (screen.kind === 'setNewPassword') {
+      dispatch(logOut({ robotName }))
+    }
     modal.resolve(null)
     modal.remove()
   }
@@ -163,6 +203,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       if (user.resetPassword) {
         setScreen({
           kind: 'setNewPassword',
+          reason: user.passwordResetReason ?? null,
           formData: setNewPasswordStateForm(successfulUsername),
         })
       } else {
@@ -173,9 +214,10 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
     onError: handleError,
   })
 
+  const documentationState = useDocumentationState(undefined, robotName)
   const { submitNewPassword, isLoading: isSetNewPasswordLoading } =
-    useSetNewPasswordAndSignIn({
-      onSuccess: successfulUsername => {
+    useSetNewPasswordAndSignIn(documentationState, {
+      onSuccess: (successfulUsername, _newPassword) => {
         dispatch(logOut({ robotName }))
         setScreen({
           kind: 'login',
@@ -194,7 +236,9 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       },
     })
 
-  const handleLoginSubmit: ComponentProps<'form'>['onSubmit'] = event => {
+  const handleLoginSubmit = async (
+    event: FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     event.preventDefault()
     if (screen.kind !== 'login') return
     const { username, logInPassword } = screen.formData
@@ -222,6 +266,10 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       usernameRequiredError: null,
       passwordRequiredError: null,
     })
+
+    if (loginStatus == null) {
+      setLoginStatus(await fetchLoginStatus(host, trimmedUsername))
+    }
     submitPassword(trimmedUsername, trimmedPassword)
   }
 
@@ -303,8 +351,12 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       <Modal
         title={t('access_control:desktop_login_modal_header')}
         onClose={uncloseable ? undefined : handleClose}
-        // Above SignRun and other run-header modals (zIndexOverlay: 1000).
-        zIndexOverlay={10001}
+        zIndexOverlay={
+          // bounce below documentation modal when setting a new password
+          screen.kind === 'setNewPassword'
+            ? Z_INDEX.COMPLIANCE_MODALS - 1
+            : Z_INDEX.LOGIN_MODAL
+        }
         footer={<div className={styles.modal_footer_container}>{footer}</div>}
       >
         <div className={styles.content_container}>
@@ -312,12 +364,17 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
             <LoginView
               formId={loginFormId}
               formData={screen.formData}
+              reason={loginStatus?.reason ?? null}
               onSubmit={handleLoginSubmit}
               onUsernameChange={value => {
+                setLoginStatus(null)
                 updateLoginFormData(setScreen, {
                   username: value,
                   usernameRequiredError: null,
                 })
+              }}
+              onUsernameBlur={username => {
+                void fetchLoginStatus(host, username).then(setLoginStatus)
               }}
               onLogInPasswordChange={value => {
                 updateLoginFormData(setScreen, {
@@ -335,6 +392,7 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
           ) : (
             <SetNewPasswordView
               formData={screen.formData}
+              reason={screen.reason}
               onNewPasswordChange={value => {
                 updateSetNewPasswordFormData(setScreen, {
                   newPassword: value,
@@ -390,22 +448,39 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
 interface LoginViewProps {
   formId: string
   formData: LoginFormState
+  reason: UserLoginStatusReason | null
   onSubmit: ComponentProps<'form'>['onSubmit']
   onUsernameChange: (value: string) => void
+  onUsernameBlur: (username: string) => void
   onLogInPasswordChange: (value: string) => void
   onForgotPasswordClick: () => void
 }
 
-function LoginView(props: LoginViewProps): JSX.Element {
+function LoginView(props: LoginViewProps): ReactNode {
   const {
     formId,
     formData,
+    reason,
     onSubmit,
     onUsernameChange,
+    onUsernameBlur,
     onLogInPasswordChange,
     onForgotPasswordClick,
   } = props
   const { t } = useTranslation()
+  const [showPassword, setShowPassword] = useState(false)
+  const passwordInputRef = useRef<HTMLInputElement>(null)
+
+  usePlaceCaretAtEndOnToggle(passwordInputRef, showPassword, true)
+
+  const handleTogglePasswordVisibility = (): void => {
+    setShowPassword(current => !current)
+  }
+
+  const passwordFieldTitle =
+    reason === 'temporaryPassword'
+      ? t('access_control:on_device_login_one_time_password')
+      : t('access_control:login_form_password_field')
 
   return (
     <>
@@ -420,6 +495,7 @@ function LoginView(props: LoginViewProps): JSX.Element {
 
       <form id={formId} onSubmit={onSubmit} className={styles.fields_container}>
         <InputField
+          autoFocus
           name="username"
           title={t('access_control:login_form_username_field')}
           type="text"
@@ -428,16 +504,27 @@ function LoginView(props: LoginViewProps): JSX.Element {
           onChange={event => {
             onUsernameChange(event.target.value)
           }}
+          onBlur={() => {
+            onUsernameBlur(formData.username)
+          }}
         />
         <InputField
+          ref={passwordInputRef}
           name="password"
-          title={t('access_control:login_form_password_field')}
-          type="password"
+          title={passwordFieldTitle}
+          type={showPassword ? 'text' : 'password'}
           value={formData.logInPassword}
           error={formData.passwordRequiredError ?? formData.error ?? undefined}
           onChange={event => {
             onLogInPasswordChange(event.target.value)
           }}
+          rightElement={
+            <PasswordVisibilityToggle
+              isVisible={showPassword}
+              onToggle={handleTogglePasswordVisibility}
+              iconOnly
+            />
+          }
         />
         <div>
           <BasicButton type="button" underLine onClick={onForgotPasswordClick}>
@@ -449,7 +536,7 @@ function LoginView(props: LoginViewProps): JSX.Element {
   )
 }
 
-function ForgotPasswordView(): JSX.Element {
+function ForgotPasswordView(): ReactNode {
   const { t } = useTranslation()
 
   return (
@@ -466,38 +553,64 @@ function ForgotPasswordView(): JSX.Element {
 
 interface SetNewPasswordViewProps {
   formData: SetNewPasswordFormState
+  reason: UserLoginStatusReason | null
   onNewPasswordChange: (value: string) => void
   onConfirmPasswordChange: (value: string) => void
   onPasswordFieldBlur: () => void
 }
 
-function SetNewPasswordView(props: SetNewPasswordViewProps): JSX.Element {
+function SetNewPasswordView(props: SetNewPasswordViewProps): ReactNode {
   const {
     formData,
+    reason,
     onNewPasswordChange,
     onConfirmPasswordChange,
     onPasswordFieldBlur,
   } = props
   const { t } = useTranslation()
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const newPasswordInputRef = useRef<HTMLInputElement>(null)
+  const confirmPasswordInputRef = useRef<HTMLInputElement>(null)
+
+  usePlaceCaretAtEndOnToggle(newPasswordInputRef, showNewPassword, true)
+  usePlaceCaretAtEndOnToggle(confirmPasswordInputRef, showConfirmPassword, true)
+
+  const handleToggleNewPasswordVisibility = (): void => {
+    setShowNewPassword(current => !current)
+  }
+
+  const handleToggleConfirmPasswordVisibility = (): void => {
+    setShowConfirmPassword(current => !current)
+  }
+
+  const heading =
+    reason === 'passwordExpired'
+      ? t('access_control:desktop_password_expired_heading')
+      : t('access_control:desktop_set_new_password_heading')
+  const subheading =
+    reason === 'passwordExpired'
+      ? t('access_control:desktop_password_expired_subheading')
+      : t('access_control:desktop_set_new_password_subheading')
 
   return (
     <>
       <div className={styles.text_container}>
-        <StyledText desktopStyle="headingSmallBold">
-          {t('access_control:desktop_password_expired_heading')}
-        </StyledText>
+        <StyledText desktopStyle="headingSmallBold">{heading}</StyledText>
         <StyledText color={COLORS.grey60} desktopStyle="bodyDefaultRegular">
-          {t('access_control:desktop_password_expired_subheading')}
+          {subheading}
         </StyledText>
       </div>
 
       <div className={styles.fields_container}>
         <InputField
+          ref={newPasswordInputRef}
+          autoFocus
           name="newPassword"
           title={t(
             'access_control:desktop_password_expired_new_password_field'
           )}
-          type="password"
+          type={showNewPassword ? 'text' : 'password'}
           value={formData.newPassword}
           error={formData.error ?? undefined}
           onChange={event => {
@@ -506,13 +619,21 @@ function SetNewPasswordView(props: SetNewPasswordViewProps): JSX.Element {
           onBlur={() => {
             onPasswordFieldBlur()
           }}
+          rightElement={
+            <PasswordVisibilityToggle
+              isVisible={showNewPassword}
+              onToggle={handleToggleNewPasswordVisibility}
+              iconOnly
+            />
+          }
         />
         <InputField
+          ref={confirmPasswordInputRef}
           name="confirmPassword"
           title={t(
             'access_control:desktop_password_expired_confirm_password_field'
           )}
-          type="password"
+          type={showConfirmPassword ? 'text' : 'password'}
           value={formData.confirmPassword}
           error={formData.confirmPasswordError ?? undefined}
           onChange={event => {
@@ -521,6 +642,13 @@ function SetNewPasswordView(props: SetNewPasswordViewProps): JSX.Element {
           onBlur={() => {
             onPasswordFieldBlur()
           }}
+          rightElement={
+            <PasswordVisibilityToggle
+              isVisible={showConfirmPassword}
+              onToggle={handleToggleConfirmPasswordVisibility}
+              iconOnly
+            />
+          }
         />
       </div>
     </>

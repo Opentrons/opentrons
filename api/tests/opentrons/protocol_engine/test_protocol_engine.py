@@ -8,11 +8,11 @@ from unittest.mock import sentinel
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.robot.types import RobotType
 
-from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import MagDeck, TempDeck
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
 from opentrons.protocol_engine import (
@@ -107,12 +107,6 @@ def queue_worker(decoy: Decoy) -> QueueWorker:
 def model_utils(decoy: Decoy) -> ModelUtils:
     """Get mock ModelUtils."""
     return decoy.mock(cls=ModelUtils)
-
-
-@pytest.fixture
-def hardware_api(decoy: Decoy) -> HardwareControlAPI:
-    """Get a mock HardwareControlAPI."""
-    return decoy.mock(cls=OT2HardwareControlAPI)
 
 
 @pytest.fixture
@@ -364,6 +358,137 @@ def test_add_fixit_command(
 
     result = subject.add_command(original_request)
     assert result == queued
+
+
+def test_add_wait_for_tasks_fixit_queues_originating_command_first(
+    decoy: Decoy,
+    state_store: StateStore,
+    action_dispatcher: ActionDispatcher,
+    model_utils: ModelUtils,
+    subject: ProtocolEngine,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A waitForTasks fixit should queue a new start_* before the rewritten wait."""
+    created_at = datetime(year=2021, month=1, day=1)
+    robot_type: RobotType = "OT-3 Standard"
+    wait_request = commands.WaitForTasksCreate(
+        params=commands.WaitForTasksParams(task_ids=["old-task"]),
+        intent=commands.CommandIntent.FIXIT,
+    )
+    start_create = commands.vacuum_module.StartSetVacuumPressureCreate(
+        params=commands.vacuum_module.StartSetVacuumPressureParams(
+            moduleId="vacuum-module-id",
+            gaugePressure=-800.0,
+            taskId="new-task",
+        ),
+        intent=commands.CommandIntent.FIXIT,
+    )
+    rewritten_wait = wait_request.model_copy(
+        update={"params": commands.WaitForTasksParams(task_ids=["new-task"])}
+    )
+    queued_start = commands.vacuum_module.StartSetVacuumPressure(
+        id="start-command-id",
+        key="start-command-key",
+        status=commands.CommandStatus.QUEUED,
+        createdAt=created_at,
+        params=start_create.params,
+        intent=commands.CommandIntent.FIXIT,
+    )
+    queued_wait = commands.WaitForTasks(
+        id="wait-command-id",
+        key="wait-command-key",
+        status=commands.CommandStatus.QUEUED,
+        createdAt=created_at,
+        params=rewritten_wait.params,
+        intent=commands.CommandIntent.FIXIT,
+    )
+
+    monkeypatch.setattr(
+        "opentrons.protocol_engine.commands.background_task_recovery.expand_wait_for_tasks_fixit",
+        lambda *args, **kwargs: ([start_create], ["new-task"]),
+    )
+
+    decoy.when(state_store.config).then_return(
+        Config(robot_type=robot_type, deck_type=DeckType.OT3_STANDARD)
+    )
+    decoy.when(
+        slot_standardization.standardize_command(wait_request, robot_type)
+    ).then_return(wait_request)
+    decoy.when(
+        slot_standardization.standardize_command(start_create, robot_type)
+    ).then_return(start_create)
+
+    ids = iter(["start-command-id", "wait-command-id"])
+    decoy.when(model_utils.generate_id()).then_do(lambda prefix="": next(ids))
+    decoy.when(model_utils.get_timestamp()).then_return(created_at)
+
+    def _stub_queued_start(*_a: object, **_k: object) -> None:
+        decoy.when(state_store.commands.get("start-command-id")).then_return(
+            queued_start
+        )
+
+    def _stub_queued_wait(*_a: object, **_k: object) -> None:
+        decoy.when(state_store.commands.get("wait-command-id")).then_return(queued_wait)
+
+    decoy.when(
+        state_store.commands.validate_action_allowed(
+            QueueCommandAction(
+                command_id="start-command-id",
+                created_at=created_at,
+                request=start_create,
+                request_hash=None,
+            )
+        )
+    ).then_return(
+        QueueCommandAction(
+            command_id="start-command-id",
+            created_at=created_at,
+            request=start_create,
+            request_hash=None,
+        )
+    )
+    decoy.when(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
+            QueueCommandAction(
+                command_id="start-command-id",
+                created_at=created_at,
+                request=start_create,
+                request_hash=None,
+            )
+        )
+    ).then_do(_stub_queued_start)
+
+    decoy.when(
+        state_store.commands.validate_action_allowed(
+            QueueCommandAction(
+                command_id="wait-command-id",
+                created_at=created_at,
+                request=rewritten_wait,
+                request_hash=None,
+            )
+        )
+    ).then_return(
+        QueueCommandAction(
+            command_id="wait-command-id",
+            created_at=created_at,
+            request=rewritten_wait,
+            request_hash=None,
+        )
+    )
+    decoy.when(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
+            QueueCommandAction(
+                command_id="wait-command-id",
+                created_at=created_at,
+                request=rewritten_wait,
+                request_hash=None,
+            )
+        )
+    ).then_do(_stub_queued_wait)
+
+    result = subject.add_command(wait_request)
+
+    assert result == queued_wait
 
 
 def test_add_fixit_command_raises(
@@ -761,6 +886,30 @@ async def test_finish_with_defaults(
     )
 
 
+async def test_finish_is_noop_when_already_stopped(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    subject: ProtocolEngine,
+    hardware_stopper: HardwareStopper,
+    queue_worker: QueueWorker,
+    state_store: StateStore,
+) -> None:
+    """It should no-op if finish() already completed."""
+    decoy.when(state_store.commands.get_is_stopped()).then_return(True)
+
+    await subject.finish()
+
+    decoy.verify(
+        action_dispatcher.dispatch(FinishAction(set_run_status=True)),
+        times=0,
+    )
+    decoy.verify(await queue_worker.join(), times=0)
+    decoy.verify(
+        await hardware_stopper.do_halt(disengage_before_stopping=True),
+        times=0,
+    )
+
+
 @pytest.mark.parametrize(
     argnames=["stopped_by_estop", "expected_drop_tips", "expected_end_state"],
     argvalues=[
@@ -1013,7 +1162,7 @@ async def test_async_module_error_stops_on_match(
 
     decoy.verify(
         action_dispatcher.dispatch(action=validated_action),
-        queue_worker.cancel(),
+        queue_worker.cancel("asynchronous module error from thermocyclerModuleV1"),
     )
 
 
@@ -1096,7 +1245,7 @@ async def test_estop(
 
     decoy.verify(
         action_dispatcher.dispatch(action=validated_action),
-        queue_worker.cancel(),
+        queue_worker.cancel("E-stop Pressed"),
     )
 
 
@@ -1180,11 +1329,11 @@ def test_add_legacy_labware_offset(
         Config(robot_type=robot_type, deck_type=DeckType.OT3_STANDARD)
     )
     decoy.when(state_store.addressable_areas.deck_definition).then_return(
-        cast(DeckDefinitionV5, {})
+        cast(DeckDefinitionV6, {})
     )
     decoy.when(
         labware_offset_standardization.standardize_labware_offset_create(
-            request, robot_type, cast(DeckDefinitionV5, {})
+            request, robot_type, cast(DeckDefinitionV6, {})
         )
     ).then_return(standardized_request)
     decoy.when(model_utils.generate_id()).then_return(id)
@@ -1257,11 +1406,11 @@ def test_add_labware_offset(
         Config(robot_type=robot_type, deck_type=DeckType.OT3_STANDARD)
     )
     decoy.when(state_store.addressable_areas.deck_definition).then_return(
-        cast(DeckDefinitionV5, {})
+        cast(DeckDefinitionV6, {})
     )
     decoy.when(
         labware_offset_standardization.standardize_labware_offset_create(
-            request, robot_type, cast(DeckDefinitionV5, {})
+            request, robot_type, cast(DeckDefinitionV6, {})
         )
     ).then_return(standardized_request)
     decoy.when(model_utils.generate_id()).then_return(id)

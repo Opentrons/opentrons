@@ -1,4 +1,4 @@
-import { test } from '@applitools/eyes-playwright/fixture'
+import { test } from '@playwright/test'
 
 test.describe('ProtocolVisualization', () => {
   test.beforeEach(async ({ page }) => {
@@ -6,18 +6,14 @@ test.describe('ProtocolVisualization', () => {
     await page.waitForLoadState('networkidle')
   })
 
-  test('captures first and last protocol steps', async ({ page, eyes }) => {
+  test('captures first and last protocol steps', async ({ page }) => {
     const container = page.getByTestId('protocol-visualization-container')
     await container.waitFor({ state: 'visible' })
-    await eyes.check('ProtocolVisualization initial step', {
-      region: container,
-      matchLevel: 'Strict',
-    })
 
     const scrubberTrack = container
       .locator('[class*="track_container"]')
       .first()
-    await scrubberTrack.waitFor({ state: 'attached' })
+    await scrubberTrack.scrollIntoViewIfNeeded()
     const scrubberBox = await scrubberTrack.boundingBox()
     if (scrubberBox == null) {
       throw new Error('Protocol visualization scrubber was not visible')
@@ -34,10 +30,5 @@ test.describe('ProtocolVisualization', () => {
         .getAnimations()
         .every(a => a.playState === 'finished' || a.playState === 'idle')
     )
-
-    await eyes.check('ProtocolVisualization last step', {
-      region: container,
-      matchLevel: 'Strict',
-    })
   })
 })

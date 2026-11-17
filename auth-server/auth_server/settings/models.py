@@ -7,6 +7,8 @@ import pydantic
 
 AUTH_SERVER_AUDIT_SYSTEM_NAME = "system"
 AUTH_SERVER_AUDIT_SYSTEM_FULLNAME = "authentication subsystem"
+SECONDS_PER_DAY = 24 * 60 * 60
+MIN_PASSWORD_RESET_TIME_SEC = SECONDS_PER_DAY
 
 
 class _StrictBaseModel(pydantic.BaseModel):
@@ -23,11 +25,18 @@ class SettingsResponseData(_StrictBaseModel):
 
     maxNumberOfLoginAttempts: int | None = pydantic.Field(
         default=5,
+        ge=1,
+        le=5,
         description="Max number of login attempts before account deactivation. Set to null to remove the limit.",
     )
     passwordResetTime: float | None = pydantic.Field(
         default=None,
-        description="Duration in seconds until password must be changed. Set to null to remove the limit.",
+        ge=MIN_PASSWORD_RESET_TIME_SEC,
+        description=(
+            "Duration in seconds until password must be changed. "
+            f"Must be at least {MIN_PASSWORD_RESET_TIME_SEC} (1 day). "
+            "Set to null to remove the limit."
+        ),
     )
     passwordComplexityMinimumLength: int | None = pydantic.Field(
         default=None,
@@ -55,6 +64,30 @@ class SettingsResponseData(_StrictBaseModel):
     )
 
 
+class PatchSettingsResponseMeta(_StrictBaseModel):
+    """Contains metadata about the patch settings response.
+
+    This is used to determine if the user's password has been reset.
+    """
+
+    requiresLogout: Annotated[
+        bool,
+        pydantic.Field(
+            description="Whether the user needs to logout to apply the new settings."
+        ),
+    ]
+
+
+class PatchSettingsResponseBody(_StrictBaseModel):
+    """A response to a patch settings request.
+
+    This includes the new settings and metadata about the response.
+    """
+
+    data: SettingsResponseData
+    meta: PatchSettingsResponseMeta
+
+
 class PatchSettingsRequestData(_StrictBaseModel):
     """A request to change the settings.
 
@@ -65,13 +98,20 @@ class PatchSettingsRequestData(_StrictBaseModel):
     maxNumberOfLoginAttempts: Annotated[
         int | None,
         pydantic.Field(
-            description="Max number of login attempts before account deactivation."
+            ge=1,
+            le=5,
+            description="Max number of login attempts before account deactivation.",
         ),
     ] = None
     passwordResetTime: Annotated[
         float | None,
         pydantic.Field(
-            description="Duration in seconds until password must be changed. Set to null to remove the limit.",
+            ge=MIN_PASSWORD_RESET_TIME_SEC,
+            description=(
+                "Duration in seconds until password must be changed. "
+                f"Must be at least {MIN_PASSWORD_RESET_TIME_SEC} (1 day). "
+                "Set to null to remove the limit."
+            ),
         ),
     ] = None
     passwordComplexityMinimumLength: Annotated[

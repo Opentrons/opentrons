@@ -184,7 +184,7 @@ function socketEmulatorFromPort(port: SerialPort): Socket {
       currentTimeout = null
     } else if (timeout !== 0) {
       currentTimeout = setTimeout(() => {
-        console.log('socket timed out')
+        console.error('socket timed out')
         socket.emit('timeout')
       }, timeout)
       if (callable != null) {

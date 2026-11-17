@@ -5,9 +5,9 @@ import {
   getSimplestDeckConfigForProtocol,
 } from '@opentrons/shared-data'
 
+import { ModuleInfo } from '/app/components/adhoc/shared/ModuleInfo'
 import { getStandardDeckViewLayerBlockList } from '/app/local-resources/deck_configuration'
 import { useModuleUSBPort } from '/app/local-resources/modules'
-import { ModuleInfo } from '/app/molecules/ModuleInfo'
 
 import type { ModuleOnDeck } from '@opentrons/components'
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'

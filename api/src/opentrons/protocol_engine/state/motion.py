@@ -17,6 +17,7 @@ from . import _move_types
 from .addressable_areas import AddressableAreaView
 from .config import Config
 from .geometry import GeometryView
+from .instrument_interface import InstrumentInterfaceView
 from .labware import LabwareView
 from .module_substates import HeaterShakerModuleId
 from .modules import ModuleView
@@ -50,6 +51,7 @@ class MotionView:
         pipette_view: PipetteView,
         addressable_area_view: AddressableAreaView,
         geometry_view: GeometryView,
+        instrument_interface_view: InstrumentInterfaceView,
         module_view: ModuleView,
     ) -> None:
         """Initialize a MotionState instance."""
@@ -58,6 +60,7 @@ class MotionView:
         self._pipettes = pipette_view
         self._addressable_areas = addressable_area_view
         self._geometry = geometry_view
+        self._instrument_interface = instrument_interface_view
         self._modules = module_view
 
     def get_pipette_location(
@@ -129,7 +132,8 @@ class MotionView:
             elif self._labware.get_is_row_labware(labware_id):
                 return CriticalPoint.X_CENTER
             else:
-                return None
+                # Irregular ordering (extra barcode/cap wells, etc.).
+                return CriticalPoint.Y_CENTER
         elif self._labware.get_should_center_pipette_on_target_well(labware_id):
             return CriticalPoint.XY_CENTER
         else:
@@ -155,7 +159,7 @@ class MotionView:
 
         destination_cp = self.get_critical_point_for_wells_in_labware(labware_id)
 
-        destination = self._geometry.get_well_position(
+        destination = self._instrument_interface.get_well_position(
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,

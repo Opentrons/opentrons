@@ -92,7 +92,7 @@ const getCheckedPath = (
       : (castFormData.liquidClass ?? null)
   ]?.byPipette
     .find(
-      ({ pipetteModel }) => (pipetteModel = getFlexNameConversion(pipetteSpecs))
+      ({ pipetteModel }) => pipetteModel === getFlexNameConversion(pipetteSpecs)
     )
     ?.byTipType.find(({ tiprack }) => tiprack === tipRack?.tiprackDefURI)
 
@@ -208,10 +208,14 @@ export const moveLiquidFormToArgs = (
         )
       : null
 
+  // Well spreading must use checkedPath: getCheckedPath can downgrade
+  // multiDispense/multiAspirate to single when the tip handles multi
+  const checkedPath = getCheckedPath(castFormData, contextualState, path)
+
   // 1:many with single path: spread well array of length 1 to match other well array
   // distribute 1:many can not happen into the waste chute or trash bin
   if (destWells != null && !isDispensingIntoDisposalLocation) {
-    if (path === 'single' && sourceWells.length !== destWells.length) {
+    if (checkedPath === 'single' && sourceWells.length !== destWells.length) {
       if (sourceWells.length === 1) {
         sourceWells = Array(destWells.length).fill(sourceWells[0])
       } else if (destWells.length === 1) {
@@ -253,29 +257,29 @@ export const moveLiquidFormToArgs = (
     'dispense_mix_times'
   )
   const aspirateDelay = getMoveLiquidDelayData({
-    castFormData: castFormData,
+    castFormData,
     secondsField: 'aspirate_delay_seconds',
     checkboxField: 'aspirate_delay_checkbox',
   })
   const dispenseDelay = getMoveLiquidDelayData({
-    castFormData: castFormData,
+    castFormData,
     secondsField: 'dispense_delay_seconds',
     checkboxField: 'dispense_delay_checkbox',
   })
   const aspirateSubmergeDelay = getMoveLiquidDelayData({
-    castFormData: castFormData,
+    castFormData,
     secondsField: 'aspirate_submerge_delay_seconds',
   })
   const dispenseSubmergeDelay = getMoveLiquidDelayData({
-    castFormData: castFormData,
+    castFormData,
     secondsField: 'dispense_submerge_delay_seconds',
   })
   const aspirateRetractDelay = getMoveLiquidDelayData({
-    castFormData: castFormData,
+    castFormData,
     secondsField: 'aspirate_retract_delay_seconds',
   })
   const dispenseRetractDelay = getMoveLiquidDelayData({
-    castFormData: castFormData,
+    castFormData,
     secondsField: 'dispense_retract_delay_seconds',
   })
   const blowoutLocation =
@@ -431,8 +435,6 @@ export const moveLiquidFormToArgs = (
     ),
     'expected tips_selected to be set when tip_tracking is manual'
   )
-
-  const checkedPath = getCheckedPath(castFormData, contextualState, path)
 
   switch (checkedPath) {
     case 'single': {

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { TwoColumn } from '/app/molecules/InterventionModal'
+import { TwoColumn } from '/app/components/ODD/modals/InterventionModal'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 import {
   selectActivePipette,
@@ -13,9 +13,10 @@ import {
 import { LPCDeck } from './LPCDeck'
 import { PlaceItemInstruction } from './PlaceItemInstruction'
 
+import type { ReactNode } from 'react'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 
-export function PrepareLabware(props: EditOffsetContentProps): JSX.Element {
+export function PrepareLabware(props: EditOffsetContentProps): ReactNode {
   const { runId, commandUtils, proceedSubstep, goBackSubstep, contentHeader } =
     props
   const { toggleRobotMoving, handleConfirmLwModulePlacement } = commandUtils

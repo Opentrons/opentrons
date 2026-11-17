@@ -100,6 +100,7 @@ class DisplayCategory(StrEnum):
     reservoir = "reservoir"
     trash = "trash"
     wellPlate = "wellPlate"
+    filterPlate = "filterPlate"
     aluminumBlock = "aluminumBlock"
     adapter = "adapter"
     other = "other"
@@ -597,6 +598,7 @@ class LabwareDefinition2(BaseModel):
     gripperOffsets: dict[str, GripperOffsets] = Field(default_factory=dict)
     gripForce: float | None = None
     gripHeightFromLabwareBottom: float | None = None
+    skirtHeight: float | None = None
     stackLimit: int | None = None
     compatibleParentLabware: list[str] | None = None
     innerLabwareGeometry: dict[str, InnerWellGeometry | UserDefinedVolumes] | None = (
@@ -627,6 +629,7 @@ class LabwareDefinition3(BaseModel):
     gripperOffsets: dict[str, GripperOffsets] = Field(default_factory=dict)
     gripForce: float | None = None
     gripHeightFromLabwareOrigin: float | None = None
+    skirtHeight: Annotated[float, Field(ge=0)] | None = None
     stackLimit: int | None = None
     compatibleParentLabware: list[str] | None = None
     innerLabwareGeometry: dict[str, InnerWellGeometry] | None = None

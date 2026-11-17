@@ -1,10 +1,12 @@
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import {
   isModuleConfirmationStatus,
   isRunAgainStatus,
@@ -31,11 +33,13 @@ import {
 } from '/app/redux/protocol-runs'
 import { useIsRobotOutOfStorage } from '/app/resources/devices'
 
+import { useRunHeaderRunControls } from '../../../hooks'
 import { isAnyHeaterShakerShaking } from '../../../RunHeaderModalContainer/modals'
 import { useActionBtnDisabledUtils } from './useActionBtnDisabledUtils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { IconName } from '@opentrons/components'
+import type { DocumentedAction } from '@opentrons/react-api-client'
 import type { StepKey } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
 import type { BaseActionButtonProps } from '..'
@@ -71,7 +75,6 @@ export function useActionButtonProperties({
   runRecord,
   robotAnalyticsData,
   robotSerialNumber,
-  protocolRunControls,
   attachedModules,
   runHeaderModalContainerUtils,
   isResetRunLoadingRef,
@@ -87,7 +90,8 @@ export function useActionButtonProperties({
   buttonIconName: IconName | null
 } {
   const { t } = useTranslation(['run_details', 'shared'])
-  const { play, pause, reset } = protocolRunControls
+  const navigate = useNavigate()
+
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotType = useRobotType(robotName)
   const { reportCameraEnablementSettings } = useCameraAnalytics({
@@ -100,9 +104,27 @@ export function useActionButtonProperties({
   const missingSetupSteps = useSelector<State, StepKey[]>((state: State) =>
     getMissingSetupSteps(state, runId)
   )
-  const documentationState = useDocumentationState()
-  const { addCameraSettingsToRun } =
-    useAddCameraSettingsToRunMutation(documentationState)
+
+  const actionsToDocument: DocumentedAction[] = useMemo(
+    () =>
+      !areCameraPreferencesConfirmed
+        ? ['update_camera_settings_for_run', 'play_run']
+        : ['play_run'],
+    [areCameraPreferencesConfirmed]
+  )
+  const { documentationState: linkedDocumentationState } =
+    useLinkedDocumentationState(actionsToDocument, runId)
+
+  const protocolRunControls = useRunHeaderRunControls(
+    runId,
+    robotName,
+    linkedDocumentationState
+  )
+  const { play, pause } = protocolRunControls
+
+  const { addCameraSettingsToRun } = useAddCameraSettingsToRunMutation(
+    linkedDocumentationState
+  )
   const runCameraSettings = useSelector((state: State) =>
     getCameraUsageState(state, runId)
   )
@@ -218,7 +240,7 @@ export function useActionButtonProperties({
       }
     }
   } else if (isRunAgainStatus(runStatus)) {
-    buttonIconName = isResetRunLoadingRef.current ? 'ot-spinner' : 'play'
+    buttonIconName = 'play'
     buttonText = t('run_again')
     handleButtonClick = () => {
       if (isRobotOutOfMemory) {
@@ -226,13 +248,6 @@ export function useActionButtonProperties({
         return
       }
 
-      isResetRunLoadingRef.current = true
-      reset({
-        onError: () => {
-          // e.g. user cancelled the documentation modal
-          isResetRunLoadingRef.current = false
-        },
-      })
       runHeaderModalContainerUtils.dropTipUtils.resetTipStatus()
       trackEvent({
         name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -240,6 +255,10 @@ export function useActionButtonProperties({
       })
       trackProtocolRunEvent({
         name: ANALYTICS_PROTOCOL_RUN_ACTION.AGAIN,
+      })
+      // Same as device-page rerun: show page loading; ProtocolRunDetails clones.
+      navigate(`/devices/${robotName}/protocol-runs/${runId}/setup`, {
+        state: { pendingRerun: true },
       })
     }
   }

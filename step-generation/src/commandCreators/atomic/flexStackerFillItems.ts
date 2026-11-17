@@ -3,25 +3,63 @@ import { getIsLid } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import { flexStackerStateGetter } from '../../robotStateSelectors'
 import {
-  formatPyStr,
   getChunkForIndentingLists,
   getIsSpaceInHopper,
   INDENT,
   indentPyLines,
   labwareMatchesLabwareInHopper,
+  pythonRuntimeString,
+  resolveStringRuntimeValue,
   uuid,
 } from '../../utils'
 
-import type { CommandCreator, FlexStackerFillItemsArgs } from '../../types'
+import type {
+  CommandCreator,
+  CommandCreatorError,
+  FlexStackerFillItemsArgs,
+} from '../../types'
 
 export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
   args,
   invariantContext,
   robotState
 ) => {
-  const { moduleId, interventionMessage, fillLabwareIds } = args
-  const { labwareEntities, moduleEntities } = invariantContext
-  if (moduleId == null || moduleEntities[moduleId] == null) {
+  const { interventionMessage, fillLabwareIds } = args
+  const { labwareEntities, moduleEntities, runtimeParameters } =
+    invariantContext
+  const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
+  const resolvedFillLabwareIds = fillLabwareIds.map(id =>
+    resolveStringRuntimeValue(id, runtimeParameters)
+  )
+  const resolvedMessage =
+    interventionMessage == null
+      ? null
+      : resolveStringRuntimeValue(interventionMessage, runtimeParameters)
+  const errors: CommandCreatorError[] = []
+  if (moduleId == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: args.moduleId })
+    )
+  }
+  fillLabwareIds.forEach((id, i) => {
+    if (resolvedFillLabwareIds[i] == null) {
+      errors.push(errorCreators.invalidRuntimeParameter({ parameterName: id }))
+    }
+  })
+  if (interventionMessage != null && resolvedMessage == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({
+        parameterName: interventionMessage,
+      })
+    )
+  }
+  if (errors.length > 0 || moduleId == null) {
+    return { errors }
+  }
+  const resolvedLabwareIds = resolvedFillLabwareIds.filter(
+    (id): id is string => id != null
+  )
+  if (moduleEntities[moduleId] == null) {
     return { errors: [errorCreators.missingModuleError()] }
   }
   const flexStackerState = flexStackerStateGetter(robotState, moduleId)
@@ -30,7 +68,7 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
     invariantContext.labwareEntities
   )
   const modulePythonName = moduleEntities[moduleId].pythonName
-  const labwarePythonNames = fillLabwareIds
+  const labwarePythonNames = resolvedLabwareIds
     .filter(id => !getIsLid(labwareEntities[id].def))
     .map(lwId => labwareEntities[lwId]?.pythonName)
   const labwareChunks = getChunkForIndentingLists(labwarePythonNames, 4)
@@ -55,8 +93,8 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
     return {
       errors: [errorCreators.flexStackerHopperFull()],
     }
-  } else if (fillLabwareIds.length > 0) {
-    const allMatch = fillLabwareIds.every(labware =>
+  } else if (resolvedLabwareIds.length > 0) {
+    const allMatch = resolvedLabwareIds.every(labware =>
       labwareMatchesLabwareInHopper(labware, invariantContext, flexStackerState)
     )
     if (!allMatch) {
@@ -66,15 +104,17 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
     }
   }
 
-  const filteredFillLabwareIds = fillLabwareIds.filter(
+  const filteredFillLabwareIds = resolvedLabwareIds.filter(
     id => !getIsLid(labwareEntities[id].def)
   )
   const pythonArgs = [
     ...(filteredFillLabwareIds.length > 0
       ? `labware=[${formattedPythonLabwareNames}],\n`
       : []),
-    ...(interventionMessage != null
-      ? [`message=${formatPyStr(interventionMessage)},\n`]
+    ...(interventionMessage != null && resolvedMessage != null
+      ? [
+          `message=${pythonRuntimeString(interventionMessage, resolvedMessage, runtimeParameters)},\n`,
+        ]
       : []),
   ].join('')
 
@@ -85,8 +125,8 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
         key: uuid(),
         params: {
           moduleId,
-          labware: fillLabwareIds,
-          message: interventionMessage ?? undefined,
+          labware: resolvedLabwareIds,
+          message: resolvedMessage ?? undefined,
         },
       },
     ],

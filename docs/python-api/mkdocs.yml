@@ -166,5 +166,5 @@ extra_css:
   - ../shared/print-pdf.css
 
 extra:
-  apiLevel: 2.29
-  robot_stack_version: 9.1.0
+  apiLevel: 2.30
+  robot_stack_version: 10.0.0

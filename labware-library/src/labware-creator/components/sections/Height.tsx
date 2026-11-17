@@ -37,6 +37,16 @@ const Content = (props: ContentProps): JSX.Element => {
           inputMasks={[maskTo2Decimal]}
           units="mm"
         />
+        {values.labwareType === 'filterPlate' ||
+        values.labwareType === 'wellPlate' ? (
+          <>
+            <TextField
+              name="skirtHeight"
+              inputMasks={[maskTo2Decimal]}
+              units="mm"
+            />
+          </>
+        ) : null}
       </div>
     </div>
   )
@@ -46,6 +56,7 @@ export const Height = (): JSX.Element | null => {
   const fieldList: Array<keyof LabwareFields> = [
     'labwareType',
     'labwareZDimension',
+    'skirtHeight',
   ]
   const { values, errors, touched } = useFormikContext<LabwareFields>()
 

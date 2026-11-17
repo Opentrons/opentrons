@@ -10,6 +10,7 @@ import {
 } from './constants'
 import { getAnnotations, getShapes } from './utils'
 
+import type { ReactNode } from 'react'
 import type { LiquidHandlingPropertyByVolume } from '@opentrons/shared-data'
 import type { ByVolumeType, DataPoint } from './types'
 
@@ -22,7 +23,7 @@ export function ByVolumeBuilder(props: {
   byVolume: LiquidHandlingPropertyByVolume
   maxX: number
   maxY: number
-}): JSX.Element {
+}): ReactNode {
   const { type, dataPoints, setDataPoints, maxX, maxY } = props
 
   const { t } = useTranslation('by_volume_builder')

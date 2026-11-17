@@ -1,10 +1,11 @@
 import { useTranslation } from 'react-i18next'
 
 import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
-import { LegacyStyledText } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 
 import styles from './errorcontent.module.css'
 
+import type { ReactNode } from 'react'
 import type { RunStatus } from '@opentrons/api-client'
 import type { RunCommandError } from '@opentrons/shared-data'
 
@@ -17,11 +18,11 @@ export function ErrorContent({
   errors,
   isSingleError,
   runStatus,
-}: ErrorContentProps): JSX.Element {
+}: ErrorContentProps): ReactNode {
   const { t } = useTranslation('run_details')
   return (
     <>
-      <LegacyStyledText forwardedAs="p" className={styles.error_info_text}>
+      <StyledText forwardedAs="p" className={styles.error_info_text}>
         {isSingleError
           ? t('error_info', {
               errorType: errors[0].errorType,
@@ -34,11 +35,11 @@ export function ErrorContent({
             : t(errors.length > 1 ? 'no_of_errors' : 'no_of_error', {
                 count: errors.length,
               })}
-      </LegacyStyledText>
+      </StyledText>
       <div className={styles.error_container}>
         <div className={styles.error_list}>
           {errors.map((error, index) => (
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               className={styles.error_detail_text}
               key={index}
@@ -46,7 +47,7 @@ export function ErrorContent({
               {isSingleError
                 ? error.detail
                 : `${error.errorCode}: ${error.detail}`}
-            </LegacyStyledText>
+            </StyledText>
           ))}
         </div>
       </div>

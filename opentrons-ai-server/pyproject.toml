@@ -17,10 +17,12 @@ dependencies = [
     "structlog==24.4.0",
     "asgi-correlation-id==4.3.3",
     "gspread==6.1.4",
-    "google-auth==2.36.0",
+    "google-auth==2.43.0",
     "google-auth-oauthlib==1.2.1",
     "anthropic==0.120.2",
-    "weave==0.51.54",
+    "weave[anthropic,wandb]==0.53.13",
+    "nh3==0.3.7",
+    "wandb==0.31.0",
 ]
 
 [project.optional-dependencies]
@@ -95,5 +97,7 @@ module = "llama_index.llms.openai"
 ignore_missing_imports = true
 
 [tool.uv]
+# Keep in sync with repo-root uv.toml and oe-core's Dockerfile
+required-version = "==0.12.1"
 # cooldown time for security
 exclude-newer = "1 week"

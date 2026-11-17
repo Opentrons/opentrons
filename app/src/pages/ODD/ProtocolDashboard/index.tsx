@@ -10,18 +10,22 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  LegacyStyledText,
-  POSITION_STATIC,
   POSITION_STICKY,
   SPACING,
+  StyledText,
+  Z_INDEX,
 } from '@opentrons/components'
 import {
   useAllProtocolsQuery,
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 
-import { SmallButton, TouchFloatingActionButton } from '/app/atoms/buttons'
-import { Navigation } from '/app/organisms/ODD/Navigation'
+import {
+  SmallButton,
+  TouchFloatingActionButton,
+} from '/app/components/ODD/buttons'
+import { ProtocolCard } from '/app/components/ODD/cards/ProtocolCard'
+import { Navigation } from '/app/components/ODD/headers/Navigation'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_FLOW_STARTED } from '/app/redux/analytics'
 import {
@@ -35,7 +39,6 @@ import { DeleteProtocolConfirmationModal } from './DeleteProtocolConfirmationMod
 import { NoProtocols } from './NoProtocols'
 import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
 import { PipetteNotAttachedErrorModal } from './PipetteNotAttachedErrorModal'
-import { ProtocolCard } from './ProtocolCard'
 import { sortProtocols } from './utils'
 
 import type { PipetteData } from '@opentrons/api-client'
@@ -43,7 +46,13 @@ import type { ProtocolResource } from '@opentrons/shared-data'
 import type { ProtocolsOnDeviceSortKey } from '/app/redux/config/types'
 import type { Dispatch } from '/app/redux/types'
 
-export function ProtocolDashboard(): JSX.Element {
+export interface ProtocolDashboardProps {
+  isCRSEnabled: boolean
+}
+
+export function ProtocolDashboard({
+  isCRSEnabled,
+}: ProtocolDashboardProps): JSX.Element {
   const protocols = useAllProtocolsQuery()
   const runs = useNotifyAllRunsQuery()
   const { t } = useTranslation('protocol_info')
@@ -52,9 +61,6 @@ export function ProtocolDashboard(): JSX.Element {
   const { data: attachedInstruments } = useInstrumentsQuery()
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
-  const [navMenuIsOpened, setNavMenuIsOpened] = useState<boolean>(false)
-  const [longPressModalIsOpened, setLongPressModalOpened] =
-    useState<boolean>(false)
   const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] =
     useState<boolean>(false)
   const [targetProtocolId, setTargetProtocolId] = useState<string>('')
@@ -184,26 +190,22 @@ export function ProtocolDashboard(): JSX.Element {
         minHeight="25rem"
         paddingBottom={SPACING.spacing40}
       >
-        <Navigation
-          setNavMenuIsOpened={setNavMenuIsOpened}
-          longPressModalIsOpened={longPressModalIsOpened}
-        />
+        <Navigation />
         <Box paddingX={SPACING.spacing40}>
           {pinnedProtocols.length > 0 && (
             <Flex
               flexDirection={DIRECTION_COLUMN}
               marginBottom={SPACING.spacing32}
             >
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="p"
                 marginBottom={SPACING.spacing8}
                 color={COLORS.grey60}
               >
                 {t('pinned_protocols')}
-              </LegacyStyledText>
+              </StyledText>
               <PinnedProtocolCarousel
                 pinnedProtocols={pinnedProtocols}
-                longPress={setLongPressModalOpened}
                 setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
                 setTargetProtocolId={setTargetProtocolId}
                 isRequiredCSV={isRequiredCSV}
@@ -218,13 +220,9 @@ export function ProtocolDashboard(): JSX.Element {
                 flexDirection={DIRECTION_ROW}
                 paddingTop={SPACING.spacing16}
                 paddingBottom={SPACING.spacing16}
-                position={
-                  navMenuIsOpened || longPressModalIsOpened
-                    ? POSITION_STATIC
-                    : POSITION_STICKY
-                }
+                position={POSITION_STICKY}
                 top="7.75rem"
-                zIndex={navMenuIsOpened || longPressModalIsOpened ? 0 : 2.5}
+                zIndex={Z_INDEX.DETAILS}
                 width="100%"
               >
                 <Flex width="32.3125rem">
@@ -297,7 +295,6 @@ export function ProtocolDashboard(): JSX.Element {
                       key={protocol.id}
                       lastRun={lastRun}
                       protocol={protocol}
-                      longPress={setLongPressModalOpened}
                       setShowDeleteConfirmationModal={
                         setShowDeleteConfirmationModal
                       }
@@ -311,12 +308,14 @@ export function ProtocolDashboard(): JSX.Element {
           ) : pinnedProtocols.length === 0 ? (
             <NoProtocols />
           ) : null}
-          <TouchFloatingActionButton
-            buttonText={t('quick_transfer')}
-            iconName="plus"
-            onClick={handleCreateNewQuickTransfer}
-            aria-label={t('create_quick_transfer')}
-          />
+          {isCRSEnabled ? null : (
+            <TouchFloatingActionButton
+              buttonText={t('quick_transfer')}
+              iconName="plus"
+              onClick={handleCreateNewQuickTransfer}
+              aria-label={t('create_quick_transfer')}
+            />
+          )}
         </Box>
       </Flex>
     </>

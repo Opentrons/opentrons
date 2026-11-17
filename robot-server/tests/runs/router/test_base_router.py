@@ -8,6 +8,7 @@ from decoy import Decoy
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.hardware_control.types import DoorState, EstopState
 from opentrons.protocol_engine import (
     CommandErrorSlice,
     CommandPointer,
@@ -49,6 +50,7 @@ from server_utils.auth.resource_server.types import (
     AuthenticationNotRequiredResult,
 )
 from server_utils.auth.scopes import Scope, serialize_scopes
+from server_utils.fastapi_utils.app_state import AppState
 from server_utils.fastapi_utils.models.json_api import (
     MultiBodyMeta,
     RequestModel,
@@ -57,6 +59,8 @@ from server_utils.fastapi_utils.models.json_api import (
     SimpleEmptyBody,
 )
 
+from robot_server.access_control.settings.models import ResponseData
+from robot_server.access_control.settings.store import AccessControlSettingStore
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
 )
@@ -106,9 +110,15 @@ from robot_server.runs.run_orchestrator_store import RunConflictError
 from robot_server.runs.run_store import RunStore
 
 
-def mock_notify_publishers() -> None:
+async def mock_notify_publishers() -> None:
     """A mock notify_publishers."""
     return None
+
+
+@pytest.fixture
+def mock_app_state(decoy: Decoy) -> AppState:
+    """Get a mock AppState."""
+    return decoy.mock(cls=AppState)
 
 
 @pytest.fixture
@@ -164,6 +174,12 @@ def mock_disk_monitor(decoy: Decoy) -> DiskMonitor:
     return decoy.mock(cls=DiskMonitor)
 
 
+@pytest.fixture
+def mock_access_control_setting_store(decoy: Decoy) -> AccessControlSettingStore:
+    """Get a mock AccessControlSettingStore."""
+    return decoy.mock(cls=AccessControlSettingStore)
+
+
 async def test_create_run(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
@@ -177,6 +193,7 @@ async def test_create_run(
     mock_camera_provider: CameraProvider,
     mock_audit_client: AuditClient,
     mock_disk_monitor: DiskMonitor,
+    mock_access_control_setting_store: AccessControlSettingStore,
 ) -> None:
     """It should be able to create a basic run."""
     run_id = "run-id"
@@ -251,6 +268,7 @@ async def test_create_run(
         audit_client=mock_audit_client,
         check_estop=True,
         access_control_status=False,
+        access_control_setting_store=mock_access_control_setting_store,
         disk_monitor=mock_disk_monitor,
     )
 
@@ -258,6 +276,112 @@ async def test_create_run(
     assert result.status_code == 201
 
     decoy.verify(mock_run_auto_deleter.make_room_for_new_run(), times=1)
+
+
+@pytest.mark.parametrize(
+    ("delete_over_max", "expected_auto_delete_calls"),
+    [
+        (False, 0),
+        (True, 1),
+    ],
+)
+async def test_create_run_auto_delete_respects_crs_toggle(
+    decoy: Decoy,
+    mock_run_data_manager: RunDataManager,
+    mock_run_auto_deleter: RunAutoDeleter,
+    labware_offset_create: pe_types.LegacyLabwareOffsetCreate,
+    mock_deck_configuration_store: DeckConfigurationStore,
+    mock_protocol_store: ProtocolStore,
+    mock_data_files_store: DataFilesStore,
+    mock_camera_provider: CameraProvider,
+    mock_audit_client: AuditClient,
+    mock_disk_monitor: DiskMonitor,
+    mock_access_control_setting_store: AccessControlSettingStore,
+    delete_over_max: bool,
+    expected_auto_delete_calls: int,
+) -> None:
+    """It should skip run auto-delete when CRS is on and the 20-run cap setting is off."""
+    run_id = "run-id"
+    run_created_at = datetime(year=2021, month=1, day=1)
+    expected_response = Run(
+        id=run_id,
+        createdAt=run_created_at,
+        protocolId=None,
+        logPeriodId="123",
+        current=True,
+        actions=[],
+        errors=[],
+        pipettes=[],
+        modules=[],
+        labware=[],
+        labwareOffsets=[],
+        status=pe_types.EngineStatus.IDLE,
+        liquids=[],
+        liquidClasses=[],
+        outputFileIds=[],
+        hasEverEnteredErrorRecovery=False,
+    )
+    decoy.when(
+        await mock_deck_configuration_store.get_deck_configuration()
+    ).then_return([])
+    decoy.when(await mock_audit_client.get_logging_enabled()).then_return(
+        GetLoggingEnabledData(loggingEnabled=True)
+    )
+    decoy.when(await mock_audit_client.get_current_log_period()).then_return(
+        GetLogPeriodsData(
+            id="123",
+            startedAt=datetime(year=2021, month=1, day=1),
+            endedAt=None,
+        )
+    )
+    decoy.when(mock_disk_monitor.is_disk_space_below_run_start_limit()).then_return(
+        False
+    )
+    decoy.when(mock_access_control_setting_store.get_all()).then_return(
+        ResponseData(deleteOverMaxOnDiskProtocols=delete_over_max)
+    )
+    decoy.when(
+        await mock_run_data_manager.create(
+            run_id=run_id,
+            created_at=run_created_at,
+            labware_offsets=[labware_offset_create],
+            deck_configuration=[],
+            camera_provider=mock_camera_provider,
+            protocol=None,
+            run_time_param_values=None,
+            run_time_param_paths=None,
+            notify_publishers=mock_notify_publishers,
+            access_control_status=True,
+            log_period_id="123",
+        )
+    ).then_return(expected_response)
+
+    result = await create_run(
+        request_body=RequestModel(
+            data=RunCreate(labwareOffsets=[labware_offset_create])
+        ),
+        run_data_manager=mock_run_data_manager,
+        data_files_store=mock_data_files_store,
+        data_files_directory=Path("/dev/null"),
+        run_id=run_id,
+        created_at=run_created_at,
+        run_auto_deleter=mock_run_auto_deleter,
+        deck_configuration_store=mock_deck_configuration_store,
+        camera_provider=mock_camera_provider,
+        notify_publishers=mock_notify_publishers,
+        protocol_store=mock_protocol_store,
+        audit_client=mock_audit_client,
+        check_estop=True,
+        access_control_status=True,
+        access_control_setting_store=mock_access_control_setting_store,
+        disk_monitor=mock_disk_monitor,
+    )
+
+    assert result.content.data == expected_response
+    assert result.status_code == 201
+    decoy.verify(
+        mock_run_auto_deleter.make_room_for_new_run(), times=expected_auto_delete_calls
+    )
 
 
 async def test_create_protocol_run(
@@ -271,6 +395,7 @@ async def test_create_protocol_run(
     mock_camera_provider: CameraProvider,
     mock_audit_client: AuditClient,
     mock_disk_monitor: DiskMonitor,
+    mock_access_control_setting_store: AccessControlSettingStore,
 ) -> None:
     """It should be able to create a protocol run."""
     run_id = "run-id"
@@ -380,6 +505,7 @@ async def test_create_protocol_run(
         audit_client=mock_audit_client,
         check_estop=True,
         access_control_status=False,
+        access_control_setting_store=mock_access_control_setting_store,
         disk_monitor=mock_disk_monitor,
     )
 
@@ -401,6 +527,7 @@ async def test_create_protocol_run_bad_protocol_id(
     mock_camera_provider: CameraProvider,
     mock_audit_client: AuditClient,
     mock_disk_monitor: DiskMonitor,
+    mock_access_control_setting_store: AccessControlSettingStore,
 ) -> None:
     """It should 404 if a protocol for a run does not exist."""
     error = ProtocolNotFoundError("protocol-id")
@@ -430,6 +557,7 @@ async def test_create_protocol_run_bad_protocol_id(
             check_estop=True,
             notify_publishers=mock_notify_publishers,
             access_control_status=False,
+            access_control_setting_store=mock_access_control_setting_store,
             disk_monitor=mock_disk_monitor,
         )
 
@@ -449,6 +577,7 @@ async def test_create_run_conflict(
     mock_camera_provider: CameraProvider,
     mock_audit_client: AuditClient,
     mock_disk_monitor: DiskMonitor,
+    mock_access_control_setting_store: AccessControlSettingStore,
 ) -> None:
     """It should respond with a conflict error if multiple engines are created."""
     created_at = datetime(year=2021, month=1, day=1)
@@ -494,6 +623,7 @@ async def test_create_run_conflict(
             audit_client=mock_audit_client,
             check_estop=True,
             access_control_status=False,
+            access_control_setting_store=mock_access_control_setting_store,
             disk_monitor=mock_disk_monitor,
         )
 
@@ -513,6 +643,7 @@ async def create_run_fails_when_out_of_space_under_acm(
     mock_camera_provider: CameraProvider,
     mock_audit_client: AuditClient,
     mock_disk_monitor: DiskMonitor,
+    mock_access_control_setting_store: AccessControlSettingStore,
 ) -> None:
     """It should refuse to create a run when out of space and ACM is enabled."""
     created_at = datetime(year=2021, month=1, day=1)
@@ -543,6 +674,7 @@ async def create_run_fails_when_out_of_space_under_acm(
             audit_client=mock_audit_client,
             check_estop=True,
             access_control_status=True,
+            access_control_setting_store=mock_access_control_setting_store,
             disk_monitor=mock_disk_monitor,
         )
 
@@ -561,6 +693,7 @@ async def test_create_protocol_run_succeeds_when_out_of_space_with_acm_off(
     mock_camera_provider: CameraProvider,
     mock_audit_client: AuditClient,
     mock_disk_monitor: DiskMonitor,
+    mock_access_control_setting_store: AccessControlSettingStore,
 ) -> None:
     """It should be able to create a protocol run."""
     run_id = "run-id"
@@ -670,6 +803,7 @@ async def test_create_protocol_run_succeeds_when_out_of_space_with_acm_off(
         audit_client=mock_audit_client,
         check_estop=True,
         access_control_status=False,
+        access_control_setting_store=mock_access_control_setting_store,
         disk_monitor=mock_disk_monitor,
     )
 
@@ -703,7 +837,7 @@ async def test_get_run_data_from_url(
         hasEverEnteredErrorRecovery=False,
     )
 
-    decoy.when(mock_run_data_manager.get("run-id")).then_return(expected_response)
+    decoy.when(await mock_run_data_manager.get("run-id")).then_return(expected_response)
 
     result = await get_run_data_from_url(
         runId="run-id",
@@ -720,7 +854,9 @@ async def test_get_run_with_missing_id(
     """It should 404 if the run ID does not exist."""
     not_found_error = RunNotFoundError(run_id="run-id")
 
-    decoy.when(mock_run_data_manager.get(run_id="run-id")).then_raise(not_found_error)
+    decoy.when(await mock_run_data_manager.get(run_id="run-id")).then_raise(
+        not_found_error
+    )
 
     with pytest.raises(ApiError) as exc_info:
         await get_run_data_from_url(
@@ -764,7 +900,7 @@ async def test_get_runs_empty(
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should return an empty collection response when no runs exist."""
-    decoy.when(mock_run_data_manager.get_all(length=20)).then_return([])
+    decoy.when(await mock_run_data_manager.get_all(length=20)).then_return([])
     decoy.when(mock_run_data_manager.current_run_id).then_return(None)
 
     result = await get_runs(run_data_manager=mock_run_data_manager, pageLength=20)
@@ -821,7 +957,9 @@ async def test_get_runs_not_empty(
         hasEverEnteredErrorRecovery=False,
     )
 
-    decoy.when(mock_run_data_manager.get_all(20)).then_return([response_1, response_2])
+    decoy.when(await mock_run_data_manager.get_all(20)).then_return(
+        [response_1, response_2]
+    )
     decoy.when(mock_run_data_manager.current_run_id).then_return("unique-id-2")
 
     result = await get_runs(run_data_manager=mock_run_data_manager, pageLength=20)
@@ -960,6 +1098,7 @@ async def test_update_run_to_not_current(
         protocol_store=mock_protocol_store,
         access_control_status=False,
         authentication=AuthenticationNotRequiredResult(),
+        user_notes=None,
     )
 
     assert result.content == SimpleBody(data=expected_response)
@@ -994,7 +1133,7 @@ async def test_update_current_none_noop(
         hasEverEnteredErrorRecovery=False,
     )
 
-    decoy.when(mock_run_data_manager.get("run-id")).then_return(expected_response)
+    decoy.when(await mock_run_data_manager.get("run-id")).then_return(expected_response)
 
     result = await update_run(
         runId="run-id",
@@ -1006,6 +1145,7 @@ async def test_update_current_none_noop(
         protocol_store=mock_protocol_store,
         access_control_status=False,
         authentication=AuthenticationNotRequiredResult(),
+        user_notes=None,
     )
 
     assert result.content == SimpleBody(data=expected_response)
@@ -1043,7 +1183,9 @@ async def test_update_run_signed_by_and_uncurrent(
     uncurrent_response = signed_response.model_copy(update={"current": False})
 
     decoy.when(
-        mock_run_data_manager.set_signed_by(run_id="run-id", signed_by="Alice Example")
+        await mock_run_data_manager.set_signed_by(
+            run_id="run-id", signed_by="Alice Example"
+        )
     ).then_return(signed_response)
     decoy.when(
         await mock_run_data_manager.uncurrent("run-id", access_control_status=False)
@@ -1064,6 +1206,7 @@ async def test_update_run_signed_by_and_uncurrent(
         protocol_store=mock_protocol_store,
         access_control_status=False,
         authentication=AuthenticationNotRequiredResult(),
+        user_notes=None,
     )
 
     assert result.content == SimpleBody(data=uncurrent_response)
@@ -1080,7 +1223,9 @@ async def test_update_run_not_complete(
 ) -> None:
     """It should 409 if signing a run that has not completed."""
     decoy.when(
-        mock_run_data_manager.set_signed_by(run_id="run-id", signed_by="Alice Example")
+        await mock_run_data_manager.set_signed_by(
+            run_id="run-id", signed_by="Alice Example"
+        )
     ).then_raise(RunNotCompleteError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
@@ -1094,6 +1239,7 @@ async def test_update_run_not_complete(
             protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticationNotRequiredResult(),
+            user_notes=None,
         )
 
     assert exc_info.value.status_code == 409
@@ -1126,6 +1272,7 @@ async def test_update_run_signoff_required(
             protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticationNotRequiredResult(),
+            user_notes=None,
         )
 
     assert exc_info.value.status_code == 409
@@ -1158,6 +1305,7 @@ async def test_update_to_current_not_current(
             protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticationNotRequiredResult(),
+            user_notes=None,
         )
 
     assert exc_info.value.status_code == 409
@@ -1190,6 +1338,7 @@ async def test_update_to_current_conflict(
             protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticationNotRequiredResult(),
+            user_notes=None,
         )
 
     assert exc_info.value.status_code == 409
@@ -1222,6 +1371,7 @@ async def test_update_to_current_missing(
             protocol_store=mock_protocol_store,
             access_control_status=False,
             authentication=AuthenticationNotRequiredResult(),
+            user_notes=None,
         )
 
     assert exc_info.value.status_code == 404
@@ -1251,6 +1401,7 @@ async def test_update_run_signed_by_requires_run_signoff_write_scope(
                 username="testuser",
                 fullname="Test User",
             ),
+            user_notes=None,
         )
 
     assert exc_info.value.required_scopes == {Scope.RUN_SIGNOFF_WRITE}
@@ -1286,7 +1437,9 @@ async def test_update_run_signed_by(
     )
 
     decoy.when(
-        mock_run_data_manager.set_signed_by(run_id="run-id", signed_by="Alice Example")
+        await mock_run_data_manager.set_signed_by(
+            run_id="run-id", signed_by="Alice Example"
+        )
     ).then_return(expected_response)
 
     result = await update_run(
@@ -1299,6 +1452,7 @@ async def test_update_run_signed_by(
         protocol_store=mock_protocol_store,
         access_control_status=False,
         authentication=AuthenticationNotRequiredResult(),
+        user_notes=None,
     )
 
     assert result.content == SimpleBody(data=expected_response)
@@ -1310,14 +1464,16 @@ async def test_get_run_commands_errors(
 ) -> None:
     """It should return a list of all commands errors in a run."""
     decoy.when(
-        mock_run_data_manager.get_command_error_slice(
+        await mock_run_data_manager.get_command_error_slice(
             run_id="run-id",
             cursor=0,
             length=42,
         )
     ).then_raise(RunNotCurrentError("oh no!"))
 
-    decoy.when(mock_run_data_manager.get_command_errors_count("run-id")).then_return(1)
+    decoy.when(
+        await mock_run_data_manager.get_command_errors_count("run-id")
+    ).then_return(1)
 
     with pytest.raises(ApiError):
         result = await get_run_commands_error(
@@ -1339,14 +1495,16 @@ async def test_get_run_commands_errors_raises_no_run(
         createdAt=datetime(year=2024, month=4, day=4),
         detail="Things are not looking good.",
     )
-    decoy.when(mock_run_data_manager.get_command_errors_count("run-id")).then_return(1)
+    decoy.when(
+        await mock_run_data_manager.get_command_errors_count("run-id")
+    ).then_return(1)
 
     command_error_slice = CommandErrorSlice(
         cursor=1, total_length=3, commands_errors=[error]
     )
 
     decoy.when(
-        mock_run_data_manager.get_command_error_slice(
+        await mock_run_data_manager.get_command_error_slice(
             run_id="run-id",
             cursor=0,
             length=42,
@@ -1383,14 +1541,16 @@ async def test_get_run_commands_errors_default_cursor(
     expected_cursor_result: int,
 ) -> None:
     """It should return a list of all commands errors in a run."""
-    decoy.when(mock_run_data_manager.get_command_errors_count("run-id")).then_return(1)
+    decoy.when(
+        await mock_run_data_manager.get_command_errors_count("run-id")
+    ).then_return(1)
 
     command_error_slice = CommandErrorSlice(
         cursor=expected_cursor_result, total_length=3, commands_errors=error_list
     )
 
     decoy.when(
-        mock_run_data_manager.get_command_error_slice(
+        await mock_run_data_manager.get_command_error_slice(
             run_id="run-id",
             cursor=0,
             length=42,
@@ -1416,6 +1576,7 @@ async def test_get_current_state_success(
     mock_run_data_manager: RunDataManager,
     mock_hardware_api: HardwareControlAPI,
     labware_definition: LabwareDefinition,
+    mock_app_state: AppState,
 ) -> None:
     """It should return different state from the current run.
 
@@ -1475,7 +1636,14 @@ async def test_get_current_state_success(
         mock_run_data_manager.get_flex_stacker_substate(run_id=run_id)
     ).then_return(stacker_substates)
 
-    hardware_store = HardwareStateStore(hardware_resource=mock_hardware_api)
+    hardware_store = HardwareStateStore(
+        hardware_resource=mock_hardware_api,
+        attached_modules=[],
+        attached_subsystems={},
+        estop_state=EstopState.DISENGAGED,
+        door_state=DoorState.CLOSED,
+        module_door_serial=None,
+    )
 
     result = await get_current_state(
         runId=run_id,
@@ -1522,15 +1690,23 @@ async def test_get_current_state_run_not_current(
     decoy: Decoy,
     mock_run_data_manager: RunDataManager,
     mock_hardware_api: HardwareControlAPI,
+    mock_app_state: AppState,
 ) -> None:
     """It should raise RunStopped when the run is not current."""
     run_id = "non-current-run-id"
 
-    decoy.when(mock_run_data_manager.get(run_id=run_id)).then_raise(
+    decoy.when(await mock_run_data_manager.get(run_id=run_id)).then_raise(
         RunNotCurrentError("Run is not current")
     )
 
-    hardware_store = HardwareStateStore(hardware_resource=mock_hardware_api)
+    hardware_store = HardwareStateStore(
+        hardware_resource=mock_hardware_api,
+        attached_modules=[],
+        attached_subsystems={},
+        estop_state=EstopState.DISENGAGED,
+        door_state=DoorState.CLOSED,
+        module_door_serial=None,
+    )
 
     with pytest.raises(ApiError) as exc_info:
         await get_current_state(

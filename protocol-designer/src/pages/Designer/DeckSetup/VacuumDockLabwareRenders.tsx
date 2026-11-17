@@ -29,9 +29,7 @@ interface VacuumDockLabwareRendersProps {
   setHoveredLabware: Dispatch<
     SetStateAction<LabwareOnDeckType | null | undefined>
   >
-  setDraggedLabware: Dispatch<
-    SetStateAction<LabwareOnDeckType | null | undefined>
-  >
+
   selectedZoomInSlot?: DeckSlotId
   x: number
   y: number
@@ -49,7 +47,6 @@ export function VacuumDockLabwareRenders(
     setShowMenuListForId,
     hover,
     setHoveredLabware,
-    setDraggedLabware,
     selectedZoomInSlot,
     x,
     y,
@@ -107,7 +104,6 @@ export function VacuumDockLabwareRenders(
         hover={hover}
         slotPosition={dockPositionWithOffset}
         setHoveredLabware={setHoveredLabware}
-        setDraggedLabware={setDraggedLabware}
         swapBlocked={false}
         labwareOnDeck={topLabware}
         isSelected={selectedZoomInSlot != null}

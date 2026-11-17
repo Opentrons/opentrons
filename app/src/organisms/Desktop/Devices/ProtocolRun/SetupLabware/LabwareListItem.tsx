@@ -37,12 +37,12 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
-import { ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
 import { SecureLabwareModal } from './SecureLabwareModal'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
@@ -242,7 +242,8 @@ export function LabwareListItem(
           <RobotInfoLabel deckLabel={slotInfo} />
         ) : (
           <StyledText
-            css={TYPOGRAPHY.pSemiBold}
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             data-testid={`slot_info_${slotInfo}`}
           >
             {slotInfo}
@@ -401,7 +402,7 @@ const LabwareThumbnail = styled.svg`
 
 function StandaloneLabware(props: {
   definition: LabwareDefinition
-}): JSX.Element {
+}): ReactNode {
   const { definition } = props
   const { minX, minY, xDimension, yDimension } = getLabwareViewBox(definition)
 

@@ -1,16 +1,28 @@
 import * as errorCreators from '../../errorCreators'
 import { flexStackerStateGetter } from '../../robotStateSelectors'
-import { getLabwareIdOnShuttle, uuid } from '../../utils'
+import {
+  getLabwareIdOnShuttle,
+  resolveStringRuntimeValue,
+  uuid,
+} from '../../utils'
 
-import type { FlexStackerRetrieveCreateCommand } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+import type { CommandCreator, ModuleStepGenArgs } from '../../types'
 
-export const flexStackerRetrieve: CommandCreator<
-  FlexStackerRetrieveCreateCommand['params']
-> = (args, invariantContext, robotState) => {
-  const { moduleId } = args
-  const { moduleEntities } = invariantContext
-  if (moduleId == null || moduleEntities[moduleId] == null) {
+export const flexStackerRetrieve: CommandCreator<ModuleStepGenArgs> = (
+  args,
+  invariantContext,
+  robotState
+) => {
+  const { moduleEntities, runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
+  if (moduleId == null) {
+    return {
+      errors: [
+        errorCreators.invalidRuntimeParameter({ parameterName: args.moduleId }),
+      ],
+    }
+  }
+  if (moduleEntities[moduleId] == null) {
     return { errors: [errorCreators.missingModuleError()] }
   }
   const modulePythonName = moduleEntities[moduleId].pythonName

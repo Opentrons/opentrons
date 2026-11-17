@@ -27,11 +27,12 @@ import { InitializationSettings } from './InitializationSettings'
 import { LidControls } from './LidControls'
 import { ReadSettings } from './ReadSettings'
 
+import type { ReactNode } from 'react'
 import type { AbsorbanceReaderState } from '@opentrons/step-generation'
 import type { AbsorbanceReaderFormType } from '/protocol-designer/form-types'
 import type { StepFormProps } from '../../types'
 
-export function AbsorbanceReaderTools(props: StepFormProps): JSX.Element {
+export function AbsorbanceReaderTools(props: StepFormProps): ReactNode {
   const { formData, propsForFields, toolboxStep, showFormErrors } = props
   const { moduleId } = formData
   const dispatch = useDispatch()

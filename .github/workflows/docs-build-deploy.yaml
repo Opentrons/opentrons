@@ -34,7 +34,7 @@ env:
 
 jobs:
   build-docs:
-    timeout-minutes: 5
+    timeout-minutes: 15
     runs-on: ubuntu-24.04
     permissions:
       id-token: write
@@ -46,9 +46,14 @@ jobs:
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          # The /info/ page reports the newest docs tag reachable from HEAD,
+          # which needs full history and tags.
+          fetch-depth: 0
       - name: Setup UV
         uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
+          version-file: uv.toml
           python-version: '3.12'
           enable-cache: true
           cache-dependency-glob: './docs/uv.lock'
@@ -85,6 +90,7 @@ jobs:
       - name: Setup UV
         uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
+          version-file: uv.toml
           python-version: '3.12'
           enable-cache: true
       - name: Setup Deploy Dependencies
@@ -118,6 +124,7 @@ jobs:
       - name: Setup UV
         uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
+          version-file: uv.toml
           python-version: '3.12'
           enable-cache: true
       - name: Setup Deploy Dependencies

@@ -17,6 +17,7 @@ import {
 import { ZTipPositionModal } from '/protocol-designer/components/organisms'
 import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
 
+import type { ReactNode } from 'react'
 import type { FieldProps } from '../types'
 
 interface BlowoutOffsetFieldProps extends FieldProps {
@@ -25,9 +26,7 @@ interface BlowoutOffsetFieldProps extends FieldProps {
   blowoutLabwareId?: unknown
 }
 
-export function BlowoutOffsetField(
-  props: BlowoutOffsetFieldProps
-): JSX.Element {
+export function BlowoutOffsetField(props: BlowoutOffsetFieldProps): ReactNode {
   const {
     disabled,
     value,

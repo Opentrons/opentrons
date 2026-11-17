@@ -13,8 +13,8 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -27,6 +27,7 @@ import {
 import { DisplayWifiList } from '../../NetworkSettings'
 import { NetworkDetailsModal } from './NetworkDetailsModal'
 
+import type { ReactNode } from 'react'
 import type { WifiSecurityType } from '@opentrons/api-client'
 
 const FETCH_WIFI_LIST_MS = 5000
@@ -42,7 +43,7 @@ export function WifiConnectionDetails({
   connectedWifiAuthType,
   handleNetworkPress,
   handleJoinAnotherNetwork,
-}: WifiConnectionDetailsProps): JSX.Element {
+}: WifiConnectionDetailsProps): ReactNode {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const [showNetworkDetailModal, setShowNetworkDetailModal] =
     useState<boolean>(false)
@@ -74,13 +75,13 @@ export function WifiConnectionDetails({
             gridGap={SPACING.spacing8}
             padding={`0 ${SPACING.spacing40} ${SPACING.spacing40}`}
           >
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.grey60}
             >
               {t('connected_network')}
-            </LegacyStyledText>
+            </StyledText>
             <Btn
               display={DISPLAY_FLEX}
               width="100%"
@@ -109,12 +110,12 @@ export function WifiConnectionDetails({
                       flexDirection={DIRECTION_COLUMN}
                       gridGap={SPACING.spacing2}
                     >
-                      <LegacyStyledText
+                      <StyledText
                         forwardedAs="h4"
                         textAlign={TYPOGRAPHY.textAlignLeft}
                       >
                         {activeSsid}
-                      </LegacyStyledText>
+                      </StyledText>
                     </Flex>
                   </Flex>
                 </Flex>
@@ -129,19 +130,19 @@ export function WifiConnectionDetails({
                     aria-label={`${activeSsid}_info_icon`}
                     color={COLORS.black90}
                   />
-                  <LegacyStyledText
+                  <StyledText
                     forwardedAs="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   >
                     {t('view_details')}
-                  </LegacyStyledText>
+                  </StyledText>
                 </Flex>
               </Flex>
             </Btn>
           </Flex>
         ) : null}
         {activeSsid != null ? (
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             color={COLORS.grey60}
@@ -149,7 +150,7 @@ export function WifiConnectionDetails({
             marginBottom={SPACING.spacing8}
           >
             {t('other_networks')}
-          </LegacyStyledText>
+          </StyledText>
         ) : null}
         <DisplayWifiList
           list={list}

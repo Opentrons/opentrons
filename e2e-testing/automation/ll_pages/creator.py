@@ -116,12 +116,17 @@ class LabwareCreator(BasePage):
     # ------------------------------------------------------------------
 
     def expect_missing_info_message(self, *, visible: bool = True) -> None:
-        """Assert whether the 'Add missing info…' message is shown."""
+        """Assert whether the 'Add missing info…' message is shown.
+
+        Top and side previews each render the message, so a visible check
+        uses the first match. Playwright strict mode rejects a locator that
+        matches more than one element.
+        """
         msg = self.page.get_by_text("Add missing info to see labware preview")
         if visible:
-            expect(msg).to_be_visible()
+            expect(msg.first).to_be_visible()
         else:
-            expect(msg).not_to_be_visible()
+            expect(msg).to_have_count(0)
 
     # ------------------------------------------------------------------
     # Regularity (homogeneous wells)

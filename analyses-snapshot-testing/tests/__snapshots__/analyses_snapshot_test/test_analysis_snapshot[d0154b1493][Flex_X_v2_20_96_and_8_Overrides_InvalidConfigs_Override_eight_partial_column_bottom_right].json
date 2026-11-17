@@ -1278,7 +1278,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "ProtocolCommandFailedError [line 167]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): IncompatibleNozzleConfiguration: No entry for back left nozzle 'G12' in pipette",
+      "detail": "ProtocolCommandFailedError [line 153]: Error 4000 GENERAL_ERROR (ProtocolCommandFailedError): IncompatibleNozzleConfiguration: No entry for back left nozzle 'G12' in pipette",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",

@@ -22,12 +22,13 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
-import { OddModal } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { ReactNode } from 'react'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 interface DeleteProtocolConfirmationModalProps {
   protocolId: string
@@ -37,7 +38,7 @@ interface DeleteProtocolConfirmationModalProps {
 export function DeleteProtocolConfirmationModal({
   protocolId,
   setShowDeleteConfirmationModal,
-}: DeleteProtocolConfirmationModalProps): JSX.Element {
+}: DeleteProtocolConfirmationModalProps): ReactNode {
   const { i18n, t } = useTranslation(['protocol_list', 'shared'])
   const { makeSnackbar } = useToaster()
   const [showIcon, setShowIcon] = useState<boolean>(false)

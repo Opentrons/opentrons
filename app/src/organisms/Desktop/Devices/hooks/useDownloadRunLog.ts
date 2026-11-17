@@ -5,9 +5,9 @@ import { getCommands, getProtocol, getRun } from '@opentrons/api-client'
 import { ERROR_TOAST, INFO_TOAST } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
+import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { useToaster } from '/app/organisms/ToasterOven'
-
-import { downloadFile } from '../utils'
+import { saveFileFromBuffer } from '/app/redux/shell/remote'
 
 import type { IconProps } from '@opentrons/components'
 
@@ -22,6 +22,21 @@ export function useDownloadRunLog(
   const { makeToast } = useToaster()
 
   const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
+
+  const saveRunLog = (runDetails: object, fileName: string): void => {
+    void saveFileFromBuffer({
+      name: fileName,
+      buffer: new TextEncoder().encode(JSON.stringify(runDetails)).buffer,
+    })
+      .catch((error: unknown) => {
+        if (!isFileSaveCanceledError(error)) {
+          throw error
+        }
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }
 
   const downloadRunLog = (): void => {
     setIsLoading(true)
@@ -70,16 +85,14 @@ export function useDownloadRunLog(
                               protocolName
                             )}_${createdAt}.json`
                           : fileName
-                      setIsLoading(false)
-                      downloadFile(runDetails, fileName)
+                      saveRunLog(runDetails, fileName)
                     })
                     .catch((e: Error) => {
                       setIsLoading(false)
                       makeToast(e.message, ERROR_TOAST)
                     })
                 } else {
-                  setIsLoading(false)
-                  downloadFile(runDetails, fileName)
+                  saveRunLog(runDetails, fileName)
                 }
               })
               .catch((e: Error) => {

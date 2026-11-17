@@ -57,7 +57,22 @@ export function useCreateMaintenanceRunMutation(
     actionsToDocument,
     ({ variables: createMaintenanceRunData, userNotes }) =>
       createMaintenanceRun(host!, createMaintenanceRunData, userNotes)
-        .then(response => response.data)
+        .then(response => {
+          queryClient.setQueryData(
+            getQueryKey(host, 'maintenance_runs', 'current_run'),
+            response.data
+          )
+          queryClient.setQueryData(
+            getQueryKey(
+              host,
+              'maintenance_runs',
+              response.data.data.id,
+              'details'
+            ),
+            response.data
+          )
+          return response.data
+        })
         .catch(e => {
           queryClient.invalidateQueries(
             getQueryKey(host, 'robot/control/estopStatus')

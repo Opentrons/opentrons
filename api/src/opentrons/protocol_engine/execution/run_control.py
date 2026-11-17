@@ -53,7 +53,9 @@ class RunControlHandler:
     async def wait_for_tasks(self, tasks: list[str]) -> None:
         """Wait for concurrent tasks to complete."""
         await self._state_store.wait_for(
-            condition=lambda: self._state_store.tasks.all_tasks_finished_or_any_task_failed(
-                task_ids=tasks
+            condition=lambda: (
+                self._state_store.tasks.all_tasks_finished_or_any_task_failed(
+                    task_ids=tasks
+                )
             )
         )

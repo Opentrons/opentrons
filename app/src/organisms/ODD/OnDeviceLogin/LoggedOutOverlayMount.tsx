@@ -1,4 +1,4 @@
-import { LoggedOutOverlay } from '/app/molecules/LoggedOutOverlay'
+import { LoggedOutOverlay } from '/app/components/ODD/modals/LoggedOutOverlay'
 
 import { useShouldShowLoggedOutOverlay } from './hooks/useShouldShowLoggedOutOverlay'
 import { showLoginModal, useIsLoginModalOpen } from './LoginModal'

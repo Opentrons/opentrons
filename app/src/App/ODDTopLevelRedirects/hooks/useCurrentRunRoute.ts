@@ -2,6 +2,7 @@ import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
   RUN_STATUS_FAILED,
   RUN_STATUS_IDLE,
+  RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
 } from '@opentrons/api-client'
@@ -21,23 +22,25 @@ export function useCurrentRunRoute(currentRunId: string): string | null {
   const hasRunStarted = runRecord?.data.startedAt != null
   const runStatus = runRecord?.data.status
 
-  if (isFetching) {
+  if (isFetching || runRecord?.data.id !== currentRunId) {
     return null
   } else if (
     runStatus === RUN_STATUS_SUCCEEDED ||
-    (runStatus === RUN_STATUS_STOPPED && hasRunStarted) ||
+    runStatus === RUN_STATUS_STOPPED ||
     runStatus === RUN_STATUS_FAILED
   ) {
     return `/runs/${runId}/summary`
   } else if (
     runStatus === RUN_STATUS_IDLE ||
-    (!hasRunStarted && runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR)
+    (!hasRunStarted &&
+      (runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ||
+        runStatus === RUN_STATUS_STOP_REQUESTED))
   ) {
     return `/runs/${runId}/setup`
   } else if (hasRunStarted) {
     return `/runs/${runId}/run`
   } else {
-    // includes runs cancelled before starting and runs not yet started
+    console.error(`Unexpected run route found for run ${runId}`, runStatus)
     return null
   }
 }

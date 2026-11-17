@@ -7,7 +7,6 @@ from opentrons.drivers.absorbance_reader import (
     AbstractAbsorbanceReaderDriver,
     SimulatingDriver,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import (
     ABSMeasurementConfig,
     ABSMeasurementMode,
@@ -15,6 +14,7 @@ from opentrons.drivers.types import (
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderPlatePresence,
 )
+from opentrons.drivers.usb.types import USBPort
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.modules import mod_abc
 from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnectedError

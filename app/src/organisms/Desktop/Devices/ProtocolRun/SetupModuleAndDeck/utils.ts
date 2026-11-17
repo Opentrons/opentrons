@@ -67,7 +67,7 @@ export function getFixtureImage(cutoutFixtureId: CutoutFixtureId): string {
       } else if (WASTE_CHUTE_STAGING_AREA_FIXTURES.includes(cutoutFixtureId)) {
         return wasteChuteStagingArea
       } else {
-        console.log('unknown fixture: ', cutoutFixtureId)
+        console.error('unknown fixture: ', cutoutFixtureId)
         return 'Error: unknown fixture'
       }
   }

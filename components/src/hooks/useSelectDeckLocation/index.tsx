@@ -24,12 +24,13 @@ import {
   SlotLabels,
 } from '../../hardware-sim'
 import { COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
+import { Icon } from '../../helix/icons'
 import { Text } from '../../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type {
   AddressableArea,
   CoordinateTuple,
@@ -95,7 +96,7 @@ export function DeckLocationSelect({
   theme = 'default',
   isThermocycler = false,
   showTooltipOnDisabled = false,
-}: DeckLocationSelectProps): JSX.Element {
+}: DeckLocationSelectProps): ReactNode {
   const robotType = deckDef.robot.model
 
   const { t } = useTranslation(['module_wizard_flows', 'deck_configuration'])

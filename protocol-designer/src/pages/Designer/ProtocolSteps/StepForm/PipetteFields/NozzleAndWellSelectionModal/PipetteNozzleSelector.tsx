@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -26,6 +26,7 @@ import {
 } from './utils'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,
@@ -44,7 +45,7 @@ interface PipetteNozzleSelectorProps {
 
 export function PipetteNozzleSelector(
   props: PipetteNozzleSelectorProps
-): JSX.Element {
+): ReactNode {
   const { pipetteSpecs, propsForFields, robotType } = props
   const { channels, displayName } = pipetteSpecs
   const { t } = useTranslation('protocol_steps')
@@ -69,8 +70,12 @@ export function PipetteNozzleSelector(
     value: nozzle as PartialPrimaryNozzles,
   }))
 
-  const wellOrdering = Object.values(pipetteSpecs.orderedColumns).map(
-    column => column.orderedNozzles
+  const wellOrdering = useMemo(
+    () =>
+      Object.values(pipetteSpecs.orderedColumns).map(
+        column => column.orderedNozzles
+      ),
+    [pipetteSpecs.orderedColumns]
   )
 
   const isPartialNozzle = nozzleConfiguration === PARTIAL_COLUMN

@@ -8,20 +8,22 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { Skeleton } from '/app/atoms/Skeleton'
+import { Skeleton } from '/app/components/adhoc/shared/Skeleton'
 
-export function ProtocolSetupTitleSkeleton(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function ProtocolSetupTitleSkeleton(): ReactNode {
   return (
     <>
       <Skeleton
         height="2.25rem"
-        width="11.937rem"
+        width="12rem"
         backgroundSize="99rem"
         borderRadius={BORDERS.borderRadius12}
       />
       <Skeleton
         height="2.25rem"
-        width="28rem"
+        width="100%"
         backgroundSize="99rem"
         borderRadius={BORDERS.borderRadius12}
       />
@@ -29,41 +31,43 @@ export function ProtocolSetupTitleSkeleton(): JSX.Element {
   )
 }
 
-export function ProtocolSetupButtonsSkeleton(): JSX.Element {
+export function ProtocolSetupHeaderButtonSkeleton(): ReactNode {
+  return (
+    <Skeleton
+      height="6.25rem"
+      width="6.25rem"
+      backgroundSize="99rem"
+      borderRadius={BORDERS.borderRadiusFull}
+      fixedBackground
+    />
+  )
+}
+
+export function ProtocolSetupButtonsSkeleton(): ReactNode {
   return (
     <>
-      <Skeleton
-        height="6.25rem"
-        width="6.25rem"
-        backgroundSize="99rem"
-        borderRadius={BORDERS.borderRadiusFull}
-        fixedBackground
-      />
-      <Skeleton
-        height="6.25rem"
-        width="6.25rem"
-        backgroundSize="99rem"
-        borderRadius={BORDERS.borderRadiusFull}
-        fixedBackground
-      />
+      <ProtocolSetupHeaderButtonSkeleton />
+      <ProtocolSetupHeaderButtonSkeleton />
     </>
   )
 }
 
-const SetupSkeleton = (): JSX.Element => {
+const SetupSkeleton = (): ReactNode => {
   return (
     <Skeleton
       height="5.5rem"
       width="100%"
       backgroundSize="99rem"
-      borderRadius={BORDERS.borderRadius12}
+      borderRadius={BORDERS.borderRadius16}
     />
   )
 }
 
-export function ProtocolSetupStepSkeleton(): JSX.Element {
+export function ProtocolSetupStepSkeleton(): ReactNode {
   return (
     <>
+      <SetupSkeleton />
+      <SetupSkeleton />
       <SetupSkeleton />
       <SetupSkeleton />
       <SetupSkeleton />
@@ -72,7 +76,7 @@ export function ProtocolSetupStepSkeleton(): JSX.Element {
   )
 }
 
-export function ProtocolSetupFullSkeleton(): JSX.Element {
+export function ProtocolSetupFullSkeleton(): ReactNode {
   return (
     <Flex
       position={POSITION_ABSOLUTE}
@@ -87,11 +91,19 @@ export function ProtocolSetupFullSkeleton(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
       >
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+        <Flex
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          gridGap={SPACING.spacing40}
+        >
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing2}
+            flex="1"
+            minWidth="0"
+          >
             <ProtocolSetupTitleSkeleton />
           </Flex>
-          <Flex gridGap={SPACING.spacing16}>
+          <Flex gridGap={SPACING.spacing16} flexShrink={0}>
             <ProtocolSetupButtonsSkeleton />
           </Flex>
         </Flex>

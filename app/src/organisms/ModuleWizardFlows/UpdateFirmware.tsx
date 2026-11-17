@@ -9,13 +9,16 @@ import {
 } from '@opentrons/react-api-client'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
+} from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useRequireAdminForUpdates } from '/app/local-resources/access-control/useRequireAdminForUpdates'
+import { isUpdatesWritePermissionError } from '/app/local-resources/access-control/utils'
 
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
 
@@ -25,9 +28,10 @@ const CHECKING_UPDATE_TIMEOUT_MS = 1000
 const NO_UPDATE_FOUND_TIMEOUT_MS = 2000
 interface UpdateFirmwareProps extends ModuleSetupWizardMaybePipetteStepProps {
   patchModuleAfterUpdate: (module: AttachedModule) => void
+  robotName: string
 }
 
-export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
+export function UpdateFirmware(props: UpdateFirmwareProps): ReactNode {
   const {
     proceed,
     setErrorMessage,
@@ -36,6 +40,7 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
     setIsModuleUpdating,
     isOnDevice,
     sendIdentifyModule,
+    robotName,
   } = props
   const { t } = useTranslation('module_wizard_flows')
 
@@ -48,6 +53,7 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
   const [pollForUpdatedModule, setPollForUpdatedModule] = useState(false)
 
   const documentationState = useDocumentationState()
+  const { ensureCanUpdate } = useRequireAdminForUpdates(robotName)
   const {
     updateModule,
     isLoading,
@@ -121,7 +127,11 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
       if (isLoading) {
         setInProgress(true)
       } else if (isError) {
-        if (error != null && isDocumentedMutationError(error)) {
+        if (
+          error != null &&
+          (isDocumentedMutationError(error) ||
+            isUpdatesWritePermissionError(error))
+        ) {
           setIsModuleUpdating(false)
           setInProgress(false)
           resetUpdateModule()
@@ -150,6 +160,9 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
   )
 
   const handleUpdateFirmware = (): void => {
+    if (!ensureCanUpdate()) {
+      return
+    }
     setIsModuleUpdating(true)
     updateModule(attachedModule.serialNumber)
   }

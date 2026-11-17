@@ -8,11 +8,11 @@ import {
   Flex,
   Icon,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   Link,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
@@ -24,7 +24,7 @@ import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { RunStatus } from '@opentrons/api-client'
 
 export interface UseConfirmCancelModalResult {
@@ -49,9 +49,7 @@ export interface ConfirmCancelModalProps {
   runStatus: RunStatus | null
 }
 
-export function ConfirmCancelModal(
-  props: ConfirmCancelModalProps
-): JSX.Element {
+export function ConfirmCancelModal(props: ConfirmCancelModalProps): ReactNode {
   const { onClose, runId, robotName, runStatus } = props
   const documentationState = useDocumentationState()
   const { stopRun } = useStopRunMutation(documentationState)
@@ -91,12 +89,10 @@ export function ConfirmCancelModal(
       title={t('cancel_run_modal_heading')}
     >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-        <LegacyStyledText forwardedAs="p">
-          {cancelRunAlertInfo}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
+        <StyledText forwardedAs="p">{cancelRunAlertInfo}</StyledText>
+        <StyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
           {t('cancel_run_module_info')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
           {isCanceling ? null : (
             <Link

@@ -17,6 +17,7 @@ import { InputStepFormField } from '/protocol-designer/components/molecules'
 
 import { PositionField } from '../../PipetteFields'
 
+import type { ReactNode } from 'react'
 import type { FormData, ReferenceFields } from '/protocol-designer/form-types'
 import type { MoveLiquidPrefixType } from '/protocol-designer/resources/types'
 import type { FieldPropsByName } from '../../types'
@@ -38,7 +39,7 @@ interface MultiInputFieldProps {
   referenceField?: ReferenceFields
 }
 
-export function MultiInputField(props: MultiInputFieldProps): JSX.Element {
+export function MultiInputField(props: MultiInputFieldProps): ReactNode {
   const {
     formData,
     name,

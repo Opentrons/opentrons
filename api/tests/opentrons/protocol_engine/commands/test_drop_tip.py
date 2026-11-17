@@ -114,7 +114,7 @@ async def test_drop_tip_implementation(
     )
 
     decoy.when(
-        mock_state_view.geometry.get_checked_tip_drop_location(
+        mock_state_view.instrument_interface.get_checked_tip_drop_location(
             pipette_id="abc",
             labware_id="123",
             well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
@@ -213,13 +213,13 @@ async def test_drop_tip_with_alternating_locations(
         origin=DropTipWellOrigin.DEFAULT, offset=WellOffset(x=10, y=20, z=30)
     )
     decoy.when(
-        mock_state_view.geometry.get_next_tip_drop_location(
+        mock_state_view.instrument_interface.get_next_tip_drop_location(
             labware_id="123", well_name="A3", pipette_id="abc"
         )
     ).then_return(drop_location)
 
     decoy.when(
-        mock_state_view.geometry.get_checked_tip_drop_location(
+        mock_state_view.instrument_interface.get_checked_tip_drop_location(
             pipette_id="abc",
             labware_id="123",
             well_location=drop_location,
@@ -300,7 +300,7 @@ async def test_tip_attached_error(
     )
 
     decoy.when(
-        mock_state_view.geometry.get_checked_tip_drop_location(
+        mock_state_view.instrument_interface.get_checked_tip_drop_location(
             pipette_id="abc",
             labware_id="123",
             well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
@@ -414,7 +414,7 @@ async def test_stall_error(
     )
 
     decoy.when(
-        mock_state_view.geometry.get_checked_tip_drop_location(
+        mock_state_view.instrument_interface.get_checked_tip_drop_location(
             pipette_id="abc",
             labware_id="123",
             well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),

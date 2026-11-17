@@ -1,0 +1,44 @@
+.button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-32);
+  border-radius: var(--border-radius-40);
+  box-shadow: none;
+}
+
+.button:focus {
+  background-color: var(--blue-40);
+  box-shadow: none;
+}
+
+.button:hover {
+  border: none;
+  background-color: var(--blue-35);
+  box-shadow: none;
+  color: var(--black-90);
+}
+
+.button:focus-visible {
+  background-color: var(--blue-35);
+  box-shadow: 0 0 0 var(--spacing-4) var(--blue-50);
+}
+
+.button:active {
+  background-color: var(--blue-40);
+}
+
+.button:disabled {
+  background-color: var(--grey-35);
+  color: var(--grey-60);
+}
+
+.description {
+  display: -webkit-box;
+  min-width: 0;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  word-break: normal;
+}

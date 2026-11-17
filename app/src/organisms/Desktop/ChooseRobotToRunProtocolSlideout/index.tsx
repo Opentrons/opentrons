@@ -5,11 +5,9 @@ import { useNavigate } from 'react-router-dom'
 import first from 'lodash/first'
 
 import {
-  ALIGN_CENTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  Icon,
   NO_WRAP,
   PrimaryButton,
   SecondaryButton,
@@ -21,15 +19,11 @@ import {
   isDocumentedMutationError,
   useUploadCsvFileMutation,
 } from '@opentrons/react-api-client'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
 import { useTrackCreateProtocolRunEvent } from '/app/organisms/Desktop/Devices/hooks'
-import { LegacyApplyHistoricOffsets } from '/app/organisms/LegacyApplyHistoricOffsets'
-import { useOffsetCandidatesForAnalysis } from '/app/organisms/LegacyApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { useRobotType } from '/app/redux-resources/robots'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { useIsRobotOutOfStorage } from '/app/resources/devices'
 import {
@@ -37,7 +31,7 @@ import {
   getRunTimeParameterValuesForRun,
 } from '/app/transformations/runs'
 
-import { ChooseRobotSlideout } from '../ChooseRobotSlideout'
+import { ChooseRobotSlideout, SendingButtonLabel } from '../ChooseRobotSlideout'
 import { RobotOutOfStorageModal } from '../Devices/RobotOutOfStorageModal.tsx'
 import { useCreateRunFromProtocol } from './useCreateRunFromProtocol'
 
@@ -73,8 +67,6 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
     setSelectedRobot,
   } = props
   const navigate = useNavigate()
-  const isFlex = useRobotType(selectedRobot?.name ?? '') === FLEX_ROBOT_TYPE
-  const [shouldApplyOffsets, setShouldApplyOffsets] = useState<boolean>(true)
   const { protocolKey, srcFileNames, srcFiles, mostRecentAnalysis } =
     storedProtocolData
   const [currentPage, setCurrentPage] = useState<number>(1)
@@ -101,12 +93,6 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   }, [protocolKey, runTimeParameters])
 
   const [targetProps, tooltipProps] = useHoverTooltip()
-
-  const offsetCandidates = useOffsetCandidatesForAnalysis(
-    mostRecentAnalysis,
-    isFlex,
-    null
-  )
 
   const documentationState = useDocumentationState()
   const { uploadCsvFile } = useUploadCsvFileMutation(documentationState)
@@ -140,16 +126,13 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       },
     },
     null,
-    shouldApplyOffsets
-      ? offsetCandidates.map(({ vector, location, definitionUri }) => ({
-          vector,
-          location,
-          definitionUri,
-        }))
-      : [],
+    [],
     runTimeParameters?.length > 0 ? ['confirm_parameters'] : []
   )
   const handleProceed: MouseEventHandler<HTMLButtonElement> = () => {
+    if (isCreatingRun) {
+      return
+    }
     if (isRobotOutOfStorage) {
       setShowRobotOutOfStorageModal(true)
       return
@@ -247,30 +230,13 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
   const singlePageButton = (
     <PrimaryButton
       disabled={
-        isCreatingRun ||
-        selectedRobot == null ||
-        isSelectedRobotOnDifferentSoftwareVersion
+        selectedRobot == null || isSelectedRobotOnDifferentSoftwareVersion
       }
       width="100%"
       onClick={handleProceed}
     >
-      {isCreatingRun ? (
-        <Icon name="ot-spinner" spin size="1rem" />
-      ) : (
-        t('shared:proceed_to_setup')
-      )}
+      {isCreatingRun ? <SendingButtonLabel /> : t('shared:proceed_to_setup')}
     </PrimaryButton>
-  )
-
-  const offsetsComponent = isFlex ? null : (
-    <LegacyApplyHistoricOffsets
-      offsetCandidates={offsetCandidates}
-      shouldApplyOffsets={shouldApplyOffsets}
-      setShouldApplyOffsets={setShouldApplyOffsets}
-      commands={mostRecentAnalysis?.commands ?? []}
-      labware={mostRecentAnalysis?.labware ?? []}
-      modules={mostRecentAnalysis?.modules ?? []}
-    />
   )
 
   const footer = (
@@ -278,12 +244,10 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
       {hasRunTimeParameters ? (
         currentPage === 1 ? (
           <>
-            {offsetsComponent}
             <PrimaryButton
               onClick={handleProceedToRTP}
               width="100%"
               disabled={
-                isCreatingRun ||
                 selectedRobot == null ||
                 isSelectedRobotOnDifferentSoftwareVersion
               }
@@ -312,15 +276,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
               {...targetProps}
             >
               {isCreatingRun ? (
-                <Flex
-                  gridGap={SPACING.spacing4}
-                  alignItems={ALIGN_CENTER}
-                  whiteSpace={NO_WRAP}
-                  marginLeft={`-${SPACING.spacing4}`}
-                >
-                  <Icon name="ot-spinner" spin size="1rem" />
-                  {t('shared:confirm_values')}
-                </Flex>
+                <SendingButtonLabel />
               ) : (
                 t('shared:confirm_values')
               )}
@@ -333,10 +289,7 @@ export function ChooseRobotToRunProtocolSlideoutComponent(
           </Flex>
         )
       ) : (
-        <>
-          {offsetsComponent}
-          {singlePageButton}
-        </>
+        <>{singlePageButton}</>
       )}
     </Flex>
   )

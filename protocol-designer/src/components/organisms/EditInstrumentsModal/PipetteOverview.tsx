@@ -29,7 +29,7 @@ import { changeSavedStepForm } from '/protocol-designer/steplist/actions'
 import { PipetteInfoItem } from '../PipetteInfoItem'
 import { getSectionsFromPipetteName } from './utils'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type {
@@ -69,7 +69,7 @@ export function PipetteOverview({
   leftPipette,
   rightPipette,
   gripper,
-}: PipetteOverviewProps): JSX.Element {
+}: PipetteOverviewProps): ReactNode {
   const { t } = useTranslation(['onboarding', 'protocol_overview'])
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const additionalEquipmentEntities = useSelector(
@@ -105,13 +105,12 @@ export function PipetteOverview({
   } = pipetteConfig
 
   const visibleLeftPipette =
-    leftPipette != null &&
-    !temporarilyDeletedPipettes.includes(leftPipette.id as string)
+    leftPipette != null && !temporarilyDeletedPipettes.includes(leftPipette.id)
       ? leftPipette
       : null
   const visibleRightPipette =
     rightPipette != null &&
-    !temporarilyDeletedPipettes.includes(rightPipette.id as string)
+    !temporarilyDeletedPipettes.includes(rightPipette.id)
       ? rightPipette
       : null
 
@@ -120,9 +119,9 @@ export function PipetteOverview({
   const effectiveHas96Channel =
     (has96Channel &&
       leftPipette?.spec.channels === 96 &&
-      !temporarilyDeletedPipettes.includes(leftPipette.id as string)) ||
+      !temporarilyDeletedPipettes.includes(leftPipette.id)) ||
     (rightPipette?.spec.channels === 96 &&
-      !temporarilyDeletedPipettes.includes(rightPipette.id as string))
+      !temporarilyDeletedPipettes.includes(rightPipette.id))
 
   const handleAddPipette = (): void => {
     setPage('add')
@@ -196,7 +195,7 @@ export function PipetteOverview({
                   setPipetteType(info96.type)
                   setPipetteGen(info96.gen)
                   setPipetteVolume(info96.volume)
-                  setSelectedTips(pipette96.tiprackDefURI as string[])
+                  setSelectedTips(pipette96.tiprackDefURI)
                 }
               }}
               cleanForm={() => {
@@ -224,7 +223,7 @@ export function PipetteOverview({
                     setPipetteType(leftInfo.type)
                     setPipetteGen(leftInfo.gen)
                     setPipetteVolume(leftInfo.volume)
-                    setSelectedTips(leftPipette.tiprackDefURI as string[])
+                    setSelectedTips(leftPipette.tiprackDefURI)
                   }}
                   cleanForm={() => {
                     setTemporarilyDeletedPipettes(prev => [
@@ -247,7 +246,7 @@ export function PipetteOverview({
                     setPipetteType(rightInfo.type)
                     setPipetteGen(rightInfo.gen)
                     setPipetteVolume(rightInfo.volume)
-                    setSelectedTips(rightPipette.tiprackDefURI as string[])
+                    setSelectedTips(rightPipette.tiprackDefURI)
                   }}
                   cleanForm={() => {
                     setTemporarilyDeletedPipettes(prev => [

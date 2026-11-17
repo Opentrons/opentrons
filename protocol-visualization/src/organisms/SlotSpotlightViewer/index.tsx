@@ -1,14 +1,25 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { ModelessModal } from '@opentrons/components'
+import {
+  ModelessModal,
+  RobotInfoLabel,
+  StyledText,
+} from '@opentrons/components'
+import {
+  FAKE_HOPPER_LOCATION_MAP,
+  HOPPER_FAKE_LOCATIONS,
+} from '@opentrons/step-generation'
 
 import { SlotDetails } from '../SlotDetails'
 import styles from './slotspotlightviewer.module.css'
 
 import type { ReactNode } from 'react'
 import type { Liquid, ProtocolAnalysisOutput } from '@opentrons/shared-data'
-import type { InvariantContext, RobotState } from '@opentrons/step-generation'
+import type {
+  HopperLocationMapKey,
+  InvariantContext,
+  RobotState,
+} from '@opentrons/step-generation'
 import type { AppType } from '../../types'
 
 // Note: use the desktop app's sizes
@@ -40,17 +51,25 @@ export function SlotSpotlightViewer(
     onClose,
   } = props
   const { t } = useTranslation('protocol_visualization')
-  // the slot content renders its own header block into this element via portal
-  const [headerEl, setHeaderEl] = useState<HTMLDivElement | null>(null)
 
   if (appType === 'desktop') {
     return null
   }
 
+  let deckLabel = slotId
+  if (HOPPER_FAKE_LOCATIONS.includes(slotId)) {
+    deckLabel = FAKE_HOPPER_LOCATION_MAP[slotId as HopperLocationMapKey]
+  }
+
   return (
     <ModelessModal
       header={
-        <div ref={setHeaderEl} className={styles.header} id={HEADER_ID} />
+        <div className={styles.header} id={HEADER_ID}>
+          <RobotInfoLabel deckLabel={deckLabel} />
+          <StyledText desktopStyle="bodyLargeSemiBold">
+            {t('slot_spotlight')}
+          </StyledText>
+        </div>
       }
       aria-labelledby={HEADER_ID}
       aria-label={t('close_slot_spotlight')}
@@ -64,7 +83,6 @@ export function SlotSpotlightViewer(
         invariantContext={invariantContext}
         analysis={analysis}
         liquids={liquids}
-        headerPortalEl={headerEl}
       />
     </ModelessModal>
   )

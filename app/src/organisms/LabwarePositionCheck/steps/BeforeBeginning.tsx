@@ -1,16 +1,20 @@
 import { Trans, useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { LegacyStyledText } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 
-import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
-import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
+import { WizardRequiredEquipmentList } from '/app/components/adhoc/shared/wizards/WizardRequiredEquipmentList'
+import {
+  DescriptionContent,
+  TwoColumn,
+} from '/app/components/ODD/modals/InterventionModal'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
 
+import type { ReactNode } from 'react'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type { State } from '/app/redux/types'
 
-export function BeforeBeginning(props: LPCWizardContentProps): JSX.Element {
+export function BeforeBeginning(props: LPCWizardContentProps): ReactNode {
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const { runId, commandUtils } = props
   const { protocolName } = useSelector(
@@ -51,7 +55,7 @@ export function BeforeBeginning(props: LPCWizardContentProps): JSX.Element {
             <Trans
               t={t}
               i18nKey="labware_position_check_description"
-              components={{ block: <LegacyStyledText forwardedAs="p" /> }}
+              components={{ block: <StyledText forwardedAs="p" /> }}
             />
           }
         />

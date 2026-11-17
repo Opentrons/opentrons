@@ -4,9 +4,10 @@ import { useTranslation } from 'react-i18next'
 import { COLORS, JUSTIFY_FLEX_END, PrimaryButton } from '@opentrons/components'
 import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
+import { SimpleWizardBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { SmallButton } from '/app/components/ODD/buttons'
 
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
@@ -19,7 +20,7 @@ interface CheckStackerInstallProps extends ModuleSetupWizardMaybePipetteStepProp
 
 export function CheckStackerInstall(
   props: CheckStackerInstallProps
-): JSX.Element {
+): ReactNode {
   const {
     proceed,
     isOnDevice,

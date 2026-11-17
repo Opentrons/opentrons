@@ -1,5 +1,4 @@
 import { beforeEach, describe, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import {
   SINGLE_LEFT_SLOT_FIXTURE,
@@ -53,7 +52,7 @@ const MOCK_DECK_CONFIG: DeckConfiguration = [
 
 describe('useDeckConfigurationCompatibility', () => {
   beforeEach(() => {
-    when(useNotifyDeckConfigurationQuery)
+    vi.when(useNotifyDeckConfigurationQuery)
       .calledWith()
       .thenReturn({
         data: MOCK_DECK_CONFIG,

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import { COLORS } from '../helix-design-system'
-import { Overlay } from '../modals'
+import { Overlay } from '../helix/modals'
 
 import type { Dispatch, MouseEventHandler, SetStateAction } from 'react'
 

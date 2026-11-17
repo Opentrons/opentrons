@@ -14,7 +14,6 @@ export const vacuumCloseVentSetPumpPressure: CommandCreator<
     [
       curryCommandCreator(vacuumCloseVent, {
         moduleId: args.moduleId,
-        commandCreatorFnName: 'vacuumCloseVent',
       }),
       curryCommandCreator(vacuumSetPumpPressure, {
         ...args,

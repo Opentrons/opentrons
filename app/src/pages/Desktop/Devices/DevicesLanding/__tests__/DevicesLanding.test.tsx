@@ -2,9 +2,9 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { RobotCard } from '/app/components/desktop/cards/RobotCard'
 import { i18n } from '/app/i18n'
 import { DevicesEmptyState } from '/app/organisms/Desktop/Devices/DevicesEmptyState'
-import { RobotCard } from '/app/organisms/Desktop/Devices/RobotCard'
 import {
   getConnectableRobots,
   getReachableRobots,
@@ -20,7 +20,7 @@ import {
 import { DevicesLanding } from '..'
 
 vi.mock('/app/organisms/Desktop/Devices/DevicesEmptyState')
-vi.mock('/app/organisms/Desktop/Devices/RobotCard')
+vi.mock('/app/components/desktop/cards/RobotCard')
 vi.mock('/app/redux/discovery')
 
 const render = () => {

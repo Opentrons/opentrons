@@ -1,13 +1,14 @@
 import { useTranslation } from 'react-i18next'
 import NiceModal from '@ebay/nice-modal-react'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { RobotSettingButton } from '/app/organisms/ODD/RobotSettingsDashboard'
 import { useUpdateClientDataEncryptionKeys } from '/app/resources/client_data/encryptionKeys'
 
 import styles from './robot_encryption_key_setting_option.module.css'
 import { RobotEncryptionKeyModal } from './RobotEncryptionKeyModal'
 
+import type { ReactNode } from 'react'
 import type { SetSettingOption } from '../types'
 
 interface RobotEncryptionKeySettingOptionProps {
@@ -16,7 +17,7 @@ interface RobotEncryptionKeySettingOptionProps {
 
 export function RobotEncryptionKeySettingOption({
   setCurrentOption,
-}: RobotEncryptionKeySettingOptionProps): JSX.Element {
+}: RobotEncryptionKeySettingOptionProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const { requestKeyDisplay } = useUpdateClientDataEncryptionKeys()
   const showPasswordModal = (): void => {

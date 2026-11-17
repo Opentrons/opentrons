@@ -1,8 +1,6 @@
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-
 import { FlexSetupLPC } from './FlexSetupLPC'
-import { OT2SetupLPC } from './OT2SetupLPC'
 
+import type { ReactNode } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 import type { UseLPCFlowsResult } from '/app/organisms/LabwarePositionCheck'
 
@@ -19,10 +17,6 @@ export interface SetupLabwarePositionCheckProps {
 
 export function SetupLabwarePositionCheck(
   props: SetupLabwarePositionCheckProps
-): JSX.Element {
-  return props.robotType === FLEX_ROBOT_TYPE ? (
-    <FlexSetupLPC {...props} />
-  ) : (
-    <OT2SetupLPC {...props} />
-  )
+): ReactNode {
+  return <FlexSetupLPC {...props} />
 }

@@ -2,8 +2,8 @@ import { Fragment } from 'react'
 import { RemoveScroll } from 'react-remove-scroll'
 import cx from 'classnames'
 
+import { Overlay } from '../helix/modals'
 import styles from './modals.module.css'
-import { Overlay } from './Overlay'
 
 import type { MouseEventHandler, ReactNode, Ref } from 'react'
 
@@ -30,7 +30,7 @@ export interface LegacyModalProps {
  * Base modal component that fills its nearest `display:relative` ancestor
  * with a dark overlay and displays `children` as its contents in a white box
  */
-export function LegacyModal(props: LegacyModalProps): JSX.Element {
+export function LegacyModal(props: LegacyModalProps): ReactNode {
   const {
     contentsClassName,
     alertOverlay,

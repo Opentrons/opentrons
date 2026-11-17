@@ -67,6 +67,9 @@ export default defineConfig({
       ...configDefaults.exclude,
       '**/node_modules/**',
       '**/dist/**',
+      // pnpm stores a symlink to js-package-testing here (for its link: deps),
+      // which would otherwise escape the js-package-testing exclusion below.
+      '**/.pnpm-store/**',
       '**/js-package-testing/**',
       '**/lib/**',
       '**/js-package-testing/tests/**',
@@ -160,7 +163,7 @@ export default defineConfig({
         replacement: path.resolve('./discovery-client/src/index.ts'),
       },
       {
-        find: '@opentrons/usb-bridge/node-client',
+        find: '@opentrons/node-usb-bridge-client',
         replacement: path.resolve('./usb-bridge/node-client/src/index.ts'),
       },
       {
@@ -176,6 +179,11 @@ export default defineConfig({
       {
         find: /^\/app\/(?!src\/)/,
         replacement: path.resolve('./app/src/') + '/',
+      },
+      // vitest 5 needs this prioritized before /src since they live outside it
+      {
+        find: /^\/protocol-designer\/fixtures\//,
+        replacement: path.resolve('./protocol-designer/fixtures/') + '/',
       },
       {
         find: /^\/protocol-designer\/(?!src\/)/,

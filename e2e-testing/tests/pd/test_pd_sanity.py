@@ -7,8 +7,6 @@ from pathlib import Path
 import pytest
 from playwright.sync_api import Page
 
-from eyes import Eyes
-
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from automation.pd_pages import (
@@ -33,7 +31,7 @@ def test_protocol_designer_loads(page: Page, pd_base_url: str) -> None:
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-def test_full_onboarding_flow(page: Page, pd_base_url: str, eyes: Eyes | None) -> None:
+def test_full_onboarding_flow(page: Page, pd_base_url: str) -> None:
     """Full onboarding flow test using page objects."""
     print(f"Running full onboarding test against: {pd_base_url}")
 
@@ -45,8 +43,6 @@ def test_full_onboarding_flow(page: Page, pd_base_url: str, eyes: Eyes | None) -
 
     landing_page.confirm_welcome_modal()
     landing_page.click_create_protocol()
-    if eyes is not None:
-        eyes.check_window("Flex landing page after create protocol")
     # Pipette Configuration
     pipette_modal = PipetteModal(page)
     pipette_modal.open_pipette_selector()
@@ -55,11 +51,6 @@ def test_full_onboarding_flow(page: Page, pd_base_url: str, eyes: Eyes | None) -
     pipette_modal.select_pipette_type("1-Channel", "1000 µL")
     pipette_modal.select_tip_racks(["Filter Tip Rack 1000 µL", "Filter Tip Rack 200 µL", "Filter Tip Rack 50 µL"])
     pipette_modal.save_pipette_selection()
-    if eyes is not None:
-        eyes.check(
-            checkpoint_name="Pipette Configuration Saved",
-            target=eyes.Target.window().fully(),
-        )
     # Basics configuration (pipette + gripper)
     module_config = ModuleConfigPage(page)
     module_config.select_gripper(True)
@@ -92,11 +83,6 @@ def test_full_onboarding_flow(page: Page, pd_base_url: str, eyes: Eyes | None) -
 
     deck_config.confirm_deck_configuration()
     deck_config.name_protocol("Protocol Onboarding Demonstration")
-    if eyes is not None:
-        eyes.check(
-            checkpoint_name="Deck Configuration Complete with HS, TD, Stacker, Plate Reader",
-            target=eyes.Target.window().fully(),
-        )
     deck_config.enter_edit_mode()
     print("✓ Protocol named and entered edit mode")
 

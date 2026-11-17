@@ -25,7 +25,7 @@ from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Vector3D
 from opentrons_shared_data.robot.types import RobotType
 
@@ -70,14 +70,13 @@ from opentrons.protocol_engine.types import (
     ModuleOffsetData,
     PotentialCutoutFixture,
 )
-from opentrons.protocols.api_support.deck_type import STANDARD_OT3_DECK
-from opentrons.types import DeckSlotName, MountType, Point
+from opentrons.types import DeckSlotName, MountType
 
 
 @pytest.fixture(scope="session")
-def ot3_standard_deck_def() -> DeckDefinitionV5:
-    """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT3_DECK, 5)
+def ot3_standard_deck_def() -> DeckDefinitionV6:
+    """Get the OT-3 standard deck definition."""
+    return load_deck(DeckType.OT3_STANDARD, 6)
 
 
 def get_addressable_area_view(
@@ -85,7 +84,7 @@ def get_addressable_area_view(
     potential_cutout_fixtures_by_cutout_id: Optional[
         Dict[str, Set[PotentialCutoutFixture]]
     ] = None,
-    deck_definition: Optional[DeckDefinitionV5] = None,
+    deck_definition: Optional[DeckDefinitionV6] = None,
     deck_configuration: Optional[DeckConfigurationType] = None,
     robot_type: RobotType = "OT-3 Standard",
     use_simulated_deck_config: bool = False,
@@ -95,7 +94,7 @@ def get_addressable_area_view(
         loaded_addressable_areas_by_name=loaded_addressable_areas_by_name or {},
         potential_cutout_fixtures_by_cutout_id=potential_cutout_fixtures_by_cutout_id
         or {},
-        deck_definition=deck_definition or cast(DeckDefinitionV5, {"otId": "fake"}),
+        deck_definition=deck_definition or cast(DeckDefinitionV6, {"otId": "fake"}),
         deck_configuration=deck_configuration or [],
         robot_definition={
             "displayName": "OT-3",
@@ -147,7 +146,7 @@ def make_module_view(
                 load_location_by_module_id[module_id] = None
 
     state = ModuleState(
-        deck_type=deck_type or DeckType.OT2_STANDARD,
+        deck_type=deck_type or DeckType.OT3_STANDARD,
         load_location_by_module_id=load_location_by_module_id or {},
         requested_model_by_id=requested_model_by_module_id or {},
         hardware_by_module_id=hardware_by_module_id or {},
@@ -358,118 +357,41 @@ def test_get_properties_by_id(
 
 
 @pytest.mark.parametrize(
-    argnames=["module_def", "slot", "expected_offset"],
-    argvalues=[
-        (
-            lazy_fixture("tempdeck_v1_def"),
-            DeckSlotName.SLOT_1,
-            Point(x=-0.15, y=-0.15, z=80.09),
-        ),
-        (
-            lazy_fixture("tempdeck_v2_def"),
-            DeckSlotName.SLOT_1,
-            Point(x=-1.45, y=-0.15, z=80.09),
-        ),
-        (
-            lazy_fixture("tempdeck_v2_def"),
-            DeckSlotName.SLOT_3,
-            Point(x=1.15, y=-0.15, z=80.09),
-        ),
-        (
-            lazy_fixture("magdeck_v1_def"),
-            DeckSlotName.SLOT_1,
-            Point(x=0.125, y=-0.125, z=82.25),
-        ),
-        (
-            lazy_fixture("magdeck_v2_def"),
-            DeckSlotName.SLOT_1,
-            Point(x=-1.175, y=-0.125, z=82.25),
-        ),
-        (
-            lazy_fixture("magdeck_v2_def"),
-            DeckSlotName.SLOT_3,
-            Point(x=1.425, y=-0.125, z=82.25),
-        ),
-        (
-            lazy_fixture("thermocycler_v1_def"),
-            DeckSlotName.SLOT_7,
-            Point(x=0, y=82.56, z=97.8),
-        ),
-        (
-            lazy_fixture("thermocycler_v2_def"),
-            DeckSlotName.SLOT_7,
-            Point(x=0, y=68.8, z=108.96),
-        ),
-        (
-            lazy_fixture("heater_shaker_v1_def"),
-            DeckSlotName.SLOT_1,
-            Point(x=-0.125, y=1.125, z=68.275),
-        ),
-        (
-            lazy_fixture("heater_shaker_v1_def"),
-            DeckSlotName.SLOT_3,
-            Point(x=0.125, y=-1.125, z=68.275),
-        ),
-    ],
-)
-def test_get_module_offset_for_ot2_standard(
-    module_def: ModuleDefinition,
-    slot: DeckSlotName,
-    expected_offset: Point,
-) -> None:
-    """It should return the correct labware offset for module in specified slot."""
-    subject = make_module_view(
-        deck_type=DeckType.OT2_STANDARD,
-        slot_by_module_id={"module-id": slot},
-        hardware_by_module_id={
-            "module-id": HardwareModule(
-                serial_number="module-serial",
-                definition=module_def,
-            )
-        },
-    )
-    assert (
-        subject.get_nominal_offset_to_child("module-id", get_addressable_area_view())
-        == expected_offset
-    )
-
-
-@pytest.mark.parametrize(
     argnames=["module_def", "slot", "expected_offset", "deck_definition"],
     argvalues=[
         (
             lazy_fixture("tempdeck_v2_def"),
-            DeckSlotName.SLOT_1.to_ot3_equivalent(),
+            DeckSlotName.SLOT_D1,
             LabwareOffsetVector(x=0, y=0, z=9),
             lazy_fixture("ot3_standard_deck_def"),
         ),
         (
             lazy_fixture("tempdeck_v2_def"),
-            DeckSlotName.SLOT_3.to_ot3_equivalent(),
+            DeckSlotName.SLOT_D3,
             LabwareOffsetVector(x=0, y=0, z=9),
             lazy_fixture("ot3_standard_deck_def"),
         ),
         (
             lazy_fixture("thermocycler_v2_def"),
-            DeckSlotName.SLOT_7.to_ot3_equivalent(),
+            DeckSlotName.SLOT_B1,
             LabwareOffsetVector(x=-20.005, y=67.96, z=10.96),
             lazy_fixture("ot3_standard_deck_def"),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
-            DeckSlotName.SLOT_1.to_ot3_equivalent(),
+            DeckSlotName.SLOT_D1,
             LabwareOffsetVector(x=0, y=0, z=18.95),
             lazy_fixture("ot3_standard_deck_def"),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
-            DeckSlotName.SLOT_3.to_ot3_equivalent(),
+            DeckSlotName.SLOT_D3,
             LabwareOffsetVector(x=0, y=0, z=18.95),
             lazy_fixture("ot3_standard_deck_def"),
         ),
         (
             lazy_fixture("mag_block_v1_def"),
-            DeckSlotName.SLOT_2.to_ot3_equivalent(),
+            DeckSlotName.SLOT_D2,
             LabwareOffsetVector(x=0, y=0, z=38.0),
             lazy_fixture("ot3_standard_deck_def"),
         ),
@@ -479,7 +401,7 @@ def test_get_module_offset_for_ot3_standard(
     module_def: ModuleDefinition,
     slot: DeckSlotName,
     expected_offset: LabwareOffsetVector,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
 ) -> None:
     """It should return the correct labware offset for module in specified slot."""
     subject = make_module_view(
@@ -1981,34 +1903,14 @@ def test_is_edge_move_unsafe(
     assert result is expected_result
 
 
-@pytest.mark.parametrize(
-    argnames=["deck_type", "slot_name", "expected_highest_z", "deck_definition"],
-    argvalues=[
-        (
-            DeckType.OT2_STANDARD,
-            DeckSlotName.SLOT_1,
-            84,
-            lazy_fixture("ot3_standard_deck_def"),
-        ),
-        (
-            DeckType.OT3_STANDARD,
-            DeckSlotName.SLOT_D1,
-            12.91,
-            lazy_fixture("ot3_standard_deck_def"),
-        ),
-    ],
-)
 def test_get_module_highest_z(
     tempdeck_v2_def: ModuleDefinition,
-    deck_type: DeckType,
-    slot_name: DeckSlotName,
-    expected_highest_z: float,
-    deck_definition: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> None:
     """It should get the highest z point of the module."""
     subject = make_module_view(
-        deck_type=deck_type,
-        slot_by_module_id={"module-id": slot_name},
+        deck_type=DeckType.OT3_STANDARD,
+        slot_by_module_id={"module-id": DeckSlotName.SLOT_D1},
         requested_model_by_module_id={
             "module-id": ModuleModel.TEMPERATURE_MODULE_V2,
         },
@@ -2019,12 +1921,13 @@ def test_get_module_highest_z(
             )
         },
     )
+    expected_highest_z = 12.91
     assert isclose(
         subject.get_module_highest_z(
             module_id="module-id",
             addressable_areas=get_addressable_area_view(
                 deck_configuration=None,
-                deck_definition=deck_definition,
+                deck_definition=ot3_standard_deck_def,
                 use_simulated_deck_config=True,
             ),
         ),
@@ -2073,12 +1976,6 @@ def test_get_overflowed_module_in_slot(tempdeck_v1_def: ModuleDefinition) -> Non
             DeckType.OT3_STANDARD,
             lazy_fixture("thermocycler_v2_def"),
             DeckSlotName.SLOT_1,
-            False,
-        ),
-        (
-            DeckType.OT2_STANDARD,
-            lazy_fixture("thermocycler_v2_def"),
-            DeckSlotName.SLOT_A1,
             False,
         ),
     ],

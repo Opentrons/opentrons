@@ -34,14 +34,14 @@ def collect_protocol_file(
     return main_file, f"{name_stem}{main_file.suffix}"
 
 
-def collect_rtp_csv(
+async def collect_rtp_csv(
     run_id: str,
     run_data_manager: RunDataManager,
     data_files_store: DataFilesStore,
 ) -> Optional[Tuple[Path, str]]:
     """Return the CSV runtime parameter input file, or None if unavailable."""
     try:
-        run_record = run_data_manager.get(run_id)
+        run_record = await run_data_manager.get(run_id)
         for param in run_record.runTimeParameters:
             if param.type == "csv_file" and param.file is not None:
                 file_info = data_files_store.get(param.file.id)
@@ -53,7 +53,7 @@ def collect_rtp_csv(
         return None
 
 
-def collect_run_log(
+async def collect_run_log(
     run_id: str,
     run: Union[RunResource, BadRunResource],
     run_data_manager: RunDataManager,
@@ -62,37 +62,24 @@ def collect_run_log(
 ) -> Optional[Tuple[Path, str]]:
     """Build a run log JSON file in ``staging_dir``, or None if unavailable."""
     try:
-        run_record = run_data_manager.get(run_id)
-        length_probe = run_data_manager.get_commands_slice(
+        run_record = await run_data_manager.get(run_id)
+        length_probe = await run_data_manager.get_commands_slice(
             run_id=run_id,
             cursor=0,
             length=0,
             include_fixit_commands=True,
         )
-        command_slice = run_data_manager.get_commands_slice(
+        command_slice = await run_data_manager.get_commands_slice(
             run_id=run_id,
             cursor=0,
             length=length_probe.total_length,
             include_fixit_commands=True,
         )
+
         command_summaries = [
-            RunCommandSummary.model_construct(
-                id=c.id,
-                key=c.key,
-                commandType=c.commandType,
-                intent=c.intent,
-                status=c.status,
-                createdAt=c.createdAt,
-                startedAt=c.startedAt,
-                completedAt=c.completedAt,
-                params=c.params,
-                error=c.error,
-                notes=c.notes,
-                failedCommandId=c.failedCommandId,
-                commandAnnotationIds=c.commandAnnotationIds
-                if c.commandAnnotationIds
-                else None,
-            ).model_dump(mode="json", by_alias=True)
+            RunCommandSummary.build_from_json(c).model_dump_json(
+                by_alias=True, exclude_none=True
+            )
             for c in command_slice.commands
         ]
 
@@ -113,7 +100,7 @@ def collect_run_log(
         return None
 
 
-def collect_labware_offsets(
+async def collect_labware_offsets(
     run_id: str,
     run: Union[RunResource, BadRunResource],
     run_data_manager: RunDataManager,
@@ -122,7 +109,7 @@ def collect_labware_offsets(
 ) -> Optional[Tuple[Path, str]]:
     """Build labware offsets JSON in ``staging_dir``, or None if unavailable."""
     try:
-        run_record = run_data_manager.get(run_id)
+        run_record = await run_data_manager.get(run_id)
         offsets_payload = [
             offset.model_dump(mode="json", by_alias=True)
             for offset in run_record.labwareOffsets

@@ -1,10 +1,5 @@
 // ToDo (kk:04/25/2024) re-organized all constants
 
-export const ANALYTICS_PIPETTE_OFFSET_STARTED: 'analytics:PIPETTE_OFFSET_STARTED' =
-  'analytics:PIPETTE_OFFSET_STARTED'
-export const ANALYTICS_TIP_LENGTH_STARTED: 'analytics:TIP_LENGTH_STARTED' =
-  'analytics:TIP_LENGTH_STARTED'
-
 export const ANALYTICS_LIQUID_SETUP_VIEW_TOGGLE = 'liquidSetupViewToggle'
 export const ANALYTICS_ADD_CUSTOM_LABWARE = 'addCustomLabware'
 export const ANALYTICS_U2E_DRIVE_ALERT_DISMISSED = 'u2eDriverAlertDismissed'
@@ -143,8 +138,6 @@ export const ANALYTICS_LPC_ANALYSIS_KIND: 'lpcAnalysisKind' = 'lpcAnalysisKind'
 export const ANALYTICS_LPC_LAUNCH: 'lpcLaunch' = 'lpcLaunch'
 export const ANALYTICS_LPC_APPLY_OFFSETS: 'lpcApplyOffsets' = 'lpcApplyOffsets'
 export const ANALYTICS_LPC_SAVE_OFFSET: 'lpcSaveOffset' = 'lpcSaveOffset'
-export const ANALYTICS_LPC_SAVE_OFFSET_TO_RUN_RECORD: 'lpcSaveOffsetToRunRecord' =
-  'lpcSaveOffsetToRunRecord'
 export const ANALYTICS_LPC_OFFSET_SOURCE_RESOLUTION: 'lpcOffsetSourceResolution' =
   'lpcOffsetSourceResolution'
 

@@ -1,7 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -14,6 +13,7 @@ import { useCurrentRun } from '/app/resources/runs'
 import {
   DeviceReset,
   DisableStackerSensors,
+  DisableVacuumModuleWasteDetection,
   DisplayRobotName,
   EnableComplianceReadySoftware,
   EnableStatusLight,
@@ -59,6 +59,7 @@ vi.mock('../AdvancedTab/UpdateRobotSoftware')
 vi.mock('../AdvancedTab/UsageSettings')
 vi.mock('../AdvancedTab/UseOlderAspirateBehavior')
 vi.mock('../AdvancedTab/DisableStackerSensors')
+vi.mock('../AdvancedTab/DisableVacuumModuleWasteDetection')
 vi.mock('/app/resources/runs')
 
 const render = () => {
@@ -111,7 +112,7 @@ describe('RobotSettings Advanced tab', () => {
     vi.mocked(UseOlderAspirateBehavior).mockReturnValue(
       <div>Mock UseOlderAspirateBehavior Section</div>
     )
-    when(useIsFlex).calledWith('otie').thenReturn(false)
+    vi.when(useIsFlex).calledWith('otie').thenReturn(false)
     vi.mocked(EnableStatusLight).mockReturnValue(
       <div>mock EnableStatusLight</div>
     )
@@ -120,6 +121,9 @@ describe('RobotSettings Advanced tab', () => {
     )
     vi.mocked(DisableStackerSensors).mockReturnValue(
       <div>Mock DisableStackerSensors Section</div>
+    )
+    vi.mocked(DisableVacuumModuleWasteDetection).mockReturnValue(
+      <div>Mock DisableVacuumModuleWasteDetection Section</div>
     )
     vi.mocked(EnterRobotEncryptionKey).mockReturnValue(
       <div>Mock EnterRobotEncryptionKey Section</div>
@@ -166,7 +170,7 @@ describe('RobotSettings Advanced tab', () => {
   })
 
   it('should not render LegacySettings section for Flex', () => {
-    when(useIsFlex).calledWith('otie').thenReturn(true)
+    vi.when(useIsFlex).calledWith('otie').thenReturn(true)
     render()
     expect(screen.queryByText('Mock LegacySettings Section')).toBeNull()
   })
@@ -192,7 +196,7 @@ describe('RobotSettings Advanced tab', () => {
   })
 
   it('should not render ShortTrashBin section for Flex', () => {
-    when(useIsFlex).calledWith('otie').thenReturn(true)
+    vi.when(useIsFlex).calledWith('otie').thenReturn(true)
     render()
     expect(screen.queryByText('Mock ShortTrashBin Section')).toBeNull()
   })
@@ -213,7 +217,7 @@ describe('RobotSettings Advanced tab', () => {
   })
 
   it('should not render UsageSettings for Flex', () => {
-    when(useIsFlex).calledWith('otie').thenReturn(true)
+    vi.when(useIsFlex).calledWith('otie').thenReturn(true)
     render()
     expect(screen.queryByText('Mock UsageSettings Section')).toBeNull()
   })
@@ -224,7 +228,7 @@ describe('RobotSettings Advanced tab', () => {
   })
 
   it('should not render UseOlderAspirateBehavior section for Flex', () => {
-    when(useIsFlex).calledWith('otie').thenReturn(true)
+    vi.when(useIsFlex).calledWith('otie').thenReturn(true)
     render()
     expect(
       screen.queryByText('Mock UseOlderAspirateBehavior Section')
@@ -237,7 +241,7 @@ describe('RobotSettings Advanced tab', () => {
   })
 
   it('should render EnableStatusLight section for Flex', () => {
-    when(useIsFlex).calledWith('otie').thenReturn(true)
+    vi.when(useIsFlex).calledWith('otie').thenReturn(true)
     render()
     screen.getByText('mock EnableStatusLight')
   })
@@ -250,8 +254,21 @@ describe('RobotSettings Advanced tab', () => {
   })
 
   it('should render DisableStackerSensors section for Flex', () => {
-    when(useIsFlex).calledWith('otie').thenReturn(true)
+    vi.when(useIsFlex).calledWith('otie').thenReturn(true)
     render()
     screen.getByText('Mock DisableStackerSensors Section')
+  })
+
+  it('should not render DisableVacuumModuleWasteDetection section for OT-2', () => {
+    render()
+    expect(
+      screen.queryByText('Mock DisableVacuumModuleWasteDetection')
+    ).not.toBeInTheDocument()
+  })
+
+  it('should render DisableVacuumModuleWasteDetection section for Flex', () => {
+    vi.when(useIsFlex).calledWith('otie').thenReturn(true)
+    render()
+    screen.getByText('Mock DisableVacuumModuleWasteDetection Section')
   })
 })

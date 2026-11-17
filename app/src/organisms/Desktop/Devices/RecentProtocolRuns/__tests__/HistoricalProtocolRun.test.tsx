@@ -1,13 +1,17 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
 import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
+import {
+  useDeleteRunMutation,
+  useRunDataFileMetadata,
+} from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { getStoredProtocols } from '/app/redux/protocol-storage'
 import { storedProtocolData as storedProtocolDataFixture } from '/app/redux/protocol-storage/__fixtures__'
 import {
@@ -27,6 +31,10 @@ import type { RunTimeParameter } from '@opentrons/shared-data'
 vi.mock('/app/redux/protocol-storage')
 vi.mock('/app/resources/runs')
 vi.mock('../HistoricalProtocolRunOverflowMenu')
+vi.mock('@opentrons/react-api-client')
+vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
+  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
+}))
 
 const run = {
   current: false,
@@ -56,7 +64,7 @@ describe('RecentProtocolRuns', () => {
     vi.mocked(HistoricalProtocolRunOverflowMenu).mockReturnValue(
       <div>mock HistoricalProtocolRunOverflowMenu</div>
     )
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith('fakeRunId', {
         staleTime: Infinity,
         refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
@@ -69,6 +77,13 @@ describe('RecentProtocolRuns', () => {
       completedAt: '2022-05-04T18:24:41.833862+00:00',
     })
     vi.mocked(getStoredProtocols).mockReturnValue([storedProtocolDataFixture])
+    vi.mocked(useRunDataFileMetadata).mockReturnValue({
+      data: undefined,
+    } as UseQueryResult<any, unknown>)
+    vi.mocked(useDeleteRunMutation).mockReturnValue({
+      deleteRun: vi.fn(),
+      isLoading: false,
+    } as any)
   })
 
   it('renders the correct information derived from run and protocol', () => {

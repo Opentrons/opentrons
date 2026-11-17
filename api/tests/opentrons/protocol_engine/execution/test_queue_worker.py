@@ -109,7 +109,7 @@ async def test_cancel(
         await command_executor.execute(command_id=matchers.Anything()),
         times=0,
     )
-    decoy.verify(command_executor.cancel_tasks("Engine cancelled"), times=1)
+    decoy.verify(command_executor.cancel_tasks("Engine cancelled "), times=1)
 
 
 async def test_cancel_noops_if_joined(

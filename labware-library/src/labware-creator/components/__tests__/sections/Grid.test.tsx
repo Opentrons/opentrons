@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import isEqual from 'lodash/isEqual'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { getDefaultFormState, yesNoOptions } from '../../../fields'
 import { getLabwareName, isEveryFieldHidden } from '../../../utils'
@@ -83,10 +82,10 @@ describe('Grid', () => {
     vi.restoreAllMocks()
   })
   it('should render when fields are visible', () => {
-    when(vi.mocked(getLabwareName))
+    vi.when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, true)
       .thenReturn('FAKE LABWARE NAME PLURAL')
-    when(vi.mocked(getLabwareName))
+    vi.when(vi.mocked(getLabwareName))
 
     render(wrapInFormik(<Grid />, formikConfig))
     expect(screen.getByText('Grid'))
@@ -117,7 +116,7 @@ describe('Grid', () => {
   })
 
   it('should not render when all fields are hidden', () => {
-    when(vi.mocked(isEveryFieldHidden))
+    vi.when(vi.mocked(isEveryFieldHidden))
       .calledWith(
         [
           'gridRows',

@@ -49,7 +49,7 @@ async def test_get_command_annotations_slice(
         total_length=400,
     )
     decoy.when(
-        mock_run_data_manager.get_command_annotations_slice(
+        await mock_run_data_manager.get_command_annotations_slice(
             run_id="run-id", cursor=1, length=4
         )
     ).then_return(expected_annotations)
@@ -114,10 +114,10 @@ async def test_get_command_annotations_slice_uses_default_values(
         total_length=456,
     )
     decoy.when(
-        mock_run_data_manager.get_total_command_annotations_count("run-id")
+        await mock_run_data_manager.get_total_command_annotations_count("run-id")
     ).then_return(total_annotations_in_run)
     decoy.when(
-        mock_run_data_manager.get_command_annotations_slice(
+        await mock_run_data_manager.get_command_annotations_slice(
             run_id="run-id",
             cursor=expected_cursor,
             length=expected_page_length,
@@ -150,10 +150,10 @@ async def test_get_command_annotations_slice_cursor_calculation_non_default_page
         total_length=456,
     )
     decoy.when(
-        mock_run_data_manager.get_total_command_annotations_count("run-id")
+        await mock_run_data_manager.get_total_command_annotations_count("run-id")
     ).then_return(total_annotations_in_run)
     decoy.when(
-        mock_run_data_manager.get_command_annotations_slice(
+        await mock_run_data_manager.get_command_annotations_slice(
             run_id="run-id",
             cursor=expected_cursor,
             length=page_length,
@@ -180,7 +180,7 @@ async def test_get_command_annotations_slice_with_non_default_cursor(
         total_length=456,
     )
     decoy.when(
-        mock_run_data_manager.get_command_annotations_slice(
+        await mock_run_data_manager.get_command_annotations_slice(
             run_id="run-id",
             cursor=100,
             length=4,
@@ -208,7 +208,7 @@ async def test_get_specified_command_annotation(
         params={},
     )
     decoy.when(
-        mock_run_data_manager.get_command_annotation("run-id", "annotation-id")
+        await mock_run_data_manager.get_command_annotation("run-id", "annotation-id")
     ).then_return(expected_annotation)
     result = await get_command_annotation(
         runId="run-id",
@@ -234,7 +234,7 @@ async def test_get_command_annotation_raises_errors(
 ) -> None:
     """It should 404 if you attempt to get a non-existent command annotation."""
     decoy.when(
-        mock_run_data_manager.get_command_annotation("run-id", "annotation-id")
+        await mock_run_data_manager.get_command_annotation("run-id", "annotation-id")
     ).then_raise(exception)
 
     with pytest.raises(ApiError) as exc_info:

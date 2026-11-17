@@ -6,10 +6,12 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
+
+import type { ReactNode } from 'react'
 
 export interface Metadata {
   [key: string]: any
@@ -25,9 +27,9 @@ export function MetadataDetails({
   description,
   metadata,
   protocolType,
-}: MetadataDetailsProps): JSX.Element {
+}: MetadataDetailsProps): ReactNode {
   if (protocolType === 'json') {
-    return <LegacyStyledText forwardedAs="p">{description}</LegacyStyledText>
+    return <StyledText forwardedAs="p">{description}</StyledText>
   } else {
     const filteredMetaData = Object.entries(
       omit(metadata, ['description', 'protocolName', 'author', 'apiLevel'])
@@ -39,20 +41,20 @@ export function MetadataDetails({
         flexDirection={DIRECTION_COLUMN}
         data-testid="ProtocolDetails_description"
       >
-        <LegacyStyledText forwardedAs="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
+        <StyledText forwardedAs="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
           {description}
-        </LegacyStyledText>
+        </StyledText>
         {filteredMetaData.map((item, index) => {
           return (
             <Fragment key={index}>
-              <LegacyStyledText
+              <StyledText
                 forwardedAs="h6"
                 marginTop={SPACING.spacing8}
                 color={COLORS.grey60}
               >
                 {startCase(item.label)}
-              </LegacyStyledText>
-              <LegacyStyledText forwardedAs="p">{item.value}</LegacyStyledText>
+              </StyledText>
+              <StyledText forwardedAs="p">{item.value}</StyledText>
             </Fragment>
           )
         })}

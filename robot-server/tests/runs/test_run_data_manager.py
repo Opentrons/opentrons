@@ -1,6 +1,5 @@
 """Tests for RunDataManager."""
 
-import inspect
 from datetime import datetime
 from typing import Dict, List
 from unittest.mock import Mock, sentinel
@@ -14,9 +13,9 @@ from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import (
     CommandErrorSlice,
     CommandPointer,
-    CommandSlice,
     EngineStatus,
     ErrorOccurrence,
+    JsonCommandSlice,
     LabwareOffset,
     Liquid,
     LoadedLabware,
@@ -42,7 +41,6 @@ from opentrons.protocol_runner import RunResult
 from opentrons_shared_data.data_files import RunFileNameMetadata
 from opentrons_shared_data.errors.exceptions import InvalidStoredData
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
-from opentrons_shared_data.robot.types import RobotTypeEnum
 
 from robot_server.access_control.settings.models import ResponseData
 from robot_server.access_control.settings.store import AccessControlSettingStore
@@ -76,7 +74,7 @@ from robot_server.runs.run_store import (
 from robot_server.service.notifications import RunsPublisher
 
 
-def mock_notify_publishers() -> None:
+async def mock_notify_publishers() -> None:
     """A mock notify_publishers."""
     return None
 
@@ -250,19 +248,6 @@ def run_command() -> commands.Command:
 
 
 @pytest.fixture
-def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Get a mocked feature flags."""
-    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
-        params = inspect.getfullargspec(func)
-        mock_get_ff = decoy.mock(func=func)
-        if any("robot_type" in p for p in params.args):
-            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
-        else:
-            decoy.when(mock_get_ff()).then_return(False)
-        monkeypatch.setattr(feature_flags, name, mock_get_ff)
-
-
-@pytest.fixture
 def subject(
     mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
@@ -335,7 +320,9 @@ async def test_create(
         )
     ).then_return(engine_state_summary)
 
-    decoy.when(mock_run_orchestrator_store.get_run_time_parameters()).then_return([])
+    decoy.when(await mock_run_orchestrator_store.get_run_time_parameters()).then_return(
+        []
+    )
 
     decoy.when(
         mock_run_store.insert(
@@ -350,7 +337,7 @@ async def test_create(
         displayName="foo", variableName="bar", default=True, value=False
     )
     file_parameter = CSVParameter(displayName="my_file", variableName="file-id")
-    decoy.when(mock_run_orchestrator_store.get_run_time_parameters()).then_return(
+    decoy.when(await mock_run_orchestrator_store.get_run_time_parameters()).then_return(
         [bool_parameter, file_parameter]
     )
 
@@ -500,14 +487,14 @@ async def test_get_current_run(
 
     decoy.when(mock_run_store.get(run_id=run_id)).then_return(run_resource)
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
-    decoy.when(mock_run_orchestrator_store.get_state_summary()).then_return(
+    decoy.when(await mock_run_orchestrator_store.get_state_summary()).then_return(
         engine_state_summary
     )
-    decoy.when(mock_run_orchestrator_store.get_run_time_parameters()).then_return(
+    decoy.when(await mock_run_orchestrator_store.get_run_time_parameters()).then_return(
         run_time_parameters
     )
 
-    result = subject.get(run_id=run_id)
+    result = await subject.get(run_id=run_id)
 
     assert result == Run(
         current=True,
@@ -553,7 +540,7 @@ async def test_get_historical_run(
     )
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("some other id")
 
-    result = subject.get(run_id=run_id)
+    result = await subject.get(run_id=run_id)
 
     assert result == Run(
         current=False,
@@ -599,7 +586,7 @@ async def test_get_historical_run_no_data(
     )
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("some other id")
 
-    result = subject.get(run_id=run_id)
+    result = await subject.get(run_id=run_id)
 
     assert result == BadRun(
         dataError=run_error,
@@ -700,10 +687,10 @@ async def test_get_all_runs(
     )
 
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("current-run")
-    decoy.when(mock_run_orchestrator_store.get_state_summary()).then_return(
+    decoy.when(await mock_run_orchestrator_store.get_state_summary()).then_return(
         current_run_data
     )
-    decoy.when(mock_run_orchestrator_store.get_run_time_parameters()).then_return(
+    decoy.when(await mock_run_orchestrator_store.get_run_time_parameters()).then_return(
         current_run_time_parameters
     )
     decoy.when(mock_run_store.get_state_summary("historical-run")).then_return(
@@ -716,7 +703,7 @@ async def test_get_all_runs(
         [historical_run_resource, current_run_resource]
     )
 
-    result = subject.get_all(length=20)
+    result = await subject.get_all(length=20)
 
     assert result == [
         Run(
@@ -795,11 +782,12 @@ async def test_delete_historical_run(
 
 
 @pytest.mark.parametrize(
-    ("signed_by", "access_control_status", "expect_signoff_required"),
+    ("signed_by", "access_control_status", "expect_signoff_required", "current_run_id"),
     [
-        pytest.param(None, True, True, id="signoff_required"),
-        pytest.param("Alice Example", True, False, id="already_signed"),
-        pytest.param(None, False, False, id="access_control_disabled"),
+        pytest.param(None, True, True, "test-run-id", id="signoff_required"),
+        pytest.param("Alice Example", True, False, "test-run-id", id="already_signed"),
+        pytest.param(None, False, False, "test-run-id", id="access_control_disabled"),
+        pytest.param(None, True, False, "not-run-id", id="not_current_run"),
     ],
 )
 async def test_delete_signoff_enforcement(
@@ -811,6 +799,7 @@ async def test_delete_signoff_enforcement(
     signed_by: str | None,
     access_control_status: bool,
     expect_signoff_required: bool,
+    current_run_id: str,
 ) -> None:
     """It should enforce signoff before deleting a run when required."""
     run_id = "test-run-id"
@@ -828,7 +817,7 @@ async def test_delete_signoff_enforcement(
             log_period_id=None,
         )
     )
-    decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
+    decoy.when(mock_run_orchestrator_store.current_run_id).then_return(current_run_id)
 
     if expect_signoff_required:
         with pytest.raises(RunSignoffRequiredError, match=run_id):
@@ -840,11 +829,13 @@ async def test_delete_signoff_enforcement(
         decoy.verify(mock_run_store.remove(run_id=run_id), times=0)
     else:
         await subject.delete(run_id=run_id, access_control_status=access_control_status)
-
-        decoy.verify(
-            await mock_run_orchestrator_store.clear(),
-            mock_run_store.remove(run_id=run_id),
-        )
+        if current_run_id == run_id:
+            decoy.verify(
+                await mock_run_orchestrator_store.clear(),
+                mock_run_store.remove(run_id=run_id),
+            )
+        else:
+            decoy.verify(mock_run_store.remove(run_id=run_id))
 
 
 async def test_uncurrent(
@@ -866,7 +857,7 @@ async def test_uncurrent(
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id)
     decoy.when(await mock_run_orchestrator_store.clear()).then_return(
         RunResult(
-            commands=[run_command],
+            commands=[],
             state_summary=engine_state_summary,
             parameters=run_time_parameters,
             command_annotations=command_annotations,
@@ -878,7 +869,7 @@ async def test_uncurrent(
         mock_run_store.update_run_state(
             run_id=run_id,
             summary=engine_state_summary,
-            commands=[run_command],
+            commands=None,
             command_annotations=command_annotations,
             run_time_parameters=run_time_parameters,
         )
@@ -991,7 +982,7 @@ async def test_uncurrent_signoff_enforcement(
     else:
         decoy.when(await mock_run_orchestrator_store.clear()).then_return(
             RunResult(
-                commands=[run_command],
+                commands=[],
                 state_summary=engine_state_summary,
                 parameters=run_time_parameters,
                 command_annotations=command_annotations,
@@ -1002,7 +993,7 @@ async def test_uncurrent_signoff_enforcement(
             mock_run_store.update_run_state(
                 run_id=run_id,
                 summary=engine_state_summary,
-                commands=[run_command],
+                commands=None,
                 command_annotations=command_annotations,
                 run_time_parameters=run_time_parameters,
             )
@@ -1051,7 +1042,7 @@ async def test_create_archives_existing(
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(run_id_old)
     decoy.when(await mock_run_orchestrator_store.clear()).then_return(
         RunResult(
-            commands=[run_command],
+            commands=[],
             state_summary=engine_state_summary,
             parameters=run_time_parameters,
             command_annotations=command_annotations,
@@ -1114,7 +1105,7 @@ async def test_create_archives_existing(
         mock_run_store.update_run_state(
             run_id=run_id_old,
             summary=engine_state_summary,
-            commands=[run_command],
+            commands=None,
             command_annotations=command_annotations,
             run_time_parameters=run_time_parameters,
         )
@@ -1199,7 +1190,7 @@ async def test_create_replacement_signoff_enforcement(
     else:
         decoy.when(await mock_run_orchestrator_store.clear()).then_return(
             RunResult(
-                commands=[run_command],
+                commands=[],
                 state_summary=engine_state_summary,
                 parameters=run_time_parameters,
                 command_annotations=command_annotations,
@@ -1262,14 +1253,14 @@ async def test_create_replacement_signoff_enforcement(
             mock_run_store.update_run_state(
                 run_id=run_id_old,
                 summary=engine_state_summary,
-                commands=[run_command],
+                commands=None,
                 command_annotations=command_annotations,
                 run_time_parameters=run_time_parameters,
             )
         )
 
 
-def test_get_commands_slice_from_db(
+async def test_get_commands_slice_from_db(
     decoy: Decoy,
     subject: RunDataManager,
     mock_run_store: RunStore,
@@ -1287,8 +1278,13 @@ def test_get_commands_slice_from_db(
         run_command,
     ]
 
-    expected_command_slice = CommandSlice(
-        commands=expected_commands_result, cursor=1, total_length=3
+    expected_command_slice = JsonCommandSlice(
+        commands=[
+            command.model_dump_json(by_alias=True)
+            for command in expected_commands_result
+        ],
+        cursor=1,
+        total_length=3,
     )
 
     decoy.when(
@@ -1296,14 +1292,14 @@ def test_get_commands_slice_from_db(
             run_id="run_id", cursor=1, length=2, include_fixit_commands=True
         )
     ).then_return(expected_command_slice)
-    result = subject.get_commands_slice(
+    result = await subject.get_commands_slice(
         run_id="run_id", cursor=1, length=2, include_fixit_commands=True
     )
 
     assert expected_command_slice == result
 
 
-def test_get_commands_slice_current_run(
+async def test_get_commands_slice_current_run(
     decoy: Decoy,
     subject: RunDataManager,
     mock_run_orchestrator_store: RunOrchestratorStore,
@@ -1321,20 +1317,27 @@ def test_get_commands_slice_current_run(
         run_command,
     ]
 
-    expected_command_slice = CommandSlice(
-        commands=expected_commands_result, cursor=1, total_length=3
+    expected_command_slice = JsonCommandSlice(
+        commands=[
+            command.model_dump_json(by_alias=True)
+            for command in expected_commands_result
+        ],
+        cursor=1,
+        total_length=3,
     )
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("run-id")
-    decoy.when(mock_run_orchestrator_store.get_command_slice(1, 2, True)).then_return(
-        expected_command_slice
-    )
+    decoy.when(
+        await mock_run_orchestrator_store.get_command_slice(1, 2, True)
+    ).then_return(expected_command_slice)
 
-    result = subject.get_commands_slice("run-id", 1, 2, include_fixit_commands=True)
+    result = await subject.get_commands_slice(
+        "run-id", 1, 2, include_fixit_commands=True
+    )
 
     assert expected_command_slice == result
 
 
-def test_get_commands_errors_slice_historical_run(
+async def test_get_commands_errors_slice_historical_run(
     decoy: Decoy,
     subject: RunDataManager,
     mock_run_orchestrator_store: RunOrchestratorStore,
@@ -1353,12 +1356,12 @@ def test_get_commands_errors_slice_historical_run(
         command_error_slice
     )
 
-    result = subject.get_command_error_slice("run-id", 1, 2)
+    result = await subject.get_command_error_slice("run-id", 1, 2)
 
     assert command_error_slice == result
 
 
-def test_get_commands_errors_slice_current_run(
+async def test_get_commands_errors_slice_current_run(
     decoy: Decoy,
     subject: RunDataManager,
     mock_run_orchestrator_store: RunOrchestratorStore,
@@ -1374,16 +1377,16 @@ def test_get_commands_errors_slice_current_run(
     )
 
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("run-id")
-    decoy.when(mock_run_orchestrator_store.get_command_error_slice(1, 2)).then_return(
-        command_error_slice
-    )
+    decoy.when(
+        await mock_run_orchestrator_store.get_command_error_slice(1, 2)
+    ).then_return(command_error_slice)
 
-    result = subject.get_command_error_slice("run-id", 1, 2)
+    result = await subject.get_command_error_slice("run-id", 1, 2)
 
     assert command_error_slice == result
 
 
-def test_get_commands_slice_from_db_run_not_found(
+async def test_get_commands_slice_from_db_run_not_found(
     decoy: Decoy, subject: RunDataManager, mock_run_store: RunStore
 ) -> None:
     """Should get a sliced command list from run store."""
@@ -1393,7 +1396,7 @@ def test_get_commands_slice_from_db_run_not_found(
         )
     ).then_raise(RunNotFoundError(run_id="run-id"))
     with pytest.raises(RunNotFoundError):
-        subject.get_commands_slice(
+        await subject.get_commands_slice(
             run_id="run-id", cursor=1, length=2, include_fixit_commands=True
         )
 
@@ -1444,8 +1447,10 @@ def test_get_current_command_not_current_run(
         index=0,
     )
 
-    command_slice = CommandSlice(
-        commands=[last_command_slice], cursor=0, total_length=1
+    command_slice = JsonCommandSlice(
+        commands=[last_command_slice.model_dump_json(by_alias=True)],
+        cursor=0,
+        total_length=1,
     )
 
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("not-run-id")
@@ -1513,8 +1518,10 @@ def test_get_last_completed_command_not_current_run(
         "different-run-id"
     )
 
-    command_slice = CommandSlice(
-        commands=[last_command_slice], cursor=1, total_length=1
+    command_slice = JsonCommandSlice(
+        commands=[last_command_slice.model_dump_json(by_alias=True)],
+        cursor=1,
+        total_length=1,
     )
     decoy.when(
         mock_run_store.get_commands_slice(
@@ -1527,7 +1534,7 @@ def test_get_last_completed_command_not_current_run(
     assert result == expected_last_command
 
 
-def test_get_command_from_engine(
+async def test_get_command_from_engine(
     decoy: Decoy,
     subject: RunDataManager,
     mock_run_store: RunStore,
@@ -1536,15 +1543,15 @@ def test_get_command_from_engine(
 ) -> None:
     """Should get command by id from engine store."""
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("run-id")
-    decoy.when(mock_run_orchestrator_store.get_command("command-id")).then_return(
+    decoy.when(await mock_run_orchestrator_store.get_command("command-id")).then_return(
         run_command
     )
-    result = subject.get_command("run-id", "command-id")
+    result = await subject.get_command("run-id", "command-id")
 
     assert result == run_command
 
 
-def test_get_command_from_db(
+async def test_get_command_from_db(
     decoy: Decoy,
     subject: RunDataManager,
     mock_run_store: RunStore,
@@ -1556,12 +1563,12 @@ def test_get_command_from_db(
     decoy.when(
         mock_run_store.get_command(run_id="run-id", command_id="command-id")
     ).then_return(run_command)
-    result = subject.get_command("run-id", "command-id")
+    result = await subject.get_command("run-id", "command-id")
 
     assert result == run_command
 
 
-def test_get_command_from_db_run_not_found(
+async def test_get_command_from_db_run_not_found(
     decoy: Decoy,
     subject: RunDataManager,
     mock_run_store: RunStore,
@@ -1575,10 +1582,10 @@ def test_get_command_from_db_run_not_found(
     ).then_raise(RunNotFoundError("run-id"))
 
     with pytest.raises(RunNotFoundError):
-        subject.get_command("run-id", "command-id")
+        await subject.get_command("run-id", "command-id")
 
 
-def test_get_command_from_db_command_not_found(
+async def test_get_command_from_db_command_not_found(
     decoy: Decoy,
     subject: RunDataManager,
     mock_run_store: RunStore,
@@ -1592,10 +1599,10 @@ def test_get_command_from_db_command_not_found(
     ).then_raise(CommandNotFoundError(command_id="command-id"))
 
     with pytest.raises(CommandNotFoundError):
-        subject.get_command("run-id", "command-id")
+        await subject.get_command("run-id", "command-id")
 
 
-def test_get_all_commands_as_preserialized_list(
+async def test_get_all_commands_as_preserialized_list(
     decoy: Decoy,
     subject: RunDataManager,
     mock_run_store: RunStore,
@@ -1606,13 +1613,13 @@ def test_get_all_commands_as_preserialized_list(
     decoy.when(
         mock_run_store.get_all_commands_as_preserialized_list("run-id", True)
     ).then_return(['{"id": command-1}', '{"id": command-2}'])
-    assert subject.get_all_commands_as_preserialized_list("run-id", True) == [
+    assert await subject.get_all_commands_as_preserialized_list("run-id", True) == [
         '{"id": command-1}',
         '{"id": command-2}',
     ]
 
 
-def test_get_all_commands_as_preserialized_list_errors_for_active_runs(
+async def test_get_all_commands_as_preserialized_list_errors_for_active_runs(
     decoy: Decoy,
     subject: RunDataManager,
     mock_run_store: RunStore,
@@ -1620,12 +1627,14 @@ def test_get_all_commands_as_preserialized_list_errors_for_active_runs(
 ) -> None:
     """It should raise an error when fetching pre-serialized commands list while run is active."""
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("current-run-id")
-    decoy.when(mock_run_orchestrator_store.get_is_run_terminal()).then_return(False)
+    decoy.when(await mock_run_orchestrator_store.get_is_run_terminal()).then_return(
+        False
+    )
     with pytest.raises(PreSerializedCommandsNotAvailableError):
-        subject.get_all_commands_as_preserialized_list("current-run-id", True)
+        await subject.get_all_commands_as_preserialized_list("current-run-id", True)
 
 
-def test_get_command_annotations_slice_current_run(
+async def test_get_command_annotations_slice_current_run(
     decoy: Decoy,
     subject: RunDataManager,
     mock_run_orchestrator_store: RunOrchestratorStore,
@@ -1645,15 +1654,17 @@ def test_get_command_annotations_slice_current_run(
     )
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("current-run-id")
     decoy.when(
-        mock_run_orchestrator_store.get_command_annotations_slice(cursor=1, length=10)
+        await mock_run_orchestrator_store.get_command_annotations_slice(
+            cursor=1, length=10
+        )
     ).then_return(annotations_slice)
-    result = subject.get_command_annotations_slice(
+    result = await subject.get_command_annotations_slice(
         run_id="current-run-id", cursor=1, length=10
     )
     assert result == annotations_slice
 
 
-def test_get_command_annotation_from_current_run(
+async def test_get_command_annotation_from_current_run(
     decoy: Decoy,
     subject: RunDataManager,
     mock_run_orchestrator_store: RunOrchestratorStore,
@@ -1667,13 +1678,13 @@ def test_get_command_annotation_from_current_run(
     )
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("run-id")
     decoy.when(
-        mock_run_orchestrator_store.get_command_annotation("annotation-id")
+        await mock_run_orchestrator_store.get_command_annotation("annotation-id")
     ).then_return(cmd_annotation)
-    result = subject.get_command_annotation("run-id", "annotation-id")
+    result = await subject.get_command_annotation("run-id", "annotation-id")
     assert result == cmd_annotation
 
 
-def test_get_command_annotations_slice_from_db(
+async def test_get_command_annotations_slice_from_db(
     decoy: Decoy,
     subject: RunDataManager,
     mock_run_orchestrator_store: RunOrchestratorStore,
@@ -1699,13 +1710,13 @@ def test_get_command_annotations_slice_from_db(
             run_id="not-current-id", cursor=1, length=10
         )
     ).then_return(annotations_slice)
-    result = subject.get_command_annotations_slice(
+    result = await subject.get_command_annotations_slice(
         run_id="not-current-id", cursor=1, length=10
     )
     assert result == annotations_slice
 
 
-def test_get_command_annotation_from_db(
+async def test_get_command_annotation_from_db(
     decoy: Decoy,
     subject: RunDataManager,
     mock_run_orchestrator_store: RunOrchestratorStore,
@@ -1725,7 +1736,7 @@ def test_get_command_annotation_from_db(
             run_id="not-current-run-id", command_annotation_id="annotation-id"
         )
     ).then_return(cmd_annotation)
-    result = subject.get_command_annotation("not-current-run-id", "annotation-id")
+    result = await subject.get_command_annotation("not-current-run-id", "annotation-id")
     assert result == cmd_annotation
 
 
@@ -1739,7 +1750,7 @@ async def test_get_current_run_labware_definition(
     """It should get the current run labware definition from the engine."""
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return("run-id")
     decoy.when(
-        mock_run_orchestrator_store.get_loaded_labware_definitions()
+        await mock_run_orchestrator_store.get_loaded_labware_definitions()
     ).then_return(
         [
             LabwareDefinition2.model_construct(namespace="test_1"),  # type: ignore[call-arg]
@@ -1747,7 +1758,7 @@ async def test_get_current_run_labware_definition(
         ]
     )
 
-    result = subject.get_run_loaded_labware_definitions(run_id="run-id")
+    result = await subject.get_run_loaded_labware_definitions(run_id="run-id")
 
     assert result == [
         LabwareDefinition2.model_construct(namespace="test_1"),  # type: ignore[call-arg]
@@ -1765,7 +1776,7 @@ async def test_set_error_recovery_rules_raises_run_not_current(
         "not-current-run-id"
     )
     with pytest.raises(RunNotCurrentError):
-        subject.set_error_recovery_rules(
+        await subject.set_error_recovery_rules(
             run_id="run-id", rules=decoy.mock(cls=List[ErrorRecoveryRule])
         )
 
@@ -1789,11 +1800,11 @@ async def test_set_error_recovery_rules_translates_and_calls_orchestrator(
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(
         sentinel.current_run_id
     )
-    subject.set_error_recovery_rules(
+    await subject.set_error_recovery_rules(
         run_id=sentinel.current_run_id, rules=sentinel.input_rules
     )
     decoy.verify(
-        mock_run_orchestrator_store.set_error_recovery_policy(
+        await mock_run_orchestrator_store.set_error_recovery_policy(
             sentinel.expected_output, sentinel.input_rules, sentinel.is_enabled
         )
     )
@@ -1813,7 +1824,7 @@ async def test_get_error_recovery_rules(
     decoy.when(mock_run_orchestrator_store.current_run_id).then_return(
         sentinel.current_run_id
     )
-    subject.set_error_recovery_rules(
+    await subject.set_error_recovery_rules(
         run_id=sentinel.current_run_id, rules=sentinel.input_rules
     )
     assert (

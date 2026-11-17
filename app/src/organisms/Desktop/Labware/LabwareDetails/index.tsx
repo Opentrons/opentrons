@@ -5,8 +5,8 @@ import { format } from 'date-fns'
 import {
   COLORS,
   Icon,
-  LegacyStyledText,
   Link,
+  StyledText,
   Tooltip,
   TOOLTIP_TOP_START,
   TYPOGRAPHY,
@@ -18,9 +18,9 @@ import {
   getUniqueWellProperties,
 } from '@opentrons/shared-data'
 
-import { Slideout } from '/app/atoms/Slideout'
+import { CustomLabwareOverflowMenu } from '/app/components/desktop/cards/LabwareCard/CustomLabwareOverflowMenu'
+import { Slideout } from '/app/components/desktop/Slideout'
 
-import { CustomLabwareOverflowMenu } from '../LabwareCard/CustomLabwareOverflowMenu'
 import { Dimensions } from './Dimensions'
 import { Gallery } from './Gallery'
 import { getWellLabel } from './helpers/labels'
@@ -32,6 +32,7 @@ import { WellDimensions } from './WellDimensions'
 import { WellProperties } from './WellProperties'
 import { WellSpacing } from './WellSpacing'
 
+import type { ReactNode } from 'react'
 import type { LabwareDefAndDate } from '/app/local-resources/labware'
 
 export interface LabwareDetailsProps {
@@ -39,7 +40,7 @@ export interface LabwareDetailsProps {
   labware: LabwareDefAndDate
 }
 
-export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
+export function LabwareDetails(props: LabwareDetailsProps): ReactNode {
   const { t } = useTranslation(['labware_landing', 'branded'])
   const { definition, modified, filename } = props.labware
   const { metadata, parameters, brand, wells, ordering } = definition
@@ -77,9 +78,9 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   const slideoutHeader = (
     <div className={styles.slideout_header_container}>
       <div className={styles.slideout_header_content}>
-        <LegacyStyledText css={TYPOGRAPHY.h2SemiBold}>
+        <StyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {displayName}
-        </LegacyStyledText>
+        </StyledText>
         <Link
           onClick={props.onClose}
           role="button"
@@ -91,19 +92,16 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
       {!isCustomDefinition && (
         <div className={styles.brand_def_container}>
           <Icon color={COLORS.blue50} name="check-decagram" height=".7rem" />{' '}
-          <LegacyStyledText
-            forwardedAs="label"
-            className={styles.brand_def_text}
-          >
+          <StyledText forwardedAs="label" className={styles.brand_def_text}>
             {t('branded:opentrons_def')}
-          </LegacyStyledText>
+          </StyledText>
         </div>
       )}
       {modified != null && filename != null && (
         <div className={styles.last_updated_container}>
-          <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
+          <StyledText forwardedAs="label" color={COLORS.grey50}>
             {t('last_updated')} {format(new Date(modified), 'MM/dd/yyyy')}
-          </LegacyStyledText>
+          </StyledText>
           <CustomLabwareOverflowMenu
             filename={filename}
             onDelete={props.onClose}
@@ -117,7 +115,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
     <Slideout onCloseClick={props.onClose} title={slideoutHeader} isExpanded>
       <Gallery definition={definition} />
       <div className={styles.api_name_container}>
-        <LegacyStyledText forwardedAs="h6">{t('api_name')}</LegacyStyledText>
+        <StyledText forwardedAs="h6">{t('api_name')}</StyledText>
         <Link
           className={styles.api_name_link}
           onClick={handleCopy}

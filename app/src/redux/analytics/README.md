@@ -1,6 +1,6 @@
 # analytics redux module
 
-Utilities and middleware to send redux actions to mixpanel and Intercom.
+Utilities and middleware to send redux actions to Mixpanel.
 
 ## setup
 

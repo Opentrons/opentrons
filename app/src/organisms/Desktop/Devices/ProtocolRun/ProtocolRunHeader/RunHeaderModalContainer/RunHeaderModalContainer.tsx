@@ -14,7 +14,6 @@ import {
 } from './modals'
 
 import type { RunStatus } from '@opentrons/api-client'
-import type { RunControls } from '/app/organisms/RunTimeControl'
 import type { UseRunHeaderModalContainerResult } from '.'
 import type { UseRunErrorsResult } from '../hooks'
 
@@ -22,7 +21,6 @@ export interface RunHeaderModalContainerProps {
   runId: string
   runStatus: RunStatus | null
   robotName: string
-  protocolRunControls: RunControls
   runHeaderModalContainerUtils: UseRunHeaderModalContainerResult
   runErrors: UseRunErrorsResult
 }
@@ -31,7 +29,7 @@ export interface RunHeaderModalContainerProps {
 export function RunHeaderModalContainer(
   props: RunHeaderModalContainerProps
 ): JSX.Element | null {
-  const { runId, runStatus, runHeaderModalContainerUtils } = props
+  const { runId, runStatus, runHeaderModalContainerUtils, robotName } = props
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
 
   const {
@@ -84,7 +82,8 @@ export function RunHeaderModalContainer(
         <HeaterShakerIsRunningModal
           closeModal={HSRunningModalUtils.toggleModal}
           module={HSRunningModalUtils.module}
-          startRun={props.protocolRunControls.play}
+          runId={runId}
+          robotName={robotName}
         />
       ) : null}
       {HSConfirmationModalUtils.showModal && (

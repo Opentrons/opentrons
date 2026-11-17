@@ -10,6 +10,7 @@ import {
 } from '@opentrons/api-client'
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
+  fixture96Plate,
   opentrons96PcrAdapterV1,
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -17,7 +18,6 @@ import {
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
-import { mockLabwareDef } from '/app/organisms/LegacyLabwarePositionCheck/__fixtures__/mockLabwareDef'
 
 import { LabwareListItem } from '../LabwareListItem'
 import { SecureLabwareModal } from '../SecureLabwareModal'
@@ -37,6 +37,14 @@ vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
   useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
 }))
 
+const mockLabwareDef: LabwareDefinition = {
+  ...(fixture96Plate as LabwareDefinition),
+  metadata: {
+    displayName: 'Mock Labware Definition',
+    displayCategory: 'wellPlate',
+    displayVolumeUnits: 'mL',
+  },
+}
 const mockAdapterDef = opentrons96PcrAdapterV1 as LabwareDefinition
 const mockAdapterId = 'mockAdapterId'
 const mockNestedLabwareDisplayName = 'nested labware display name'

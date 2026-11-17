@@ -6,15 +6,16 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { OddModal } from '/app/molecules/OddModal'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 
+import type { ReactNode } from 'react'
 import type { RunTimeParameter } from '@opentrons/shared-data'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 interface ResetValuesModalProps {
   runTimeParametersOverrides: RunTimeParameter[]
@@ -26,7 +27,7 @@ export function ResetValuesModal({
   runTimeParametersOverrides,
   setRunTimeParametersOverrides,
   handleGoBack,
-}: ResetValuesModalProps): JSX.Element {
+}: ResetValuesModalProps): ReactNode {
   const { t } = useTranslation(['protocol_setup', 'shared'])
 
   const modalHeader: OddModalHeaderBaseProps = {
@@ -53,9 +54,9 @@ export function ResetValuesModal({
   return (
     <OddModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-        <LegacyStyledText forwardedAs="p">
+        <StyledText forwardedAs="p">
           {t('reset_parameter_values_body')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}

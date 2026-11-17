@@ -29,6 +29,9 @@ from server_utils.audit.audit_server import (
     SubmitAuditLogSuccessData as SUSuccessData,
 )
 from server_utils.audit.audit_server import (
+    SubmitSupportingFileMessageData as SUSubmitSupportingFileMessageData,
+)
+from server_utils.audit.audit_server import (
     TotalUsageSummaryData as SUTotalUsageSummaryData,
 )
 
@@ -72,7 +75,9 @@ class LocalClient(SUClient):
         )
 
     @override
-    async def store_robot_log(self, robot_log_file: TextIO) -> StoreRobotLogSuccessData:
+    async def store_robot_log(
+        self, robot_log_file: TextIO, message: SUSubmitSupportingFileMessageData
+    ) -> StoreRobotLogSuccessData:
         raise RuntimeError(
             "Should not be calling store robot log from audit server directly"
         )

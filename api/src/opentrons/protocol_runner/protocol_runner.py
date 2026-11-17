@@ -1,6 +1,5 @@
 """Protocol run control and management."""
 
-import asyncio
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional, Union
 
@@ -15,12 +14,11 @@ from ..protocol_engine.types import (
     PrimitiveRunTimeParamValuesType,
     RunTimeParameter,
 )
+from ..protocols.api_support.definitions import MIN_SUPPORTED_JSON_SCHEMA_VERSION
 from ..protocols.types import PythonProtocol
 from .json_file_reader import JsonFileReader
 from .json_translator import JsonTranslator
-from .legacy_context_plugin import LegacyContextPlugin
 from .python_protocol_wrappers import (
-    LEGACY_JSON_SCHEMA_VERSION_CUTOFF,
     LEGACY_PYTHON_API_VERSION_CUTOFF,
     ProtocolContextCreator,
     PythonAndLegacyFileReader,
@@ -31,7 +29,6 @@ from opentrons import protocol_reader
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import ParameterContext
-from opentrons.protocol_api.core.legacy.load_info import LoadInfo
 from opentrons.protocol_engine import (
     Command,
     ProtocolEngine,
@@ -55,11 +52,10 @@ from opentrons.protocol_reader import (
 )
 from opentrons.protocols.parse import PythonParseMode
 from opentrons.util.async_helpers import asyncio_yield
-from opentrons.util.broker import Broker
 
 
 class RunResult(BaseModel):
-    """Result data from a run, pulled from the ProtocolEngine."""
+    """Result data from a run, pulled from the ProtocolEngine, including the commands list and command annotations list."""
 
     commands: List[Command]
     state_summary: StateSummary
@@ -67,6 +63,14 @@ class RunResult(BaseModel):
     command_annotations: List[
         CommandAnnotation
     ]  # TODO: can we remove this since annotations are now fetched from state summary?
+    command_preconditions: Optional[CommandPreconditions]
+
+
+class EngineRunResult(BaseModel):
+    """Result data from a run, pulled from the ProtocolEngine, without large list set of commands."""
+
+    state_summary: StateSummary
+    parameters: List[RunTimeParameter]
     command_preconditions: Optional[CommandPreconditions]
 
 
@@ -150,7 +154,7 @@ class AbstractRunner(ABC):
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
-    ) -> RunResult:
+    ) -> EngineRunResult:
         """Run a given protocol to completion."""
 
 
@@ -217,9 +221,7 @@ class PythonAndLegacyRunner(AbstractRunner):
 
         # fixme(mm, 2022-12-23): This does I/O and compute-bound parsing that will block
         # the event loop. Jira RSS-165.
-        protocol = self._protocol_file_reader.read(
-            protocol_source, labware_definitions, python_parse_mode
-        )
+        protocol = self._protocol_file_reader.read(protocol_source, python_parse_mode)
         if isinstance(protocol, PythonProtocol):
             self._parameter_context = ParameterContext(api_version=protocol.api_level)
             run_time_parameters_with_overrides = (
@@ -230,27 +232,21 @@ class PythonAndLegacyRunner(AbstractRunner):
                     run_time_param_file_overrides=run_time_param_paths,
                 )
             )
+
         else:
             run_time_parameters_with_overrides = None
-        equipment_broker = None
 
         if protocol.api_level < LEGACY_PYTHON_API_VERSION_CUTOFF:
-            equipment_broker = Broker[LoadInfo]()
-            self._protocol_engine.add_plugin(
-                LegacyContextPlugin(
-                    engine_loop=asyncio.get_running_loop(),
-                    broker=self._broker,
-                    equipment_broker=equipment_broker,
-                )
+            raise NotImplementedError(
+                f"This protocol requests API level {protocol.api_level}, but this simulator "
+                f"can only simulate protocols of API level {LEGACY_PYTHON_API_VERSION_CUTOFF} or higher"
             )
-            self._hardware_api.should_taskify_movement_execution(taskify=True)
         else:
             self._hardware_api.should_taskify_movement_execution(taskify=False)
 
         context = self._protocol_context_creator.create(
             protocol=protocol,
             broker=self._broker,
-            equipment_broker=equipment_broker,
         )
         initial_home_command = pe_commands.HomeCreate(
             # this command homes all axes, including pipette plunger and gripper jaw
@@ -276,7 +272,7 @@ class PythonAndLegacyRunner(AbstractRunner):
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
         run_time_param_paths: Optional[CSVRuntimeParamPaths] = None,
         python_parse_mode: PythonParseMode = PythonParseMode.NORMAL,
-    ) -> RunResult:
+    ) -> EngineRunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests & protocol analyzer
         if protocol_source:
@@ -292,19 +288,13 @@ class PythonAndLegacyRunner(AbstractRunner):
         await self._task_queue.join()
 
         run_data = self._protocol_engine.state_view.get_summary()
-        commands = self._protocol_engine.state_view.commands.get_all()
         parameters = self.run_time_parameters
-        command_annotations = (
-            self._protocol_engine.state_view.commands.get_all_command_annotations()
-        )
         preconditions = (
             self._protocol_engine.state_view.preconditions.get_precondition()
         )
-        return RunResult(
-            commands=commands,
+        return EngineRunResult(
             state_summary=run_data,
             parameters=parameters,
-            command_annotations=command_annotations,
             command_preconditions=preconditions,
         )
 
@@ -438,7 +428,7 @@ class JsonRunner(AbstractRunner):
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
-    ) -> RunResult:
+    ) -> EngineRunResult:
         # TODO(mc, 2022-01-11): move load to runner creation, remove from `run`
         # currently `protocol_source` arg is only used by tests
         if protocol_source:
@@ -449,15 +439,12 @@ class JsonRunner(AbstractRunner):
         await self._task_queue.join()
 
         run_data = self._protocol_engine.state_view.get_summary()
-        commands = self._protocol_engine.state_view.commands.get_all()
         preconditions = (
             self._protocol_engine.state_view.preconditions.get_precondition()
         )
-        return RunResult(
-            commands=commands,
+        return EngineRunResult(
             state_summary=run_data,
             parameters=[],
-            command_annotations=self._command_annotations,
             command_preconditions=preconditions,
         )
 
@@ -521,7 +508,7 @@ class LiveRunner(AbstractRunner):
         deck_configuration: DeckConfigurationType,
         protocol_source: Optional[ProtocolSource] = None,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
-    ) -> RunResult:
+    ) -> EngineRunResult:
         assert protocol_source is None
         await self._hardware_api.home()
         self.play(deck_configuration=deck_configuration)
@@ -529,15 +516,12 @@ class LiveRunner(AbstractRunner):
         await self._task_queue.join()
 
         run_data = self._protocol_engine.state_view.get_summary()
-        commands = self._protocol_engine.state_view.commands.get_all()
         preconditions = (
             self._protocol_engine.state_view.preconditions.get_precondition()
         )
-        return RunResult(
-            commands=commands,
+        return EngineRunResult(
             state_summary=run_data,
             parameters=[],
-            command_annotations=[],
             command_preconditions=preconditions,
         )
 
@@ -559,10 +543,12 @@ def create_protocol_runner(
     drop_tips_after_run: bool = True,
 ) -> Union[JsonRunner, PythonAndLegacyRunner]:
     """Create a protocol runner."""
-    if (
-        isinstance(protocol_config, JsonProtocolConfig)
-        and protocol_config.schema_version >= LEGACY_JSON_SCHEMA_VERSION_CUTOFF
-    ):
+    if isinstance(protocol_config, JsonProtocolConfig):
+        if protocol_config.schema_version < MIN_SUPPORTED_JSON_SCHEMA_VERSION:
+            raise NotImplementedError(
+                f"JSON protocols with schema versions below {MIN_SUPPORTED_JSON_SCHEMA_VERSION} are "
+                "no longer supported. Upload them to Protocol Designer to update them for Flex."
+            )
         return JsonRunner(
             protocol_engine=protocol_engine,
             hardware_api=hardware_api,

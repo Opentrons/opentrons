@@ -8,14 +8,15 @@ import {
   Flex,
   Icon,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
 
 import { getModalPortalEl } from '/app/App/portal'
 
+import type { ReactNode } from 'react'
 import type { IconName } from '@opentrons/components'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 
@@ -40,7 +41,7 @@ const ICON_NAME_BY_COMMAND_TYPE: {
   waitForResume: 'pause-circle',
   moveLabware: 'move-xy',
 }
-export function Tick(props: TickProps): JSX.Element {
+export function Tick(props: TickProps): ReactNode {
   const { index, count, range, firstCommandType, makeHandleJumpToStep, total } =
     props
   const { t } = useTranslation('run_details')
@@ -77,9 +78,9 @@ export function Tick(props: TickProps): JSX.Element {
       left={`${percent}%`}
       transform={`translateX(-${percent}%)`}
     >
-      <LegacyStyledText forwardedAs="h6">
+      <StyledText forwardedAs="h6">
         {isAggregatedTick ? count : null}
-      </LegacyStyledText>
+      </StyledText>
       {createPortal(
         <Tooltip tooltipProps={tooltipProps}>
           <Flex
@@ -91,18 +92,18 @@ export function Tick(props: TickProps): JSX.Element {
               <Icon name={iconName} size={SPACING.spacing20} />
             ) : null}
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText forwardedAs="label">
+              <StyledText forwardedAs="label">
                 {t('step_number', {
                   step_number: isAggregatedTick
                     ? `${stepNumber} - ${stepNumber + range}`
                     : stepNumber,
                 })}
-              </LegacyStyledText>
-              <LegacyStyledText forwardedAs="label">
+              </StyledText>
+              <StyledText forwardedAs="label">
                 {commandTKey != null ? t(commandTKey) : null}
-              </LegacyStyledText>
+              </StyledText>
               {isAggregatedTick ? (
-                <LegacyStyledText>{t('plus_more', { count })}</LegacyStyledText>
+                <StyledText>{t('plus_more', { count })}</StyledText>
               ) : null}
             </Flex>
           </Flex>

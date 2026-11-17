@@ -33,7 +33,7 @@ import { uuid } from '/protocol-designer/utils'
 
 import { getStepIndex, getTimeFromString } from './utils'
 
-import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
+import type { ChangeEvent, Dispatch, ReactNode, SetStateAction } from 'react'
 import type { ThermocyclerStepTypeGeneral } from './ThermocyclerProfileModal'
 
 export interface ThermocyclerStepType {
@@ -54,7 +54,7 @@ interface ThermocyclerStepProps {
   backgroundColor?: string
   readOnly?: boolean
 }
-export function ThermocyclerStep(props: ThermocyclerStepProps): JSX.Element {
+export function ThermocyclerStep(props: ThermocyclerStepProps): ReactNode {
   const {
     setShowCreateNewStep,
     step,

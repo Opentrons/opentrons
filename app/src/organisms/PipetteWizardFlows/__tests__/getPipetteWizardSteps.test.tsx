@@ -5,34 +5,60 @@ import {
   NINETY_SIX_CHANNEL,
   RIGHT,
   SINGLE_MOUNT_PIPETTES,
-  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { FLOWS, SECTIONS } from '../constants'
-import { getPipetteWizardSteps } from '../getPipetteWizardSteps'
+import {
+  getPipetteWizardSteps,
+  insertSelectSlotAfterAttachProbe,
+} from '../getPipetteWizardSteps'
 
-import type { UseQueryResult } from 'react-query'
-import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { PipetteWizardStep } from '../types'
 
 describe('getPipetteWizardSteps', () => {
-  const mockSinglePipette = {
-    left: { id: 'pipette_id', ok: true, model: 'p1000', channels: 1 },
-    right: null,
-  } as any
-  const mock96Pipette = {
-    left: {
-      id: 'pipette_id',
-      ok: true,
-      model: 'p1000',
-      mount: 'left',
-      data: { channels: 96 },
-    },
-    right: null,
-  } as any
-
   it('returns the correct array of info when the flow is calibrate single channel', () => {
     const mockCalibrateFlowSteps = [
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.SELECT_SLOT,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.DETACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.RESULTS,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+    ] as PipetteWizardStep[]
+
+    expect(
+      getPipetteWizardSteps(FLOWS.CALIBRATE, LEFT, SINGLE_MOUNT_PIPETTES, false)
+    ).toStrictEqual(mockCalibrateFlowSteps)
+  })
+  it('skips the slot picker when includeSlotSelect is false', () => {
+    expect(
+      getPipetteWizardSteps(
+        FLOWS.CALIBRATE,
+        LEFT,
+        SINGLE_MOUNT_PIPETTES,
+        false,
+        false
+      )
+    ).toStrictEqual([
       {
         section: SECTIONS.BEFORE_BEGINNING,
         mount: LEFT,
@@ -53,17 +79,7 @@ describe('getPipetteWizardSteps', () => {
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
       },
-    ] as PipetteWizardStep[]
-
-    expect(
-      getPipetteWizardSteps(
-        FLOWS.CALIBRATE,
-        LEFT,
-        SINGLE_MOUNT_PIPETTES,
-        false,
-        mockSinglePipette
-      )
-    ).toStrictEqual(mockCalibrateFlowSteps)
+    ] as PipetteWizardStep[])
   })
   it('returns the correct array of info for attach pipette flow single channel', () => {
     const mockAttachPipetteFlowSteps = [
@@ -93,6 +109,11 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.ATTACH,
       },
       {
+        section: SECTIONS.SELECT_SLOT,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
         section: SECTIONS.DETACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
@@ -105,13 +126,7 @@ describe('getPipetteWizardSteps', () => {
     ] as PipetteWizardStep[]
 
     expect(
-      getPipetteWizardSteps(
-        FLOWS.ATTACH,
-        LEFT,
-        SINGLE_MOUNT_PIPETTES,
-        false,
-        mockSinglePipette
-      )
+      getPipetteWizardSteps(FLOWS.ATTACH, LEFT, SINGLE_MOUNT_PIPETTES, false)
     ).toStrictEqual(mockAttachPipetteFlowSteps)
   })
 
@@ -135,13 +150,7 @@ describe('getPipetteWizardSteps', () => {
     ] as PipetteWizardStep[]
 
     expect(
-      getPipetteWizardSteps(
-        FLOWS.DETACH,
-        LEFT,
-        SINGLE_MOUNT_PIPETTES,
-        false,
-        mockSinglePipette
-      )
+      getPipetteWizardSteps(FLOWS.DETACH, LEFT, SINGLE_MOUNT_PIPETTES, false)
     ).toStrictEqual(mockDetachPipetteFlowSteps)
   })
   it('returns the correct array of info for attach pipette 96 channel', () => {
@@ -182,6 +191,11 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.ATTACH,
       },
       {
+        section: SECTIONS.SELECT_SLOT,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
         section: SECTIONS.DETACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
@@ -194,13 +208,7 @@ describe('getPipetteWizardSteps', () => {
     ] as PipetteWizardStep[]
 
     expect(
-      getPipetteWizardSteps(
-        FLOWS.ATTACH,
-        LEFT,
-        NINETY_SIX_CHANNEL,
-        true,
-        mock96Pipette
-      )
+      getPipetteWizardSteps(FLOWS.ATTACH, LEFT, NINETY_SIX_CHANNEL, true)
     ).toStrictEqual(mockAttachPipetteFlowSteps)
   })
 
@@ -234,13 +242,7 @@ describe('getPipetteWizardSteps', () => {
     ] as PipetteWizardStep[]
 
     expect(
-      getPipetteWizardSteps(
-        FLOWS.DETACH,
-        LEFT,
-        NINETY_SIX_CHANNEL,
-        true,
-        mock96Pipette
-      )
+      getPipetteWizardSteps(FLOWS.DETACH, LEFT, NINETY_SIX_CHANNEL, true)
     ).toStrictEqual(mockDetachPipetteFlowSteps)
   })
   it('returns the correct array when 96-channel is going to be attached and there is a pipette already on the mount', () => {
@@ -292,6 +294,11 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.ATTACH,
       },
       {
+        section: SECTIONS.SELECT_SLOT,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
         section: SECTIONS.DETACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
@@ -304,13 +311,7 @@ describe('getPipetteWizardSteps', () => {
     ] as PipetteWizardStep[]
 
     expect(
-      getPipetteWizardSteps(
-        FLOWS.ATTACH,
-        LEFT,
-        NINETY_SIX_CHANNEL,
-        false,
-        mockSinglePipette
-      )
+      getPipetteWizardSteps(FLOWS.ATTACH, LEFT, NINETY_SIX_CHANNEL, false)
     ).toStrictEqual(mockAttachPipetteFlowSteps)
   })
   it('returns the correct array of info for calibrate pipette 96 channel', () => {
@@ -326,6 +327,11 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.CALIBRATE,
       },
       {
+        section: SECTIONS.SELECT_SLOT,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
         section: SECTIONS.DETACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
@@ -338,116 +344,14 @@ describe('getPipetteWizardSteps', () => {
     ] as PipetteWizardStep[]
 
     expect(
-      getPipetteWizardSteps(
-        FLOWS.CALIBRATE,
-        LEFT,
-        NINETY_SIX_CHANNEL,
-        false,
-        mock96Pipette
-      )
+      getPipetteWizardSteps(FLOWS.CALIBRATE, LEFT, NINETY_SIX_CHANNEL, false)
     ).toStrictEqual(mockCalibrateFlowSteps)
   })
-  it('returns the correct array when 96-channel is going to be attached and there is a pipette already on the mount and a waste chute on deck', () => {
-    const mockDeckConfig = {
-      data: [
-        {
-          cutoutId: 'cutoutD3',
-          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-        },
-      ],
-    } as any as UseQueryResult<DeckConfiguration>
-    const mockAttachPipetteFlowSteps = [
-      {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: RIGHT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.DETACH_PIPETTE,
-        mount: RIGHT,
-        flowType: FLOWS.DETACH,
-      },
-      {
-        section: SECTIONS.RESULTS,
-        mount: RIGHT,
-        flowType: FLOWS.DETACH,
-        nextMount: 'both',
-      },
-      {
-        section: SECTIONS.CARRIAGE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.MOUNTING_PLATE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.MOUNT_PIPETTE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.FIRMWARE_UPDATE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.RESULTS,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.ATTACH_PROBE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.REMOVE_WASTE_CHUTE,
-        mount: LEFT,
-        flowType: FLOWS.DETACH,
-      },
-      {
-        section: SECTIONS.DETACH_PROBE,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
-        section: SECTIONS.ATTACH_WASTE_CHUTE,
-        mount: LEFT,
-        flowType: FLOWS.DETACH,
-      },
-      {
-        section: SECTIONS.RESULTS,
-        mount: LEFT,
-        flowType: FLOWS.CALIBRATE,
-      },
-    ] as PipetteWizardStep[]
+})
 
-    expect(
-      getPipetteWizardSteps(
-        FLOWS.ATTACH,
-        LEFT,
-        NINETY_SIX_CHANNEL,
-        false,
-        mockSinglePipette,
-        mockDeckConfig
-      )
-    ).toStrictEqual(mockAttachPipetteFlowSteps)
-  })
-
-  it('returns the correct array of info for calibrate pipette 96 when a waste chute is in deck config', () => {
-    const mockDeckConfig = {
-      data: [
-        {
-          cutoutId: 'cutoutD3',
-          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-        },
-      ],
-    } as any as UseQueryResult<DeckConfiguration>
-
-    const mockCalibrateFlowSteps = [
+describe('insertSelectSlotAfterAttachProbe', () => {
+  it('inserts SELECT_SLOT immediately after each ATTACH_PROBE', () => {
+    const steps = [
       {
         section: SECTIONS.BEFORE_BEGINNING,
         mount: LEFT,
@@ -459,35 +363,41 @@ describe('getPipetteWizardSteps', () => {
         flowType: FLOWS.CALIBRATE,
       },
       {
-        section: SECTIONS.REMOVE_WASTE_CHUTE,
+        section: SECTIONS.DETACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
       },
+    ] as PipetteWizardStep[]
+
+    expect(insertSelectSlotAfterAttachProbe(steps)).toStrictEqual([
+      {
+        section: SECTIONS.BEFORE_BEGINNING,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      {
+        section: SECTIONS.ATTACH_PROBE,
+        mount: LEFT,
+        flowType: FLOWS.CALIBRATE,
+      },
+      { section: SECTIONS.SELECT_SLOT, mount: LEFT, flowType: FLOWS.CALIBRATE },
       {
         section: SECTIONS.DETACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
       },
+    ])
+  })
+
+  it('returns the original steps when includeSlotSelect is false', () => {
+    const steps = [
       {
-        section: SECTIONS.ATTACH_WASTE_CHUTE,
-        mount: LEFT,
-        flowType: FLOWS.CALIBRATE,
-      },
-      {
-        section: SECTIONS.RESULTS,
+        section: SECTIONS.ATTACH_PROBE,
         mount: LEFT,
         flowType: FLOWS.CALIBRATE,
       },
     ] as PipetteWizardStep[]
-    expect(
-      getPipetteWizardSteps(
-        FLOWS.CALIBRATE,
-        LEFT,
-        NINETY_SIX_CHANNEL,
-        false,
-        mock96Pipette,
-        mockDeckConfig
-      )
-    ).toStrictEqual(mockCalibrateFlowSteps)
+
+    expect(insertSelectSlotAfterAttachProbe(steps, false)).toStrictEqual(steps)
   })
 })

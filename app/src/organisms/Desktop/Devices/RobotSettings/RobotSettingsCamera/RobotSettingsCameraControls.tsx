@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { StyledText } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { TertiaryButton } from '/app/atoms/buttons'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import { CameraControls } from '/app/organisms/Desktop/Camera/CameraControls'
 import styles from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/camerasettings.module.css'
 

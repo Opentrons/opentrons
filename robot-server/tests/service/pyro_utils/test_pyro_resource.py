@@ -1,6 +1,5 @@
 """Testing suite for the RobotServerPyroResource."""
 
-import inspect
 import socket
 import threading
 from typing import cast
@@ -20,6 +19,9 @@ from opentrons.protocol_engine import DeckType
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
 )
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_engine.resources.file_provider import (
     FileProvider,
     UserDefinedCSVCmdFileNameMetadata,
@@ -28,7 +30,6 @@ from opentrons.util.pyro.pyro_client_async_adapter import ClientPyroFunctionWrap
 from opentrons.util.pyro.pyro_daemon_utility import create_pyro_daemon
 from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
 from opentrons_shared_data.data_files import DataFileInfo, MimeType
-from opentrons_shared_data.robot.types import RobotTypeEnum
 from server_utils.fastapi_utils.app_state import AppState
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
@@ -49,21 +50,8 @@ TEST_PYRO_TIMEOUT = 5
 
 
 @pytest.fixture
-def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
-        params = inspect.getfullargspec(func)
-        mock_get_ff = decoy.mock(func=func)
-        if any("robot_type" in p for p in params.args):
-            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
-        else:
-            decoy.when(mock_get_ff()).then_return(False)
-        monkeypatch.setattr(feature_flags, name, mock_get_ff)
-
-
-@pytest.fixture
-def ot3_hardware_api(decoy: Decoy, request: pytest.FixtureRequest) -> OT3API:
+def ot3_hardware_api(decoy: Decoy) -> OT3API:
     """Get a mocked out OT3API."""
-    request.node.add_marker("ot3_only")
     try:
         from opentrons.hardware_control.ot3api import OT3API
 
@@ -76,7 +64,7 @@ def ot3_hardware_api(decoy: Decoy, request: pytest.FixtureRequest) -> OT3API:
 
 @pytest.fixture
 def mock_app_state(decoy: Decoy) -> AppState:
-    """Get a mock DataFilesStore."""
+    """Get a mock AppState."""
     return decoy.mock(cls=AppState)
 
 
@@ -163,6 +151,7 @@ async def test_run_hardware_event_callback(
         deck_type=DeckType("ot3_standard"),
         run_process_pyro_provider=mock_run_process_pyro_provider,
         access_control_status=False,
+        command_store_provider=CommandStoreProvider(),
     )
 
     resource_utilities.register_run_orchestrator_store_to_pyro_resource(
@@ -320,30 +309,6 @@ async def test_deck_config(
     )
 
 
-async def test_notify_publisher(
-    ot3_hardware_api: OT3API,
-    mock_app_state: AppState,
-    mock_feature_flags: None,
-    decoy: Decoy,
-) -> None:
-    """Enforce that the RobotServerPyroResource provides a Proxy of the Notify Publisher."""
-    decoy.when(feature_flags.hardware_subprocess_enabled()).then_return(True)
-    ot3_async, rs_async = await _host_pyro_nameserver_and_ot3api(
-        hw_api=ot3_hardware_api, app_state=mock_app_state
-    )
-    # Cast the two Async proxies on the nameserver as a locally useful type
-    robot_server_resource = cast(pyro_resource.RobotServerPyroResource, rs_async)
-
-    resource_utilities.register_notify_publishers_to_pyro_resource(
-        mock_app_state,
-        lambda: [],  # type: ignore
-    )
-
-    result = robot_server_resource.get_notify_publishers()
-
-    assert isinstance(result, ClientPyroFunctionWrapper)
-
-
 async def test_run_hardware_state_update_callback(
     ot3_hardware_api: OT3API,
     mock_app_state: AppState,
@@ -369,13 +334,16 @@ async def test_run_hardware_state_update_callback(
         deck_type=DeckType("ot3_standard"),
         run_process_pyro_provider=mock_run_process_pyro_provider,
         access_control_status=False,
+        command_store_provider=CommandStoreProvider(),
     )
 
     resource_utilities.register_run_orchestrator_store_to_pyro_resource(
         mock_app_state, run_store
     )
 
-    hardware_store = HardwareStateStore(hardware_resource=ot3_hardware_api)
+    hardware_store = await HardwareStateStore.build(
+        hardware_resource=ot3_hardware_api, app_state=mock_app_state
+    )
 
     resource_utilities.register_hardware_state_store_to_pyro_resource(
         mock_app_state, hardware_store

@@ -15,11 +15,11 @@ import {
   Icon,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   ListItem,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -28,18 +28,18 @@ import {
 } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons/SmallButton'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { OddModal } from '/app/molecules/OddModal'
 import { getIsOnDevice } from '/app/redux/config'
 import { usePlacePlateReaderLid } from '/app/resources/modules'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { ModalProps } from '@opentrons/components'
 import type {
   ModalSize,
   OddModalHeaderBaseProps,
-} from '/app/molecules/OddModal/types'
+} from '/app/components/ODD/modals/OddModal/types'
 
 // Note (07/13/2023) After the launch, we will unify the modal components into one component.
 // Then TouchScreenModal and DesktopModal will be TouchScreenContent and DesktopContent that only render each content.
@@ -55,7 +55,7 @@ export function EstopPressedModal({
   closeModal,
   isWaitingForResumeOperation,
   setIsWaitingForResumeOperation,
-}: EstopPressedModalProps): JSX.Element {
+}: EstopPressedModalProps): ReactNode {
   const isOnDevice = useSelector(getIsOnDevice)
   return createPortal(
     isOnDevice ? (
@@ -84,7 +84,7 @@ function TouchscreenModal({
   closeModal,
   isWaitingForResumeOperation,
   setIsWaitingForResumeOperation,
-}: EstopPressedModalProps): JSX.Element {
+}: EstopPressedModalProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'branded'])
   const [isResuming, setIsResuming] = useState<boolean>(false)
   const documentationState = useDocumentationState()
@@ -124,12 +124,9 @@ function TouchscreenModal({
   return (
     <OddModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
-        <LegacyStyledText
-          forwardedAs="p"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('branded:estop_pressed_description')}
-        </LegacyStyledText>
+        </StyledText>
         <ListItem
           type={isEngaged ? 'error' : 'success'}
           flexDirection={DIRECTION_ROW}
@@ -137,12 +134,12 @@ function TouchscreenModal({
           alignItems={ALIGN_CENTER}
           borderRadius={BORDERS.borderRadius8}
         >
-          <LegacyStyledText
+          <StyledText
             forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >
             {t('estop')}
-          </LegacyStyledText>
+          </StyledText>
           <Chip
             type={isEngaged ? 'error' : 'success'}
             text={isEngaged ? t('engaged') : t('disengaged')}
@@ -173,7 +170,7 @@ function DesktopModal({
   closeModal,
   isWaitingForResumeOperation,
   setIsWaitingForResumeOperation,
-}: EstopPressedModalProps): JSX.Element {
+}: EstopPressedModalProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const [isResuming, setIsResuming] = useState<boolean>(false)
   const documentationState = useDocumentationState()
@@ -218,9 +215,9 @@ function DesktopModal({
         <Banner type={isEngaged ? 'error' : 'success'}>
           {isEngaged ? t('estop_engaged') : t('estop_disengaged')}
         </Banner>
-        <LegacyStyledText forwardedAs="p" color={COLORS.grey60}>
+        <StyledText forwardedAs="p" color={COLORS.grey60}>
           {t('branded:estop_pressed_description')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END}>
           <PrimaryButton
             onClick={handleClick}

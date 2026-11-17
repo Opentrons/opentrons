@@ -2,7 +2,6 @@ import last from 'lodash/last'
 import { legacy_configureStore } from 'redux-mock-store'
 import { thunk } from 'redux-thunk'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { getRobotStateTimeline } from '/protocol-designer/file-data/selectors'
 import * as stepFormSelectors from '/protocol-designer/step-forms/selectors'
@@ -43,7 +42,7 @@ describe('steps actions', () => {
     let ids: string[]
     beforeEach(() => {
       ids = ['id_1', 'id_2']
-      when(vi.mocked(stepFormSelectors.getOrderedStepIds))
+      vi.when(vi.mocked(stepFormSelectors.getOrderedStepIds))
         .calledWith(expect.anything())
         .thenReturn(ids)
     })
@@ -126,7 +125,7 @@ describe('steps actions', () => {
   })
   describe('duplicateSelectedSteps', () => {
     beforeEach(() => {
-      when(vi.mocked(stepFormSelectors.getSavedStepHierarchy))
+      vi.when(vi.mocked(stepFormSelectors.getSavedStepHierarchy))
         .calledWith(expect.anything())
         .thenReturn({
           topLevelItems: [
@@ -157,10 +156,10 @@ describe('steps actions', () => {
       vi.restoreAllMocks()
     })
     it('should duplicate a single-selected step', () => {
-      when(vi.mocked(getSelectedStepId))
+      vi.when(vi.mocked(getSelectedStepId))
         .calledWith(expect.anything())
         .thenReturn('id_3')
-      when(vi.mocked(getMultiSelectItemIds))
+      vi.when(vi.mocked(getMultiSelectItemIds))
         .calledWith(expect.anything())
         .thenReturn(null)
       vi.mocked(getMultiSelectLastSelected).mockReturnValue(null)
@@ -189,10 +188,10 @@ describe('steps actions', () => {
       ])
     })
     it('should duplicate multi-selected steps', () => {
-      when(vi.mocked(getSelectedStepId))
+      vi.when(vi.mocked(getSelectedStepId))
         .calledWith(expect.anything())
         .thenReturn(null)
-      when(vi.mocked(getMultiSelectItemIds))
+      vi.when(vi.mocked(getMultiSelectItemIds))
         .calledWith(expect.anything())
         .thenReturn(['id_2', 'id_3'])
       vi.mocked(getMultiSelectLastSelected).mockReturnValue('id_3')
@@ -296,10 +295,10 @@ describe('steps actions', () => {
             moduleId: 'temperatureId',
           }
 
-          when(vi.mocked(stepFormSelectors.getUnsavedForm))
+          vi.when(vi.mocked(stepFormSelectors.getUnsavedForm))
             .calledWith(expect.anything())
             .thenReturn(temperatureForm)
-          when(vi.mocked(stepFormSelectors.getCurrentFormIsPresaved))
+          vi.when(vi.mocked(stepFormSelectors.getCurrentFormIsPresaved))
             .calledWith(expect.anything())
             .thenReturn(isPresaved)
 
@@ -370,10 +369,10 @@ describe('steps actions', () => {
             moduleId: 'heaterShakerId',
           }
 
-          when(vi.mocked(stepFormSelectors.getUnsavedForm))
+          vi.when(vi.mocked(stepFormSelectors.getUnsavedForm))
             .calledWith(expect.anything())
             .thenReturn(heaterShakerForm)
-          when(vi.mocked(stepFormSelectors.getCurrentFormIsPresaved))
+          vi.when(vi.mocked(stepFormSelectors.getCurrentFormIsPresaved))
             .calledWith(expect.anything())
             .thenReturn(isPresaved)
 
@@ -432,7 +431,7 @@ describe('steps actions', () => {
     }
 
     beforeEach(() => {
-      when(vi.mocked(stepFormSelectors.getSavedStepHierarchy))
+      vi.when(vi.mocked(stepFormSelectors.getSavedStepHierarchy))
         .calledWith(expect.anything())
         .thenReturn(mockStepHierarchy)
     })
@@ -443,7 +442,7 @@ describe('steps actions', () => {
     })
 
     it('should dispatch REORDER_STEPS action when a step is selected', () => {
-      when(vi.mocked(getSelectedStepId))
+      vi.when(vi.mocked(getSelectedStepId))
         .calledWith(expect.anything())
         .thenReturn('step_2')
 
@@ -461,7 +460,7 @@ describe('steps actions', () => {
     })
 
     it('should not dispatch any action when no step is selected', () => {
-      when(vi.mocked(getSelectedStepId))
+      vi.when(vi.mocked(getSelectedStepId))
         .calledWith(expect.anything())
         .thenReturn(null)
 

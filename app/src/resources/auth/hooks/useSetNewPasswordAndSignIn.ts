@@ -1,15 +1,19 @@
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { updateSelf } from '@opentrons/api-client'
-import { useHost } from '@opentrons/react-api-client'
+import {
+  isDocumentedMutationError,
+  useHost,
+  useUpdateSelfMutation,
+} from '@opentrons/react-api-client'
 
-import { mapAuthUserMutationError } from '../mapAuthUserMutationError'
+import { mapSetNewPasswordError } from '../mapAuthUserMutationError'
 
 import type { TFunction } from 'i18next'
+import type { DocumentationState } from '@opentrons/react-api-client'
 
 export interface UseSetNewPasswordAndSignInOptions {
-  onSuccess: (username: string) => void
+  onSuccess: (username: string, password: string) => void
   onError: (message: string) => void
 }
 
@@ -23,9 +27,10 @@ interface UseSetNewPasswordAndSignInResult {
  * temporary password and holds a valid access token.
  *
  * Submits the chosen password via `PATCH /auth/users/self`. Callers should then
- * return the user to the login screen so they can sign in with the new password.
+ * sign the user in again with the new password so they receive a full-scope token.
  */
 export function useSetNewPasswordAndSignIn(
+  documentationState: DocumentationState,
   options: UseSetNewPasswordAndSignInOptions
 ): UseSetNewPasswordAndSignInResult {
   const { onSuccess, onError } = options
@@ -33,50 +38,36 @@ export function useSetNewPasswordAndSignIn(
     t: TFunction
   }
   const host = useHost()
-  const [isLoading, setIsLoading] = useState(false)
+  const { updateSelf, isLoading } = useUpdateSelfMutation(documentationState)
 
   const submitNewPassword = useCallback(
     (username: string, password: string): void => {
-      if (host == null || host.token == null) {
+      if (host?.token == null) {
         console.error('useSetNewPasswordAndSignIn: missing host token')
         onError(
           t('set_new_password_error_session_expired', {
             ns: 'access_control',
-          }) as string
+          })
         )
         return
       }
 
-      setIsLoading(true)
-      void (async () => {
-        try {
-          // ok so usually using react-api-client functions outside of mutations is bad
-          // but here, we need to specifically not ask for documentation as were in the middle of login
-          // eslint-disable-next-line opentrons/no-direct-mutating
-          await updateSelf(host, { data: { password } }, '')
-          onSuccess(username)
-        } catch (error) {
+      void updateSelf({ data: { password } })
+        .then(() => {
+          onSuccess(username, password)
+        })
+        .catch((error: unknown) => {
+          if (isDocumentedMutationError(error)) {
+            return
+          }
           console.error(
             'useSetNewPasswordAndSignIn: failed to update password',
             error
           )
-          const formError = mapAuthUserMutationError<{ password: string }>(
-            error,
-            t
-          )
-          onError(
-            formError?.field === 'password'
-              ? formError.error.message
-              : (t('set_new_password_error_update_failed', {
-                  ns: 'access_control',
-                }) as string)
-          )
-        } finally {
-          setIsLoading(false)
-        }
-      })()
+          onError(mapSetNewPasswordError(error, t))
+        })
     },
-    [host, onError, onSuccess, t]
+    [host, onError, onSuccess, t, updateSelf]
   )
 
   return {

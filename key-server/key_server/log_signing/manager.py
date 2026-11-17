@@ -2,7 +2,7 @@
 
 import base64
 from pathlib import Path
-from typing import Final, Literal, Set, TypeVar, Union, cast
+from typing import Final, Literal, Set, TypeVar, Union
 
 from .key_utils import create_or_load, get_public_key_pem, hash_content, sign_hashpair
 from .types import LogSigningRequestError
@@ -106,7 +106,7 @@ def _check_alg(
         raise LogSigningRequestError(
             f"Invalid crypt value: specified algorithm {alg} but only {', '.join(required_algorithms)} are allowed"
         )
-    return cast(_Alg, alg)
+    return alg
 
 
 def _decode_crypt_val(

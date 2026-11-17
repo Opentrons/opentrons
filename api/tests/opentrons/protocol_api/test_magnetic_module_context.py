@@ -90,29 +90,7 @@ def test_get_status(
     assert result == "disengaged"
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
-def test_engage_height_from_home_succeeds_on_low_version(
-    decoy: Decoy,
-    mock_broker: LegacyBroker,
-    mock_core: MagneticModuleCore,
-    subject: MagneticModuleContext,
-) -> None:
-    """It should engage if given a raw motor height and the apiLevel is low."""
-    subject.engage(height=42.0)
-
-    decoy.verify(
-        mock_broker.publish(
-            "command",
-            matchers.DictMatching({"$": "before", "name": "command.MAGDECK_ENGAGE"}),
-        ),
-        mock_core.engage(height_from_home=42.0),
-        mock_broker.publish("command", matchers.DictMatching({"$": "after"})),
-    )
-
-
-# TODO(mm, 2023-02-09): Add MAX_SUPPORTED_VERSION when it's >=2.14.
-@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
-def test_engage_height_from_home_raises_on_high_version(
+def test_engage_height_from_home_raises(
     decoy: Decoy,
     mock_core: MagneticModuleCore,
     subject: MagneticModuleContext,
@@ -124,8 +102,7 @@ def test_engage_height_from_home_raises_on_high_version(
         subject.engage(42.0)
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
-def test_calibrate_raises_on_high_version(
+def test_calibrate_raises(
     decoy: Decoy,
     mock_core: MagneticModuleCore,
     subject: MagneticModuleContext,
@@ -154,7 +131,6 @@ def test_engage_height_from_base(
     )
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 3)])
 def test_engage_offset_from_default(
     decoy: Decoy,
     mock_broker: LegacyBroker,
@@ -171,21 +147,6 @@ def test_engage_offset_from_default(
         ),
         mock_core.engage_to_labware(offset=42.0, preserve_half_mm=False),
         mock_broker.publish("command", matchers.DictMatching({"$": "after"})),
-    )
-
-
-@pytest.mark.parametrize("api_version", [APIVersion(2, 2)])
-def test_engage_offset_from_default_low_version(
-    decoy: Decoy,
-    mock_core: MagneticModuleCore,
-    subject: MagneticModuleContext,
-) -> None:
-    """It should preserve pre-2.3 buggy labware engage height behavior."""
-    subject.engage(offset=42.0)
-
-    decoy.verify(
-        mock_core.engage_to_labware(offset=42.0, preserve_half_mm=True),
-        times=1,
     )
 
 

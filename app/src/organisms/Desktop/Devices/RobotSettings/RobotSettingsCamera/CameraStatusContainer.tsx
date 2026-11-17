@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Chip, StyledText } from '@opentrons/components'
 
-import { ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
 import styles from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/camerasettings.module.css'
 
 import type { JSX } from 'react'

@@ -2,11 +2,12 @@ import { useTranslation } from 'react-i18next'
 
 import { RadioButton, StyledText } from '@opentrons/components'
 
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { zoomNumberToString } from '/app/local-resources/images/utils/cameraUtils'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import styles from './cameracontrols.module.css'
 
+import type { ReactNode } from 'react'
 import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 
 const ZOOM_VALUES: Array<UseCameraSettingsValuesResult['zoom']> = [1, 1.5, 2]
@@ -23,7 +24,7 @@ export function ZoomSettingsView({
   adjustZoom,
   returnToHomeView,
   isLoading,
-}: ZoomSettingsViewProps): JSX.Element {
+}: ZoomSettingsViewProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   const buildSubLabel = (

@@ -1,6 +1,5 @@
 """Tests for RunDataManager."""
 
-import inspect
 from datetime import datetime
 
 import pytest
@@ -8,9 +7,9 @@ from decoy import Decoy
 
 from opentrons.config import feature_flags
 from opentrons.protocol_engine import (
-    CommandSlice,
     EngineStatus,
     ErrorOccurrence,
+    JsonCommandSlice,
     LabwareOffset,
     Liquid,
     LoadedLabware,
@@ -25,7 +24,6 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.resources import CameraProvider
 from opentrons.types import DeckSlotName
-from opentrons_shared_data.robot.types import RobotTypeEnum
 
 from robot_server.camera.provider import CameraProviderWrapper
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
@@ -44,7 +42,7 @@ from robot_server.service.notifications import (
 )
 
 
-def mock_notify_publishers() -> None:
+async def mock_notify_publishers() -> None:
     """A mock notify_publishers."""
     return None
 
@@ -124,19 +122,6 @@ def mock_camera_provider(
 ) -> CameraProvider:
     """Return a mock CameraProvider."""
     return decoy.mock(cls=CameraProvider)
-
-
-@pytest.fixture
-def mock_feature_flags(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Get a mocked feature flags."""
-    for name, func in inspect.getmembers(feature_flags, inspect.isfunction):
-        params = inspect.getfullargspec(func)
-        mock_get_ff = decoy.mock(func=func)
-        if any("robot_type" in p for p in params.args):
-            decoy.when(mock_get_ff(RobotTypeEnum.FLEX)).then_return(False)
-        else:
-            decoy.when(mock_get_ff()).then_return(False)
-        monkeypatch.setattr(feature_flags, name, mock_get_ff)
 
 
 async def test_create(
@@ -305,14 +290,14 @@ async def test_get_current_run(
     decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(
         run_id
     )
-    decoy.when(mock_maintenance_run_orchestrator_store.get_state_summary()).then_return(
-        engine_state_summary
-    )
+    decoy.when(
+        await mock_maintenance_run_orchestrator_store.get_state_summary()
+    ).then_return(engine_state_summary)
     decoy.when(
         mock_maintenance_run_orchestrator_store.current_run_created_at
     ).then_return(datetime(2023, 1, 1))
 
-    result = subject.get(run_id=run_id)
+    result = await subject.get(run_id=run_id)
 
     assert result == MaintenanceRun(
         current=True,
@@ -348,7 +333,7 @@ async def test_get_run_not_current(
         "not-current-id"
     )
     with pytest.raises(MaintenanceRunNotFoundError):
-        subject.get(run_id=run_id)
+        await subject.get(run_id=run_id)
 
 
 async def test_delete_current_run(
@@ -375,7 +360,7 @@ async def test_delete_current_run(
     )
 
 
-def test_get_commands_slice_current_run(
+async def test_get_commands_slice_current_run(
     decoy: Decoy,
     subject: MaintenanceRunDataManager,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
@@ -396,16 +381,21 @@ def test_get_commands_slice_current_run(
         run_command,
     ]
 
-    expected_command_slice = CommandSlice(
-        commands=expected_commands_result, cursor=1, total_length=3
+    expected_command_slice = JsonCommandSlice(
+        commands=[
+            command.model_dump_json(by_alias=True)
+            for command in expected_commands_result
+        ],
+        cursor=1,
+        total_length=3,
     )
     decoy.when(mock_maintenance_run_orchestrator_store.current_run_id).then_return(
         "run-id"
     )
     decoy.when(
-        mock_maintenance_run_orchestrator_store.get_command_slice(1, 2)
+        await mock_maintenance_run_orchestrator_store.get_command_slice(1, 2)
     ).then_return(expected_command_slice)
 
-    result = subject.get_commands_slice("run-id", 1, 2)
+    result = await subject.get_commands_slice("run-id", 1, 2)
 
     assert expected_command_slice == result

@@ -22,7 +22,6 @@ import type { State } from '/app/redux/types'
 // If the run initializes with offset data (ex, from a cloned run) and any run-provided offset
 // is stale, return the timestamp of the last time this protocol was run prior to the current run.
 export function useOffsetConflictTimestamp(
-  isFlex: boolean,
   runId: string | null,
   currentRunRecord: Run | undefined
 ): void {
@@ -60,7 +59,6 @@ export function useOffsetConflictTimestamp(
     currentRunRecord == null
 
   if (
-    isFlex &&
     !existingConflictInfo.isInitialized &&
     !isInitializing &&
     !areOffsetsApplied // if a different app has finalized offsets, don't return a conflict

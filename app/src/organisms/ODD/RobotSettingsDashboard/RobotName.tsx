@@ -6,16 +6,17 @@ import {
   Flex,
   Icon,
   JUSTIFY_FLEX_START,
-  LegacyStyledText,
+  StyledText,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { SetSettingOption } from './types'
 
 interface RobotNameProps {
   setCurrentOption: SetSettingOption
 }
 
-export function RobotName({ setCurrentOption }: RobotNameProps): JSX.Element {
+export function RobotName({ setCurrentOption }: RobotNameProps): ReactNode {
   const { t } = useTranslation(['device_settings'])
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
@@ -28,9 +29,9 @@ export function RobotName({ setCurrentOption }: RobotNameProps): JSX.Element {
           <Icon name="chevron-left" size="2.5rem" />
         </Btn>
       </Flex>
-      <LegacyStyledText fontSize="2rem" textAlign="center">
+      <StyledText fontSize="2rem" textAlign="center">
         {t('robot_name')}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }

@@ -6,12 +6,14 @@ import {
   COLORS,
   DIRECTION_ROW,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-export function OnOffToggle(props: { isOn: boolean }): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function OnOffToggle(props: { isOn: boolean }): ReactNode {
   const { t } = useTranslation('shared')
   return (
     <Flex
@@ -22,12 +24,9 @@ export function OnOffToggle(props: { isOn: boolean }): JSX.Element {
       padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
       borderRadius={BORDERS.borderRadius16}
     >
-      <LegacyStyledText
-        forwardedAs="h4"
-        fontWeight={TYPOGRAPHY.fontWeightRegular}
-      >
+      <StyledText forwardedAs="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
         {props.isOn ? t('on') : t('off')}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
 }

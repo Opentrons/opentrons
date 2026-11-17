@@ -4,7 +4,7 @@
   "namespace": "opentrons",
   "metadata": {
     "displayName": "Millipore 96 Well Plate 500\u00b5L Solvinert",
-    "displayCategory": "wellPlate",
+    "displayCategory": "filterPlate",
     "displayVolumeUnits": "\u00b5L",
     "tags": []
   },
@@ -29,6 +29,8 @@
     "y": 0,
     "z": 0
   },
+  "gripForce": 15,
+  "gripHeightFromLabwareBottom": 11.91,
   "dimensions": {
     "xDimension": 127.8,
     "yDimension": 85.49,

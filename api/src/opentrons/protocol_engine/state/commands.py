@@ -69,6 +69,9 @@ from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryType,
 )
 from opentrons.protocol_engine.notes.notes import CommandNote
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_engine.state import update_types
 
 
@@ -133,6 +136,34 @@ class CommandSlice(BaseModel):
     commands: List[Command]
     cursor: int
     total_length: int
+
+
+@dataclass(frozen=True)
+class JsonCommandSlice:
+    """A subset of all commands in state in JSON format."""
+
+    commands: List[str]
+    cursor: int
+    total_length: int
+
+    @staticmethod
+    def to_pyro_dict(obj: "JsonCommandSlice") -> Dict[str, Any]:
+        """Consumed by Serpent, convert type to a Pyro Dictionary."""
+        return {
+            "__class__": f"{obj.__module__}.{obj.__class__.__qualname__}",
+            "commands": obj.commands,
+            "cursor": obj.cursor,
+            "total_length": obj.total_length,
+        }
+
+    @staticmethod
+    def from_pyro_dict(classname: Any, data: Dict[str, Any]) -> "JsonCommandSlice":
+        """Consumed by Serpent, convert from a Pyro Dictionary."""
+        return JsonCommandSlice(
+            commands=data["commands"],
+            cursor=data["cursor"],
+            total_length=data["total_length"],
+        )
 
 
 class CommandErrorSlice(BaseModel):
@@ -298,6 +329,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         config: Config,
         is_door_open: bool,
         error_recovery_policy: ErrorRecoveryPolicy,
+        command_store_provider: Optional[CommandStoreProvider] = None,
         updates_callback: Optional[
             Callable[
                 [CurrentCommandNotification | FinalizedCommandNotification | Any], None
@@ -307,7 +339,9 @@ class CommandStore(HasState[CommandState], HandlesActions):
         """Initialize a CommandStore and its state."""
         self._config = config
         self._state = CommandState(
-            command_history=CommandHistory(),
+            command_history=CommandHistory(
+                command_store_provider=command_store_provider
+            ),
             queue_status=QueueStatus.SETUP,
             is_door_blocking=is_door_open and config.block_on_door_open,
             run_result=None,
@@ -837,8 +871,8 @@ class CommandView:
 
     def get_slice(
         self, cursor: Optional[int], length: int, include_fixit_commands: bool
-    ) -> CommandSlice:
-        """Get a subset of commands around a given cursor.
+    ) -> JsonCommandSlice:
+        """Get a subset of commands around a given cursor in JSON string format.
 
         If the cursor is omitted, a cursor will be selected automatically
         based on the currently running or most recently executed command,
@@ -867,11 +901,19 @@ class CommandView:
             start=start, stop=stop, command_ids=command_ids
         )
 
-        return CommandSlice(
+        return JsonCommandSlice(
             commands=commands,
             cursor=start,
             total_length=total_length,
         )
+
+    def delete_end_slice(self, length: int) -> None:
+        """Delete the end of the command history up to a given length."""
+        self._state.command_history.del_end_slice(length)
+
+    def get_length(self) -> int:
+        """Get the length of all elements added to the history."""
+        return self._state.command_history.length()
 
     def get_errors_slice(
         self,
@@ -1422,3 +1464,7 @@ class CommandView:
         # todo(mm, 2024-10-04): Instead of allowlisting command types, maybe we should
         # add a `mayRunWithDoorOpen: bool` field to command requests.
         return fixit_command.commandType in allowed_command_types
+
+    async def teardown_command_history(self) -> None:
+        """Teardown the interface with the persistence command store."""
+        await self._state.command_history.teardown_command_manager()

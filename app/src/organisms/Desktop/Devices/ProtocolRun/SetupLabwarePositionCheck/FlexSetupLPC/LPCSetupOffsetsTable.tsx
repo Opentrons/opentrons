@@ -15,11 +15,12 @@ import {
 import { LabwareOffsetsTable } from '/app/organisms/LabwareOffsetsTable'
 import { selectTotalCountLocationSpecificOffsets } from '/app/redux/protocol-runs'
 
+import type { ReactNode } from 'react'
 import type { SetupLabwarePositionCheckProps } from '..'
 
 export function LPCSetupOffsetsTable(
   props: SetupLabwarePositionCheckProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation('protocol_setup')
   const totalOffsetCount = useSelector(
     selectTotalCountLocationSpecificOffsets(props.runId)

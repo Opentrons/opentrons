@@ -28,17 +28,18 @@ dynamic = ['version', 'hatch-dependency-coversion']
 
 [dependency-groups]
 dev = [
-    "pytest>=9.0.2",
-    "pytest-cov==4.1.0",
-    "ruff==0.14.10",
-    "mypy==1.19.1",
-    "mock~=5.1.0",
-    "types-mock~=5.1.0",
-    "hypothesis<7,>=6.96.1",
-    "pytest-asyncio<2,>=1",
-    "matplotlib",
-    "build~=1.2.0",
-    "pytest-lazy-fixtures<2,>=1.1.4",
+    "pytest==9.2.0",
+    "pytest-cov==7.1.0",
+    "ruff==0.17.4",
+    "coverage==7.16.2",
+    "mypy==2.4.1",
+    "mock==5.2.0",
+    "types-mock==5.2.0.20260518",
+    "hypothesis==6.168.5",
+    "pytest-asyncio==1.4.1.post1",
+    "matplotlib==3.10.9",
+    "build==1.6.1",
+    "pytest-lazy-fixtures==1.4.1",
 ]
 
 [project.urls]
@@ -119,6 +120,8 @@ warn_unused_configs = true
 strict = true
 
 [tool.uv]
+# Keep in sync with repo-root uv.toml and oe-core's Dockerfile
+required-version = "==0.12.1"
 # cooldown time for security
 exclude-newer = "1 week"
 

@@ -30,7 +30,7 @@ class DiskMonitor:
         used_space = self.get_total_disk_space_mb()
         available_space = self.get_available_disk_space_mb()
         images_size = self.get_images_directory_size_mb()
-        limit = self._settings.system_low_space_threshold_mb
+        limit = self._settings.run_start_limit_free_space_mb
         return DiskDetails(
             systemAvailableMb=available_space,
             systemTotalMb=used_space,

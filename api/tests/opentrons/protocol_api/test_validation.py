@@ -1,6 +1,5 @@
 """Tests for Protocol API input validation."""
 
-import re
 from contextlib import nullcontext as do_not_raise
 from typing import Any, ContextManager, Dict, List, Optional, Sequence, Type, Union
 
@@ -207,14 +206,6 @@ def test_ensure_and_convert_deck_slot(
         ("b7", APIVersion(2, 0), ValueError, "not a valid deck slot"),
         ("B7", APIVersion(2, 0), ValueError, "not a valid deck slot"),
         (1.23, APIVersion(2, 0), TypeError, "must be a string or integer"),
-        (
-            "A1",
-            APIVersion(2, 0),
-            APIVersionError,
-            re.escape(
-                "Error 4011 INCORRECT_API_VERSION (APIVersionError): Specifying a deck slot like 'A1' is not available until API version 2.15. You are currently using API version 2.0. Increase your protocol's apiLevel, or use slot '10' instead."
-            ),
-        ),
         ("A4", APIVersion(2, 15), APIVersionError, "Using a staging deck slot"),
     ],
 )

@@ -1,11 +1,11 @@
 import cx from 'classnames'
 
 import { IconButton } from '../buttons'
-import { Icon } from '../icons'
+import { Icon } from '../helix/icons'
 import styles from './alerts.module.css'
 
 import type { ReactNode } from 'react'
-import type { IconProps } from '../icons'
+import type { IconProps } from '../helix/icons'
 
 export type AlertType = 'success' | 'warning' | 'error' | 'info'
 
@@ -55,7 +55,7 @@ const ALERT_PROPS_BY_TYPE: Record<
  * @deprecated Use 'Banner' instead
  */
 
-export function AlertItem(props: AlertItemProps): JSX.Element {
+export function AlertItem(props: AlertItemProps): ReactNode {
   const alertProps = ALERT_PROPS_BY_TYPE[props.type]
   const icon = props.icon ? props.icon : alertProps.icon
   const className = cx(styles.alert, alertProps.className, props.className)

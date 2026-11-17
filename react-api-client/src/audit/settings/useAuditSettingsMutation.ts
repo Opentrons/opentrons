@@ -56,15 +56,10 @@ export function useAuditSettingsMutation(
     }: DocumentedMutationParameters<PatchAuditSettingsRequest>) =>
       patchAuditSettings(host!, body, userNotes)
         .then(response => {
-          queryClient
-            .invalidateQueries(
-              getQueryKey(host, 'audit', 'external', 'settings')
-            )
-            .catch((e: Error) => {
-              console.error(
-                `error invalidating audit settings query: ${e.message}`
-              )
-            })
+          queryClient.setQueryData(
+            getQueryKey(host, 'audit', 'external', 'settings'),
+            response.data
+          )
           return response.data
         })
         .catch((e: AxiosError) => {

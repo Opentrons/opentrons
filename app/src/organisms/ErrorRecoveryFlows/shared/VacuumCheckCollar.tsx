@@ -1,15 +1,19 @@
 import { useTranslation } from 'react-i18next'
 
 import CheckCollar from '/app/assets/videos/error-recovery/Vacuum_CheckCollar.webm'
-import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
+import {
+  DescriptionContent,
+  TwoColumn,
+} from '/app/components/ODD/modals/InterventionModal'
 
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { RightColumnAnimation } from './RightColumnAnimation'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
-export function VacuumCheckCollar(props: RecoveryContentProps): JSX.Element {
+export function VacuumCheckCollar(props: RecoveryContentProps): ReactNode {
   const { routeUpdateActions } = props
   const { proceedNextStep, goBackPrevStep } = routeUpdateActions
 

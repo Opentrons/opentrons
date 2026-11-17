@@ -10,15 +10,16 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { OddModal } from '/app/molecules/OddModal'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import {
   clearSelectedLabwareWorkingOffsets,
   goBackEditOffsetSubstep,
   selectSelectedLwOverview,
 } from '/app/redux/protocol-runs'
 
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { ReactNode } from 'react'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
 export const handleUnsavedOffsetsModalODD = (
@@ -30,7 +31,7 @@ export const handleUnsavedOffsetsModalODD = (
 }
 
 const UnsavedOffsetsModalODD = NiceModal.create(
-  (props: LPCWizardContentProps): JSX.Element => {
+  (props: LPCWizardContentProps): ReactNode => {
     const { runId } = props
     const { t } = useTranslation('labware_position_check')
     const dispatch = useDispatch()

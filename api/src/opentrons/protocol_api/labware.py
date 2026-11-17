@@ -28,7 +28,6 @@ from typing import (
 
 from opentrons_shared_data.labware.types import (
     LabwareDefinition,
-    LabwareDefinition2,
     LabwareParameters2,
     LabwareParameters3,
 )
@@ -43,9 +42,6 @@ from .core.engine import (
     SET_OFFSET_RESTORED_API_VERSION,
 )
 from .core.labware import AbstractLabware
-from .core.legacy.legacy_labware_core import LegacyLabwareCore
-from .core.legacy.legacy_well_core import LegacyWellCore
-from .core.legacy.well_geometry import WellGeometry
 from .core.module import AbstractModuleCore
 from opentrons.protocol_engine.types import LiquidTrackingType
 from opentrons.protocols.api_support.types import APIVersion
@@ -82,14 +78,6 @@ if TYPE_CHECKING:
 _log = logging.getLogger(__name__)
 
 
-_IGNORE_API_VERSION_BREAKPOINT = APIVersion(2, 13)
-"""API version after which to respect... the API version setting.
-
-At this API version and below, `Labware` objects were always
-erroneously constructed set to MAX_SUPPORTED_VERSION.
-"""
-
-
 class TipSelectionError(Exception):
     pass
 
@@ -114,9 +102,6 @@ class Well:
     """
 
     def __init__(self, parent: Labware, core: WellCore, api_version: APIVersion):
-        if api_version <= _IGNORE_API_VERSION_BREAKPOINT:
-            api_version = _IGNORE_API_VERSION_BREAKPOINT
-
         self._parent = parent
         self._core = core
         self._api_version = api_version
@@ -174,9 +159,7 @@ class Well:
         return self._core.get_max_volume()
 
     @property
-    def geometry(self) -> WellGeometry:
-        if isinstance(self._core, LegacyWellCore):
-            return self._core.geometry
+    def geometry(self) -> None:
         raise UnsupportedAPIError(api_element="Well.geometry")
 
     @property
@@ -469,8 +452,6 @@ class Labware:
                                      defaults to
                                      `MAX_SUPPORTED_VERSION`.
         """
-        if api_version <= _IGNORE_API_VERSION_BREAKPOINT:
-            api_version = _IGNORE_API_VERSION_BREAKPOINT
 
         self._api_version = api_version
         self._core: LabwareCore = core
@@ -489,18 +470,11 @@ class Labware:
 
     @property
     def separate_calibration(self) -> bool:
-        if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise UnsupportedAPIError(
-                api_element="Labware.separate_calibration",
-                since_version=f"{ENGINE_CORE_API_VERSION}",
-                current_version=f"{self._api_version}",
-            )
-
-        _log.warning(
-            "Labware.separate_calibrations is a deprecated internal property."
-            " It no longer has meaning, but will always return `False`"
+        raise UnsupportedAPIError(
+            api_element="Labware.separate_calibration",
+            since_version=f"{ENGINE_CORE_API_VERSION}",
+            current_version=f"{self._api_version}",
         )
-        return False
 
     @classmethod
     def _builder_for_core_map(
@@ -563,9 +537,6 @@ class Labware:
             off-deck. Formerly, if the labware was removed by using `del` on
             [`deck`][opentrons.protocol_api.ProtocolContext.deck], this would return where it was before its removal.
         """
-        if isinstance(self._core, LegacyLabwareCore):
-            # Type ignoring to preserve backwards compatibility
-            return self._core.get_geometry().parent.labware.object  # type: ignore
 
         assert self._protocol_core and self._core_map, "Labware initialized incorrectly"
 
@@ -596,15 +567,11 @@ class Labware:
         .. deprecated: 2.14
             Set the name of labware in `load_labware` instead.
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise UnsupportedAPIError(
-                api_element="Labware.name setter",
-                since_version=f"{ENGINE_CORE_API_VERSION}",
-                current_version=f"{self._api_version}",
-            )
-
-        assert isinstance(self._core, LegacyLabwareCore)
-        self._core.set_name(new_name)
+        raise UnsupportedAPIError(
+            api_element="Labware.name setter",
+            since_version=f"{ENGINE_CORE_API_VERSION}",
+            current_version=f"{self._api_version}",
+        )
 
     @property
     @requires_version(2, 0)
@@ -748,6 +715,46 @@ class Labware:
 
         return labware
 
+    @requires_version(2, 31)
+    def load_adapter(
+        self,
+        name: str,
+        namespace: Optional[str] = None,
+        version: Optional[int] = None,
+    ) -> Labware:
+        """Load a compatible adapter onto this labware.
+
+        Used to stack vacuum module spacers, for example:
+
+        ```python
+        s1 = vacuum_module.load_adapter("opentrons_vacuum_manifold_spacer_3.2mm")
+        s2 = s1.load_adapter("opentrons_vacuum_manifold_spacer_12.8mm")
+        ```
+
+        The parameters of this function behave like those of
+        [`ProtocolContext.load_adapter()`][opentrons.protocol_api.ProtocolContext.load_adapter].
+        Note that the parameter `name` here corresponds to `load_name` on the
+        `ProtocolContext` function.
+
+        Returns:
+            The initialized and loaded adapter object.
+        """
+        adapter_core = self._protocol_core.load_adapter(
+            load_name=name,
+            namespace=namespace,
+            version=version,
+            location=self._core,
+        )
+
+        adapter = Labware(
+            core=adapter_core,
+            api_version=self._api_version,
+            protocol_core=self._protocol_core,
+            core_map=self._core_map,
+        )
+        self._core_map.add(adapter_core, adapter)
+        return adapter
+
     @requires_version(2, 15)
     def load_labware_from_definition(
         self, definition: LabwareDefinition, label: Optional[str] = None
@@ -838,14 +845,12 @@ class Labware:
 
         *Deprecated in version 2.14*
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise UnsupportedAPIError(
-                api_element="Labware.set_calibration()",
-                since_version=f"{ENGINE_CORE_API_VERSION}",
-                current_version=f"{self._api_version}",
-                extra_message="Try using the Opentrons App's Labware Position Check.",
-            )
-        self._core.set_calibration(delta)
+        raise UnsupportedAPIError(
+            api_element="Labware.set_calibration()",
+            since_version=f"{ENGINE_CORE_API_VERSION}",
+            current_version=f"{self._api_version}",
+            extra_message="Try using the Opentrons App's Labware Position Check.",
+        )
 
     @requires_version(2, 12)
     def set_offset(self, x: float, y: float, z: float) -> None:
@@ -906,10 +911,7 @@ class Labware:
 
         *Changed in version 2.18:* Restored, and now applies to labware type–location pairs.
         """
-        if (
-            self._api_version >= ENGINE_CORE_API_VERSION
-            and self._api_version < SET_OFFSET_RESTORED_API_VERSION
-        ):
+        if self._api_version < SET_OFFSET_RESTORED_API_VERSION:
             raise APIVersionError(
                 api_element="Labware.set_offset()",
                 until_version=f"{SET_OFFSET_RESTORED_API_VERSION}",
@@ -1195,15 +1197,11 @@ class Labware:
         *Deprecated in version 2.14:* Ensure tip length is set properly in your tip rack's definition
         and/or use the Opentrons App's tip length calibration feature.
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise UnsupportedAPIError(
-                api_element="Labware.tip_length setter",
-                since_version=f"{ENGINE_CORE_API_VERSION}",
-                current_version=f"{self._api_version}",
-            )
-
-        assert isinstance(self._core, LegacyLabwareCore)
-        self._core.set_tip_length(length)
+        raise UnsupportedAPIError(
+            api_element="Labware.tip_length setter",
+            since_version=f"{ENGINE_CORE_API_VERSION}",
+            current_version=f"{self._api_version}",
+        )
 
     # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def next_tip(
@@ -1259,22 +1257,11 @@ class Labware:
         *Deprecated in version 2.14:* Modification of tip tracking state outside
         [`reset()`][opentrons.protocol_api.labware.Labware.reset] has been deprecated.
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise UnsupportedAPIError(
-                api_element="Labware.use_tips",
-                since_version=f"{ENGINE_CORE_API_VERSION}",
-                current_version=f"{self._api_version}",
-                extra_message="To modify tip state, use Labware.reset.",
-            )
-
-        assert num_channels > 0, "Bad call to use_tips: num_channels<=0"
-        fail_if_full = self._api_version < APIVersion(2, 2)
-
-        assert isinstance(self._core, LegacyLabwareCore)
-        self._core.get_tip_tracker().use_tips(
-            start_well=start_well._core,
-            num_channels=num_channels,
-            fail_if_full=fail_if_full,
+        raise UnsupportedAPIError(
+            api_element="Labware.use_tips",
+            since_version=f"{ENGINE_CORE_API_VERSION}",
+            current_version=f"{self._api_version}",
+            extra_message="To modify tip state, use Labware.reset.",
         )
 
     def __repr__(self) -> str:
@@ -1305,18 +1292,11 @@ class Labware:
 
         *Removed in version 2.14*
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise UnsupportedAPIError(
-                api_element="Labware.previous_tip",
-                since_version=f"{ENGINE_CORE_API_VERSION}",
-                current_version=f"{self._api_version}",
-            )
-
-        # This logic is the inverse of `next_tip()`
-        assert num_tips > 0, "Bad call to previous_tip: num_tips <= 0"
-        assert isinstance(self._core, LegacyLabwareCore)
-        well_core = self._core.get_tip_tracker().previous_tip(num_tips=num_tips)
-        return self._wells_by_name[well_core.get_name()] if well_core else None
+        raise UnsupportedAPIError(
+            api_element="Labware.previous_tip",
+            since_version=f"{ENGINE_CORE_API_VERSION}",
+            current_version=f"{self._api_version}",
+        )
 
     # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def return_tips(self, start_well: Well, num_channels: int = 1) -> None:
@@ -1343,20 +1323,11 @@ class Labware:
         *Removed in version 2.14:* Use
         [`reset()`][opentrons.protocol_api.labware.Labware.reset] instead.
         """
-        if self._api_version >= ENGINE_CORE_API_VERSION:
-            raise UnsupportedAPIError(
-                api_element="Labware.return_tips()",
-                since_version=f"{ENGINE_CORE_API_VERSION}",
-                current_version=f"{self._api_version}",
-                extra_message="Use Labware.reset() instead.",
-            )
-
-        # This logic is the inverse of `use_tips()`
-        assert num_channels > 0, "Bad call to return_tips: num_channels <= 0"
-
-        assert isinstance(self._core, LegacyLabwareCore)
-        self._core.get_tip_tracker().return_tips(
-            start_well=start_well._core, num_channels=num_channels
+        raise UnsupportedAPIError(
+            api_element="Labware.return_tips()",
+            since_version=f"{ENGINE_CORE_API_VERSION}",
+            current_version=f"{self._api_version}",
+            extra_message="Use Labware.reset() instead.",
         )
 
     @requires_version(2, 0)
@@ -1599,102 +1570,3 @@ def next_available_tip(
             start,
             nozzle_map=nozzle_map,
         )
-
-
-# TODO(mc, 2022-11-09): implementation detail, move somewhere else
-# only used in old calibration flows by robot-server
-def load_from_definition(
-    definition: "LabwareDefinition2",
-    parent: Location,
-    label: Optional[str] = None,
-    api_level: Optional[APIVersion] = None,
-) -> Labware:
-    """
-    Return a labware object constructed from a provided labware definition dict
-
-    :param definition: A dict representing all required data for a labware,
-        including metadata such as the display name of the labware, a
-        definition of the order to iterate over wells, the shape of wells
-        (shape, physical dimensions, etc), and so on. The correct shape of
-        this definition is governed by the "labware-designer" project in
-        the Opentrons/opentrons repo.
-    :param parent: A [`Location`][opentrons.types.Location] representing the location where
-                   the front and left most point of the outside of labware is
-                   (often the front-left corner of a slot on the deck).
-    :param str label: An optional label that will override the labware's
-                      display name from its definition
-    :param api_level: the API version to set for the loaded labware
-                      instance. The [`Labware`][opentrons.protocol_api.Labware] will
-                      conform to this level. If not specified,
-                      defaults to ``APIVersion(2, 13)``.
-    """
-    return Labware(
-        core=LegacyLabwareCore(
-            definition=definition,
-            parent=parent,
-            label=label,
-        ),
-        api_version=api_level or APIVersion(2, 13),
-        protocol_core=None,  # type: ignore[arg-type]
-        core_map=None,  # type: ignore[arg-type]
-    )
-
-
-# TODO(mc, 2022-11-09): implementation detail, move somewhere else
-# only used in old calibration flows by robot-server
-def load(
-    load_name: str,
-    parent: Location,
-    label: Optional[str] = None,
-    namespace: Optional[str] = None,
-    version: int = 1,
-    bundled_defs: Optional[Mapping[str, LabwareDefinition2]] = None,
-    extra_defs: Optional[Mapping[str, LabwareDefinition2]] = None,
-    api_level: Optional[APIVersion] = None,
-) -> Labware:
-    """
-    Return a labware object constructed from a labware definition dict looked
-    up by name (definition must have been previously stored locally on the
-    robot)
-
-    :param load_name: A string to use for looking up a labware definition
-        previously saved to disc. The definition file must have been saved in a
-        known location
-    :param parent: A [`Location`][opentrons.types.Location] representing the location where
-                   the front and left most point of the outside of labware is
-                   (often the front-left corner of a slot on the deck).
-    :param str label: An optional label that will override the labware's
-                      display name from its definition
-    :param str namespace: The namespace the labware definition belongs to.
-        If unspecified, will search 'opentrons' then 'custom_beta'
-    :param int version: The version of the labware definition. If unspecified,
-        will use version 1.
-    :param bundled_defs: If specified, a mapping of labware names to labware
-        definitions. Only the bundle will be searched for definitions.
-    :param extra_defs: If specified, a mapping of labware names to labware
-        definitions. If no bundle is passed, these definitions will also be
-        searched.
-    :param api_level: the API version to set for the loaded labware
-                      instance. The [`Labware`][opentrons.protocol_api.Labware] will
-                      conform to this level. If not specified,
-                      defaults to ``APIVersion(2, 13)``.
-    """
-    definition = get_labware_definition(
-        load_name,
-        namespace,
-        version,
-        bundled_defs=bundled_defs,
-        extra_defs=extra_defs,
-    )
-
-    # The legacy `load_from_definition()` function that we're calling only supports
-    # schemaVersion==2 labware. Fortunately, when robot-server calls this function,
-    # we only expect it to try to load schemaVersion==2 labware, so we never expect
-    # this ValueError to be raised in practice.
-    if definition["schemaVersion"] != 2:
-        raise ValueError(
-            f"{namespace}/{load_name}/{version} has schema {definition['schemaVersion']}."
-            " Only schema 2 is supported."
-        )
-
-    return load_from_definition(definition, parent, label, api_level)

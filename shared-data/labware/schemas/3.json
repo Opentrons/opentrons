@@ -39,6 +39,7 @@
         "reservoir",
         "trash",
         "wellPlate",
+        "filterPlate",
         "aluminumBlock",
         "adapter",
         "other",
@@ -893,6 +894,11 @@
       "type": "number",
       "description": "Recommended Z-height, from labware origin to the center of gripper pads, when gripping the labware."
     },
+    "skirtHeight": {
+      "description": "Height of the skirt wall in mm, from the top of the skirt to the bottom of the skirt. When the skirt starts at the top of the labware, wells may hang below this height; extents still reach the lowest point.",
+      "$ref": "#/definitions/positiveNumber"
+    },
+
     "stackLimit": {
       "type": "number",
       "description": "The limit representing the maximum stack size for a given labware. Defaults to 1 when unspecified indicating a single labware with no labware below it."

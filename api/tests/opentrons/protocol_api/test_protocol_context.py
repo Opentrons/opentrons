@@ -564,21 +564,6 @@ def test_load_labware_off_deck(
     decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
-def test_load_labware_off_deck_raises(
-    subject: ProtocolContext,
-) -> None:
-    """It should raise and api error."""
-    with pytest.raises(APIVersionError):
-        subject.load_labware(
-            load_name="UPPERCASE_LABWARE",
-            label="some_display_name",
-            namespace="some_namespace",
-            version=1337,
-            location=OFF_DECK,
-        )
-
-
 def test_load_labware_on_staging_slot(
     decoy: Decoy,
     mock_core: ProtocolCore,
@@ -1514,29 +1499,6 @@ def test_move_labware_off_deck(
     )
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
-def test_move_labware_off_deck_raises(
-    subject: ProtocolContext,
-    decoy: Decoy,
-    mock_core: ProtocolCore,
-    mock_core_map: LoadedCoreMap,
-) -> None:
-    """It should raise an APIVersionError if using move_labware in an unsupported version."""
-    mock_labware_core = decoy.mock(cls=LabwareCore)
-
-    decoy.when(mock_labware_core.get_well_columns()).then_return([])
-
-    movable_labware = Labware(
-        core=mock_labware_core,
-        api_version=MAX_SUPPORTED_VERSION,
-        protocol_core=mock_core,
-        core_map=mock_core_map,
-    )
-
-    with pytest.raises(APIVersionError):
-        subject.move_labware(labware=movable_labware, new_location=OFF_DECK)
-
-
 def test_move_labware_to_trash_raises(
     subject: ProtocolContext,
     decoy: Decoy,
@@ -1735,23 +1697,12 @@ def test_load_module_default_location(
     assert isinstance(result, ModuleContext)
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
 def test_load_module_with_configuration(subject: ProtocolContext) -> None:
-    """It should raise an APIVersionError if the deprecated `configuration` argument is used."""
+    """It should raise an UnsupportedAPIError if the deprecated `configuration` argument is used."""
     with pytest.raises(UnsupportedAPIError):
         subject.load_module(
             module_name="spline reticulator",
-            location=42,
-            configuration="semi",
-        )
-
-
-@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
-def test_load_module_with_mag_block_raises(subject: ProtocolContext) -> None:
-    """It should raise an APIVersionError if loading a magnetic block."""
-    with pytest.raises(UnsupportedAPIError):
-        subject.load_module(
-            module_name="magneticBlockV1",
             location=42,
             configuration="semi",
         )

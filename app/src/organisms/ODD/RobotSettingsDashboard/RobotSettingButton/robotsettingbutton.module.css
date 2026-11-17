@@ -29,15 +29,11 @@
   align-items: flex-start;
   justify-content: center;
   gap: var(--spacing-2);
-}
-
-.setting_name {
-  font-weight: 600;
+  text-wrap: wrap;
 }
 
 .setting_info {
   color: var(--grey-60);
-  font-weight: 400;
   text-align: left;
 }
 

@@ -5,14 +5,15 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { OddModal } from '/app/molecules/OddModal'
+import { SmallButton } from '/app/components/ODD/buttons/SmallButton'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { ReactNode } from 'react'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 interface DeckConfigurationDiscardChangesModalProps {
   setShowConfirmationModal: (showConfirmationModal: boolean) => void
@@ -20,7 +21,7 @@ interface DeckConfigurationDiscardChangesModalProps {
 
 export function DeckConfigurationDiscardChangesModal({
   setShowConfirmationModal,
-}: DeckConfigurationDiscardChangesModalProps): JSX.Element {
+}: DeckConfigurationDiscardChangesModalProps): ReactNode {
   const { t } = useTranslation('device_details')
   const navigate = useNavigate()
   const modalHeader: OddModalHeaderBaseProps = {
@@ -35,9 +36,9 @@ export function DeckConfigurationDiscardChangesModal({
   return (
     <OddModal header={modalHeader}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-        <LegacyStyledText forwardedAs="p">
+        <StyledText forwardedAs="p">
           {t('changes_will_be_lost_description')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex
           width="100%"
           flexDirection={DIRECTION_ROW}

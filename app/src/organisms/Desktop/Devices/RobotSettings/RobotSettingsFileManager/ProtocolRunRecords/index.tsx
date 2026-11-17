@@ -12,8 +12,11 @@ import {
 } from '@opentrons/components'
 import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
+import { isRunSignoffRequiredError } from '/app/local-resources/access-control/utils'
+import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { useToaster } from '/app/organisms/ToasterOven'
+import { useEnsureAuditLogAuthorization } from '/app/resources/audit/useEnsureAuditLogAuthorization'
 import {
   useDeleteSelectedRuns,
   useDownloadSelectedRuns,
@@ -27,7 +30,11 @@ import fileManagerStyles from '../robotsettingsfilemanager.module.css'
 import protocolRunRecordsStyles from './protocolrunrecords.module.css'
 import { RunRecord } from './RunRecord'
 
+import type { ReactNode } from 'react'
 import type { IconProps } from '@opentrons/components'
+import type { DocumentedAction } from '@opentrons/react-api-client'
+
+const DELETE_RUNS_ACTIONS: DocumentedAction[] = ['delete_runs']
 
 interface ProtocolRunRecordsProps {
   robotName: string
@@ -35,7 +42,7 @@ interface ProtocolRunRecordsProps {
 
 export function ProtocolRunRecords({
   robotName,
-}: ProtocolRunRecordsProps): JSX.Element {
+}: ProtocolRunRecordsProps): ReactNode {
   const { t } = useTranslation('device_details')
   const { makeToast, eatToast } = useToaster()
   const { data: runData } = useNotifyAllRunsQuery()
@@ -43,8 +50,16 @@ export function ProtocolRunRecords({
     () => [...(runData?.data ?? [])].reverse(),
     [runData?.data]
   )
-  const documentationState = useDocumentationState()
-  const { downloadRuns, isDownloading: isDownloadingRuns } =
+  const { documentationState } = useLinkedDocumentationState(
+    DELETE_RUNS_ACTIONS,
+    robotName,
+    robotName
+  )
+  const ensureAuthorized = useEnsureAuditLogAuthorization(
+    documentationState,
+    DELETE_RUNS_ACTIONS
+  )
+  const { mutateAsync: downloadSelectedRuns, status: downloadRunsStatus } =
     useDownloadSelectedRuns(robotName)
   const { deleteSelectedRuns, deletingIds } =
     useDeleteSelectedRuns(documentationState)
@@ -70,23 +85,23 @@ export function ProtocolRunRecords({
       handleNoRunsSelected('download')
       return
     }
-    if (!isDownloadingRuns) {
+    if (downloadRunsStatus !== 'loading') {
       const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
       const toastId = makeToast(
         t('downloading_run_records') as string,
         INFO_TOAST,
         { disableTimeout: true, icon: toastIcon }
       )
-      void downloadRuns(
-        runs.filter(run => {
-          return selectedIds.has(run.id)
-        })
-      )
-        .catch((e: Error) => {
-          makeToast(e.message, ERROR_TOAST, { closeButton: true })
-        })
+      void downloadSelectedRuns({
+        runs: runs.filter(run => selectedIds.has(run.id)),
+      })
         .then(() => {
           makeToast(t('files_successfully_downloaded') as string, SUCCESS_TOAST)
+        })
+        .catch((e: Error) => {
+          if (!isFileSaveCanceledError(e)) {
+            makeToast(e.message, ERROR_TOAST, { closeButton: true })
+          }
         })
         .finally(() => {
           eatToast(toastId)
@@ -102,10 +117,19 @@ export function ProtocolRunRecords({
     setShowDeleteRecordsModal(true)
   }
 
-  const handleConfirmDeleteSelected = (): void => {
+  const handleConfirmDeleteSelected = async (): Promise<void> => {
     setShowDeleteRecordsModal(false)
+    try {
+      await ensureAuthorized()
+    } catch (error) {
+      if (!isDocumentedMutationError(error)) {
+        makeToast((error as Error).message, ERROR_TOAST)
+      }
+      setShowDeleteRecordsModal(true)
+      return
+    }
     const selectedRuns = runs.filter(run => selectedIds.has(run.id))
-    void downloadRuns(selectedRuns)
+    void downloadSelectedRuns({ runs: selectedRuns })
       .then(successfullyDownloadedRuns => {
         if (successfullyDownloadedRuns.length < selectedRuns.length) {
           makeToast(t('some_runs_not_deleted') as string, WARNING_TOAST, {
@@ -118,11 +142,27 @@ export function ProtocolRunRecords({
         return deleteSelectedRuns(successfullyDownloadedRuns)
       })
       .catch((error: Error) => {
-        if (isDocumentedMutationError(error)) {
-          // Re-open delete modal if it was a documented mutation error
+        if (
+          isDocumentedMutationError(error) ||
+          isFileSaveCanceledError(error)
+        ) {
           setShowDeleteRecordsModal(true)
+        } else if (isRunSignoffRequiredError(error)) {
+          makeToast(
+            t('cancel_or_start_run_before_deleting') as string,
+            ERROR_TOAST,
+            {
+              heading: t('unable_to_delete_run_record'),
+              closeButton: true,
+            }
+          )
         } else {
-          makeToast(error.message || 'Error processing records', ERROR_TOAST)
+          makeToast(
+            error.message.length > 0
+              ? error.message
+              : 'Error processing records',
+            ERROR_TOAST
+          )
         }
       })
   }
@@ -134,7 +174,9 @@ export function ProtocolRunRecords({
           onClose={() => {
             setShowDeleteRecordsModal(false)
           }}
-          onConfirm={handleConfirmDeleteSelected}
+          onConfirm={() => {
+            void handleConfirmDeleteSelected()
+          }}
           type="selectedRuns"
         />
       )}

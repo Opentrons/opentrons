@@ -11,11 +11,12 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { OddModal } from '/app/molecules/OddModal'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useIsOEMMode } from '/app/resources/robot-settings'
 
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { ReactNode } from 'react'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 interface RobotSystemVersionModalProps {
   version: string
@@ -27,7 +28,7 @@ export function RobotSystemVersionModal({
   version,
   releaseNotes,
   setShowModal,
-}: RobotSystemVersionModalProps): JSX.Element {
+}: RobotSystemVersionModalProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared'])
   const navigate = useNavigate()
   const isOEMMode = useIsOEMMode()

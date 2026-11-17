@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { TwoColumn } from '/app/molecules/InterventionModal'
+import { TwoColumn } from '/app/components/ODD/modals/InterventionModal'
 
 import { RECOVERY_MAP } from '../constants'
 import { LeftColumnLabwareInfo } from './LeftColumnLabwareInfo'

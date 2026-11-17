@@ -90,4 +90,101 @@ describe('flexStackerEmpty', () => {
       type: 'MISSING_MODULE',
     })
   })
+  it('resolves runtime parameters into the command and python', () => {
+    invariantContext.runtimeParameters = {
+      selected_module: {
+        variableName: 'selected_module',
+        displayName: 'Selected module',
+        type: 'string',
+        default: moduleId,
+      },
+      strategy: {
+        variableName: 'strategy',
+        displayName: 'Strategy',
+        type: 'string',
+        default: 'logical',
+      },
+      message: {
+        variableName: 'message',
+        displayName: 'Message',
+        type: 'string',
+        default: 'Take everything out of the Stacker',
+      },
+      count: {
+        variableName: 'count',
+        displayName: 'Count',
+        type: 'int',
+        default: 2,
+      },
+    }
+    const result = flexStackerEmpty(
+      {
+        moduleId: 'selected_module',
+        strategy: 'strategy',
+        message: 'message',
+        count: 'count',
+      },
+      invariantContext,
+      robotState
+    )
+    expect(result).toEqual({
+      commands: [
+        {
+          commandType: 'flexStacker/empty',
+          key: expect.any(String),
+          params: {
+            moduleId,
+            strategy: 'logical',
+            message: 'Take everything out of the Stacker',
+            count: 2,
+          },
+        },
+      ],
+      python: 'mock_flex_stacker_1.empty(message=message)',
+    })
+  })
+  it('returns errors if runtime parameters are not valid', () => {
+    invariantContext.runtimeParameters = {
+      mock_rtp: {
+        variableName: 'mock_rtp',
+        displayName: 'mock rtp',
+        type: 'boolean',
+        default: false,
+      },
+      mock_string_rtp: {
+        variableName: 'mock_string_rtp',
+        displayName: 'mock string rtp',
+        type: 'string',
+        default: 'mock',
+      },
+    }
+    const result = flexStackerEmpty(
+      {
+        moduleId: 'mock_rtp',
+        strategy: 'mock_rtp',
+        message: 'mock_rtp',
+        count: 'mock_string_rtp',
+      },
+      invariantContext,
+      robotState
+    )
+    expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_string_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+    ])
+  })
 })

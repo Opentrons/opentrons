@@ -13,14 +13,14 @@ import {
   Tabs,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 
 import { ACTIONS } from './constants'
 import { getCompatibleLabwareByCategory } from './utils'
 
 import type { ComponentProps, Dispatch } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { SmallButton } from '/app/atoms/buttons'
+import type { SmallButton } from '/app/components/ODD/buttons'
 import type { LabwareFilter } from '/app/local-resources/labware'
 import type {
   QuickTransferWizardAction,

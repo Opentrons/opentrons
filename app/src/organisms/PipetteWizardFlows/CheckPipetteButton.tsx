@@ -1,9 +1,9 @@
 import { PrimaryButton } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { SmallButton } from '/app/components/ODD/buttons'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 
 interface CheckPipetteButtonProps {
   proceedButtonText: string
@@ -14,7 +14,7 @@ interface CheckPipetteButtonProps {
 }
 export const CheckPipetteButton = (
   props: CheckPipetteButtonProps
-): JSX.Element => {
+): ReactNode => {
   const { proceedButtonText, proceed, setFetching, isFetching, isOnDevice } =
     props
   const { refetch } = useInstrumentsQuery({

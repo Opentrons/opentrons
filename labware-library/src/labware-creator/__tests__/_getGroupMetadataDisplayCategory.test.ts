@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { _getGroupMetadataDisplayCategory } from '../fieldsToLabware'
 
 describe('_getGroupMetadataDisplayCategory', () => {
-  it('should return null for wellPlate and reservoir', () => {
-    const labwareTypes = ['wellPlate', 'reservoir']
+  it('should return null for wellPlate, filterPlate, and reservoir', () => {
+    const labwareTypes = ['wellPlate', 'filterPlate', 'reservoir']
     labwareTypes.forEach(labwareType => {
       const result = _getGroupMetadataDisplayCategory({
         aluminumBlockChildType: null,

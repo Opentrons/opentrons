@@ -1,7 +1,10 @@
 import { useTranslation } from 'react-i18next'
 
-import { StyledText, Tag } from '../../atoms'
+import { StyledText } from '../../atoms'
+import { Tag } from '../../helix/Tag'
 import styles from './LabwareDetailsWithCount.module.css'
+
+import type { ReactNode } from 'react'
 
 interface LabwareDetailsWithCountProps {
   title: string
@@ -13,7 +16,7 @@ export function LabwareDetailsWithCount({
   title,
   subTitle,
   quantity: label,
-}: LabwareDetailsWithCountProps): JSX.Element {
+}: LabwareDetailsWithCountProps): ReactNode {
   const { t } = useTranslation('protocol_command_text')
   return (
     <div className={styles.container}>

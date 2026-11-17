@@ -14,6 +14,7 @@ import {
 
 import { getRobotType } from '../../../file-data/selectors'
 
+import type { ReactNode } from 'react'
 import type { DeckLabelProps } from '@opentrons/components'
 import type {
   CoordinateTuple,
@@ -40,7 +41,7 @@ interface ModuleLabelProps {
   labelName?: string
   isVacuumDock?: boolean
 }
-export const ModuleLabel = (props: ModuleLabelProps): JSX.Element => {
+export const ModuleLabel = (props: ModuleLabelProps): ReactNode => {
   const {
     moduleModel,
     position,

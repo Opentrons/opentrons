@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -7,12 +7,14 @@ import {
   SecondaryButton,
   StyledText,
   TextAreaField,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { ActionList } from '/app/organisms/ActionItems/ActionList'
 
 import styles from './documentationrequired.module.css'
 
+import type { FormEvent, ReactNode } from 'react'
 import type {
   DocumentationReport,
   DocumentedAction,
@@ -34,10 +36,12 @@ export function DocumentationRequired({
   onClose,
   minReportLength,
   initialDocreport,
-}: DocumentationRequiredProps): JSX.Element {
+}: DocumentationRequiredProps): ReactNode {
   const { t } = useTranslation(['access_control', 'shared'])
   const [inputText, setInputText] = useState<string>(initialDocreport ?? '')
   const [error, setError] = useState<string | null>(null)
+
+  const formId = useId()
 
   const handleInputChange = (value: string): void => {
     setInputText(value)
@@ -45,11 +49,18 @@ export function DocumentationRequired({
   }
 
   const trimmedNote = inputText.trim()
-  const handleConfirm = (): void => {
-    if (trimmedNote === '') return
+  const handleConfirm = (e: FormEvent<HTMLFormElement>): void => {
+    e.preventDefault()
+
+    if (trimmedNote === '') {
+      setError(t('documentation_is_required') as string)
+      return
+    }
     if (trimmedNote.length < minReportLength) {
       setError(
-        '' + t('must_be_at_least_characters', { minLength: minReportLength })
+        t('must_be_at_least_characters', {
+          minLength: minReportLength,
+        }) as string
       )
       return
     }
@@ -59,7 +70,7 @@ export function DocumentationRequired({
   const footer = (
     <div className={styles.button_container}>
       <SecondaryButton onClick={onClose}>{t('cancel_action')}</SecondaryButton>
-      <PrimaryButton onClick={handleConfirm} disabled={trimmedNote === ''}>
+      <PrimaryButton type="submit" form={formId}>
         {t('shared:confirm')}
       </PrimaryButton>
     </div>
@@ -70,16 +81,17 @@ export function DocumentationRequired({
       title={t('documentation_required')}
       onClose={onClose}
       closeOnOutsideClick={false}
-      zIndexOverlay={10000}
+      zIndexOverlay={Z_INDEX.COMPLIANCE_MODALS}
       width="47rem"
       height="30rem"
       overflowY="hidden"
       footer={footer}
     >
-      <div className={styles.container}>
+      <form className={styles.container} id={formId} onSubmit={handleConfirm}>
         <div className={styles.text_area_container}>
           <div className={styles.text_area_field_fill}>
             <TextAreaField
+              autoFocus
               multiline
               value={inputText}
               error={error}
@@ -102,7 +114,7 @@ export function DocumentationRequired({
             className={styles.action_list}
           />
         </div>
-      </div>
+      </form>
     </Modal>
   )
 }

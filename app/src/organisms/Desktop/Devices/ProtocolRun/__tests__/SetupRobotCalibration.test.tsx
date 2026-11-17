@@ -1,6 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 
@@ -11,18 +10,14 @@ import {
   ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
   useTrackEvent,
 } from '/app/redux/analytics'
-import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
 import {
   DEFAULT_STATUS_REFETCH_INTERVAL,
   useNotifyRunQuery,
   useRunHasStarted,
 } from '/app/resources/runs'
 
-import { useDeckCalibrationData } from '../../hooks'
-import { SetupDeckCalibration } from '../SetupDeckCalibration'
 import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
-import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
 
 import type { ComponentProps } from 'react'
 
@@ -30,9 +25,7 @@ vi.mock('/app/redux/analytics')
 vi.mock('../../hooks')
 vi.mock('/app/resources/runs')
 vi.mock('/app/redux-resources/robots')
-vi.mock('../SetupDeckCalibration')
 vi.mock('../SetupInstrumentCalibration')
-vi.mock('../SetupTipLengthCalibration')
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -63,23 +56,13 @@ describe('SetupRobotCalibration', () => {
   }
 
   beforeEach(() => {
-    when(vi.mocked(useTrackEvent)).calledWith().thenReturn(mockTrackEvent)
-    vi.mocked(SetupDeckCalibration).mockReturnValue(
-      <div>Mock SetupDeckCalibration</div>
-    )
+    vi.when(vi.mocked(useTrackEvent)).calledWith().thenReturn(mockTrackEvent)
     vi.mocked(SetupInstrumentCalibration).mockReturnValue(
       <div>Mock SetupInstrumentCalibration</div>
     )
-    vi.mocked(SetupTipLengthCalibration).mockReturnValue(
-      <div>Mock SetupTipLengthCalibration</div>
-    )
-    when(vi.mocked(useDeckCalibrationData)).calledWith(ROBOT_NAME).thenReturn({
-      deckCalibrationData: mockDeckCalData,
-      isDeckCalibrated: true,
-    })
-    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
-    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
+    vi.when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
       .thenReturn({
         data: {
@@ -95,19 +78,9 @@ describe('SetupRobotCalibration', () => {
     vi.resetAllMocks()
   })
 
-  it('renders deck, pipette, and tip length calibration components', () => {
+  it('renders only pipette calibration component', () => {
     render()
-    screen.getByText('Mock SetupDeckCalibration')
     screen.getByText('Mock SetupInstrumentCalibration')
-    screen.getByText('Mock SetupTipLengthCalibration')
-  })
-
-  it('renders only pipette calibration component for Flex', () => {
-    when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(true)
-    render()
-    expect(screen.queryByText('Mock SetupDeckCalibration')).toBeNull()
-    screen.getByText('Mock SetupInstrumentCalibration')
-    expect(screen.queryByText('Mock SetupTipLengthCalibration')).toBeNull()
   })
 
   it('changes Proceed CTA copy based on next step', () => {
@@ -138,7 +111,7 @@ describe('SetupRobotCalibration', () => {
   })
 
   it('does not call the expandStep function on click if run has started', () => {
-    when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
+    vi.when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
     render()
     const button = screen.getByRole('button', {
       name: 'Proceed to deck hardware',

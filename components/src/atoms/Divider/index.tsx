@@ -1,10 +1,12 @@
-import { Box, COLORS, SPACING } from '../..'
+import { COLORS } from '../../helix-design-system'
+import { Box } from '../../primitives'
+import { SPACING } from '../../ui-style-constants'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 type Props = ComponentProps<typeof Box>
 
-export function Divider(props: Props): JSX.Element {
+export function Divider(props: Props): ReactNode {
   return (
     <Box
       borderBottom={`1px solid ${String(COLORS.grey30)}`}

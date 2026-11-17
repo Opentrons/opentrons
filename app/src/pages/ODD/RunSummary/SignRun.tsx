@@ -1,211 +1,168 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 import clsx from 'clsx'
 
-import {
-  ERROR_TOAST,
-  Icon,
-  StyledText,
-  TouchInputField,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { StyledText, Z_INDEX } from '@opentrons/components'
 
-import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
-import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
+import { useInsufficientPermissionsToast } from '/app/local-resources/access-control/useInsufficientPermissionsToast'
 import { showLoginModal } from '/app/organisms/ODD/OnDeviceLogin/LoginModal'
-import { useToaster } from '/app/organisms/ToasterOven'
 import { useLocalRobotName } from '/app/redux-resources/robots/hooks/useLocalRobotName'
 import { useSignRunFlow } from '/app/resources/access-control/useSignRunFlow'
 import { useCurrentRunId, useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import styles from './signrun.module.css'
 
-import type { KeyboardReactInterface } from 'react-simple-keyboard'
-
-// Above OnDeviceLogin overlay (z-index: 10001) so the toast is visible on login.
-const TOAST_ABOVE_LOGIN_Z_INDEX = 10002
+import type { ReactNode } from 'react'
+import type { DocumentationState } from '@opentrons/react-api-client'
 
 export function SignRun({
   runId,
+  documentationState,
   onSigned,
 }: {
   runId: string
+  documentationState: DocumentationState
   onSigned?: () => void
-}): JSX.Element {
-  const { t, i18n } = useTranslation(['access_control', 'shared'])
-
-  const [name, setName] = useState('')
-  const [nameError, setNameError] = useState(false)
-  const [keyboardExpanded, setKeyboardExpanded] = useState(true)
-
-  const keyboardRef = useRef<KeyboardReactInterface | null>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const permissionToastIdRef = useRef<string | null>(null)
+}): ReactNode {
+  const { t } = useTranslation('access_control')
 
   const robotName = useLocalRobotName() ?? 'no name'
-  const { makeToast, eatToast: eatToasterToast } = useToaster()
+  const { popToast, eatToast } = useInsufficientPermissionsToast()
 
-  const popToast = (): void => {
-    permissionToastIdRef.current = makeToast(
-      '' + t('sign_protocol_run_permission_required'),
-      ERROR_TOAST,
-      {
-        closeButton: true,
-        buttonText: i18n.format(t('shared:close'), 'capitalize'),
-        disableTimeout: true,
-        zIndex: TOAST_ABOVE_LOGIN_Z_INDEX,
-      }
-    )
-  }
+  const [signed, setSigned] = useState(false)
+  const [signError, setSignError] = useState(false)
 
-  const eatToast = (): void => {
-    if (permissionToastIdRef.current != null) {
-      eatToasterToast(permissionToastIdRef.current)
-      permissionToastIdRef.current = null
-    }
-  }
-
-  const { signRun, isLoading, loginGate, correctName } = useSignRunFlow(
+  const { signRun, isSigned, isLoading, loginGate, name } = useSignRunFlow(
     runId,
     robotName,
-    async () => await showLoginModal(),
+    // use a random key to rerender modal on logout and log back in
+    showLoginModal,
     popToast,
     eatToast,
+    documentationState,
+    true,
     onSigned
   )
 
-  const trimmedName = name.trim()
-
-  const signDisabled =
-    trimmedName === '' || isLoading || nameError || loginGate !== 'done'
+  useEffect(() => {
+    if (isSigned) {
+      onSigned?.()
+    }
+  }, [isSigned, onSigned])
 
   useEffect(() => {
-    if (inputRef.current != null) {
-      inputRef.current.focus()
+    if (signed && loginGate !== 'done') {
+      setSigned(false)
     }
-    keyboardRef.current?.setInput(name)
-  }, [name])
-
-  const handleNameChange = (value: string): void => {
-    setName(value)
-    setNameError(false)
-  }
-
-  const handleKeyboardToggle = (): void => {
-    setKeyboardExpanded(prev => !prev)
-  }
+  }, [loginGate, signed])
 
   const handleSign = (): void => {
-    if (trimmedName === '') {
+    if (!signed) {
+      setSignError(true)
       return
     }
 
-    if (trimmedName !== correctName) {
-      setNameError(true)
-      return
-    }
-
-    setNameError(false)
-    signRun(trimmedName)
+    setSignError(false)
+    signRun()
   }
 
   return (
-    <>
-      <div className={styles.container}>
-        <ChildNavigation
-          header={t('sign_protocol_run')}
-          buttonText={t('sign')}
-          onClickButton={handleSign}
-          buttonIsDisabled={signDisabled}
-        />
-        {isLoading ? (
-          <div className={styles.loading_container}>
-            <Icon
-              name="ot-spinner"
-              className={styles.spinner}
-              aria-label="spinner"
-              spin
-            />
-          </div>
-        ) : (
-          <div
-            className={clsx(styles.content_container, {
-              [styles.content_container_keyboard_expanded]: keyboardExpanded,
-              [styles.content_container_keyboard_collapsed]: !keyboardExpanded,
-            })}
-          >
-            <div className={styles.form_section}>
-              <StyledText oddStyle="bodyTextRegular">
-                {t('sign_protocol_run_description')}
-              </StyledText>
-              <TouchInputField
-                ref={inputRef}
-                autoFocus
-                type="text"
-                label={t('legal_name')}
-                value={name}
-                error={nameError ? t('sign_protocol_run_name_mismatch') : null}
-                textAlign={TYPOGRAPHY.textAlignCenter}
-                borderRadius="var(--border-radius-8)"
-                onChange={event => {
-                  handleNameChange(event.target.value)
+    <OddModal
+      header={{ title: t('sign_protocol_run') }}
+      modalZIndex={Z_INDEX.BLOCKING_MODALS}
+      key={name}
+    >
+      <div className={styles.content_container}>
+        <div className={styles.form_section}>
+          <StyledText oddStyle="bodyTextRegular">
+            {t('sign_protocol_run_description')}
+          </StyledText>
+          <div className={styles.signature_field_container}>
+            <div
+              className={clsx(styles.signature_field, {
+                [styles.signature_field_error]: signError,
+              })}
+            >
+              <button
+                type="button"
+                className={styles.signature_input_wrap}
+                aria-label={t('legal_name')}
+                aria-invalid={signError}
+                onClick={() => {
+                  if (loginGate === 'done') {
+                    setSigned(true)
+                    setSignError(false)
+                  }
                 }}
-              />
+              >
+                <span
+                  className={clsx(styles.signature_text, {
+                    [styles.signature_text_signed]: signed,
+                  })}
+                >
+                  {signed ? name : t('tap_to_sign')}
+                </span>
+              </button>
+              <span className={styles.signature_name}>{name ?? '  '}</span>
             </div>
+            {signError ? (
+              <span className={styles.signature_error_text} role="alert">
+                {t('signature_required')}
+              </span>
+            ) : null}
           </div>
-        )}
-      </div>
-      {!isLoading ? (
-        <div className={styles.keyboard_container}>
-          <AccordionKeyboard
-            isOpen={keyboardExpanded}
-            onToggle={handleKeyboardToggle}
-          >
-            <FullKeyboard
-              onChange={(input: string) => {
-                handleNameChange(input)
-                inputRef.current?.focus()
-              }}
-              keyboardRef={keyboardRef}
-            />
-          </AccordionKeyboard>
         </div>
-      ) : null}
-    </>
+        <SmallButton
+          buttonText={t('submit')}
+          onClick={handleSign}
+          width="100%"
+          iconName={isLoading ? 'ot-spinner' : undefined}
+          iconPlacement={isLoading ? 'endIcon' : undefined}
+          disabled={isLoading}
+        />
+      </div>
+    </OddModal>
   )
 }
 
-const SignRunModalImpl = NiceModal.create((): JSX.Element | null => {
-  const modal = useModal()
-  const runId = useCurrentRunId()
-  const { isFetched } = useNotifyAllRunsQuery({ pageLength: 0 })
+const SignRunModalImpl = NiceModal.create(
+  ({
+    documentationState,
+  }: {
+    documentationState: DocumentationState
+  }): JSX.Element | null => {
+    const modal = useModal()
+    const runId = useCurrentRunId()
+    const { isFetched } = useNotifyAllRunsQuery({ pageLength: 0 })
 
-  useEffect(() => {
-    if (isFetched && runId == null) {
-      modal.resolve(false)
-      modal.remove()
+    useEffect(() => {
+      if (isFetched && runId == null) {
+        modal.resolve(false)
+        modal.remove()
+      }
+    }, [isFetched, modal, runId])
+
+    if (runId == null) {
+      return null
     }
-  }, [isFetched, modal, runId])
 
-  if (runId == null) {
-    return null
-  }
-
-  return (
-    <div className={styles.overlay}>
+    return (
       <SignRun
         runId={runId}
+        documentationState={documentationState}
         onSigned={() => {
           modal.resolve(true)
           modal.remove()
         }}
       />
-    </div>
-  )
-})
+    )
+  }
+)
 
 /** Open the ODD sign-run modal and await whether the run was signed. */
-export const showSignRunModal = (): Promise<boolean> =>
-  NiceModal.show(SignRunModalImpl)
+export const showSignRunModal = (
+  documentationState: DocumentationState
+): Promise<boolean> => NiceModal.show(SignRunModalImpl, { documentationState })

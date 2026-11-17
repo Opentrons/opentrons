@@ -10,19 +10,20 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  LegacyStyledText,
   RadioButton,
   SPACING,
+  StyledText,
   truncateString,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useAllCsvFilesQuery } from '@opentrons/react-api-client'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { getShellUpdateDataFiles } from '/app/redux/shell'
 
 import { EmptyFile } from './EmptyFile'
 
+import type { ReactNode } from 'react'
 import type { CsvFileData } from '@opentrons/api-client'
 import type {
   CsvFileParameter,
@@ -46,7 +47,7 @@ export function ChooseCsvFile({
   handleGoBack,
   parameter,
   setParameter,
-}: ChooseCsvFileProps): JSX.Element {
+}: ChooseCsvFileProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
 
   // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
@@ -115,9 +116,9 @@ export function ChooseCsvFile({
       >
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing48}>
           <Flex css={CONTAINER_STYLE}>
-            <LegacyStyledText css={HEADER_TEXT_STYLE}>
+            <StyledText css={HEADER_TEXT_STYLE}>
               {t('csv_files_on_robot')}
-            </LegacyStyledText>
+            </StyledText>
             <Flex css={LIST_CONTAINER_STYLE}>
               {csvFilesOnRobot.length !== 0 ? (
                 csvFilesOnRobot.map((csv: CsvFileData) => (
@@ -143,9 +144,9 @@ export function ChooseCsvFile({
             </Flex>
           </Flex>
           <Flex css={CONTAINER_STYLE}>
-            <LegacyStyledText css={HEADER_TEXT_STYLE}>
+            <StyledText css={HEADER_TEXT_STYLE}>
               {t('csv_files_on_usb')}
-            </LegacyStyledText>
+            </StyledText>
             <Flex css={LIST_CONTAINER_STYLE}>
               {sortedCsvFilesOnUSB.length !== 0 ? (
                 sortedCsvFilesOnUSB.map(csvFilePath => {

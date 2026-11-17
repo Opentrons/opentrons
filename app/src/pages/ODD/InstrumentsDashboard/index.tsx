@@ -3,19 +3,19 @@ import { useState } from 'react'
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
+import { Navigation } from '/app/components/ODD/headers/Navigation'
 import { GripperWizardFlows } from '/app/organisms/GripperWizardFlows'
 import { AttachedInstrumentMountItem } from '/app/organisms/ODD/InstrumentMountItem'
-import { Navigation } from '/app/organisms/ODD/Navigation'
 import { PipetteRecalibrationODDWarning } from '/app/organisms/ODD/PipetteRecalibrationODDWarning'
 import { PipetteWizardFlows } from '/app/organisms/PipetteWizardFlows'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 
 const FETCH_PIPETTE_CAL_POLL = 10000
 
-export const InstrumentsDashboard = (): JSX.Element => {
+export const InstrumentsDashboard = (): ReactNode => {
   const { data: attachedInstruments } = useInstrumentsQuery({
     refetchInterval: FETCH_PIPETTE_CAL_POLL,
   })

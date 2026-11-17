@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections import OrderedDict
-from typing import TYPE_CHECKING, Dict, Optional
 
 import pytest
 from decoy import Decoy
@@ -12,7 +11,7 @@ from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
 from opentrons.config.robot_configs import build_config_ot3
 from opentrons.config.types import OT3Config
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
     Axis as HardwareAxis,
 )
@@ -20,7 +19,7 @@ from opentrons.hardware_control.types import (
     CriticalPoint,
 )
 from opentrons.motion_planning import Waypoint
-from opentrons.protocol_engine.errors import InvalidAxisForRobotType, MustHomeError
+from opentrons.protocol_engine.errors import MustHomeError
 from opentrons.protocol_engine.execution.gantry_mover import (
     VIRTUAL_MAX_OT3_HEIGHT,
     HardwareGantryMover,
@@ -37,15 +36,6 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.types import Mount, MountType, Point
 
-if TYPE_CHECKING:
-    from opentrons.hardware_control.ot3api import OT3API
-
-
-@pytest.fixture
-def mock_hardware_api(decoy: Decoy) -> HardwareAPI:
-    """Get a mock in the shape of a HardwareAPI."""
-    return decoy.mock(cls=HardwareAPI)
-
 
 @pytest.fixture
 def mock_state_view(decoy: Decoy) -> StateView:
@@ -57,6 +47,15 @@ def mock_state_view(decoy: Decoy) -> StateView:
 def mock_config() -> OT3Config:
     """Get a mock in the shape of a OT3Config."""
     return build_config_ot3({})
+
+
+HardwareAPI = HardwareControlAPI
+
+
+@pytest.fixture
+def mock_hardware_api(hardware_api: HardwareControlAPI) -> HardwareAPI:
+    """Dummy fixture to cut down on the diff."""
+    return hardware_api
 
 
 @pytest.fixture
@@ -334,34 +333,14 @@ async def test_home(
     decoy.verify(await mock_hardware_api.home(axes=[]), times=1)
 
 
-async def test_ot2_home_fails_with_ot3_axes(
-    decoy: Decoy,
-    mock_hardware_api: HardwareAPI,
-    hardware_subject: HardwareGantryMover,
-    mock_state_view: StateView,
-) -> None:
-    """It should raise an error when homing axes that don't exist on OT2."""
-    decoy.when(mock_state_view.config.robot_type).then_return("OT-2 Standard")
-    with pytest.raises(InvalidAxisForRobotType):
-        await hardware_subject.home(
-            axes=[
-                MotorAxis.LEFT_PLUNGER,
-                MotorAxis.RIGHT_PLUNGER,
-                MotorAxis.EXTENSION_Z,
-                MotorAxis.EXTENSION_JAW,
-            ]
-        )
-
-
-@pytest.mark.ot3_only
 async def test_home_on_ot3(
     decoy: Decoy,
-    ot3_hardware_api: OT3API,
+    mock_hardware_api: HardwareAPI,
     mock_state_view: StateView,
 ) -> None:
     """Test homing all OT3 axes."""
     subject = HardwareGantryMover(
-        state_view=mock_state_view, hardware_api=ot3_hardware_api
+        state_view=mock_state_view, hardware_api=mock_hardware_api
     )
     decoy.when(mock_state_view.config.robot_type).then_return("OT-3 Standard")
     await subject.home(
@@ -377,7 +356,7 @@ async def test_home_on_ot3(
         ]
     )
     decoy.verify(
-        await ot3_hardware_api.home(
+        await mock_hardware_api.home(
             axes=[
                 HardwareAxis.X,
                 HardwareAxis.Y,
@@ -407,31 +386,18 @@ async def test_retract_axis(
     )
 
 
-async def test_retract_axis_with_invalid_axis_for_ot2(
-    decoy: Decoy,
-    mock_hardware_api: HardwareAPI,
-    hardware_subject: HardwareGantryMover,
-    mock_state_view: StateView,
-) -> None:
-    """It should raise error when trying to retract an axis that's not valid on OT2."""
-    decoy.when(mock_state_view.config.robot_type).then_return("OT-2 Standard")
-    with pytest.raises(InvalidAxisForRobotType):
-        await hardware_subject.retract_axis(axis=MotorAxis.EXTENSION_Z)
-
-
-@pytest.mark.ot3_only
 async def test_retract_axis_on_ot3(
     decoy: Decoy,
-    ot3_hardware_api: OT3API,
+    mock_hardware_api: HardwareAPI,
     mock_state_view: StateView,
 ) -> None:
     """It should call OT3 hardware API's retract axis with specified axis."""
     subject = HardwareGantryMover(
-        state_view=mock_state_view, hardware_api=ot3_hardware_api
+        state_view=mock_state_view, hardware_api=mock_hardware_api
     )
     decoy.when(mock_state_view.config.robot_type).then_return("OT-3 Standard")
     await subject.retract_axis(MotorAxis.EXTENSION_Z)
-    decoy.verify(await ot3_hardware_api.retract_axis(axis=HardwareAxis.Z_G), times=1)
+    decoy.verify(await mock_hardware_api.retract_axis(axis=HardwareAxis.Z_G), times=1)
 
 
 # TODO(mc, 2022-12-01): this is overly complicated
@@ -528,22 +494,21 @@ async def test_home_z(
         ],
     ],
 )
-@pytest.mark.ot3_only
 async def test_move_axes(
     decoy: Decoy,
-    ot3_hardware_api: OT3API,
+    mock_hardware_api: HardwareAPI,
     mock_config: OT3Config,
     mock_state_view: StateView,
-    axis_map: Dict[MotorAxis, float],
-    critical_point: Optional[Dict[MotorAxis, float]],
+    axis_map: dict[MotorAxis, float],
+    critical_point: dict[MotorAxis, float] | None,
     expected_mount: Mount,
     relative_move: bool,
     call_to_hw: "OrderedDict[HardwareAxis, float]",
-    final_position: Dict[HardwareAxis, float],
+    final_position: dict[HardwareAxis, float],
 ) -> None:
     """Test the move axes function."""
     subject = HardwareGantryMover(
-        state_view=mock_state_view, hardware_api=ot3_hardware_api
+        state_view=mock_state_view, hardware_api=mock_hardware_api
     )
     curr_pos = {
         HardwareAxis.X: 10.0,
@@ -553,7 +518,7 @@ async def test_move_axes(
     }
     call_count = 0
 
-    def _current_position(mount: Mount, refresh: bool) -> Dict[HardwareAxis, float]:
+    def _current_position(mount: Mount, refresh: bool) -> dict[HardwareAxis, float]:
         nonlocal call_count
         nonlocal curr_pos
         nonlocal final_position
@@ -564,26 +529,26 @@ async def test_move_axes(
             return final_position
 
     decoy.when(
-        await ot3_hardware_api.current_position(expected_mount, refresh=True)
+        await mock_hardware_api.current_position(expected_mount, refresh=True)
     ).then_do(_current_position)
 
-    decoy.when(ot3_hardware_api.config).then_return(mock_config)
+    decoy.when(mock_hardware_api.config).then_return(mock_config)
     mock_config.left_mount_offset = Point(1, 1, 1)
     mock_config.right_mount_offset = Point(10, 10, 10)
     mock_config.gripper_mount_offset = Point(0.5, 0.5, 0.5)
 
-    decoy.when(ot3_hardware_api.get_deck_from_machine(curr_pos)).then_return(curr_pos)
+    decoy.when(mock_hardware_api.get_deck_from_machine(curr_pos)).then_return(curr_pos)
 
-    decoy.when(ot3_hardware_api.get_deck_from_machine(final_position)).then_return(
+    decoy.when(mock_hardware_api.get_deck_from_machine(final_position)).then_return(
         final_position
     )
     if not critical_point:
-        decoy.when(ot3_hardware_api.critical_point_for(expected_mount)).then_return(
+        decoy.when(mock_hardware_api.critical_point_for(expected_mount)).then_return(
             Point(1, 1, 1)
         )
     pos = await subject.move_axes(axis_map, critical_point, 100, relative_move)
     decoy.verify(
-        await ot3_hardware_api.move_axes(
+        await mock_hardware_api.move_axes(
             position=call_to_hw, speed=100, expect_stalls=False
         ),
         times=1,
@@ -620,25 +585,6 @@ async def test_virtual_get_position_default(
     result = await virtual_subject.get_position("pipette-id")
 
     assert result == Point(x=0, y=0, z=0)
-
-
-def test_virtual_get_max_travel_z_ot2(
-    decoy: Decoy,
-    mock_state_view: StateView,
-    virtual_subject: VirtualGantryMover,
-) -> None:
-    """It should get the max travel z height with the state store for an OT-2."""
-    decoy.when(mock_state_view.config.robot_type).then_return("OT-2 Standard")
-    decoy.when(
-        mock_state_view.pipettes.get_instrument_max_height_ot2("pipette-id")
-    ).then_return(42)
-    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
-        TipGeometry(length=20, diameter=0, volume=0)
-    )
-
-    result = virtual_subject.get_max_travel_z("pipette-id")
-
-    assert result == 22.0
 
 
 def test_virtual_get_max_travel_z_ot3(
@@ -718,10 +664,10 @@ async def test_virtual_move_to(
 async def test_virtual_move_axes(
     decoy: Decoy,
     virtual_subject: VirtualGantryMover,
-    axis_map: Dict[MotorAxis, float],
-    critical_point: Optional[Dict[MotorAxis, float]],
+    axis_map: dict[MotorAxis, float],
+    critical_point: dict[MotorAxis, float] | None,
     relative_move: bool,
-    expected_position: Dict[MotorAxis, float],
+    expected_position: dict[MotorAxis, float],
 ) -> None:
     """It should simulate moving a set of axis by a certain distance."""
     pos = await virtual_subject.move_axes(axis_map, critical_point, 100, relative_move)

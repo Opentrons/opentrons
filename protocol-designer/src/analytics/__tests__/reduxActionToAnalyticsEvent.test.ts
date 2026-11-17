@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import {
   getFileMetadata,
@@ -179,7 +178,7 @@ describe('reduxActionToAnalyticsEvent', () => {
       }
     })
     it('should create a saveStepsMulti action with additional properties and stepType moveLiquid', () => {
-      when(vi.mocked(getSavedStepForms))
+      vi.when(vi.mocked(getSavedStepForms))
         .calledWith(expect.anything())
         .thenReturn({
           // @ts-expect-error missing fields from test object
@@ -209,7 +208,7 @@ describe('reduxActionToAnalyticsEvent', () => {
       })
     })
     it('should create a saveStepsMulti action with additional properties and stepType mix', () => {
-      when(vi.mocked(getSavedStepForms))
+      vi.when(vi.mocked(getSavedStepForms))
         .calledWith(expect.anything())
         .thenReturn({
           // @ts-expect-error missing fields from test object
@@ -239,7 +238,7 @@ describe('reduxActionToAnalyticsEvent', () => {
       })
     })
     it('should create a saveStepsMulti action with additional properties and null steptype (mixed case)', () => {
-      when(vi.mocked(getSavedStepForms))
+      vi.when(vi.mocked(getSavedStepForms))
         .calledWith(expect.anything())
         .thenReturn({
           // @ts-expect-error missing fields from test object

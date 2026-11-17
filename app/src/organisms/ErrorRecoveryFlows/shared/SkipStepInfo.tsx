@@ -1,13 +1,14 @@
 import { Trans, useTranslation } from 'react-i18next'
 
-import { LegacyStyledText } from '@opentrons/components'
+import { StyledText } from '@opentrons/components'
 
 import { RECOVERY_MAP } from '../constants'
 import { TwoColTextAndFailedStepNextStep } from './TwoColTextAndFailedStepNextStep'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
-export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
+export function SkipStepInfo(props: RecoveryContentProps): ReactNode {
   const {
     failedCommand,
     recoveryCommands,
@@ -126,7 +127,7 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
         t={t}
         i18nKey={buildBodyCopyKey()}
         components={{
-          block: <LegacyStyledText forwardedAs="p" />,
+          block: <StyledText forwardedAs="p" />,
         }}
       />
     )

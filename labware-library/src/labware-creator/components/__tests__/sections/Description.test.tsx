@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -24,7 +23,7 @@ describe('Description', () => {
       onSubmit: vi.fn(),
     }
 
-    when(vi.mocked(isEveryFieldHidden))
+    vi.when(vi.mocked(isEveryFieldHidden))
       .calledWith(
         ['brand', 'brandId', 'groupBrand', 'groupBrandId'],
         formikConfig.initialValues
@@ -80,7 +79,7 @@ describe('Description', () => {
   })
 
   it('should not render when all of the fields are hidden', () => {
-    when(vi.mocked(isEveryFieldHidden))
+    vi.when(vi.mocked(isEveryFieldHidden))
       .calledWith(
         ['brand', 'brandId', 'groupBrand', 'groupBrandId'],
         formikConfig.initialValues

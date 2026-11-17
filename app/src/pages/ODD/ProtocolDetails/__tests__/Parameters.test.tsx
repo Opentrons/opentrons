@@ -1,6 +1,5 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -28,7 +27,7 @@ describe('Parameters', () => {
     props = {
       protocolId: 'mockId',
     }
-    when(useToaster)
+    vi.when(useToaster)
       .calledWith()
       .thenReturn({
         makeSnackBar: MOCK_MAKE_SNACK_BAR,

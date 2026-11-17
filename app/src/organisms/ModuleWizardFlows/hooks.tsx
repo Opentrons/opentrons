@@ -41,7 +41,7 @@ export function useSendIdentifyModule(
           },
         },
       }).catch(error => {
-        console.log(error.message)
+        console.error(`error in send identify module: ${error.message}`)
       })
     },
     [createLiveCommand]

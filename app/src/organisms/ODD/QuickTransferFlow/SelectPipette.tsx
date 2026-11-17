@@ -11,14 +11,14 @@ import {
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { usePipetteSpecsV2 } from '/app/local-resources/instruments'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import { ACTIONS } from './constants'
 
-import type { ComponentProps, Dispatch } from 'react'
+import type { ComponentProps, Dispatch, ReactNode } from 'react'
 import type { Mount, PipetteData } from '@opentrons/api-client'
-import type { SmallButton } from '/app/atoms/buttons'
+import type { SmallButton } from '/app/components/ODD/buttons'
 import type {
   QuickTransferWizardAction,
   QuickTransferWizardState,
@@ -32,7 +32,7 @@ interface SelectPipetteProps {
   dispatch: Dispatch<QuickTransferWizardAction>
 }
 
-export function SelectPipette(props: SelectPipetteProps): JSX.Element {
+export function SelectPipette(props: SelectPipetteProps): ReactNode {
   const { onNext, onBack, exitButtonProps, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const { data: attachedInstruments } = useInstrumentsQuery()

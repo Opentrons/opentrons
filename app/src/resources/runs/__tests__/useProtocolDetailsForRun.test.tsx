@@ -1,6 +1,5 @@
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import {
   useProtocolAnalysisAsDocumentQuery,
@@ -39,13 +38,13 @@ const PROTOCOL_RESPONSE = {
 
 describe('useProtocolDetailsForRun hook', () => {
   beforeEach(() => {
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(null, { staleTime: Infinity })
       .thenReturn({} as UseQueryResult<Run>)
-    when(vi.mocked(useProtocolQuery))
+    vi.when(vi.mocked(useProtocolQuery))
       .calledWith(null, { staleTime: Infinity })
       .thenReturn({} as UseQueryResult<Protocol>)
-    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+    vi.when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(null, null, { enabled: false, refetchInterval: 5000 })
       .thenReturn({
         data: null,
@@ -65,15 +64,15 @@ describe('useProtocolDetailsForRun hook', () => {
   })
 
   it('returns the protocol file when given a run id', async () => {
-    when(vi.mocked(useNotifyRunQuery))
+    vi.when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID_2, { staleTime: Infinity })
       .thenReturn({
         data: { data: { protocolId: PROTOCOL_ID } } as any,
       } as UseQueryResult<Run>)
-    when(vi.mocked(useProtocolQuery))
+    vi.when(vi.mocked(useProtocolQuery))
       .calledWith(PROTOCOL_ID, { staleTime: Infinity })
       .thenReturn({ data: PROTOCOL_RESPONSE } as UseQueryResult<Protocol>)
-    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+    vi.when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, 'fake analysis', {
         enabled: true,
         refetchInterval: 5000,
@@ -81,7 +80,7 @@ describe('useProtocolDetailsForRun hook', () => {
       .thenReturn({
         data: PROTOCOL_ANALYSIS,
       } as UseQueryResult<CompletedProtocolAnalysis | null>)
-    when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
+    vi.when(vi.mocked(useProtocolAnalysisAsDocumentQuery))
       .calledWith(PROTOCOL_ID, 'fake analysis', {
         enabled: false,
         refetchInterval: 5000,

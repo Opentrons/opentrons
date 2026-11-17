@@ -9,19 +9,18 @@ import {
   COLORS,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
+import { SimpleWizardBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { SmallButton } from '/app/components/ODD/buttons'
 
 interface ProbeNotAttachedProps {
   handleOnClick: () => void
-  setShowUnableToDetect: (ableToDetect: boolean) => void
+  dismissError: () => void
   isOnDevice: boolean
 }
 
@@ -31,7 +30,7 @@ export const ProbeNotAttached = (
   props: ProbeNotAttachedProps
 ): JSX.Element | null => {
   const { t } = useTranslation(['pipette_wizard_flows', 'shared', 'branded'])
-  const { isOnDevice, handleOnClick, setShowUnableToDetect } = props
+  const { isOnDevice, handleOnClick, dismissError } = props
   const [numberOfTryAgains, setNumberOfTryAgains] = useState<number>(0)
 
   return (
@@ -51,12 +50,17 @@ export const ProbeNotAttached = (
       >
         <Btn
           onClick={() => {
-            setShowUnableToDetect(false)
+            dismissError()
           }}
         >
-          <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
+          <StyledText
+            desktopStyle="bodyDefaultSemiBold"
+            oddStyle="bodyTextSemiBold"
+            color={COLORS.grey50}
+            paddingLeft={SPACING.spacing32}
+          >
             {t('shared:go_back')}
-          </LegacyStyledText>
+          </StyledText>
         </Btn>
         {isOnDevice ? (
           <SmallButton
@@ -86,23 +90,5 @@ const ALIGN_BUTTONS = css`
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     align-items: ${ALIGN_CENTER};
-  }
-`
-const GO_BACK_BUTTON_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.grey50};
-  padding-left: ${SPACING.spacing32};
-
-  &:hover {
-    opacity: 70%;
-  }
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-    font-size: ${TYPOGRAPHY.fontSize22};
-    padding-left: 0rem;
-    &:hover {
-      opacity: 100%;
-    }
   }
 `

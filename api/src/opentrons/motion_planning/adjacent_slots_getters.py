@@ -150,6 +150,38 @@ def get_surrounding_staging_slots(deck_slot: DeckSlotName) -> List[StagingSlotNa
     return _SURROUNDING_STAGING_SLOTS_MAP.get(deck_slot, [])
 
 
+# A4 is north. North of a staging slot is the previous entry.
+_STAGING_COLUMN: List[StagingSlotName] = [
+    StagingSlotName.SLOT_A4,
+    StagingSlotName.SLOT_B4,
+    StagingSlotName.SLOT_C4,
+    StagingSlotName.SLOT_D4,
+]
+
+
+def get_north_staging_slot(slot: StagingSlotName) -> Optional[StagingSlotName]:
+    """Get the staging slot north of the given staging slot."""
+    index = _STAGING_COLUMN.index(slot)
+    if index == 0:
+        return None
+    return _STAGING_COLUMN[index - 1]
+
+
+def get_south_staging_slot(slot: StagingSlotName) -> Optional[StagingSlotName]:
+    """Get the staging slot south of the given staging slot."""
+    index = _STAGING_COLUMN.index(slot)
+    if index + 1 == len(_STAGING_COLUMN):
+        return None
+    return _STAGING_COLUMN[index + 1]
+
+
+def get_north_south_staging_slots(slot: StagingSlotName) -> List[StagingSlotName]:
+    """Get staging slots north and south of the given staging slot."""
+    north = get_north_staging_slot(slot)
+    south = get_south_staging_slot(slot)
+    return [maybe_slot for maybe_slot in [north, south] if maybe_slot is not None]
+
+
 def get_east_west_slots(slot: int) -> List[int]:
     """Get slots east & west of the given slot."""
     east = get_east_slot(slot)

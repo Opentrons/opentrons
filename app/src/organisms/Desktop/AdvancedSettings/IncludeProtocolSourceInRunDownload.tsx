@@ -6,20 +6,21 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
 import {
   getIncludeProtocolSourceInRunDownload,
   updateConfigValue,
 } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
-export function IncludeProtocolSourceInRunDownload(): JSX.Element {
+export function IncludeProtocolSourceInRunDownload(): ReactNode {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
   const includeProtocolSourceInRunDownload = useSelector(
@@ -38,15 +39,16 @@ export function IncludeProtocolSourceInRunDownload(): JSX.Element {
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.h3SemiBold}
+        <StyledText
+          forwardedAs="h3"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing8}
         >
           {t('include_protocol_source_in_run_download')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        </StyledText>
+        <StyledText forwardedAs="p">
           {t('include_protocol_source_in_run_download_description')}
-        </LegacyStyledText>
+        </StyledText>
       </Box>
       <ToggleButton
         label="include_protocol_source_in_run_download"

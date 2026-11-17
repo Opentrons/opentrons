@@ -118,6 +118,16 @@ export function tipVolumeExceeded(args: {
   }
 }
 
+export function invalidRuntimeParameter(args: {
+  parameterName: string
+}): CommandCreatorError {
+  const { parameterName } = args
+  return {
+    message: `Runtime parameter "${parameterName}" is missing`,
+    type: 'INVALID_RUNTIME_PARAMETER',
+  }
+}
+
 export function pipetteVolumeExceeded(args: {
   actionName: string
   volume: string | number

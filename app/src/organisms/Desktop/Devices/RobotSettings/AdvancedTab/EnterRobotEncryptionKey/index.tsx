@@ -2,15 +2,17 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
-import { LegacyStyledText, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import { SPACING, StyledText, TYPOGRAPHY } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { TertiaryButton } from '/app/atoms/buttons'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import { RobotCertImportModal } from '/app/organisms/Desktop/RobotCertImport/RobotCertImportModal'
 
 import styles from './index.module.css'
 
-export function EnterRobotEncryptionKey(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function EnterRobotEncryptionKey(): ReactNode {
   const { t } = useTranslation('device_settings')
   const [showModal, setShowRobotCertImportModal] = useState(false)
 
@@ -28,15 +30,16 @@ export function EnterRobotEncryptionKey(): JSX.Element {
         : null}
       <div className={styles.container}>
         <div className={styles.text_container}>
-          <LegacyStyledText
-            css={TYPOGRAPHY.pSemiBold}
+          <StyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             marginBottom={SPACING.spacing4}
           >
             {t('encryption_key_title')}
-          </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
+          </StyledText>
+          <StyledText forwardedAs="p">
             {t('encryption_key_description')}
-          </LegacyStyledText>
+          </StyledText>
         </div>
         <TertiaryButton
           onClick={() => {

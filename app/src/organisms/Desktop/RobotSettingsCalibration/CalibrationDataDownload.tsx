@@ -6,17 +6,18 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '/app/atoms/buttons'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
+import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { useDownloadCalibrationData } from '/app/resources/devices/hooks'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 
 // TODO(bc, 2022-02-08): replace with support article when available
 const FLEX_CALIBRATION_SUPPORT_URL = 'https://support.opentrons.com'
@@ -31,14 +32,18 @@ interface CalibrationDataDownloadProps {
 export function CalibrationDataDownload({
   robotName,
   setShowHowCalibrationWorksModal,
-}: CalibrationDataDownloadProps): JSX.Element {
+}: CalibrationDataDownloadProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'robot_calibration'])
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
   const { downloadCalibration } = useDownloadCalibrationData(robotName)
 
   const onClickSaveAs: MouseEventHandler = e => {
     e.preventDefault()
-    void downloadCalibration()
+    void downloadCalibration().catch((error: unknown) => {
+      if (!isFileSaveCanceledError(error)) {
+        throw error
+      }
+    })
   }
 
   return (
@@ -48,17 +53,14 @@ export function CalibrationDataDownload({
       gridGap={SPACING.spacing40}
     >
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText
-          forwardedAs="h3"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        >
+        <StyledText forwardedAs="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('about_calibration_title')}
-        </LegacyStyledText>
+        </StyledText>
         <Trans
           t={t}
           i18nKey="about_calibration_description_ot3"
           components={{
-            block: <LegacyStyledText forwardedAs="p" />,
+            block: <StyledText forwardedAs="p" />,
           }}
         />
         <Link

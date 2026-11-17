@@ -184,6 +184,12 @@ export function getRobotUpdateAvailable(
     : getRobotUpdateType(currentVersion, updateVersion)
 }
 
+export function isRobotSoftwareUpdateAvailable(
+  updateType: RobotUpdateType | string | null
+): boolean {
+  return updateType === Constants.UPGRADE || updateType === Constants.DOWNGRADE
+}
+
 // this util returns i18n keys in device_settings
 export const getRobotUpdateDisplayInfo: (
   state: State,

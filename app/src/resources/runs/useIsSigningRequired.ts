@@ -23,20 +23,22 @@ export function useIsSigningRequired(): {
     data: accessControlSettings,
     isLoading: isAccessControlSettingsLoading,
   } = useGetRobotServerAccessControlSettingsQuery()
+  const accessControlOn =
+    accessControlEnabled?.data.accessControlEnabled ?? false
+  const requireSignoff =
+    accessControlSettings?.data.requireSignoffForProtocolLog ?? false
   const isSigningRequired =
-    (accessControlEnabled?.data.accessControlEnabled ?? false) &&
-    (accessControlSettings?.data.requireSignoffForProtocolLog ?? false)
-  const hasSignedBy = !!runRecord?.data.signedBy
+    accessControlOn && requireSignoff && !runRecord?.data.signedBy
 
   return {
     isLoading:
-      isRunRecordLoading ||
       isAccessControlEnabledLoading ||
-      isAccessControlSettingsLoading,
-    isSigningRequired: isSigningRequired && !hasSignedBy,
+      (accessControlOn && isAccessControlSettingsLoading) ||
+      (accessControlOn && requireSignoff && isRunRecordLoading),
+    isSigningRequired,
     isDownloadingRequired:
-      !!accessControlEnabled?.data.accessControlEnabled &&
-      !!accessControlSettings?.data.requireLogsToBeSavedInApp,
+      accessControlOn &&
+      (accessControlSettings?.data.requireLogsToBeSavedInApp ?? false),
     logPeriodId: runRecord?.data.logPeriodId ?? null,
   }
 }

@@ -21,9 +21,9 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
+import { ODDFixtureOption } from '/app/components/adhoc/ODD/ODDFixtureOption'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useModuleUSBPort } from '/app/local-resources/modules'
-import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
-import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration/'
 
 import {
@@ -34,6 +34,7 @@ import {
 import { useSendIdentifyModule } from '../ModuleWizardFlows/hooks'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { ModalProps } from '@opentrons/components'
 import type {
@@ -45,7 +46,7 @@ import type {
   DeckConfiguration,
   DeckDefinition,
 } from '@opentrons/shared-data'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 
 const FLEX_STACKER_FIXTURE = 'flexStackerModuleV1'
 const MODULE_IDENTIFY_TIME_MS = 10000
@@ -74,7 +75,7 @@ export function AddFixtureModal({
   deckDef,
   existingCutoutFixtureId,
   updateDeckConfiguration,
-}: AddFixtureModalProps): JSX.Element {
+}: AddFixtureModalProps): ReactNode {
   const { t } = useTranslation([
     'device_details',
     'shared',

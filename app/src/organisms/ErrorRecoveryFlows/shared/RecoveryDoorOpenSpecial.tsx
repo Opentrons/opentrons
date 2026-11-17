@@ -20,6 +20,7 @@ import { RECOVERY_MAP } from '../constants'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 
+import type { ReactNode } from 'react'
 import type {
   RecoveryContentProps,
   RecoveryRoute,
@@ -36,7 +37,7 @@ export function RecoveryDoorOpenSpecial({
   routeUpdateActions,
   doorStatusUtils,
   recoveryCommands,
-}: RecoveryContentProps): JSX.Element {
+}: RecoveryContentProps): ReactNode {
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { resumeRecovery } = recoveryActionMutationUtils
   const { proceedToRouteAndStep, handleMotionRouting } = routeUpdateActions

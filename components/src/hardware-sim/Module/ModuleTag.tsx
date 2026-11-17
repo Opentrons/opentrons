@@ -16,7 +16,7 @@ export interface ModuleTagProps {
   children: ReactNode
 }
 
-export const ModuleTag = (props: ModuleTagProps): JSX.Element => {
+export const ModuleTag = (props: ModuleTagProps): ReactNode => {
   const { x, y, height, width, children } = props
 
   return (

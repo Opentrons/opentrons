@@ -1,7 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-
 import { getActivePipetteId } from '/app/organisms/LabwarePositionCheck/LPCFlows/hooks/utils'
 
 import { getUniqueValidLwLocationInfoByAnalysis } from '..'
@@ -34,7 +32,6 @@ describe('getUniqueValidLwLocationInfoByAnalysis', () => {
     const result = getUniqueValidLwLocationInfoByAnalysis({
       protocolData: null,
       labwareDefs: MOCK_LABWARE_DEFS,
-      robotType: FLEX_ROBOT_TYPE,
     })
 
     expect(result).toEqual([])
@@ -45,7 +42,6 @@ describe('getUniqueValidLwLocationInfoByAnalysis', () => {
     const result = getUniqueValidLwLocationInfoByAnalysis({
       protocolData: MOCK_PROTOCOL_DATA,
       labwareDefs: null,
-      robotType: FLEX_ROBOT_TYPE,
     })
 
     expect(result).toEqual([])
@@ -58,18 +54,6 @@ describe('getUniqueValidLwLocationInfoByAnalysis', () => {
     const result = getUniqueValidLwLocationInfoByAnalysis({
       protocolData: MOCK_PROTOCOL_DATA,
       labwareDefs: MOCK_LABWARE_DEFS,
-      robotType: FLEX_ROBOT_TYPE,
-    })
-
-    expect(result).toEqual([])
-    expect(getLPCUniqValidLabwareLocationInfo).not.toHaveBeenCalled()
-  })
-
-  it('should return empty array when robotType is not FLEX_ROBOT_TYPE', () => {
-    const result = getUniqueValidLwLocationInfoByAnalysis({
-      protocolData: MOCK_PROTOCOL_DATA,
-      labwareDefs: MOCK_LABWARE_DEFS,
-      robotType: OT2_ROBOT_TYPE,
     })
 
     expect(result).toEqual([])
@@ -80,7 +64,6 @@ describe('getUniqueValidLwLocationInfoByAnalysis', () => {
     const result = getUniqueValidLwLocationInfoByAnalysis({
       protocolData: MOCK_PROTOCOL_DATA,
       labwareDefs: MOCK_LABWARE_DEFS,
-      robotType: FLEX_ROBOT_TYPE,
     })
 
     expect(result).toEqual(MOCK_LW_LOCATION_INFOS)
@@ -99,7 +82,6 @@ describe('getUniqueValidLwLocationInfoByAnalysis', () => {
     getUniqueValidLwLocationInfoByAnalysis({
       protocolData: protocolDataWithoutPipettes,
       labwareDefs: MOCK_LABWARE_DEFS,
-      robotType: FLEX_ROBOT_TYPE,
     } as any)
 
     expect(getActivePipetteId).toHaveBeenCalledWith([])

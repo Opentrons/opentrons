@@ -14,7 +14,7 @@ import { DeckViewOverlay } from './DeckViewOverlay'
 import { LabwareCommandSummary } from './LabwareCommandSummary'
 import { LabwareOnDeck } from './LabwareOnDeck'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   CoordinateTuple,
   DeckDefinition,
@@ -52,7 +52,7 @@ interface DeckViewStackerProps {
   renderLabware?: boolean
 }
 
-export function DeckViewStacker(props: DeckViewStackerProps): JSX.Element {
+export function DeckViewStacker(props: DeckViewStackerProps): ReactNode {
   const {
     robotState,
     invariantContext,

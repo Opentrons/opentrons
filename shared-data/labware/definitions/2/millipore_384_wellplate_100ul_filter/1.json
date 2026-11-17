@@ -440,7 +440,7 @@
   },
   "metadata": {
     "displayName": "Millipore 384 Well Plate 100µL",
-    "displayCategory": "wellPlate",
+    "displayCategory": "filterPlate",
     "displayVolumeUnits": "\u00b5L",
     "tags": []
   },
@@ -4700,6 +4700,8 @@
     "y": 0,
     "z": 0
   },
+  "gripForce": 15,
+  "gripHeightFromLabwareBottom": 11.85,
   "stackingOffsetWithLabware": {
     "default": {
       "x": 0,

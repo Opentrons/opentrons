@@ -8,7 +8,9 @@ import {
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 
-import { ODD_FOCUS_VISIBLE } from '/app/atoms/buttons/constants'
+import { ODD_FOCUS_VISIBLE } from '/app/components/adhoc/shared/buttons/constants'
+
+import type { ReactNode } from 'react'
 
 const STOP_BUTTON_STYLE = css`
   -webkit-tap-highlight-color: transparent;
@@ -50,7 +52,7 @@ export function StopButton({
   onStop,
   buttonSize = '12.5rem',
   iconSize = '5rem',
-}: StopButtonProps): JSX.Element {
+}: StopButtonProps): ReactNode {
   return (
     <Btn
       css={STOP_BUTTON_STYLE}

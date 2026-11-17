@@ -14,6 +14,7 @@
   "disclaimer": "OpentronsAI can make mistakes. Review your protocol before running it on an Opentrons robot.",
   "download": "Download as .py file",
   "drag_and_drop": "Drag and drop or <a>browse</a> your files",
+  "error_auth_token": "Sign-in could not obtain an API token. Log out and sign in again. For local dev, ensure Auth0 consent includes the sandbox-ai-api audience (see opentrons-ai-client/README.md).",
   "error_connection": "Could not reach the AI service.",
   "error_context_length": "Your request is too large for the AI to process. Try removing attached files or shortening your message.",
   "error_dismiss": "Dismiss",

@@ -19,6 +19,8 @@ import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
 import { LINK_BUTTON_STYLE } from '../../components/atoms'
 
+import type { ReactNode } from 'react'
+
 interface MetadataItem {
   title: string
   value: string | null
@@ -32,7 +34,7 @@ interface ProtocolMetadataProps {
 export function ProtocolMetadata({
   setShowEditMetadataModal,
   metaDataInfo,
-}: ProtocolMetadataProps): JSX.Element {
+}: ProtocolMetadataProps): ReactNode {
   const { t } = useTranslation('protocol_overview')
 
   return (

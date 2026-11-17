@@ -33,37 +33,79 @@ type OpentronsAIBaseArgs<T extends LatestCommandSchemaCommandType> =
     commandCreatorFnName: T
   } & ParamsForOpentronsAICommand<T>
 
-export interface AirGapInPlaceArgs extends OpentronsAIBaseArgs<'airGapInPlace'> {}
+/**
+ * Runtime parameters are passed as their names. Any arg that is not already a
+ * string can also be that name. `commandCreatorFnName` and CommonArgs stay put.
+ */
+type RuntimeParameterValue<T> = T extends any
+  ? string extends T
+    ? T
+    : T extends null | undefined
+      ? T
+      : T extends readonly [unknown, ...unknown[]]
+        ? { [K in keyof T]: RuntimeParameterValue<T[K]> }
+        : T extends ReadonlyArray<infer U>
+          ? Array<RuntimeParameterValue<U>>
+          : T extends object
+            ? { [K in keyof T]: RuntimeParameterValue<T[K]> }
+            : T | string
+  : never
+
+export type WithRuntimeParameterStrings<T> = {
+  [K in keyof T]: K extends
+    'commandCreatorFnName' | 'stepNumber' | 'name' | 'description'
+    ? T[K]
+    : RuntimeParameterValue<T[K]>
+}
+
+type RuntimeParameterArgs<T extends LatestCommandSchemaCommandType> =
+  WithRuntimeParameterStrings<OpentronsAIBaseArgs<T>>
+
+export type AirGapInPlaceArgs = RuntimeParameterArgs<'airGapInPlace'>
 export interface AspirateArgs extends OpentronsAIBaseArgs<'aspirate'> {}
-export interface AspirateInPlaceArgs extends OpentronsAIBaseArgs<'aspirateInPlace'> {}
-export interface AspirateWhileTrackingArgs extends OpentronsAIBaseArgs<'aspirateWhileTracking'> {}
-export interface BlowOutInPlaceArgs extends OpentronsAIBaseArgs<'blowOutInPlace'> {}
+export type AspirateInPlaceArgs = RuntimeParameterArgs<'aspirateInPlace'>
+export type AspirateWhileTrackingArgs =
+  RuntimeParameterArgs<'aspirateWhileTracking'>
+export type BlowOutInPlaceArgs = RuntimeParameterArgs<'blowOutInPlace'>
 export interface BlowoutArgs extends OpentronsAIBaseArgs<'blowout'> {}
-export interface ConfigureForVolumeArgs extends OpentronsAIBaseArgs<'configureForVolume'> {}
-export interface ConfigureNozzleLayoutArgs extends OpentronsAIBaseArgs<'configureNozzleLayout'> {}
-export interface DispenseInPlaceArgs extends OpentronsAIBaseArgs<'dispenseInPlace'> {}
-export interface DispenseWhileTrackingArgs extends OpentronsAIBaseArgs<'dispenseWhileTracking'> {}
-export interface DropTipInPlaceArgs extends OpentronsAIBaseArgs<'dropTipInPlace'> {}
-export interface HomeArgs extends OpentronsAIBaseArgs<'home'> {}
-export interface MoveRelativeArgs extends OpentronsAIBaseArgs<'moveRelative'> {}
-export interface MoveToAddressableAreaForDropTipArgs extends OpentronsAIBaseArgs<'moveToAddressableAreaForDropTip'> {}
-export interface MoveToCoordinatesArgs extends OpentronsAIBaseArgs<'moveToCoordinates'> {}
-export interface MoveToWellArgs extends OpentronsAIBaseArgs<'moveToWell'> {}
-export interface PrepareToAspirateArgs extends OpentronsAIBaseArgs<'prepareToAspirate'> {}
-export interface TryLiquidProbeArgs extends OpentronsAIBaseArgs<'tryLiquidProbe'> {}
+export type ConfigureForVolumeArgs = RuntimeParameterArgs<'configureForVolume'>
+export type ConfigureNozzleLayoutArgs =
+  RuntimeParameterArgs<'configureNozzleLayout'>
+export type DispenseInPlaceArgs = RuntimeParameterArgs<'dispenseInPlace'>
+export type DispenseWhileTrackingArgs =
+  RuntimeParameterArgs<'dispenseWhileTracking'>
+export type DropTipInPlaceArgs = RuntimeParameterArgs<'dropTipInPlace'>
+export type HomeArgs = RuntimeParameterArgs<'home'>
+export type MoveRelativeArgs = RuntimeParameterArgs<'moveRelative'>
+export type MoveToAddressableAreaForDropTipArgs =
+  RuntimeParameterArgs<'moveToAddressableAreaForDropTip'>
+export type MoveToCoordinatesArgs = RuntimeParameterArgs<'moveToCoordinates'>
+export type MoveToWellArgs = RuntimeParameterArgs<'moveToWell'>
+export type PrepareToAspirateArgs = RuntimeParameterArgs<'prepareToAspirate'>
+export type TryLiquidProbeArgs = RuntimeParameterArgs<'tryLiquidProbe'>
 export interface VerifyTipPresenceArgs extends OpentronsAIBaseArgs<'verifyTipPresence'> {}
-export interface HeaterShakerCloseLabwareLatchArgs extends OpentronsAIBaseArgs<'heaterShaker/closeLabwareLatch'> {}
-export interface HeaterShakerSetAndWaitForShakeSpeedArgs extends OpentronsAIBaseArgs<'heaterShaker/setAndWaitForShakeSpeed'> {}
-export interface HeaterShakerDeactiveHeaterArgs extends OpentronsAIBaseArgs<'heaterShaker/deactivateHeater'> {}
-export interface HeaterShakerOpenLabwareLatchArgs extends OpentronsAIBaseArgs<'heaterShaker/openLabwareLatch'> {}
-export interface HeaterShakerDeactivateShakerArgs extends OpentronsAIBaseArgs<'heaterShaker/deactivateShaker'> {}
-export interface TCSetTargetBlockTemperatureArgs extends OpentronsAIBaseArgs<'thermocycler/setTargetBlockTemperature'> {}
-export interface TCSetTargetLidTemperatureArgs extends OpentronsAIBaseArgs<'thermocycler/setTargetLidTemperature'> {}
-export interface TCOpenLidArgs extends OpentronsAIBaseArgs<'thermocycler/openLid'> {}
-export interface TCCloseLidArgs extends OpentronsAIBaseArgs<'thermocycler/closeLid'> {}
-export interface TCDeactivateBlockArgs extends OpentronsAIBaseArgs<'thermocycler/deactivateBlock'> {}
-export interface TCDeactivateLidArgs extends OpentronsAIBaseArgs<'thermocycler/deactivateLid'> {}
-export interface TCStartRunExtendedProfileArgs extends OpentronsAIBaseArgs<'thermocycler/startRunExtendedProfile'> {}
+export type HeaterShakerCloseLabwareLatchArgs =
+  RuntimeParameterArgs<'heaterShaker/closeLabwareLatch'>
+export type HeaterShakerSetAndWaitForShakeSpeedArgs =
+  RuntimeParameterArgs<'heaterShaker/setAndWaitForShakeSpeed'>
+export type HeaterShakerDeactiveHeaterArgs =
+  RuntimeParameterArgs<'heaterShaker/deactivateHeater'>
+export type HeaterShakerOpenLabwareLatchArgs =
+  RuntimeParameterArgs<'heaterShaker/openLabwareLatch'>
+export type HeaterShakerDeactivateShakerArgs =
+  RuntimeParameterArgs<'heaterShaker/deactivateShaker'>
+export type TCSetTargetBlockTemperatureArgs =
+  RuntimeParameterArgs<'thermocycler/setTargetBlockTemperature'>
+export type TCSetTargetLidTemperatureArgs =
+  RuntimeParameterArgs<'thermocycler/setTargetLidTemperature'>
+export type TCOpenLidArgs = RuntimeParameterArgs<'thermocycler/openLid'>
+export type TCCloseLidArgs = RuntimeParameterArgs<'thermocycler/closeLid'>
+export type TCDeactivateBlockArgs =
+  RuntimeParameterArgs<'thermocycler/deactivateBlock'>
+export type TCDeactivateLidArgs =
+  RuntimeParameterArgs<'thermocycler/deactivateLid'>
+export type TCStartRunExtendedProfileArgs =
+  RuntimeParameterArgs<'thermocycler/startRunExtendedProfile'>
 
 // the following args have additional args in the commandCreators
 // which are needed for the timeline errors
@@ -83,40 +125,48 @@ export interface DispenseArgs extends CommonArgs {
   isAirGap?: boolean
 }
 
-export interface DropTipArgs extends CommonArgs {
-  commandCreatorFnName: 'dropTip'
-  pipette: string
-  dropTipLocation?: string
-  wellName?: string
-  isReturnTip?: boolean
-}
+export type DropTipArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    commandCreatorFnName: 'dropTip'
+    pipette: string
+    dropTipLocation?: string
+    wellName?: string
+    isReturnTip?: boolean
+  }
+>
 
-export interface MoveToAddressableAreaArgs extends CommonArgs {
-  commandCreatorFnName: 'moveToAddressableArea'
-  pipetteId: string
-  fixtureId: string
-  offset: AddressableOffsetVector
-}
+export type MoveToAddressableAreaArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    commandCreatorFnName: 'moveToAddressableArea'
+    pipetteId: string
+    fixtureId: string
+    offset: AddressableOffsetVector
+  }
+>
 
-export interface PickUpTipArgs extends CommonArgs {
-  commandCreatorFnName: 'pickUpTip'
-  pipetteId: string
-  labwareId: string
-  wellName: string
-  primaryNozzle: PrimaryNozzleConfigurationStyle
-  nozzles: NozzleConfigurationStyle
-  tipTrackingOption?: 'automatic' | 'manual'
-}
+export type PickUpTipArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    commandCreatorFnName: 'pickUpTip'
+    pipetteId: string
+    labwareId: string
+    wellName: string
+    primaryNozzle: PrimaryNozzleConfigurationStyle
+    nozzles: NozzleConfigurationStyle
+    tipTrackingOption?: 'automatic' | 'manual'
+  }
+>
 
-export interface TouchTipArgs extends CommonArgs {
-  commandCreatorFnName: 'touchTip'
-  pipetteId: string
-  labwareId: string
-  wellName: string
-  zOffsetFromTop: number
-  speed?: number
-  mmFromEdge?: number
-}
+export type TouchTipArgs = WithRuntimeParameterStrings<
+  CommonArgs & {
+    commandCreatorFnName: 'touchTip'
+    pipetteId: string
+    labwareId: string
+    wellName: string
+    zOffsetFromTop: number
+    speed?: number
+    mmFromEdge?: number
+  }
+>
 
 export type OpentronsAIArgs =
   | AirGapInPlaceArgs

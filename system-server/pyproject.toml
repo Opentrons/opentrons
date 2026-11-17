@@ -51,20 +51,22 @@ robot = [
     "server-utils==0.0.0",
 ]
 dev = [
-    "ruff==0.14.10",
-    "pytest>=9.0.2",
-    "pytest-asyncio>=1.3.0,<2",
-    "pytest-cov==4.1.0",
-    "pytest-xdist~=2.5.0",
-    "tavern>=3.0.2",
-    "coverage==7.4.0",
+    "ruff==0.17.4",
+    "pytest==9.2.0",
+    "pytest-asyncio==1.4.1.post1",
+    "pytest-cov==7.1.0",
+    "pytest-xdist==3.8.0",
+    "tavern==3.7.2",
+    "coverage==7.16.2",
     "sqlalchemy2-stubs==0.0.2a38",
-    "mypy==1.19.1",
-    "decoy<3,>=2.2.0",
-    "types-requests==2.33.*",
-    "requests==2.33.*",
-    "build~=1.2.0",
-    "pytest-lazy-fixtures<2,>=1.1.4",
+    "mypy==2.4.1",
+    "decoy==2.6.0",
+    "types-requests==2.33.0.20261030",
+    "requests==2.34.2",
+    "build==1.6.1",
+    "pytest-lazy-fixtures==1.4.1",
+    "watchfiles==1.3.0",  # For uvicorn hot reloading.
+    "httpx==0.27.2",
 ]
 
 [project.urls]
@@ -129,6 +131,8 @@ server-utils = { path = "../server-utils", editable = true }
 
 # uv: global settings and dependency tweaks
 [tool.uv]
+# Keep in sync with repo-root uv.toml and oe-core's Dockerfile
+required-version = "==0.12.1"
 # Provide static metadata so uv can resolve systemd-python without building its sdist on
 # macOS, where libsystemd headers are unavailable; Linux installs still see the real wheel.
 dependency-metadata = [

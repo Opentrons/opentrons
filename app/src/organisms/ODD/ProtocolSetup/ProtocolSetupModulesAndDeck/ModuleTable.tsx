@@ -10,13 +10,11 @@ import {
 
 import { getLocalRobot } from '/app/redux/discovery'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
-import {
-  useChainLiveCommands,
-  useRunCalibrationStatus,
-} from '/app/resources/runs'
+import { useRunCalibrationStatus } from '/app/resources/runs'
 
 import { ModuleTableItem } from './ModuleTableItem'
 
+import type { ReactNode } from 'react'
 import type {
   CutoutConfigAndCompatibility,
   DeckDefinition,
@@ -32,7 +30,7 @@ interface ModuleTableProps {
   runId: string
 }
 
-export function ModuleTable(props: ModuleTableProps): JSX.Element {
+export function ModuleTable(props: ModuleTableProps): ReactNode {
   const {
     attachedProtocolModuleMatches,
     deckDef,
@@ -51,7 +49,6 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const robotName: string = localRobot?.name ?? ''
   const calibrationStatus = useRunCalibrationStatus(robotName, runId)
-  const { chainLiveCommands } = useChainLiveCommands()
 
   return (
     <>
@@ -84,7 +81,6 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
                   key={module.moduleId}
                   module={module}
                   calibrationStatus={calibrationStatus}
-                  chainLiveCommands={chainLiveCommands}
                   comboFixtureId={comboFixtureId}
                   conflictedFixture={
                     comboFixtureConflict
@@ -95,6 +91,7 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
                   }
                   deckDef={deckDef}
                   robotName={robotName}
+                  runId={runId}
                 />
               )
             }
@@ -111,10 +108,10 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
               key={module.moduleId}
               module={module}
               calibrationStatus={calibrationStatus}
-              chainLiveCommands={chainLiveCommands}
               conflictedFixture={conflictedFixture}
               deckDef={deckDef}
               robotName={robotName}
+              runId={runId}
             />
           )
         })}

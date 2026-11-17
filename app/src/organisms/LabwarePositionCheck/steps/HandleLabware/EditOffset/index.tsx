@@ -18,9 +18,10 @@ import {
 
 import { PrepareLabware } from './PrepareLabware'
 
+import type { ReactNode } from 'react'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
-export function EditOffset(props: LPCWizardContentProps): JSX.Element {
+export function EditOffset(props: LPCWizardContentProps): ReactNode {
   const { t } = useTranslation('labware_position_check')
   const dispatch = useDispatch()
   const flowType = useSelector(selectSelectedLwFlowType(props.runId))
@@ -70,9 +71,13 @@ export interface EditOffsetContentProps extends LPCWizardContentProps {
   contentHeader: string
 }
 
-export function EditOffsetContent(props: EditOffsetContentProps): JSX.Element {
+export function EditOffsetContent(props: EditOffsetContentProps): ReactNode {
   const dispatch = useDispatch()
-  const { toggleRobotMoving, handleConfirmLwFinalPosition } = props.commandUtils
+  const {
+    toggleRobotMoving,
+    handleConfirmLwFinalPosition,
+    handlePostConfirmCleanup,
+  } = props.commandUtils
   const currentSubStep = useSelector(selectCurrentSubstep(props.runId))
 
   const isOnDevice = useSelector(getIsOnDevice)
@@ -92,10 +97,12 @@ export function EditOffsetContent(props: EditOffsetContentProps): JSX.Element {
           })
         )
       })
+      .then(() => handlePostConfirmCleanup())
       .then(() => {
         dispatch(proceedEditOffsetSubstep(props.runId))
       })
       .finally(() => toggleRobotMoving(false))
+      .catch(() => undefined)
   }
 
   switch (currentSubStep) {

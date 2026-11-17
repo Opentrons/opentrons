@@ -9,6 +9,7 @@ The main interface is the `ProtocolEngine` class.
 
 from .commands import (
     Command,
+    CommandAdapter,
     CommandCreate,
     CommandIntent,
     CommandParams,
@@ -19,7 +20,12 @@ from .errors import ErrorOccurrence, ProtocolEngineError
 from .notes import CommandNote
 from .plugins import AbstractPlugin
 from .protocol_engine import ProtocolEngine
-from .state.commands import CommandErrorSlice, CommandPointer, CommandSlice
+from .state.commands import (
+    CommandErrorSlice,
+    CommandPointer,
+    CommandSlice,
+    JsonCommandSlice,
+)
 from .state.config import Config
 from .state.state import State, StateView
 from .state.state_summary import StateSummary
@@ -89,6 +95,7 @@ __all__ = [
     "ErrorOccurrence",
     # top level command unions and values
     "Command",
+    "CommandAdapter",
     "CommandParams",
     "CommandCreate",
     "CommandStatus",
@@ -99,6 +106,7 @@ __all__ = [
     "State",
     "StateView",
     "CommandSlice",
+    "JsonCommandSlice",
     "CommandErrorSlice",
     "CommandPointer",
     # public value interfaces and models

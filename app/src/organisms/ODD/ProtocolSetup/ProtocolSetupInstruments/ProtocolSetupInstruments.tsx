@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
-import { ODDBackButton } from '/app/molecules/ODDBackButton'
+import { ODDBackButton } from '/app/components/adhoc/ODD/ODDBackButton'
 import { ProtocolInstrumentMountItem } from '/app/organisms/ODD/InstrumentMountItem'
 import { PipetteRecalibrationODDWarning } from '/app/organisms/ODD/PipetteRecalibrationODDWarning'
 import { isGripperInCommands } from '/app/resources/protocols/utils'
@@ -11,7 +11,7 @@ import { getShowPipetteCalibrationWarning } from '/app/transformations/instrumen
 
 import styles from './protocolsetupinstruments.module.css'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
 import type { SetupScreens } from '../types'
@@ -24,7 +24,7 @@ export interface ProtocolSetupInstrumentsProps {
 export function ProtocolSetupInstruments({
   runId,
   setSetupScreen,
-}: ProtocolSetupInstrumentsProps): JSX.Element {
+}: ProtocolSetupInstrumentsProps): ReactNode {
   const { t, i18n } = useTranslation('protocol_setup')
   const { data: attachedInstruments, refetch } = useInstrumentsQuery()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)

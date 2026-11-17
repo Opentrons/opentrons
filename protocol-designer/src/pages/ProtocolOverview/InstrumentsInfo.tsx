@@ -17,6 +17,7 @@ import { FLEX_ROBOT_TYPE, getPipetteSpecsV2 } from '@opentrons/shared-data'
 
 import { LINK_BUTTON_STYLE } from '../../components/atoms'
 
+import type { ReactNode } from 'react'
 import type { PipetteName, RobotType } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
 import type { PipetteOnDeck } from '../../step-forms'
@@ -33,7 +34,7 @@ export function InstrumentsInfo({
   pipettesOnDeck,
   additionalEquipment,
   setShowEditInstrumentsModal,
-}: InstrumentsInfoProps): JSX.Element {
+}: InstrumentsInfoProps): ReactNode {
   const { t } = useTranslation(['protocol_overview', 'shared'])
   const leftPipette = pipettesOnDeck.find(pipette => pipette.mount === 'left')
   const rightPipette = pipettesOnDeck.find(pipette => pipette.mount === 'right')

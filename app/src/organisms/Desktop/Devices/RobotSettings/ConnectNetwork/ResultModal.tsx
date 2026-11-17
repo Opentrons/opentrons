@@ -2,10 +2,10 @@ import { useTranslation } from 'react-i18next'
 
 import { AlertModal, SpinnerModal } from '@opentrons/components'
 
-import { ErrorModal } from '/app/molecules/modals'
-
 import { DISCONNECT } from './constants'
+import { ErrorModal } from './modals'
 
+import type { ReactNode } from 'react'
 import type { NetworkChangeType } from './types'
 
 export interface ResultModalProps {
@@ -17,7 +17,7 @@ export interface ResultModalProps {
   onClose: () => unknown
 }
 
-export const ResultModal = (props: ResultModalProps): JSX.Element => {
+export const ResultModal = (props: ResultModalProps): ReactNode => {
   const { type, ssid, isPending, isError, error, onClose } = props
   const { t } = useTranslation(['device_settings', 'shared'])
   const isDisconnect = type === DISCONNECT

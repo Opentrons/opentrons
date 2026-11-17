@@ -12,7 +12,7 @@ import type { State } from '/app/redux/types'
 
 export type LogPeriodDownloadStatus =
   | { status: 'download-pending' }
-  | { status: 'download-success'; deletionKey: string }
+  | { status: 'download-success'; deletionKey: string | null }
   | { status: 'download-failure'; error: string }
 
 export interface AuditState {
@@ -34,7 +34,7 @@ interface LogPeriodIdPayload {
 
 interface LogPeriodDownloadSucceededPayload {
   logPeriodId: string
-  deletionKey: string
+  deletionKey: string | null
 }
 
 interface LogPeriodFailedPayload {

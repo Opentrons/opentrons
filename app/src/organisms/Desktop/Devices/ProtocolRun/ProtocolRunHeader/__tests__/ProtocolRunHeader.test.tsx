@@ -7,7 +7,6 @@ import { useModulesQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import {
@@ -18,11 +17,7 @@ import {
 
 import { ProtocolRunHeader } from '..'
 import { RunProgressMeter } from '../../../../RunProgressMeter'
-import {
-  useRunAnalytics,
-  useRunErrors,
-  useRunHeaderRunControls,
-} from '../hooks'
+import { useRunAnalytics, useRunErrors } from '../hooks'
 import { RunHeaderBannerContainer } from '../RunHeaderBannerContainer'
 import { RunHeaderContent } from '../RunHeaderContent'
 import {
@@ -49,12 +44,12 @@ vi.mock('../RunHeaderBannerContainer')
 vi.mock('../RunHeaderContent')
 vi.mock('../../../../RunProgressMeter')
 vi.mock('../RunHeaderProtocolName')
+vi.mock('/app/components/adhoc/shared/Skeleton', () => ({
+  Skeleton: () => <div>MOCK_PROTOCOL_RUN_HEADER_SKELETON</div>,
+}))
 vi.mock('/app/resources/dataFiles/useRunGeneratedDataFiles')
 vi.mock('../hooks')
 vi.mock('/app/local-resources/images/hooks/useInitializeCameraState')
-vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
-  useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,
-}))
 
 const MOCK_PROTOCOL = 'MOCK_PROTOCOL'
 const MOCK_RUN_ID = 'MOCK_RUN_ID'
@@ -93,6 +88,7 @@ describe('ProtocolRunHeader', () => {
           status: RUN_STATUS_RUNNING,
         },
       },
+      isLoading: false,
     } as any)
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [] },
@@ -104,7 +100,6 @@ describe('ProtocolRunHeader', () => {
     vi.mocked(useRunGeneratedDataFiles).mockReturnValue({ jpeg: [], csv: [] })
     vi.mocked(useRunAnalytics).mockImplementation(() => {})
     vi.mocked(useRunErrors).mockReturnValue([] as any)
-    vi.mocked(useRunHeaderRunControls).mockReturnValue({} as any)
     vi.mocked(useRunHeaderModalContainer).mockReturnValue(
       MOCK_RUN_HEADER_MODAL_CONTAINER_UTILS as any
     )
@@ -144,6 +139,34 @@ describe('ProtocolRunHeader', () => {
     screen.getByText('MOCK_RUN_HEADER_BANNER_CONTAINER')
     screen.getByText('MOCK_RUN_HEADER_CONTENT')
     screen.getByText('MOCK_RUN_PROGRESS_METER')
+  })
+
+  it('renders a skeleton while the run record is loading', () => {
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    } as any)
+
+    render(props)
+
+    screen.getByText('MOCK_PROTOCOL_RUN_HEADER_SKELETON')
+    expect(screen.queryByText('MOCK_RUN_HEADER_PROTOCOL_NAME')).toBeNull()
+    expect(screen.queryByText('MOCK_RUN_HEADER_CONTENT')).toBeNull()
+  })
+
+  it('renders a skeleton while awaiting a rerun clone before the new run exists', () => {
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    } as any)
+
+    render({ ...props, isCloning: true })
+
+    screen.getByText('MOCK_PROTOCOL_RUN_HEADER_SKELETON')
+    expect(useNotifyRunQuery).toHaveBeenCalledWith(
+      MOCK_RUN_ID,
+      expect.objectContaining({ enabled: false })
+    )
   })
 
   it('navigates to /devices if robot is not viewable and protocolData is not null', () => {
@@ -187,7 +210,6 @@ describe('ProtocolRunHeader', () => {
       expect.objectContaining({
         runStatus: RUN_STATUS_RUNNING,
         runErrors: [],
-        protocolRunControls: expect.any(Object),
       }),
       expect.anything()
     )
@@ -217,7 +239,6 @@ describe('ProtocolRunHeader', () => {
         runStatus: RUN_STATUS_RUNNING,
         isResetRunLoadingRef: expect.any(Object),
         attachedModules: [],
-        protocolRunControls: expect.any(Object),
       }),
       expect.anything()
     )

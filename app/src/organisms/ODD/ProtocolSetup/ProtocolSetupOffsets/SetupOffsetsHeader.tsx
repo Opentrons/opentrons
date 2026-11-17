@@ -3,9 +3,9 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { Chip, SPACING } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { ODDBackButton } from '/app/components/adhoc/ODD/ODDBackButton'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
-import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { useApplyOffsets } from '/app/organisms/LabwarePositionCheck'
 import {
   appliedOffsetsToRun,
@@ -15,13 +15,14 @@ import { useUpdateClientLPC } from '/app/resources/client_data'
 
 import styles from './setupoffsetsheader.module.css'
 
+import type { ReactNode } from 'react'
 import type { ProtocolSetupOffsetsProps } from '/app/organisms/ODD/ProtocolSetup'
 
 export function SetupOffsetsHeader({
   runId,
   setSetupScreen,
   isConfirmed,
-}: ProtocolSetupOffsetsProps): JSX.Element {
+}: ProtocolSetupOffsetsProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
   const dispatch = useDispatch()
   const isNecessaryDefaultOffsetMissing = useSelector(

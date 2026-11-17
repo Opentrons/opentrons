@@ -7,7 +7,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
-import { Icon } from '../../icons'
+import { Icon } from '../../helix/icons'
 import { Btn } from '../../primitives'
 import {
   ALIGN_CENTER,
@@ -26,6 +26,7 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
+import type { ReactNode } from 'react'
 import type {
   AddressableAreaNamesWithFakes,
   CutoutId,
@@ -45,7 +46,7 @@ interface EmptyConfigItemProps {
   ) => void
 }
 
-export function EmptyConfigItem(props: EmptyConfigItemProps): JSX.Element {
+export function EmptyConfigItem(props: EmptyConfigItemProps): ReactNode {
   const {
     deckDefinition,
     handleClickAdd,

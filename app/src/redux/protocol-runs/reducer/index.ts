@@ -1,4 +1,5 @@
 import {
+  setDropTipPromptDismissed,
   updateCameraEnablement,
   updateCameraRecoveryEnablement,
   updateCameraSpecificSettings,
@@ -77,6 +78,19 @@ export const protocolRunReducer: Reducer<ProtocolRunState, Action> = (
         [runId]: {
           ...currentRunState,
           lpc: nextLpcState,
+        },
+      }
+    }
+
+    case setDropTipPromptDismissed.type: {
+      const runId = action.payload.runId
+      const currentRunState = state[runId]
+
+      return {
+        ...state,
+        [runId]: {
+          ...currentRunState,
+          dropTipPromptDismissed: true,
         },
       }
     }

@@ -3,7 +3,7 @@ import { memo } from 'react'
 import { COLORS } from '../../../../helix-design-system'
 import { Well } from './Well'
 
-import type { CSSProperties, MemoExoticComponent } from 'react'
+import type { CSSProperties, MemoExoticComponent, ReactNode } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { WellGroup } from './constants'
 
@@ -59,7 +59,7 @@ export const STYLE_BY_WELL_CONTENTS: {
   },
 }
 
-function StyledWellsComponent(props: StyledWellProps): JSX.Element {
+function StyledWellsComponent(props: StyledWellProps): ReactNode {
   const { definition, wells, wellContents } = props
   return (
     <>

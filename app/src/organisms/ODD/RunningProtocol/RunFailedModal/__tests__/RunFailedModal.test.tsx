@@ -122,7 +122,7 @@ describe('RunFailedModal', () => {
     screen.getByText('Run failed')
     screen.getByText('mock ErrorContent')
     screen.getByText(
-      'Download the robot logs from the Opentrons App and send it to support@opentrons.com for assistance.'
+      'Download the robot logs from the Opentrons App and send them to support@opentrons.com for assistance.'
     )
     screen.getByText('Close')
   })

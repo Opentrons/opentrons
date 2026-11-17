@@ -8,22 +8,23 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_CENTER,
-  LegacyStyledText,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { useSentryReport } from '/app/App/hooks/useSentryReport'
-import { MediumButton } from '/app/atoms/buttons'
-import { OddModal } from '/app/molecules/OddModal'
+import { MediumButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { appRestart, sendLog } from '/app/redux/shell'
 
+import type { ReactNode } from 'react'
 import type { FallbackProps } from 'react-error-boundary'
-import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
+import type { OddModalHeaderBaseProps } from '/app/components/ODD/modals/OddModal/types'
 import type { Dispatch } from '/app/redux/types'
 
 export function OnDeviceDisplayAppFallback({
   error,
-}: FallbackProps): JSX.Element {
+}: FallbackProps): ReactNode {
   const { t } = useTranslation(['app_settings', 'branded'])
   const dispatch = useDispatch<Dispatch>()
   const handleRestartClick = (): void => {
@@ -55,9 +56,9 @@ export function OnDeviceDisplayAppFallback({
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
       >
-        <LegacyStyledText forwardedAs="p">
+        <StyledText forwardedAs="p">
           {t('branded:error_boundary_description')}
-        </LegacyStyledText>
+        </StyledText>
         <MediumButton
           width="100%"
           buttonType="alert"

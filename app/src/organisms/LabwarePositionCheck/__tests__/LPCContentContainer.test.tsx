@@ -3,11 +3,10 @@ import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { i18n } from '/app/i18n'
 import { mockLPCContentProps } from '/app/organisms/LabwarePositionCheck/__fixtures__/mockLPCContentProps'
 import { LPCContentContainer } from '/app/organisms/LabwarePositionCheck/LPCContentContainer'
-// eslint-disable-next-line opentrons/no-imports-across-applications
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import type { ComponentProps } from 'react'
 import type { StepMeter } from '@opentrons/components'
@@ -19,7 +18,7 @@ vi.mock('react-redux', async importOriginal => {
     useSelector: vi.fn(),
   }
 })
-vi.mock('/app/organisms/ODD/ChildNavigation')
+vi.mock('/app/components/ODD/headers/ChildNavigation')
 vi.mock('@opentrons/components', async importOriginal => {
   const actualComponents = await importOriginal<typeof StepMeter>()
   return {

@@ -1,17 +1,21 @@
 import { useTranslation } from 'react-i18next'
 
 import AttachCarboyCap from '/app/assets/videos/error-recovery/Vacuum_AttachCarboyCap.webm'
-import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
+import {
+  DescriptionContent,
+  TwoColumn,
+} from '/app/components/ODD/modals/InterventionModal'
 
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { RightColumnAnimation } from './RightColumnAnimation'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
 export function VacuumReconnectWasteTube(
   props: RecoveryContentProps
-): JSX.Element {
+): ReactNode {
   const { routeUpdateActions } = props
   const { proceedNextStep, goBackPrevStep } = routeUpdateActions
 

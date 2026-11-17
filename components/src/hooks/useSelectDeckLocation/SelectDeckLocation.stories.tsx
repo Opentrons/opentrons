@@ -42,7 +42,7 @@ export const OT2DeckLocationSelect: Story = {
 function Wrapper(props: {
   disabledSlotNames: string[]
   robotType: RobotType
-}): JSX.Element {
+}): React.ReactNode {
   const [selectedLocation, setSelectedLocation] = React.useState({
     slotName: props.robotType === FLEX_ROBOT_TYPE ? 'A1' : '1',
   })

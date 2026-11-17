@@ -10,7 +10,7 @@ import {
 } from '@opentrons/components'
 import { useEstopQuery } from '@opentrons/react-api-client'
 
-import { RoundTab } from '/app/molecules/RoundTab'
+import { RoundTab } from '/app/components/adhoc/desktop/RoundTab'
 import { EstopBanner } from '/app/organisms/Desktop/Devices/EstopBanner'
 import { InstrumentsAndModules } from '/app/organisms/Desktop/Devices/InstrumentsAndModules'
 import { Peripherals } from '/app/organisms/Desktop/Devices/Peripherals'
@@ -22,6 +22,8 @@ import { useIsRobotBusy, useIsRobotViewable } from '/app/redux-resources/robots'
 
 import styles from '../DeviceDetails/devicedetails.module.css'
 
+import type { ReactNode } from 'react'
+
 interface DeviceDetailsComponentProps {
   robotName: string
 }
@@ -30,7 +32,7 @@ type DeviceDetailsTab = 'hardware' | 'deck-configuration' | 'run-history'
 
 export function DeviceDetailsComponent({
   robotName,
-}: DeviceDetailsComponentProps): JSX.Element {
+}: DeviceDetailsComponentProps): ReactNode {
   const { t } = useTranslation('device_details')
   const { deviceDetailsTab } = useParams<{
     deviceDetailsTab?: DeviceDetailsTab

@@ -4,8 +4,8 @@ import pytest
 from _pytest.fixtures import SubRequest
 from mock import MagicMock, patch
 
-from opentrons.drivers.rpi_drivers.types import PortGroup, USBPort
-from opentrons.drivers.rpi_drivers.usb import USBBus
+from opentrons.drivers.usb.types import PortGroup, USBPort
+from opentrons.drivers.usb.usb import USBBus
 from opentrons.hardware_control.modules.types import ModuleAtPort
 from opentrons.hardware_control.types import BoardRevision
 

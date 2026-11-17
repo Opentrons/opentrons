@@ -9,12 +9,12 @@ import {
   CURSOR_POINTER,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import {
   getDevtoolsEnabled,
   getUpdateChannel,
@@ -23,7 +23,7 @@ import {
 } from '/app/redux/config'
 import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
 interface LabelProps {
@@ -49,7 +49,7 @@ interface UpdateChannelProps {
 
 export function UpdateChannel({
   handleBackPress,
-}: UpdateChannelProps): JSX.Element {
+}: UpdateChannelProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'app_settings'])
   const dispatch = useDispatch<Dispatch>()
 
@@ -83,13 +83,13 @@ export function UpdateChannel({
         paddingX={SPACING.spacing40}
         marginTop="7.75rem"
       >
-        <LegacyStyledText
+        <StyledText
           fontSize={TYPOGRAPHY.fontSize28}
           lineHeight={TYPOGRAPHY.lineHeight36}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
         >
           {t('update_channel_description')}
-        </LegacyStyledText>
+        </StyledText>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing8}
@@ -108,15 +108,15 @@ export function UpdateChannel({
                 htmlFor={radio.label}
                 isSelected={radio.value === channel}
               >
-                <LegacyStyledText
+                <StyledText
                   fontSize={TYPOGRAPHY.fontSize28}
                   lineHeight="1.875rem"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
                   {radio.label}
-                </LegacyStyledText>
+                </StyledText>
                 {radio.label === 'Alpha' ? (
-                  <LegacyStyledText
+                  <StyledText
                     marginTop={SPACING.spacing4}
                     fontSize={TYPOGRAPHY.fontSize28}
                     lineHeight={TYPOGRAPHY.lineHeight36}
@@ -126,7 +126,7 @@ export function UpdateChannel({
                     }
                   >
                     {t('alpha_description')}
-                  </LegacyStyledText>
+                  </StyledText>
                 ) : null}
               </SettingButtonLabel>
             </Fragment>

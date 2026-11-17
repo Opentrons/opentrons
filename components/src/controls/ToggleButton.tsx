@@ -1,10 +1,10 @@
 import { css } from 'styled-components'
 
 import { COLORS } from '../helix-design-system'
-import { Icon } from '../icons'
+import { Icon } from '../helix/icons'
 import { Btn, Flex } from '../primitives'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type { StyleProps } from '../primitives'
 
 const TOGGLE_DISABLED_STYLES = css`
@@ -47,7 +47,7 @@ interface ToggleButtonProps extends StyleProps {
   onClick?: (e: MouseEvent) => void
 }
 
-export function ToggleButton(props: ToggleButtonProps): JSX.Element {
+export function ToggleButton(props: ToggleButtonProps): ReactNode {
   const {
     label = 'ToggleButton',
     toggledOn,

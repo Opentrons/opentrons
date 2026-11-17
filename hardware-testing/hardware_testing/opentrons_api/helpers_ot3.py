@@ -1,4 +1,5 @@
 """Opentrons helper methods."""
+
 import asyncio
 import atexit
 import logging
@@ -47,9 +48,6 @@ from opentrons.hardware_control.backends.ot3utils import (
     sensor_node_for_mount,
 )
 
-# TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
-# have that well defined.
-from opentrons.hardware_control.instruments.ot2.pipette import Pipette as PipetteOT2
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette as PipetteOT3
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
@@ -1426,7 +1424,7 @@ def get_slot_calibration_square_position_ot3(slot: int) -> Point:
     return slot_top_left + calib_sq_offset
 
 
-def get_pipette_serial_ot3(pipette: Union[PipetteOT2, PipetteOT3]) -> str:
+def get_pipette_serial_ot3(pipette: PipetteOT3) -> str:
     """Get pipette serial number."""
     model = pipette.model
     volume = model.split("_")[0].replace("p", "")

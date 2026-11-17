@@ -1,0 +1,364 @@
+import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
+
+import { Divider, StyledText } from '@opentrons/components'
+import {
+  useAuditSettingsMutation,
+  useAuditSettingsQuery,
+  useAuthSettingsMutation,
+  useAuthSettingsQuery,
+  useGetRobotServerAccessControlSettingsQuery,
+  usePatchRobotServerAccessControlSettingsMutation,
+} from '@opentrons/react-api-client'
+
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import {
+  MAX_C_INT,
+  MAX_IDLE_LOGOUT_MINUTES,
+  MAX_NUMBER_OF_LOGIN_ATTEMPTS,
+  MAX_PASSWORD_RESET_TIME_DAYS,
+  MIN_IDLE_LOGOUT_MINUTES,
+  MIN_LENGTH_OF_REASON_FOR_INTERACTION,
+  MIN_NUMBER_OF_LOGIN_ATTEMPTS,
+  MIN_PASSWORD_RESET_TIME_DAYS,
+} from '/app/resources/auth'
+
+import { Accordion } from '../Accordion'
+import {
+  getAuditInputPatch,
+  getFieldValuesFromSettings,
+  getInputPatch,
+} from './complianceReadySettingsHelper'
+import {
+  isAuditServerSettingKey,
+  isAuthServerSettingKey,
+  isRobotServerSettingKey,
+} from './complianceReadySettingsTypes'
+import styles from './compliancereadysoftwaresettings.module.css'
+import { ComplianceReadyToggleField } from './ComplianceReadyToggleField'
+import { InputSetting } from './InputSetting'
+import { PasswordComplexity } from './PasswordComplexity'
+
+import type { JSX, ReactNode } from 'react'
+import type {
+  AuditServerSettingFieldId,
+  AuthSettingFieldId,
+  SettingFieldId,
+} from './complianceReadySettingsTypes'
+
+export type { UiSettingFieldId } from './complianceReadySettingsTypes'
+export { UI_ONLY_FIELD_IDS } from './complianceReadySettingsTypes'
+
+export interface ComplianceReadySoftwareSettingsProps {
+  robotName: string
+}
+
+interface ComplianceReadySettingsSectionProps {
+  titleKey: string
+  isLastSection: boolean
+  children: ReactNode
+}
+
+function ComplianceReadySettingsSection({
+  titleKey,
+  isLastSection,
+  children,
+}: ComplianceReadySettingsSectionProps): JSX.Element {
+  const { t } = useTranslation('device_settings')
+
+  return (
+    <div className={styles.section}>
+      <StyledText desktopStyle="bodyDefaultSemiBold">{t(titleKey)}</StyledText>
+      <div className={styles.field_list}>
+        {children}
+        {!isLastSection ? <Divider /> : null}
+      </div>
+    </div>
+  )
+}
+
+export function ComplianceReadySoftwareSettings({
+  robotName: _robotName,
+}: ComplianceReadySoftwareSettingsProps): JSX.Element {
+  const { t } = useTranslation('device_settings')
+  const documentationState = useDocumentationState()
+  const authSettingsQuery = useAuthSettingsQuery()
+  const auditSettingsQuery = useAuditSettingsQuery()
+  const robotServerAccessControlSettingsQuery =
+    useGetRobotServerAccessControlSettingsQuery()
+  const { mutateAsync: patchAuthSettings } =
+    useAuthSettingsMutation(documentationState)
+  const { mutateAsync: patchAuditSettings } =
+    useAuditSettingsMutation(documentationState)
+  const { mutate: patchRobotServerAccessControlSettings } =
+    usePatchRobotServerAccessControlSettingsMutation(documentationState)
+
+  const fieldValues = useMemo(
+    () =>
+      getFieldValuesFromSettings(
+        authSettingsQuery.data?.data,
+        robotServerAccessControlSettingsQuery.data?.data,
+        auditSettingsQuery.data?.data
+      ),
+    [
+      authSettingsQuery.data?.data,
+      robotServerAccessControlSettingsQuery.data?.data,
+      auditSettingsQuery.data?.data,
+    ]
+  )
+
+  const handleAuthSettingInputBlur = async (
+    id: AuthSettingFieldId,
+    value: number
+  ): Promise<void> => {
+    if (fieldValues[id] === value) {
+      return
+    }
+    const authPatch = getInputPatch(id, value)
+    if (authPatch != null) {
+      try {
+        await patchAuthSettings(authPatch)
+      } catch (error) {
+        console.error('Error patching auth settings:', error)
+        // error throws here to get caught by the InputSetting component
+        throw error
+      }
+    }
+  }
+
+  const handleAuditSettingInputBlur = async (
+    id: AuditServerSettingFieldId,
+    value: number
+  ): Promise<void> => {
+    if (fieldValues[id] === value) {
+      return
+    }
+    const auditPatch = getAuditInputPatch(id, value)
+    if (auditPatch != null) {
+      try {
+        await patchAuditSettings(auditPatch)
+      } catch (error) {
+        console.error('Error patching audit settings:', error)
+        // error throws here to get caught by the InputSetting component
+        throw error
+      }
+    }
+  }
+
+  const handleToggleChange = (
+    fieldId: SettingFieldId,
+    toggledOn: boolean
+  ): void => {
+    switch (fieldId) {
+      case 'passwordResetEnabled':
+        if (!toggledOn) {
+          patchAuthSettings({ data: { passwordResetTime: null } })
+        }
+        return
+      case 'passwordComplexityEnabled':
+        if (!toggledOn) {
+          patchAuthSettings({
+            data: {
+              passwordComplexitySpecialCharacters: null,
+              passwordComplexityMinimumLength: null,
+            },
+          })
+        }
+        return
+      default:
+        if (isRobotServerSettingKey(fieldId)) {
+          patchRobotServerAccessControlSettings({
+            data: { [fieldId]: toggledOn },
+          })
+        } else if (isAuthServerSettingKey(fieldId)) {
+          patchAuthSettings({ data: { [fieldId]: toggledOn } })
+        } else if (isAuditServerSettingKey(fieldId)) {
+          patchAuditSettings({ data: { [fieldId]: toggledOn } })
+        }
+    }
+  }
+
+  return (
+    <Accordion
+      id="compliance-ready-software-settings"
+      title={t('desktop_compliance_ready_software_settings')}
+    >
+      <div className={styles.content}>
+        <ComplianceReadySettingsSection
+          titleKey="desktop_login_and_security"
+          isLastSection={false}
+        >
+          <InputSetting
+            key="maxNumberOfLoginAttempts"
+            label={t(
+              'desktop_maximum_login_attempts_before_account_deactivation'
+            )}
+            value={
+              fieldValues.maxNumberOfLoginAttempts != null
+                ? String(fieldValues.maxNumberOfLoginAttempts)
+                : ''
+            }
+            units={t('desktop_logins')}
+            min={MIN_NUMBER_OF_LOGIN_ATTEMPTS}
+            max={MAX_NUMBER_OF_LOGIN_ATTEMPTS}
+            onBlur={value =>
+              handleAuthSettingInputBlur('maxNumberOfLoginAttempts', value)
+            }
+          />
+          <Divider />
+          <ComplianceReadyToggleField
+            id="passwordResetEnabled"
+            labelKey="desktop_require_password_change_after_time"
+            values={fieldValues}
+            onToggleChange={toggledOn => {
+              handleToggleChange('passwordResetEnabled', toggledOn)
+            }}
+          >
+            <InputSetting
+              key="passwordResetTime"
+              label={t('desktop_length_of_time')}
+              value={
+                fieldValues.passwordResetTime != null
+                  ? String(fieldValues.passwordResetTime)
+                  : ''
+              }
+              units={t('desktop_days')}
+              min={MIN_PASSWORD_RESET_TIME_DAYS}
+              max={MAX_PASSWORD_RESET_TIME_DAYS}
+              onBlur={value =>
+                handleAuthSettingInputBlur('passwordResetTime', value)
+              }
+            />
+          </ComplianceReadyToggleField>
+          <Divider />
+          <PasswordComplexity
+            patchAuthSettings={patchAuthSettings}
+            fieldValues={fieldValues}
+          />
+          <Divider />
+          <InputSetting
+            key="idleLogout"
+            label={t('desktop_auto_logout_inactivity_length')}
+            value={
+              fieldValues.idleLogout != null
+                ? String(fieldValues.idleLogout)
+                : ''
+            }
+            units={t('desktop_minutes')}
+            min={MIN_IDLE_LOGOUT_MINUTES}
+            max={MAX_IDLE_LOGOUT_MINUTES}
+            onBlur={value => handleAuthSettingInputBlur('idleLogout', value)}
+          />
+        </ComplianceReadySettingsSection>
+
+        <ComplianceReadySettingsSection
+          titleKey="desktop_actions_requiring_admin_credentials"
+          isLastSection={false}
+        >
+          <ComplianceReadyToggleField
+            id="requireAdminCredsWhenUpdatingRobotSoftware"
+            labelKey="desktop_require_admin_credentials_to_update_robots"
+            values={fieldValues}
+            onToggleChange={toggledOn => {
+              handleToggleChange(
+                'requireAdminCredsWhenUpdatingRobotSoftware',
+                toggledOn
+              )
+            }}
+          />
+          <Divider />
+          <ComplianceReadyToggleField
+            id="requireAdminCredsWhenSendingProtocolToRobot"
+            labelKey="desktop_require_admin_credentials_to_send_protocols"
+            values={fieldValues}
+            onToggleChange={toggledOn => {
+              handleToggleChange(
+                'requireAdminCredsWhenSendingProtocolToRobot',
+                toggledOn
+              )
+            }}
+          />
+          <Divider />
+          <ComplianceReadyToggleField
+            id="requireAdminCredsForSignoffProtocol"
+            labelKey="desktop_require_admin_credentials_to_sign_protocol_run_records"
+            values={fieldValues}
+            onToggleChange={toggledOn => {
+              handleToggleChange(
+                'requireAdminCredsForSignoffProtocol',
+                toggledOn
+              )
+            }}
+          />
+        </ComplianceReadySettingsSection>
+
+        <ComplianceReadySettingsSection
+          titleKey="desktop_audit_log_requirements"
+          isLastSection={false}
+        >
+          <ComplianceReadyToggleField
+            id="requireReasonForInteraction"
+            labelKey="desktop_require_documentation_for_robot_actions"
+            values={fieldValues}
+            onToggleChange={toggledOn => {
+              handleToggleChange('requireReasonForInteraction', toggledOn)
+            }}
+          >
+            <InputSetting
+              key="minLengthOfReasonForInteraction"
+              label={t(
+                'desktop_minimum_length_for_documentation_for_robot_actions'
+              )}
+              value={
+                fieldValues.minLengthOfReasonForInteraction != null
+                  ? String(fieldValues.minLengthOfReasonForInteraction)
+                  : ''
+              }
+              units={t('desktop_characters')}
+              onBlur={value =>
+                handleAuditSettingInputBlur(
+                  'minLengthOfReasonForInteraction',
+                  value
+                )
+              }
+              min={MIN_LENGTH_OF_REASON_FOR_INTERACTION}
+              max={MAX_C_INT}
+            />
+          </ComplianceReadyToggleField>
+          <Divider />
+          <ComplianceReadyToggleField
+            id="requireSignoffForProtocolLog"
+            labelKey="desktop_require_signoff_for_protocol_log"
+            values={fieldValues}
+            onToggleChange={toggledOn => {
+              handleToggleChange('requireSignoffForProtocolLog', toggledOn)
+            }}
+          />
+          <Divider />
+          <ComplianceReadyToggleField
+            id="requireLogsToBeSavedInApp"
+            labelKey="branded:require_logs_to_be_saved_in_app"
+            detailKey="desktop_require_logs_to_be_saved_in_app_description"
+            values={fieldValues}
+            onToggleChange={toggledOn => {
+              handleToggleChange('requireLogsToBeSavedInApp', toggledOn)
+            }}
+          />
+        </ComplianceReadySettingsSection>
+        <ComplianceReadySettingsSection
+          titleKey="desktop_robot_storage"
+          isLastSection
+        >
+          <ComplianceReadyToggleField
+            id="deleteOverMaxOnDiskProtocols"
+            labelKey="desktop_automatically_delete_protocol_run_logs"
+            values={fieldValues}
+            onToggleChange={toggledOn => {
+              handleToggleChange('deleteOverMaxOnDiskProtocols', toggledOn)
+            }}
+          />
+        </ComplianceReadySettingsSection>
+      </div>
+    </Accordion>
+  )
+}

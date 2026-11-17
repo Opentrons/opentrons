@@ -6,8 +6,8 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -16,8 +16,8 @@ import {
 } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { ToggleButton } from '/app/atoms/buttons'
-import { Divider } from '/app/atoms/structure'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
+import { Divider } from '/app/components/adhoc/shared/structure'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { getRobotSerialNumber, UNREACHABLE } from '/app/redux/discovery'
@@ -27,6 +27,7 @@ import { useCurrentRun } from '/app/resources/runs'
 import {
   DeviceReset,
   DisableStackerSensors,
+  DisableVacuumModuleWasteDetection,
   DisplayRobotName,
   EnableComplianceReadySoftware,
   EnableErrorRecoveryMode,
@@ -50,7 +51,7 @@ import { FactoryModeSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryM
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
 import { handleUpdateBuildroot } from './UpdateBuildroot'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type {
   ResetConfigRequest,
   RobotSettingsField,
@@ -64,7 +65,7 @@ interface RobotSettingsAdvancedProps {
 export function RobotSettingsAdvanced({
   robotName,
   isRobotBusy,
-}: RobotSettingsAdvancedProps): JSX.Element {
+}: RobotSettingsAdvancedProps): ReactNode {
   const [showRenameRobotSlideout, setShowRenameRobotSlideout] =
     useState<boolean>(false)
   const [showDeviceResetSlideout, setShowDeviceResetSlideout] =
@@ -187,7 +188,10 @@ export function RobotSettingsAdvanced({
             />
           </>
         )}
-        <Divider marginY={SPACING.spacing16} />
+        <Divider
+          marginTop={SPACING.spacing16}
+          marginBottom={SPACING.spacing24}
+        />
         <GantryHoming
           settings={findSettings('disableHomeOnBoot')}
           isRobotBusy={isRobotBusy || isEstopNotDisengaged}
@@ -209,6 +213,14 @@ export function RobotSettingsAdvanced({
           <>
             <Divider marginY={SPACING.spacing16} />
             <DisableStackerSensors
+              isRobotBusy={isRobotBusy || isEstopNotDisengaged}
+            />
+          </>
+        ) : null}
+        {isFlex ? (
+          <>
+            <Divider marginY={SPACING.spacing16} />
+            <DisableVacuumModuleWasteDetection
               isRobotBusy={isRobotBusy || isEstopNotDisengaged}
             />
           </>
@@ -296,13 +308,14 @@ export function FeatureFlagToggle({
       marginBottom={SPACING.spacing16}
     >
       <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.pSemiBold}
+        <StyledText
+          forwardedAs="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing4}
         >
           {title}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">{description}</LegacyStyledText>
+        </StyledText>
+        <StyledText forwardedAs="p">{description}</StyledText>
       </Box>
       <ToggleButton
         label={title}

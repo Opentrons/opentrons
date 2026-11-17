@@ -23,8 +23,10 @@ export const useErrorRecoveryDocumentation = ({
   documentationState: DocumentationState
   actionsToDocument: DocumentedAction[]
   addActionToDocument: (action: DocumentedAction) => void
-  resumeAndHandleErrorPolicyDocState: DocumentationState
-  clearResumeAndHandleErrorPolicyDocreport: () => void
+  retryThenResumeDocState: DocumentationState
+  clearRetryThenResumeDocreport: () => void
+  skipThenResumeDocState: DocumentationState
+  clearSkipThenResumeDocreport: () => void
 } => {
   const [actionsToDocument, addActionToDocument] = useActionsToDocumentList([
     'launching_error_recovery',
@@ -37,16 +39,28 @@ export const useErrorRecoveryDocumentation = ({
       : ['resume_run_from_recovery']
   }, [ignoreErrors])
 
+  const retryThenResumeActions = useMemo(
+    (): DocumentedAction[] => ['retry_action', ...resumeAndPolicyActions],
+    [resumeAndPolicyActions]
+  )
+
   const {
-    documentationState: resumeAndHandleErrorPolicyDocState,
-    clearDocreport: clearResumeAndHandleErrorPolicyDocreport,
+    documentationState: retryThenResumeDocState,
+    clearDocreport: clearRetryThenResumeDocreport,
+  } = useLinkedDocumentationState(retryThenResumeActions, recoverySessionKey)
+
+  const {
+    documentationState: skipThenResumeDocState,
+    clearDocreport: clearSkipThenResumeDocreport,
   } = useLinkedDocumentationState(resumeAndPolicyActions, recoverySessionKey)
 
   return {
     documentationState,
     actionsToDocument,
     addActionToDocument,
-    resumeAndHandleErrorPolicyDocState,
-    clearResumeAndHandleErrorPolicyDocreport,
+    retryThenResumeDocState,
+    clearRetryThenResumeDocreport,
+    skipThenResumeDocState,
+    clearSkipThenResumeDocreport,
   }
 }

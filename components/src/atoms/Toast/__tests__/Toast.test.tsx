@@ -33,7 +33,7 @@ describe('Toast', () => {
   it('calls onClose when close button is pressed', () => {
     vi.useFakeTimers()
     render(props)
-    const closeButton = screen.getByRole('button')
+    const closeButton = screen.getAllByRole('button')[1]
     fireEvent.click(closeButton)
     act(() => {
       vi.advanceTimersByTime(TOAST_ANIMATION_DURATION)

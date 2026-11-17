@@ -1,10 +1,11 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
 import { MemoryRouter } from 'react-router-dom'
 
+import { INFO_TOAST } from '@opentrons/components'
 import { useCreateProtocolMutation } from '@opentrons/react-api-client'
 
 import { mockSuccessQueryResults } from '/app/__fixtures__'
@@ -245,5 +246,36 @@ describe('SendProtocolToFlexSlideout', () => {
     ).toBeInTheDocument()
     const linkToRobotDetails = screen.getByText('Go to Robot')
     fireEvent.click(linkToRobotDetails)
+  })
+  it('does not show its own error when the robot rejects the send for insufficient permissions', async () => {
+    vi.mocked(mockMutateAsync).mockRejectedValue({
+      isAxiosError: true,
+      response: {
+        status: 403,
+        data: { requiredScopes: ['protocols.write'], providedScopes: [] },
+      },
+    })
+    mockMakeToast.mockClear()
+    mockEatToast.mockClear()
+    mockMakeToast.mockReturnValue('sending-toast-id')
+    const onCloseClick = vi.fn()
+    render({
+      storedProtocolData: storedProtocolDataFixture,
+      onCloseClick,
+      isExpanded: true,
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Send' }))
+
+    await waitFor(() => {
+      expect(mockEatToast).toHaveBeenCalledWith('sending-toast-id')
+    })
+    expect(mockMakeToast).toHaveBeenCalledTimes(1)
+    expect(mockMakeToast).toHaveBeenCalledWith(
+      expect.any(String),
+      INFO_TOAST,
+      expect.any(Object)
+    )
+    expect(onCloseClick).not.toHaveBeenCalled()
   })
 })

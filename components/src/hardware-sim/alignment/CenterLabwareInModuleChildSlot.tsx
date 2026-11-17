@@ -1,7 +1,7 @@
 import { AlignToModuleChildSlot } from './AlignToModuleChildSlot'
 import { CenterLabwareInSlot } from './CenterLabwareInSlot'
 
-import type { PropsWithChildren } from 'react'
+import type { PropsWithChildren, ReactNode } from 'react'
 import type {
   LabwareDefinition,
   ModuleDefinition,
@@ -40,7 +40,7 @@ export type CenterLabwareInModuleChildSlotProps = PropsWithChildren<{
  */
 export function CenterLabwareInModuleChildSlot(
   props: CenterLabwareInModuleChildSlotProps
-): JSX.Element {
+): ReactNode {
   const { deckId, slotId, moduleDefinition, labwareDefinition, children } =
     props
   return (

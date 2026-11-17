@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Set
 
 from opentrons_shared_data.deck.types import (
     CutoutFixture,
-    DeckDefinitionV5,
+    DeckDefinitionV6,
     SlotDefV3,
 )
 from opentrons_shared_data.module.types import ModuleOrientation
@@ -54,7 +54,7 @@ class AddressableAreaState:
 
     potential_cutout_fixtures_by_cutout_id: Dict[str, Set[PotentialCutoutFixture]]
 
-    deck_definition: DeckDefinitionV5
+    deck_definition: DeckDefinitionV6
 
     deck_configuration: Optional[DeckConfigurationType]
     """The host robot's full deck configuration.
@@ -95,7 +95,7 @@ _FLEX_ORDERED_STAGING_SLOTS = ["D4", "C4", "B4", "A4"]
 def _get_conflicting_addressable_areas_error_string(
     potential_cutout_fixtures: Set[PotentialCutoutFixture],
     loaded_addressable_areas: Dict[str, AddressableArea],
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
 ) -> str:
     loaded_areas_on_cutout = set()
     for fixture in potential_cutout_fixtures:
@@ -122,7 +122,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
         self,
         deck_configuration: DeckConfigurationType,
         config: Config,
-        deck_definition: DeckDefinitionV5,
+        deck_definition: DeckDefinitionV6,
         robot_definition: RobotDefinition,
     ) -> None:
         """Initialize an addressable area store and its state."""
@@ -172,7 +172,7 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
 
     @staticmethod
     def _get_addressable_areas_from_deck_configuration(
-        deck_config: DeckConfigurationType, deck_definition: DeckDefinitionV5
+        deck_config: DeckConfigurationType, deck_definition: DeckDefinitionV6
     ) -> Dict[str, AddressableArea]:
         """Return all addressable areas provided by the given deck configuration."""
         addressable_areas = []
@@ -261,7 +261,7 @@ class AddressableAreaView:
         self._state = state
 
     @cached_property
-    def deck_definition(self) -> DeckDefinitionV5:
+    def deck_definition(self) -> DeckDefinitionV6:
         """The full deck definition."""
         return self._state.deck_definition
 
@@ -403,6 +403,37 @@ class AddressableAreaView:
         """Get the base slot the addressable area is associated with."""
         addressable_area = self.get_addressable_area(addressable_area_name)
         return addressable_area.base_slot
+
+    def get_potential_addressable_area_base_slot(
+        self, addressable_area_name: str
+    ) -> Optional[DeckSlotName]:
+        """Get the cutout deck slot that can provide this addressable area.
+
+        Uses the loaded area when it is on the deck. When a module fixture has
+        replaced the plain name, reads the cutout from the deck definition, so
+        a later module that mounts on column 4 is found on whatever cutout
+        provides that area. Analysis uses a simulated deck, which rejects the
+        plain name as incompatible with the module fixture instead of missing.
+        """
+        try:
+            return self.get_addressable_area_base_slot(addressable_area_name)
+        except (
+            AreaNotInDeckConfigurationError,
+            AddressableAreaDoesNotExistError,
+            CutoutDoesNotExistError,
+            IncompatibleAddressableAreaError,
+        ):
+            try:
+                cutout_id, _ = (
+                    deck_configuration_provider.get_potential_cutout_fixtures(
+                        addressable_area_name, self._state.deck_definition
+                    )
+                )
+                return deck_configuration_provider.get_deck_slot_for_cutout_id(
+                    cutout_id
+                )
+            except (AddressableAreaDoesNotExistError, CutoutDoesNotExistError):
+                return None
 
     def get_addressable_area_position(
         self,

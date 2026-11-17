@@ -5,8 +5,8 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_START,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -53,32 +53,39 @@ export function RobotInformation({
         marginTop={SPACING.spacing16}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+          <StyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {t('robot_serial_number')}
-          </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
+          </StyledText>
+          <StyledText forwardedAs="p">
             {serialNumber != null
               ? serialNumber
               : t('robot_settings_advanced_unknown')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+          <StyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {t('firmware_version')}
-          </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
+          </StyledText>
+          <StyledText forwardedAs="p">
             {firmwareVersion != null
               ? firmwareVersion
               : t('robot_settings_advanced_unknown')}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+          <StyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {t('supported_protocol_api_versions')}
-          </LegacyStyledText>
-          <LegacyStyledText forwardedAs="p">
-            {formatApiVersionMinMax()}
-          </LegacyStyledText>
+          </StyledText>
+          <StyledText forwardedAs="p">{formatApiVersionMinMax()}</StyledText>
         </Flex>
       </Flex>
     </Box>

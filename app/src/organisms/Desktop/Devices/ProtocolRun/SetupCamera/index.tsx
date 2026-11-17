@@ -17,7 +17,7 @@ import {
 } from '@opentrons/react-api-client'
 import { OT_SYSTEM_CAMERA } from '@opentrons/shared-data'
 
-import { ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
 import { useLinkedDocumentationState } from '/app/local-resources/access-control/useLinkedDocumentationState'
 import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
 import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
@@ -34,6 +34,7 @@ import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 import styles from './setupcamera.module.css'
 
+import type { ReactNode } from 'react'
 import type { UseCameraUsageSettingsResult } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 import type { State } from '/app/redux/types'
 
@@ -53,7 +54,7 @@ export function SetupCamera({
   isCameraRequired,
   cameraConfirmed,
   confirmCameraSettings,
-}: SetupCameraProps): JSX.Element {
+}: SetupCameraProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
   const { makeSnackbar } = useToaster()
   const storageInfo = useRobotStorageInfo()
@@ -178,12 +179,12 @@ function StorageAlmostFullNotification({
   robotName,
 }: {
   robotName: string
-}): JSX.Element {
+}): ReactNode {
   const { t } = useTranslation('device_settings')
   const navigate = useNavigate()
 
   const onLinkClick = (): void => {
-    navigate(`/devices/${robotName}/#recent-protocol-runs`)
+    navigate(`/devices/${robotName}/run-history`)
   }
 
   return (
@@ -197,7 +198,7 @@ function StorageAlmostFullNotification({
   )
 }
 
-function CameraRequiredNotification(): JSX.Element {
+function CameraRequiredNotification(): ReactNode {
   const { t } = useTranslation('device_settings')
 
   return (
@@ -221,7 +222,7 @@ function CameraStatus({
   isCameraEnabled,
   cameraConfirmed,
   isFlex,
-}: CameraStatusProps): JSX.Element {
+}: CameraStatusProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   return (

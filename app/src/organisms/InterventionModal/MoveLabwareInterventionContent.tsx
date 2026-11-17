@@ -15,7 +15,7 @@ import {
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
 
-import { InterventionInfo } from '/app/molecules/InterventionModal/InterventionContent'
+import { InterventionInfo } from '/app/components/ODD/modals/InterventionModal/InterventionContent'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 
 import { getRunCurrentLabwareInfo } from '../ErrorRecoveryFlows/hooks/useDeckMapUtils'
@@ -100,7 +100,6 @@ export function MoveLabwareInterventionContent({
     location: oldLabwareLocation,
     loadedModules: run.modules,
     loadedLabwares: run.labware,
-    robotType: 'OT-3 Standard',
     detailLevel: 'slot-only',
     t,
   })
@@ -108,7 +107,6 @@ export function MoveLabwareInterventionContent({
     location: command.params.newLocation,
     loadedModules: run.modules,
     loadedLabwares: run.labware,
-    robotType: 'OT-3 Standard',
     detailLevel: 'slot-only',
     t,
   })

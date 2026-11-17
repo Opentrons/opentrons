@@ -7,7 +7,7 @@ import {
   useLogPeriodSummariesQuery,
 } from '@opentrons/react-api-client'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import { ComplianceReadyFiles } from './ComplianceReadyFiles'
@@ -22,8 +22,8 @@ import { DownloadLogPeriodsWizard } from './FileManagerWizardFlows/DownloadLogPe
 import { DownloadProtocolRunRecordsWizard } from './FileManagerWizardFlows/DownloadProtocolRunRecordsWizard'
 import { ProtocolRunRecords } from './ProtocolRunRecords'
 
-import type { ComponentProps } from 'react'
-import type { SmallButton } from '/app/atoms/buttons'
+import type { ComponentProps, ReactNode } from 'react'
+import type { SmallButton } from '/app/components/ODD/buttons'
 import type { SetSettingOption } from '../types'
 
 type FileManagerTab = 'diagnostic' | 'compliance' | 'records'
@@ -32,9 +32,7 @@ interface FileManagerProps {
   setCurrentOption: SetSettingOption
 }
 
-export function FileManager({
-  setCurrentOption,
-}: FileManagerProps): JSX.Element {
+export function FileManager({ setCurrentOption }: FileManagerProps): ReactNode {
   const { t } = useTranslation('device_details')
   const [showDownloadModal, setShowDownloadModal] = useState(false)
   const [showDownloadRecordsWizard, setShowDownloadRecordsWizard] =

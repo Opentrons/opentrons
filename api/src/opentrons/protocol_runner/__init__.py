@@ -7,6 +7,7 @@ protocol_runner.py for more details.
 from .protocol_runner import (
     AbstractRunner,
     AnyRunner,
+    EngineRunResult,
     JsonRunner,
     LiveRunner,
     PythonAndLegacyRunner,
@@ -18,6 +19,7 @@ from .run_orchestrator import RunOrchestrator
 __all__ = [
     "AbstractRunner",
     "RunResult",
+    "EngineRunResult",
     "create_protocol_runner",
     "JsonRunner",
     "PythonAndLegacyRunner",

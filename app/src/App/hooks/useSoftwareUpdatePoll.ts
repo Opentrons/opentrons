@@ -7,7 +7,7 @@ import { checkShellUpdate } from '/app/redux/shell'
 
 import type { Dispatch } from '/app/redux/types'
 
-const UPDATE_RECHECK_INTERVAL_MS = 60000
+const UPDATE_RECHECK_INTERVAL_MS = 1000 * 60 * 60 // Once an hour
 
 export function useSoftwareUpdatePoll(): void {
   const dispatch = useDispatch<Dispatch>()

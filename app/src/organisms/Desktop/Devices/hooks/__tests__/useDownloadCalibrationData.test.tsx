@@ -3,7 +3,6 @@ import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import {
   useInstrumentsQuery,
@@ -15,16 +14,15 @@ import {
   ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
   useTrackEvent,
 } from '/app/redux/analytics'
+import { saveFileFromBuffer } from '/app/redux/shell/remote'
 import { useDownloadCalibrationData } from '/app/resources/devices/hooks'
 
 import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'
 
-// file-saver has circular dep, need to mock with factory to prevent error
-vi.mock('file-saver', async importOriginal => {
-  const actual = await importOriginal<any>()
-  return { ...actual, saveAs: vi.fn() }
-})
+vi.mock('/app/redux/shell/remote', () => ({
+  saveFileFromBuffer: vi.fn().mockResolvedValue('/tmp'),
+}))
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/redux/analytics')
 
@@ -45,28 +43,39 @@ describe('useDownloadCalibrationData', () => {
       </Provider>
     )
     mockTrackEvent = vi.fn()
-    when(useTrackEvent).calledWith().thenReturn(mockTrackEvent)
+    vi.when(useTrackEvent).calledWith().thenReturn(mockTrackEvent)
     vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: { data: [] },
     } as any)
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [] },
     } as any)
+    vi.mocked(saveFileFromBuffer).mockResolvedValue('/tmp')
   })
 
   afterEach(() => {
     vi.resetAllMocks()
   })
 
-  it('fires analytics event with Flex robot type on download', () => {
+  it('fires analytics event with Flex robot type on download', async () => {
     const { result } = renderHook(
       () => useDownloadCalibrationData(ROBOT_NAME),
       { wrapper }
     )
-    result.current.downloadCalibration()
+    await expect(result.current.downloadCalibration('/mnt/usb')).resolves.toBe(
+      '/tmp'
+    )
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
       properties: { robotType: FLEX_ROBOT_TYPE },
     })
+    expect(saveFileFromBuffer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'otie-calibration.json',
+        destination: '/mnt/usb',
+      })
+    )
+    const saved = vi.mocked(saveFileFromBuffer).mock.calls[0][0]
+    expect(saved.buffer.byteLength).toBeGreaterThan(0)
   })
 })

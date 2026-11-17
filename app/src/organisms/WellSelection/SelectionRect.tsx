@@ -11,7 +11,7 @@ interface SelectionRectProps {
   children?: ReactNode
 }
 
-export function SelectionRect(props: SelectionRectProps): JSX.Element {
+export function SelectionRect(props: SelectionRectProps): ReactNode {
   const { onSelectionMove, onSelectionDone, children } = props
 
   const [positions, setPositions] = useState<DragRect | null>(null)

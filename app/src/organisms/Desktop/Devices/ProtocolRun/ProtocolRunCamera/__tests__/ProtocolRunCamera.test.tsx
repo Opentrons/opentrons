@@ -1,11 +1,8 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useHost } from '@opentrons/react-api-client'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { OPENTRONS_USB } from '/app/redux/discovery'
 import { getCameraUsageState } from '/app/redux/protocol-runs'
 
 import { ProtocolRunCamera } from '..'
@@ -17,13 +14,6 @@ import type { RobotType } from '@opentrons/shared-data'
 vi.mock('../LaunchLivestreamBtn')
 vi.mock('../ImageGalleryContainer')
 vi.mock('/app/redux/protocol-runs')
-vi.mock('@opentrons/react-api-client', async () => {
-  const actual = await vi.importActual('@opentrons/react-api-client')
-  return {
-    ...actual,
-    useHost: vi.fn(),
-  }
-})
 
 const render = (robotType: RobotType = 'OT-3 Standard') => {
   const RUN_ID = 'run123'
@@ -85,13 +75,6 @@ describe('ProtocolRunCamera', () => {
 
   it('does not render the live stream button if the robot is an ot-2', () => {
     render('OT-2 Standard')
-
-    expect(screen.queryByText('MOCK_LIVE_STREAM_BTN')).toBeFalsy()
-  })
-
-  it('does not render the live stream button if the connection is over usb', () => {
-    vi.mocked(useHost).mockReturnValue({ hostname: OPENTRONS_USB })
-    render()
 
     expect(screen.queryByText('MOCK_LIVE_STREAM_BTN')).toBeFalsy()
   })

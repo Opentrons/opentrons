@@ -48,6 +48,19 @@ describe('discovery actions', () => {
       },
     },
     {
+      name: 'renameRobot',
+      creator: actions.renameRobot,
+      args: ['old-name', 'new-name'],
+      expected: {
+        type: 'discovery:RENAME',
+        payload: {
+          prevName: 'old-name',
+          newName: 'new-name',
+        },
+        meta: { shell: true },
+      },
+    },
+    {
       name: 'clearDiscoveryCache',
       creator: actions.clearDiscoveryCache,
       args: [],

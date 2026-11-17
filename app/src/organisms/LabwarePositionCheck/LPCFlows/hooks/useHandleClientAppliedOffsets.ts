@@ -11,10 +11,7 @@ import { useIsRunCurrent } from '/app/resources/runs'
 const CLIENT_DATA_INTERVAL_MS = 5000
 
 // Keep the applied offset state in sync between various apps using the same robot.
-export function useHandleClientAppliedOffsets(
-  isFlex: boolean,
-  thisRunId: string | null
-): void {
+export function useHandleClientAppliedOffsets(thisRunId: string | null): void {
   const dispatch = useDispatch()
   const isThisRunCurrent = useIsRunCurrent(thisRunId)
 
@@ -22,34 +19,31 @@ export function useHandleClientAppliedOffsets(
   const { runId: clientDataRunId, userId: clientDataUserId } = useClientDataLPC(
     {
       refetchInterval: CLIENT_DATA_INTERVAL_MS,
-      enabled: isFlex,
     }
   )
 
   useEffect(
     () => {
-      if (isFlex) {
-        if (isThisRunCurrent) {
-          if (clientDataRunId !== thisRunId && clientDataRunId != null) {
-            clearClientData()
-          }
-          // Offsets applied by another user but not locally - mark as applied locally
-          else if (
-            clientDataUserId != null &&
-            clientDataRunId === thisRunId &&
-            thisRunId != null
-          ) {
-            dispatch(appliedOffsetsToRun(thisRunId))
-          }
-        } else {
-          if (clientDataRunId === thisRunId) {
-            clearClientData()
-          }
+      if (isThisRunCurrent) {
+        if (clientDataRunId !== thisRunId && clientDataRunId != null) {
+          clearClientData()
+        }
+        // Offsets applied by another user but not locally - mark as applied locally
+        else if (
+          clientDataUserId != null &&
+          clientDataRunId === thisRunId &&
+          thisRunId != null
+        ) {
+          dispatch(appliedOffsetsToRun(thisRunId))
+        }
+      } else {
+        if (clientDataRunId === thisRunId) {
+          clearClientData()
         }
       }
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isThisRunCurrent, clientDataRunId, clientDataUserId, thisRunId, isFlex]
+    [isThisRunCurrent, clientDataRunId, clientDataUserId, thisRunId]
   )
 }

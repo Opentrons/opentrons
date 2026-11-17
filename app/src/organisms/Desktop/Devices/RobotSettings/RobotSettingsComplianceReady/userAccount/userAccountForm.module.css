@@ -6,6 +6,13 @@
   gap: var(--spacing-8);
 }
 
+.form_intro {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--spacing-8);
+}
+
 .one_time_password_value {
   display: flex;
   width: 100%;

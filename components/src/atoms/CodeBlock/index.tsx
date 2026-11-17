@@ -6,6 +6,6 @@ interface CodeBlockProps {
   children: ReactNode | string
 }
 
-export function CodeBlock({ children }: CodeBlockProps): JSX.Element {
+export function CodeBlock({ children }: CodeBlockProps): ReactNode {
   return <code className={styles.container}>{children}</code>
 }

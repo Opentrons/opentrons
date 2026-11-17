@@ -18,6 +18,16 @@ class SubmitAuditLogMessageData(_StrictBaseModel):
     reason: str | None
 
 
+class SubmitSupportingFileMessageData(_StrictBaseModel):
+    """Details for a supporting-file submission."""
+
+    fileType: str
+    serverId: str
+    accountName: str
+    legalName: str
+    reason: str | None
+
+
 class SubmitExternalAuditLogMessageData(_StrictBaseModel):
     """Message body for submitting an external audit log message."""
 

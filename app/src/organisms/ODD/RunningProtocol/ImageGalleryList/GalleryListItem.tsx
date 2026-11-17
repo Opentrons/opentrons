@@ -1,11 +1,12 @@
 import { useTranslation } from 'react-i18next'
 
+import { ODDMediaContainerContent } from '/app/components/ODD/ODDMediaContainerContent'
 import { useCommandStepNumbers } from '/app/local-resources/commands/hooks/useCommandStepNumbers'
 import { useImageGalleryData } from '/app/local-resources/images/hooks/useImageGalleryData'
-import { ODDMediaContainerContent } from '/app/molecules/ODDMediaContainerContent'
 import { handleCameraPhotoModal } from '/app/organisms/ODD/RunningProtocol/ImageGalleryList/CameraPhotoModal'
 import { useImage } from '/app/resources/dataFiles/useImage'
 
+import type { ReactNode } from 'react'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition,
@@ -21,7 +22,7 @@ export interface GalleryListItemProps {
   item: UseImagesInfoItem
 }
 
-export function GalleryListItem(props: GalleryListItemProps): JSX.Element {
+export function GalleryListItem(props: GalleryListItemProps): ReactNode {
   const { t } = useTranslation('run_details')
   const { item, runId, protocolAnalysis, robotType, allRunDefs } = props
 

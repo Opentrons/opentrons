@@ -12,10 +12,10 @@ import {
   FixtureOption,
   Flex,
   Icon,
-  LegacyStyledText,
   Modal,
   SecondaryButton,
   SPACING,
+  StyledText,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -28,17 +28,17 @@ import {
 } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { SmallButton } from '/app/atoms/buttons'
-import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
+import { ODDFixtureOption } from '/app/components/adhoc/ODD/ODDFixtureOption'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { OddModal } from '/app/components/ODD/modals/OddModal'
 import { useModuleUSBPort } from '/app/local-resources/modules'
-import { ODDFixtureOption } from '/app/molecules/ODDFixtureOption'
-import { OddModal } from '/app/molecules/OddModal'
 import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configuration'
 import { useCloseCurrentRun } from '/app/resources/runs'
 
 import { useSendIdentifyModule } from '../ModuleWizardFlows/hooks'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { DeckDefinition, ModuleModel } from '@opentrons/shared-data'
 
@@ -62,7 +62,7 @@ interface ChooseModuleToConfigureModalProps {
 
 export const ChooseModuleToConfigureModal = (
   props: ChooseModuleToConfigureModalProps
-): JSX.Element => {
+): ReactNode => {
   const {
     handleConfigureModule,
     onCloseClick,
@@ -237,9 +237,7 @@ export const ChooseModuleToConfigureModal = (
   const contents =
     fixtureOptions.length > 0 ? (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-        <LegacyStyledText forwardedAs="p">
-          {t('add_this_deck_hardware')}
-        </LegacyStyledText>
+        <StyledText forwardedAs="p">{t('add_this_deck_hardware')}</StyledText>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
           {fixtureOptions}
         </Flex>
@@ -276,12 +274,12 @@ export const ChooseModuleToConfigureModal = (
             gridGap={SPACING.spacing10}
             alignItems={ALIGN_CENTER}
           >
-            <LegacyStyledText
+            <StyledText
               forwardedAs="h3"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {t('add_to_slot', { slotName: displaySlotName })}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         }
         onClose={onCloseClick}
@@ -303,7 +301,7 @@ interface NoUnconfiguredModulesProps {
   isOnDevice: boolean
   robotName: string
 }
-function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): JSX.Element {
+function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): ReactNode {
   const {
     moduleDisplayName,
     configuredModuleMatches,
@@ -313,8 +311,7 @@ function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): JSX.Element {
   } = props
   const { t } = useTranslation('protocol_setup')
   const navigate = useNavigate()
-  const documentationState = useDocumentationState()
-  const { closeCurrentRun } = useCloseCurrentRun(documentationState)
+  const { closeCurrentRun } = useCloseCurrentRun()
   const handleCancelRun = (): void => {
     closeCurrentRun()
   }
@@ -350,13 +347,13 @@ function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): JSX.Element {
         name="ot-spinner"
         spin
       />
-      <LegacyStyledText
+      <StyledText
         as={isOnDevice ? 'h4' : 'p'}
         color={COLORS.grey60}
         textAlign={TEXT_ALIGN_CENTER}
       >
         {t('plug_in_module_to_configure', { module: moduleDisplayName })}
-      </LegacyStyledText>
+      </StyledText>
     </Flex>
   )
   return (
@@ -366,22 +363,22 @@ function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): JSX.Element {
     >
       {configuredModuleMatches.length > 0 ? (
         <>
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {t('there_are_other_configured_modules', {
               module: moduleDisplayName,
             })}
-          </LegacyStyledText>
+          </StyledText>
           {loadingBlock}
           {exitButton}
         </>
       ) : (
         <>
-          <LegacyStyledText forwardedAs="p">
+          <StyledText forwardedAs="p">
             {t('there_are_no_unconfigured_modules', {
               module: moduleDisplayName,
               slot: displaySlotName,
             })}
-          </LegacyStyledText>
+          </StyledText>
           {loadingBlock}
         </>
       )}

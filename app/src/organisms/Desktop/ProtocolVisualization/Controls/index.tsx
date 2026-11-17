@@ -18,7 +18,7 @@ import { PerStepOverflowMenu } from './PerStepOverflowMenu'
 //   getPreviousGroupFirstCommandId,
 // } from './utils'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
@@ -35,7 +35,7 @@ interface ControlsProps {
   milliSecondsPerFrame: number
   setMilliSecondsPerFrame: Dispatch<SetStateAction<number>>
 }
-export function Controls(props: ControlsProps): JSX.Element {
+export function Controls(props: ControlsProps): ReactNode {
   const {
     numErrors,
     protocolName,

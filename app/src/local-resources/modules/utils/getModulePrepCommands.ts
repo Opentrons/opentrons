@@ -1,10 +1,12 @@
 import {
+  FLEX_STACKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import type { AttachedModule, FlexStackerModule } from '@opentrons/api-client'
+import type { DocumentedAction } from '@opentrons/react-api-client'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerDeactivateHeaterCreateCommand,
@@ -100,4 +102,26 @@ export function getFlexStackerPrepCommands(
       params: { moduleId: module.id },
     },
   ]
+}
+
+// The documentation modal renders RunTimeCommands, but these commands have not been
+// issued yet, so fill in the run time fields with placeholders.
+export function getFlexStackerPrepActions(
+  modules: Array<AttachedModule | null>
+): DocumentedAction[] {
+  return modules
+    .filter(
+      (module): module is FlexStackerModule =>
+        module?.moduleType === FLEX_STACKER_MODULE_TYPE
+    )
+    .flatMap(module =>
+      getFlexStackerPrepCommands(module).map(command => ({
+        ...command,
+        id: '',
+        status: 'queued' as const,
+        createdAt: '',
+        startedAt: null,
+        completedAt: null,
+      }))
+    )
 }

@@ -10,21 +10,23 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  LegacyStyledText,
   Link,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
 import multipleModuleHelp from '/app/assets/images/Moam_modal_image.png'
 
+import type { ReactNode } from 'react'
+
 const HOW_TO_MULTIPLE_MODULES_HREF =
   'https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2'
 
-export function OT2MultipleModulesHelp(): JSX.Element {
+export function OT2MultipleModulesHelp(): ReactNode {
   const { t } = useTranslation(['protocol_setup', 'shared'])
   const [showMultipleModulesModal, setShowMultipleModulesModal] =
     useState<boolean>(false)
@@ -44,22 +46,23 @@ export function OT2MultipleModulesHelp(): JSX.Element {
             setShowMultipleModulesModal(true)
           }}
           closeButton={
-            <LegacyStyledText
+            <StyledText
               forwardedAs="p"
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
               marginRight={SPACING.spacing8}
             >
               {t('learn_more')}
-            </LegacyStyledText>
+            </StyledText>
           }
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <LegacyStyledText css={TYPOGRAPHY.pSemiBold}>
+            <StyledText
+              forwardedAs="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
               {t('multiple_modules')}
-            </LegacyStyledText>
-            <LegacyStyledText forwardedAs="p">
-              {t('view_moam')}
-            </LegacyStyledText>
+            </StyledText>
+            <StyledText forwardedAs="p">{t('view_moam')}</StyledText>
           </Flex>
         </Banner>
       </Box>
@@ -73,12 +76,12 @@ export function OT2MultipleModulesHelp(): JSX.Element {
               <Flex flexDirection={DIRECTION_COLUMN}>
                 <Flex flexDirection={DIRECTION_ROW}>
                   <Flex flexDirection={DIRECTION_COLUMN} marginRight="3.625rem">
-                    <LegacyStyledText
+                    <StyledText
                       forwardedAs="p"
                       marginBottom={SPACING.spacing16}
                     >
                       {t('multiple_modules_explanation')}
-                    </LegacyStyledText>
+                    </StyledText>
                     <Link
                       external
                       css={TYPOGRAPHY.linkPSemiBold}
@@ -94,16 +97,17 @@ export function OT2MultipleModulesHelp(): JSX.Element {
                         size="0.625rem"
                       />
                     </Link>
-                    <LegacyStyledText
-                      css={TYPOGRAPHY.pSemiBold}
+                    <StyledText
+                      forwardedAs="p"
+                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                       marginBottom={SPACING.spacing4}
                     >
                       {t('example')}
-                    </LegacyStyledText>
+                    </StyledText>
 
-                    <LegacyStyledText forwardedAs="p">
+                    <StyledText forwardedAs="p">
                       {t('multiple_modules_example')}
-                    </LegacyStyledText>
+                    </StyledText>
                   </Flex>
                   <img
                     height="100%"

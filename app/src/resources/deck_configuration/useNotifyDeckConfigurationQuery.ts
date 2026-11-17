@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import { useDeckConfigurationQuery } from '@opentrons/react-api-client'
 
 import { useNotifyDataReady } from '../useNotifyDataReady'
@@ -9,16 +11,19 @@ import type { QueryOptionsWithPolling } from '../useNotifyDataReady'
 export function useNotifyDeckConfigurationQuery(
   options: QueryOptionsWithPolling<DeckConfiguration, unknown> = {}
 ): UseQueryResult<DeckConfiguration> {
-  const { shouldRefetch, queryOptionsNotify } = useNotifyDataReady({
+  const { refetch, queryOptionsNotify } = useNotifyDataReady({
     topic: 'robot-server/deck_configuration',
     options,
   })
 
   const httpQueryResult = useDeckConfigurationQuery(queryOptionsNotify)
+  const { refetch: refetchQuery } = httpQueryResult
 
-  if (shouldRefetch) {
-    void httpQueryResult.refetch()
-  }
+  useEffect(() => {
+    if (refetch > 0) {
+      void refetchQuery()
+    }
+  }, [refetch, refetchQuery])
 
   return httpQueryResult
 }

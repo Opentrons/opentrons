@@ -2,7 +2,6 @@ import { Provider } from 'react-redux'
 import { renderHook } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import { SECURITY_WPA_EAP } from '@opentrons/api-client'
 
@@ -37,16 +36,16 @@ const mockWifiNetwork: WifiNetwork = {
 
 describe('useCanDisconnect', () => {
   beforeEach(() => {
-    when(useWifiList).calledWith('otie').thenReturn([])
-    when(useIsFlex).calledWith('otie').thenReturn(false)
+    vi.when(useWifiList).calledWith('otie').thenReturn([])
+    vi.when(useIsFlex).calledWith('otie').thenReturn(false)
   })
 
   it('useCanDisconnect returns true if active network, robot >= 3.17', () => {
-    when(useWifiList)
+    vi.when(useWifiList)
       .calledWith('otie')
       .thenReturn([{ ...mockWifiNetwork, active: true }])
 
-    when(getRobotApiVersionByName)
+    vi.when(getRobotApiVersionByName)
       .calledWith({} as any, 'otie')
       .thenReturn('3.17.0')
 
@@ -55,9 +54,9 @@ describe('useCanDisconnect', () => {
   })
 
   it('useCanDisconnect returns false if no list in state', () => {
-    when(useWifiList).calledWith('otie').thenReturn([])
+    vi.when(useWifiList).calledWith('otie').thenReturn([])
 
-    when(getRobotApiVersionByName)
+    vi.when(getRobotApiVersionByName)
       .calledWith({} as any, 'otie')
       .thenReturn('3.17.0')
 
@@ -66,11 +65,11 @@ describe('useCanDisconnect', () => {
   })
 
   it('useCanDisconnect returns false if no active network', () => {
-    when(useWifiList)
+    vi.when(useWifiList)
       .calledWith('otie')
       .thenReturn([{ ...mockWifiNetwork, active: false }])
 
-    when(getRobotApiVersionByName)
+    vi.when(getRobotApiVersionByName)
       .calledWith({} as any, 'otie')
       .thenReturn('3.17.0')
 
@@ -79,11 +78,11 @@ describe('useCanDisconnect', () => {
   })
 
   it('useCanDisconnect returns false if less than 3.17.0', () => {
-    when(useWifiList)
+    vi.when(useWifiList)
       .calledWith('otie')
       .thenReturn([{ ...mockWifiNetwork, active: true }])
 
-    when(getRobotApiVersionByName)
+    vi.when(getRobotApiVersionByName)
       .calledWith({} as any, 'otie')
       .thenReturn('3.16.999')
 
@@ -92,26 +91,26 @@ describe('useCanDisconnect', () => {
   })
 
   it('useCanDisconnect returns true for a Flex', () => {
-    when(useWifiList)
+    vi.when(useWifiList)
       .calledWith('otie')
       .thenReturn([{ ...mockWifiNetwork, active: true }])
 
-    when(getRobotApiVersionByName)
+    vi.when(getRobotApiVersionByName)
       .calledWith({} as any, 'otie')
       .thenReturn('0.22.999-gamma.1')
 
-    when(useIsFlex).calledWith('otie').thenReturn(true)
+    vi.when(useIsFlex).calledWith('otie').thenReturn(true)
 
     const { result } = renderHook(() => useCanDisconnect('otie'), { wrapper })
     expect(result.current).toBe(true)
   })
 
   it('useCanDisconnect returns false if robot API version not found', () => {
-    when(useWifiList)
+    vi.when(useWifiList)
       .calledWith('otie')
       .thenReturn([{ ...mockWifiNetwork, active: true }])
 
-    when(getRobotApiVersionByName)
+    vi.when(getRobotApiVersionByName)
       .calledWith({} as any, 'otie')
       .thenReturn(null)
 

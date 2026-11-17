@@ -14,7 +14,7 @@ stages:
       json: &initial_get_settings_response
         data:
           requireSignoffForProtocolLog: true
-          requireLogsToBeSavedInApp: true
+          requireLogsToBeSavedInApp: false
           deleteOverMaxOnDiskProtocols: true
 
   - name: Change settings
@@ -24,13 +24,13 @@ stages:
       json:
         data:
           requireSignoffForProtocolLog: false
-          requireLogsToBeSavedInApp: false
+          requireLogsToBeSavedInApp: true
     response:
       status_code: 200
       json: &patch_settings_response
         data:
           requireSignoffForProtocolLog: false
-          requireLogsToBeSavedInApp: false
+          requireLogsToBeSavedInApp: true
           deleteOverMaxOnDiskProtocols: true
 
   - name: Get the settings again and make sure they're still changed
@@ -76,7 +76,7 @@ stages:
       json:
         data:
           requireSignoffForProtocolLog: true
-          requireLogsToBeSavedInApp: true
+          requireLogsToBeSavedInApp: false
           deleteOverMaxOnDiskProtocols: true
 
 ---
@@ -99,7 +99,7 @@ stages:
       json:
         data:
           requireSignoffForProtocolLog: false
-          requireLogsToBeSavedInApp: true
+          requireLogsToBeSavedInApp: false
           deleteOverMaxOnDiskProtocols: true
 
   - name: Revert it by sending null
@@ -114,5 +114,5 @@ stages:
       json:
         data:
           requireSignoffForProtocolLog: true
-          requireLogsToBeSavedInApp: true
+          requireLogsToBeSavedInApp: false
           deleteOverMaxOnDiskProtocols: true

@@ -71,7 +71,7 @@ clean-local-packages:
 	@rm -rf $(PACK_DIR)
 	@echo "Local packages cleaned!"
 
-# Run Playwright tests (visual checkpoints go to Applitools Eyes; set APPLITOOLS_API_KEY)
+# Run Playwright tests
 .PHONY: test
 test:
 	pnpm playwright test --config=playwright.config.ts

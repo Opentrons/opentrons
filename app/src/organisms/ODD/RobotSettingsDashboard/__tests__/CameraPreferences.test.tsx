@@ -1,17 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { CameraSettings } from '/app/organisms/ODD/CameraSettings'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import { CameraPreferences } from '../CameraPreferences'
 
 import type { CameraPreferencesProps } from '../CameraPreferences'
 
 vi.mock('/app/organisms/ODD/CameraSettings')
-vi.mock('/app/organisms/ODD/ChildNavigation')
+vi.mock('/app/components/ODD/headers/ChildNavigation')
 
 vi.mock('/app/local-resources/access-control/useDocumentationState', () => ({
   useDocumentationState: () => ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE,

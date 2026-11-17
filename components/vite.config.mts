@@ -12,9 +12,13 @@ import { cssModuleSideEffect } from './cssModuleSideEffect'
 export default defineConfig({
   build: {
     lib: {
-      entry: 'src/index.ts',
+      entry: {
+        index: 'src/index.ts',
+        localization: 'src/localization.ts',
+      },
       formats: ['es', 'cjs'],
-      fileName: format => `index.${format === 'es' ? 'mjs' : 'js'}`,
+      fileName: (format, entryName) =>
+        `${entryName}.${format === 'es' ? 'mjs' : 'js'}`,
     },
     outDir: 'lib',
     // Do not delete the outdir, typescript types might live there and we don't want to delete them

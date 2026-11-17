@@ -27,8 +27,7 @@ export interface UseLPCInitialStateProps {
   labwareDefs: LabwareDefinition[]
   labwareInfo: LPCLabwareInfo
   deckConfig: DeckConfiguration | undefined
-  isFlex: boolean
-  flexStoredOffsets: StoredLabwareOffset[] | undefined
+  storedOffsets: StoredLabwareOffset[] | undefined
 }
 
 // Initialize the LPC store if underlying store data is sufficiently present.
@@ -39,8 +38,7 @@ export function useInitLPCStore({
   protocolName,
   runRecord,
   deckConfig,
-  isFlex,
-  flexStoredOffsets,
+  storedOffsets,
   ...rest
 }: UseLPCInitialStateProps): void {
   const dispatch = useDispatch()
@@ -55,13 +53,13 @@ export function useInitLPCStore({
     analysis != null &&
     protocolName != null &&
     deckConfig != null &&
-    flexStoredOffsets !== undefined &&
+    storedOffsets !== undefined &&
     runRecordOffsets !== undefined
 
   // Initialize the store. This effect should only occur once.
   useEffect(
     () => {
-      if (isReadyToInit && isFlex) {
+      if (isReadyToInit) {
         const activePipetteId = getActivePipetteId(analysis.pipettes)
 
         const initialState: LPCWizardState = {
@@ -75,7 +73,7 @@ export function useInitLPCStore({
             ...rest.labwareInfo,
             sourcedOffsets: OFFSETS_SOURCE_INITIALIZING,
             initialRunRecordOffsets: sortRunRecordOffsets(runRecordOffsets),
-            initialDatabaseOffsets: flexStoredOffsets,
+            initialDatabaseOffsets: storedOffsets,
           },
           steps: {
             currentStepIndex: 0,

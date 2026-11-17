@@ -234,6 +234,7 @@ settings = [
         _id="enableProtocolSubprocess",
         title="Enable running Protocols as a seperate process",
         description="Protocol execution will run in a seperate process and utilize Pyro to communicate with the robot-server process.",
+        restart_required=True,
         robot_type=[RobotTypeEnum.FLEX],
         internal_only=True,
     ),
@@ -241,6 +242,7 @@ settings = [
         _id="enableHardwareSubprocess",
         title="Enable running Hardware Controller as a seperate process",
         description="The Hardware Controller will run in a seperate process hosted by a systemd service and utilize Pyro to communicate with the robot-server and protocol processes.",
+        restart_required=True,
         robot_type=[RobotTypeEnum.FLEX],
         internal_only=True,
     ),
@@ -258,6 +260,15 @@ settings = [
             "Lower the right mount to attach mount without detaching z axis during"
             " 96-channel pipette attach, reducing the Z margin from 20 mm to 1.85 mm."
             "This can and will ruin the right z axis, do not use."
+        ),
+        robot_type=[RobotTypeEnum.FLEX],
+    ),
+    SettingDefinition(
+        _id="disableVacuumModuleWasteDetection",
+        title="Disable Vacuum Module's waste full detection features",
+        description=(
+            "Vacuum Modules will ignore when the waste is full. "
+            "Protocol runs will no longer raise the following recoverable error: Waste Full."
         ),
         robot_type=[RobotTypeEnum.FLEX],
     ),
@@ -825,13 +836,10 @@ def _migrate41to42(previous: SettingsMap) -> SettingsMap:
 
 
 def _migrate42to43(previous: SettingsMap) -> SettingsMap:
-    """Migrate to version 43 of the feature flags file.
-
-    -  Ensure the subprocess flags default to True ensuring the hardware always runs with Pyro.
-    """
+    """Migrate to version 43 of the feature flags file."""
     newmap = {k: v for k, v in previous.items()}
-    newmap["enableProtocolSubprocess"] = True
-    newmap["enableHardwareSubprocess"] = True
+    newmap["enableProtocolSubprocess"] = False
+    newmap["enableHardwareSubprocess"] = False
     return newmap
 
 
@@ -842,6 +850,16 @@ def _migrate43to44(previous: SettingsMap) -> SettingsMap:
     """
     newmap = {k: v for k, v in previous.items()}
     newmap["internal96chAttach"] = False
+    return newmap
+
+
+def _migrate44to45(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 45 of the feature flags file.
+
+    - Adds the disableVacuumModuleWasteDetection config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["disableVacuumModuleWasteDetection"] = None
     return newmap
 
 
@@ -890,6 +908,7 @@ _MIGRATIONS = [
     _migrate41to42,
     _migrate42to43,
     _migrate43to44,
+    _migrate44to45,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

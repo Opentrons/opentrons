@@ -6,7 +6,6 @@ import {
   BORDERS,
   COLORS,
   Flex,
-  LegacyStyledText,
   ModuleIcon,
   RobotInfoLabel,
   SPACING,
@@ -35,6 +34,7 @@ import { useRequiredProtocolHardware } from '/app/resources/protocols'
 import { EmptySection } from './EmptySection'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type {
   ProtocolHardware,
   ProtocolPipette,
@@ -112,22 +112,15 @@ const useHardwareName = (
   }
 }
 
-function HardwareItem({
-  hardware,
-}: {
-  hardware: ProtocolHardware
-}): JSX.Element {
+function HardwareItem({ hardware }: { hardware: ProtocolHardware }): ReactNode {
   const { t, i18n } = useTranslation(['protocol_details', 'deck_configuration'])
 
   const hardwareName = useHardwareName(hardware, t as TFunction)
 
   let location: JSX.Element = (
-    <LegacyStyledText
-      forwardedAs="p"
-      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-    >
+    <StyledText forwardedAs="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
       {i18n.format(getHardwareLocation(hardware, t as TFunction), 'titleCase')}
-    </LegacyStyledText>
+    </StyledText>
   )
   if (hardware.hardwareType === 'module') {
     location = (
@@ -173,14 +166,14 @@ function HardwareItem({
               <ModuleIcon moduleType={iconModuleType} size="1.75rem" />
             </Flex>
           ) : null}
-          <LegacyStyledText forwardedAs="p">{hardwareName}</LegacyStyledText>
+          <StyledText forwardedAs="p">{hardwareName}</StyledText>
         </Flex>
       </TableDatum>
     </TableRow>
   )
 }
 
-export const Hardware = (props: { protocolId: string }): JSX.Element => {
+export const Hardware = (props: { protocolId: string }): ReactNode => {
   const { requiredProtocolHardware } = useRequiredProtocolHardware(
     props.protocolId
   )

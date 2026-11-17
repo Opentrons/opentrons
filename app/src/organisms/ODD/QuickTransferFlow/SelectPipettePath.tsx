@@ -8,12 +8,12 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 
 import { ACTIONS } from './constants'
 
-import type { ComponentProps, Dispatch } from 'react'
-import type { SmallButton } from '/app/atoms/buttons'
+import type { ComponentProps, Dispatch, ReactNode } from 'react'
+import type { SmallButton } from '/app/components/ODD/buttons'
 import type {
   PathOption,
   QuickTransferWizardAction,
@@ -33,7 +33,7 @@ export function SelectPipettePath({
   exitButtonProps,
   state,
   dispatch,
-}: SelectPipettePathProps): JSX.Element {
+}: SelectPipettePathProps): ReactNode {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const [selectedPath, setSelectedPath] = useState<PathOption | undefined>()
 

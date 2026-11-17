@@ -17,7 +17,7 @@ export function useCurrentSubsystemUpdateQuery<TError = Error>(
   const host = useHost()
   const queryClient = useQueryClient()
   const query = useQuery<SubsystemUpdateProgressData, TError>(
-    getQueryKey(host, '/subsystems/updates/current', subsystem),
+    getQueryKey(host, 'subsystems', 'updates', 'current', subsystem),
     () =>
       getCurrentSubsystemUpdate(host!, subsystem as Subsystem).then(
         response => response.data
@@ -26,7 +26,7 @@ export function useCurrentSubsystemUpdateQuery<TError = Error>(
       enabled: host !== null,
       onError: () => {
         queryClient.setQueryData(
-          getQueryKey(host, '/subsystems/updates/current', subsystem),
+          getQueryKey(host, 'subsystems', 'updates', 'current', subsystem),
           undefined
         )
       },

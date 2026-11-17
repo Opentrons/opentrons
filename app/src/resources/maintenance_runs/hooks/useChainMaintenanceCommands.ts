@@ -17,7 +17,8 @@ import type { CreateCommand } from '@opentrons/shared-data'
 export function useChainMaintenanceCommands(
   documentationState: DocumentationState,
   actionsToDocument: DocumentedAction[],
-  addActionToDocument: (action: DocumentedAction) => void
+  addActionToDocument: (action: DocumentedAction) => void,
+  onError?: (error: Error) => void
 ): {
   chainRunCommands: (
     maintenanceRunId: string,
@@ -45,6 +46,7 @@ export function useChainMaintenanceCommands(
         continuePastCommandFailure,
         setIsLoading
       ).catch(error => {
+        onError?.(error instanceof Error ? error : new Error(String(error)))
         if (isDocumentedMutationError(error)) {
           return new Promise<CommandData[]>(() => {})
         }

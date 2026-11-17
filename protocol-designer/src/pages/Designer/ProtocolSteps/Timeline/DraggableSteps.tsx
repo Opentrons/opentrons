@@ -35,7 +35,7 @@ import {
 
 import { ConnectedStepInfo } from './ConnectedStepInfo'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { DragLayerMonitor, DropTargetMonitor } from 'react-dnd'
 import type { StepIdType } from '/protocol-designer/form-types'
 
@@ -136,7 +136,7 @@ interface DragDropStepProps extends ConnectedStepItemProps {
  * A step that can appear at the top level of the timeline or inside a nested group.
  * It can be dragged around to move it within the timeline.
  */
-function DragDropStep(props: DragDropStepProps): JSX.Element {
+function DragDropStep(props: DragDropStepProps): ReactNode {
   const {
     stepId,
     openedOverflowMenuId,
@@ -219,7 +219,7 @@ function DragDropStep(props: DragDropStepProps): JSX.Element {
 }
 
 /** A horizontal divider indicating where the step will be placed. */
-function DragDropPreviewBar(): JSX.Element {
+function DragDropPreviewBar(): ReactNode {
   return (
     <Box paddingY={SPACING.spacing2}>
       <Divider
@@ -249,7 +249,7 @@ interface ThermocyclerProfileProps {
  * The profile step can be dragged around to move the whole group.
  * The nested block can have other steps dropped into it.
  */
-function ThermocyclerProfile(props: ThermocyclerProfileProps): JSX.Element {
+function ThermocyclerProfile(props: ThermocyclerProfileProps): ReactNode {
   const {
     startStepId,
     concurrentStepIds,
@@ -328,7 +328,7 @@ interface VacuumProfileProps {
  * The profile step can be dragged around to move the whole group.
  * The nested block can have other steps dropped into it.
  */
-function VacuumProfile(props: VacuumProfileProps): JSX.Element {
+function VacuumProfile(props: VacuumProfileProps): ReactNode {
   const {
     startStepId,
     concurrentStepIds,
@@ -394,7 +394,7 @@ interface VacuumStateDurationConcurrentProps {
  */
 function VacuumStateDurationConcurrent(
   props: VacuumStateDurationConcurrentProps
-): JSX.Element {
+): ReactNode {
   const {
     startStepId,
     concurrentStepIds,
@@ -449,9 +449,7 @@ function VacuumStateDurationConcurrent(
  * The "wait for profile to complete" checkpoint at the end of a Vacuum profile's
  * nested block. The user can drag a step onto it to move that step right above it.
  */
-function VacuumProfileEndCheckpoint(props: {
-  startStepId: string
-}): JSX.Element {
+function VacuumProfileEndCheckpoint(props: { startStepId: string }): ReactNode {
   const { startStepId } = props
 
   const dispatch = useDispatch()
@@ -510,7 +508,7 @@ function VacuumProfileEndCheckpoint(props: {
 
 function VacuumStateDurationEndCheckpoint(props: {
   startStepId: string
-}): JSX.Element {
+}): ReactNode {
   const { startStepId } = props
 
   const dispatch = useDispatch()
@@ -569,7 +567,7 @@ function VacuumStateDurationEndCheckpoint(props: {
 
 function ThermocyclerProfileEndCheckpoint(props: {
   startStepId: string
-}): JSX.Element {
+}): ReactNode {
   const { startStepId } = props
 
   const dispatch = useDispatch()

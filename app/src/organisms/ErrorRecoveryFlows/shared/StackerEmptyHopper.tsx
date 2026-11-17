@@ -3,16 +3,20 @@ import { useTranslation } from 'react-i18next'
 import { StyledText } from '@opentrons/components'
 
 import EmptyHopper from '/app/assets/videos/error-recovery/FlexStacker_EmptyHopper.webm'
-import { DescriptionContent, TwoColumn } from '/app/molecules/InterventionModal'
+import {
+  DescriptionContent,
+  TwoColumn,
+} from '/app/components/ODD/modals/InterventionModal'
 
 import { RECOVERY_MAP } from '../constants'
 import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { RightColumnAnimation } from './RightColumnAnimation'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
-export function StackerEmptyHopper(props: RecoveryContentProps): JSX.Element {
+export function StackerEmptyHopper(props: RecoveryContentProps): ReactNode {
   const { t } = useTranslation('error_recovery')
   const { routeUpdateActions, recoveryMap } = props
   const { route } = recoveryMap

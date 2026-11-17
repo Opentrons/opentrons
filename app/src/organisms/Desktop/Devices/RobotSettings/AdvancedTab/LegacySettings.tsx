@@ -5,16 +5,16 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useUpdateRobotSettingMutation } from '@opentrons/react-api-client'
 
-import { ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/utils'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { RobotSettingsField } from '@opentrons/api-client'
 
 interface LegacySettingsProps {
@@ -25,7 +25,7 @@ interface LegacySettingsProps {
 export function LegacySettings({
   settings,
   isRobotBusy,
-}: LegacySettingsProps): JSX.Element {
+}: LegacySettingsProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const { updateRobotSetting } = useUpdateRobotSettingMutation(
     ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
@@ -46,19 +46,19 @@ export function LegacySettings({
       marginTop={SPACING.spacing40}
     >
       <Box width="70%">
-        <LegacyStyledText
+        <StyledText
           forwardedAs="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing16}
         >
           {t('legacy_settings')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p" css={TYPOGRAPHY.pSemiBold}>
+        </StyledText>
+        <StyledText fontWeight={TYPOGRAPHY.fontWeightSemiBold} forwardedAs="p">
           {t('calibrate_deck_to_dots')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        </StyledText>
+        <StyledText forwardedAs="p">
           {t('calibrate_deck_description')}
-        </LegacyStyledText>
+        </StyledText>
       </Box>
       <ToggleButton
         label="legacy_settings"

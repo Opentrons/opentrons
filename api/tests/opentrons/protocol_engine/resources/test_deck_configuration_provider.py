@@ -1,12 +1,12 @@
 """Test deck configuration provider."""
 
-from typing import List, Set
+from typing import Set
 
 import pytest
 from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.labware.types import (
     LocatingFeatures,
 )
@@ -23,139 +23,62 @@ from opentrons.protocol_engine.types import (
     AddressableOffsetVector,
     AreaType,
     DeckPoint,
+    DeckType,
     Dimensions,
     PotentialCutoutFixture,
-)
-from opentrons.protocols.api_support.deck_type import (
-    SHORT_TRASH_DECK,
-    STANDARD_OT2_DECK,
-    STANDARD_OT3_DECK,
 )
 from opentrons.types import DeckSlotName
 
 
 @pytest.fixture(scope="session")
-def ot2_standard_deck_def() -> DeckDefinitionV5:
+def ot3_standard_deck_def() -> DeckDefinitionV6:
     """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT2_DECK, 5)
+    return load_deck(DeckType.OT3_STANDARD, 6)
 
 
-@pytest.fixture(scope="session")
-def ot2_short_trash_deck_def() -> DeckDefinitionV5:
-    """Get the OT-2 standard deck definition."""
-    return load_deck(SHORT_TRASH_DECK, 5)
-
-
-@pytest.fixture(scope="session")
-def ot3_standard_deck_def() -> DeckDefinitionV5:
-    """Get the OT-2 standard deck definition."""
-    return load_deck(STANDARD_OT3_DECK, 5)
-
-
-@pytest.mark.parametrize(
-    ("cutout_id", "expected_deck_point", "deck_def"),
-    [
-        (
-            "cutout5",
-            DeckPoint(x=132.5, y=90.5, z=0.0),
-            lazy_fixture("ot2_standard_deck_def"),
-        ),
-        (
-            "cutout5",
-            DeckPoint(x=132.5, y=90.5, z=0.0),
-            lazy_fixture("ot2_short_trash_deck_def"),
-        ),
-        (
-            "cutoutC2",
-            DeckPoint(x=164.0, y=107, z=0.0),
-            lazy_fixture("ot3_standard_deck_def"),
-        ),
-    ],
-)
 def test_get_cutout_position(
-    cutout_id: str,
-    expected_deck_point: DeckPoint,
-    deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> None:
     """It should get the deck position for the requested cutout id."""
-    cutout_position = subject.get_cutout_position(cutout_id, deck_def)
+    expected_deck_point = DeckPoint(x=164.0, y=107, z=0.0)
+    cutout_position = subject.get_cutout_position("cutoutC2", ot3_standard_deck_def)
     assert cutout_position == expected_deck_point
 
 
 def test_get_cutout_position_raises(
-    ot3_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> None:
     """It should raise if there is no cutout with that ID in the deck definition."""
     with pytest.raises(CutoutDoesNotExistError):
         subject.get_cutout_position("theFunCutout", ot3_standard_deck_def)
 
 
-@pytest.mark.parametrize(
-    ("cutout_fixture_id", "expected_display_name", "deck_def"),
-    [
-        ("singleStandardSlot", "Standard Slot", lazy_fixture("ot2_standard_deck_def")),
-        (
-            "singleStandardSlot",
-            "Standard Slot",
-            lazy_fixture("ot2_short_trash_deck_def"),
-        ),
-        (
-            "singleRightSlot",
-            "Standard Slot Right",
-            lazy_fixture("ot3_standard_deck_def"),
-        ),
-    ],
-)
 def test_get_cutout_fixture(
-    cutout_fixture_id: str,
-    expected_display_name: str,
-    deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> None:
     """It should get the cutout fixture given the cutout fixture id."""
-    cutout_fixture = subject.get_cutout_fixture(cutout_fixture_id, deck_def)
+    expected_display_name = "Standard Slot Right"
+    cutout_fixture = subject.get_cutout_fixture(
+        "singleRightSlot", ot3_standard_deck_def
+    )
     assert cutout_fixture["displayName"] == expected_display_name
 
 
 def test_get_cutout_fixture_raises(
-    ot3_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> None:
     """It should raise if the given cutout fixture id does not exist."""
     with pytest.raises(FixtureDoesNotExistError):
         subject.get_cutout_fixture("theFunFixture", ot3_standard_deck_def)
 
 
-@pytest.mark.parametrize(
-    ("cutout_fixture_id", "cutout_id", "expected_areas", "deck_def"),
-    [
-        (
-            "singleStandardSlot",
-            "cutout1",
-            ["1"],
-            lazy_fixture("ot2_standard_deck_def"),
-        ),
-        (
-            "singleStandardSlot",
-            "cutout1",
-            ["1"],
-            lazy_fixture("ot2_short_trash_deck_def"),
-        ),
-        (
-            "stagingAreaRightSlot",
-            "cutoutD3",
-            ["D3", "D4"],
-            lazy_fixture("ot3_standard_deck_def"),
-        ),
-    ],
-)
 def test_get_provided_addressable_area_names(
-    cutout_fixture_id: str,
-    cutout_id: str,
-    expected_areas: List[str],
-    deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> None:
     """It should get the provided addressable area for the cutout fixture and cutout."""
+    expected_areas = ["D3", "D4"]
     provided_addressable_areas = subject.get_provided_addressable_area_names(
-        cutout_fixture_id, cutout_id, deck_def
+        "stagingAreaRightSlot", "cutoutD3", ot3_standard_deck_def
     )
     assert provided_addressable_areas == expected_areas
 
@@ -168,30 +91,6 @@ def test_get_provided_addressable_area_names(
         "deck_def",
     ),
     [
-        (
-            "3",
-            "cutout3",
-            {
-                PotentialCutoutFixture(
-                    cutout_id="cutout3",
-                    cutout_fixture_id="singleStandardSlot",
-                    provided_addressable_areas=frozenset({"3"}),
-                )
-            },
-            lazy_fixture("ot2_standard_deck_def"),
-        ),
-        (
-            "3",
-            "cutout3",
-            {
-                PotentialCutoutFixture(
-                    cutout_id="cutout3",
-                    cutout_fixture_id="singleStandardSlot",
-                    provided_addressable_areas=frozenset({"3"}),
-                )
-            },
-            lazy_fixture("ot2_short_trash_deck_def"),
-        ),
         (
             "D3",
             "cutoutD3",
@@ -267,7 +166,7 @@ def test_get_potential_cutout_fixtures(
     addressable_area_name: str,
     expected_cutout_id: str,
     expected_potential_fixtures: Set[PotentialCutoutFixture],
-    deck_def: DeckDefinitionV5,
+    deck_def: DeckDefinitionV6,
 ) -> None:
     """It should get a cutout id and a set of potential cutout fixtures for an addressable area name."""
     cutout_id, potential_fixtures = subject.get_potential_cutout_fixtures(
@@ -278,61 +177,16 @@ def test_get_potential_cutout_fixtures(
 
 
 def test_get_potential_cutout_fixtures_raises(
-    ot3_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> None:
     """It should raise if there is no fixtures that provide the requested area."""
     with pytest.raises(AddressableAreaDoesNotExistError):
         subject.get_potential_cutout_fixtures("theFunArea", ot3_standard_deck_def)
 
 
-# TODO put in fixed trash for OT2 decks
 @pytest.mark.parametrize(
     ("addressable_area_name", "expected_addressable_area", "deck_def"),
     [
-        (
-            "1",
-            AddressableArea(
-                area_name="1",
-                area_type=AreaType.SLOT,
-                base_slot=DeckSlotName.SLOT_1,
-                display_name="Slot 1",
-                bounding_box=Dimensions(x=128.0, y=86.0, z=0),
-                position=AddressableOffsetVector(x=1, y=2, z=3),
-                features=LocatingFeatures(
-                    springDirectionalForceAsParent="backLeftBottom"
-                ),
-                compatible_module_types=[
-                    "magneticModuleType",
-                    "temperatureModuleType",
-                    "heaterShakerModuleType",
-                ],
-                mating_surface_unit_vector=[-1, 1, -1],
-                orientation=ModuleOrientation.NOT_APPLICABLE,
-            ),
-            lazy_fixture("ot2_standard_deck_def"),
-        ),
-        (
-            "1",
-            AddressableArea(
-                area_name="1",
-                area_type=AreaType.SLOT,
-                base_slot=DeckSlotName.SLOT_1,
-                display_name="Slot 1",
-                bounding_box=Dimensions(x=128.0, y=86.0, z=0),
-                position=AddressableOffsetVector(x=1, y=2, z=3),
-                compatible_module_types=[
-                    "magneticModuleType",
-                    "temperatureModuleType",
-                    "heaterShakerModuleType",
-                ],
-                features=LocatingFeatures(
-                    springDirectionalForceAsParent="backLeftBottom"
-                ),
-                mating_surface_unit_vector=[-1, 1, -1],
-                orientation=ModuleOrientation.NOT_APPLICABLE,
-            ),
-            lazy_fixture("ot2_short_trash_deck_def"),
-        ),
         (
             "D1",
             AddressableArea(
@@ -344,7 +198,12 @@ def test_get_potential_cutout_fixtures_raises(
                 position=AddressableOffsetVector(x=1, y=2, z=3),
                 compatible_module_types=[],
                 features=LocatingFeatures(
-                    springDirectionalForceAsParent="backLeftBottom"
+                    slotFootprintAsParent={
+                        "z": 0.0,
+                        "backLeft": {"x": 0.0, "y": 86.0},
+                        "frontRight": {"x": 128.0, "y": 0},
+                        "springDirectionalForce": "backLeftBottom",
+                    }
                 ),
                 mating_surface_unit_vector=[-1, 1, -1],
                 orientation=ModuleOrientation.NOT_APPLICABLE,
@@ -388,7 +247,7 @@ def test_get_potential_cutout_fixtures_raises(
 def test_get_addressable_area_from_name(
     addressable_area_name: str,
     expected_addressable_area: AddressableArea,
-    deck_def: DeckDefinitionV5,
+    deck_def: DeckDefinitionV6,
 ) -> None:
     """It should get the deck position for the requested cutout id."""
     addressable_area = subject.get_addressable_area_from_name(
@@ -398,7 +257,7 @@ def test_get_addressable_area_from_name(
 
 
 def test_get_addressable_area_from_name_raises(
-    ot3_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
 ) -> None:
     """It should raise if there is no addressable area by that name in the deck."""
     with pytest.raises(AddressableAreaDoesNotExistError):

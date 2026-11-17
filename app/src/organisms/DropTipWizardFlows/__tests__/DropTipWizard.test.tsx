@@ -2,8 +2,8 @@ import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { InProgressModal } from '/app/components/adhoc/shared/InProgressModal'
 import { i18n } from '/app/i18n'
-import { InProgressModal } from '/app/molecules/InProgressModal'
 
 import { mockDropTipWizardContainerProps } from '../__fixtures__'
 import {
@@ -33,7 +33,7 @@ import {
 
 import type { ComponentProps } from 'react'
 
-vi.mock('/app/molecules/InProgressModal')
+vi.mock('/app/components/adhoc/shared/InProgressModal')
 vi.mock('../ExitConfirmation')
 vi.mock('../steps')
 vi.mock('../ErrorInfo')

@@ -2,7 +2,7 @@
 
 import datetime
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.engine import Engine as SQLEngine
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -32,6 +32,14 @@ class UserStore:
                 session.expunge(user)
             return user
 
+    def get_by_id(self, user_id: int) -> User | None:
+        """Look up a user by primary key. Returns the User or None."""
+        with self._session() as session:
+            user = session.scalar(select(User).where(User.id == user_id))
+            if user is not None:
+                session.expunge(user)
+            return user
+
     def get_all(self) -> list[User]:
         """Return all users, ordered by username."""
         with self._session() as session:
@@ -43,16 +51,18 @@ class UserStore:
     def add(
         self,
         username: str,
-        hashed_password: str,
+        hashed_password: str | None,
         full_name: str,
         account_type: str,
         now: datetime.datetime,
         reset_password: bool,
+        temporary_password: str | None = None,
     ) -> User:
         """Create a user, persist it, and return it."""
         new_user = User(
             username=username,
             hashed_password=hashed_password,
+            temporary_hashed_password=temporary_password,
             full_name=full_name,
             account_type=AccountType(account_type),
             password_set_at=now,
@@ -76,7 +86,7 @@ class UserStore:
             session.delete(user)
             session.commit()
 
-    def update(
+    def update(  # noqa: C901
         self,
         username: str,
         new_username: str | None = None,
@@ -85,12 +95,17 @@ class UserStore:
         account_type: str | None = None,
         reset_password: bool | None = None,
         deactivated: bool | None = None,
+        temporary_hashed_password: str | None = None,
+        clear_temporary_hashed_password: bool = False,
         *,
         now: datetime.datetime,
     ) -> User:
         """Update a user's fields and return the updated User.
 
         Raises ``ValueError`` if the user does not exist.
+
+        Pass ``temporary_hashed_password`` to set a temp password hash, or
+        ``clear_temporary_hashed_password=True`` to clear it. Omit both to leave it unchanged.
         """
         with self._session() as session:
             user = session.scalar(select(User).where(User.username == username))
@@ -110,6 +125,10 @@ class UserStore:
                 user.reset_password = reset_password
             if deactivated is not None:
                 user.deactivated = deactivated
+            if clear_temporary_hashed_password:
+                user.temporary_hashed_password = None
+            elif temporary_hashed_password is not None:
+                user.temporary_hashed_password = temporary_hashed_password
 
             session.commit()
             session.expunge(user)
@@ -140,4 +159,10 @@ class UserStore:
             if user is None:
                 raise ValueError(f"User {username!r} not found")
             user.failed_logins.clear()
+            session.commit()
+
+    def mark_all_reset_password(self) -> None:
+        """Require every user to set a new password on their next login."""
+        with self._session() as session:
+            session.execute(update(User).values(reset_password=True))
             session.commit()

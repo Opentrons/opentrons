@@ -10,7 +10,7 @@ import {
 
 import { TimelineToolbox } from './Timeline/TimelineToolbox'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 
 const INITIAL_SIDEBAR_WIDTH = 235
 const MIN_SIDEBAR_WIDTH = 170
@@ -26,7 +26,7 @@ interface DraggableSidebarProps {
 export function DraggableSidebar({
   setTargetWidth,
   showLiquidOverflowMenu,
-}: DraggableSidebarProps): JSX.Element {
+}: DraggableSidebarProps): ReactNode {
   const sidebarRef = useRef<HTMLDivElement>(null)
   const [isResizing, setIsResizing] = useState(false)
   const [sidebarWidth, setSidebarWidth] = useState<number>(
@@ -120,7 +120,7 @@ const SidebarResizer = styled(Flex)<SidebarResizerProps>`
   }
 
   ${props =>
-    props.dragging === true &&
+    props.dragging &&
     `
     background-color: ${COLORS.blue55}; /* Dragging state */
   `}

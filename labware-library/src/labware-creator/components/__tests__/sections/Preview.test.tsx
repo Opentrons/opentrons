@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
 import { render, screen } from '@testing-library/react'
-import { when } from 'vitest-when'
 
 import { getDefaultFormState, getInitialStatus } from '../../../fields'
 import { FORM_LEVEL_ERRORS } from '../../../formLevelValidation'
@@ -30,7 +29,7 @@ describe('Preview', () => {
       onSubmit: vi.fn(),
     }
 
-    when(vi.mocked(getLabwareName))
+    vi.when(vi.mocked(getLabwareName))
       .calledWith(formikConfig.initialValues, true)
       .thenReturn('FAKE LABWARE NAME PLURAL')
   })
@@ -44,9 +43,13 @@ describe('Preview', () => {
     render(wrapInFormik(<Preview />, formikConfig))
     expect(screen.getByRole('heading')).toHaveTextContent(/check your work/i)
     screen.getByText(
-      'Check that the size, spacing, and shape of your FAKE LABWARE NAME PLURAL looks correct.'
+      'Check that the size, spacing, shape, and height of your FAKE LABWARE NAME PLURAL looks correct.'
     )
-    screen.getByText('Add missing info to see labware preview')
+    expect(
+      screen.getAllByText('Add missing info to see labware preview')
+    ).toHaveLength(2)
+    screen.getByText('Top')
+    screen.getByText('Side')
   })
 })
 

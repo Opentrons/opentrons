@@ -6,7 +6,7 @@ import { WasteChute } from './WasteChuteFixture'
 
 import type { SVGProps } from 'react'
 import type { DeckDefinition, ModuleType } from '@opentrons/shared-data'
-import type { DeckLabelProps } from '../../molecules'
+import type { DeckLabelProps } from '../../helix/deck'
 
 interface WasteChuteStagingAreaFixtureProps extends SVGProps<SVGGElement> {
   cutoutId: typeof WASTE_CHUTE_CUTOUT

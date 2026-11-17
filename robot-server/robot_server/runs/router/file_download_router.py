@@ -5,7 +5,7 @@ from textwrap import dedent
 from typing import Annotated, List, Optional, Tuple, Union
 
 from fastapi import Depends, Query, Response, status
-from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
 from starlette.background import BackgroundTask
 
 from server_utils.fastapi_utils.light_router import LightRouter
@@ -18,7 +18,7 @@ from robot_server.data_files.zip_utils import (
     collect_existing_run_images,
     collect_existing_run_output_csvs,
     create_download_staging_dir,
-    write_zip_for_download,
+    run_zip_generator,
 )
 from robot_server.errors.error_responses import ErrorBody
 from robot_server.persistence.fastapi_dependencies import (
@@ -112,7 +112,7 @@ async def download_run_files(
             description=("Include CSV output files."),
         ),
     ] = False,
-) -> Union[FileResponse, Response]:
+) -> Union[StreamingResponse, Response]:
     """Download selected files associated with a run as a zip archive.
 
     Arguments:
@@ -141,7 +141,7 @@ async def download_run_files(
     staging_path = Path(staging_dir.name)
 
     try:
-        zip_entries = _collect_run_download_entries(
+        zip_entries = await _collect_run_download_entries(
             run_id=runId,
             run=run,
             run_data_manager=run_data_manager,
@@ -165,15 +165,16 @@ async def download_run_files(
             protocol_store=protocol_store,
             fallback_filename=f"{runId}.zip",
         )
-        zip_path = await write_zip_for_download(zip_entries, staging_path)
     except Exception:
         staging_dir.cleanup()
         raise
 
-    return FileResponse(
-        path=zip_path,
+    headers = {"Content-Disposition": f'attachment; filename="{zip_filename}"'}
+
+    return StreamingResponse(
+        content=run_zip_generator(entries=zip_entries),
         media_type="application/zip",
-        filename=zip_filename,
+        headers=headers,
         background=BackgroundTask(staging_dir.cleanup),
     )
 
@@ -186,7 +187,7 @@ def _append_if_present(zip_entries: List[ZipEntry], entry: Optional[ZipEntry]) -
         zip_entries.append(entry)
 
 
-def _collect_run_download_entries(
+async def _collect_run_download_entries(
     *,
     run_id: str,
     run: Union[RunResource, BadRunResource],
@@ -222,7 +223,7 @@ def _collect_run_download_entries(
     if csv_input:
         _append_if_present(
             zip_entries,
-            collect_rtp_csv(
+            await collect_rtp_csv(
                 run_id=run_id,
                 run_data_manager=run_data_manager,
                 data_files_store=data_files_store,
@@ -231,7 +232,7 @@ def _collect_run_download_entries(
     if run_log:
         _append_if_present(
             zip_entries,
-            collect_run_log(
+            await collect_run_log(
                 run_id=run_id,
                 run=run,
                 run_data_manager=run_data_manager,
@@ -242,7 +243,7 @@ def _collect_run_download_entries(
     if labware_offsets:
         _append_if_present(
             zip_entries,
-            collect_labware_offsets(
+            await collect_labware_offsets(
                 run_id=run_id,
                 run=run,
                 run_data_manager=run_data_manager,

@@ -5,16 +5,16 @@ import {
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { useUpdateRobotSettingMutation } from '@opentrons/react-api-client'
 
-import { ToggleButton } from '/app/atoms/buttons'
+import { ToggleButton } from '/app/components/adhoc/desktop/ToggleButton'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/utils'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { RobotSettingsField } from '@opentrons/api-client'
 
 interface UseOlderAspirateBehaviorProps {
@@ -25,7 +25,7 @@ interface UseOlderAspirateBehaviorProps {
 export function UseOlderAspirateBehavior({
   settings,
   isRobotBusy,
-}: UseOlderAspirateBehaviorProps): JSX.Element {
+}: UseOlderAspirateBehaviorProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const { updateRobotSetting } = useUpdateRobotSettingMutation(
     ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE
@@ -42,15 +42,16 @@ export function UseOlderAspirateBehavior({
   return (
     <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
       <Box width="70%">
-        <LegacyStyledText
-          css={TYPOGRAPHY.pSemiBold}
+        <StyledText
+          forwardedAs="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing4}
         >
           {t('use_older_aspirate')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p">
+        </StyledText>
+        <StyledText forwardedAs="p">
           {t('use_older_aspirate_description')}
-        </LegacyStyledText>
+        </StyledText>
       </Box>
       <ToggleButton
         label="use_older_aspirate_behavior"

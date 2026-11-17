@@ -19,15 +19,15 @@ import {
   useGetModulesNeedingSetup,
   useGetModulesNeedingSetupThatCanCurrentlyBeSetUp,
 } from '/app/App/hooks/useGetModulesNeedingSetup'
-import { SmallButton } from '/app/atoms/buttons'
-import { i18n } from '/app/i18n'
-import { getCalibratedPipetteForModuleSetup } from '/app/local-resources/instruments'
-import { useModuleUSBPort } from '/app/local-resources/modules'
-import { ModalContentOneColSimpleButtons } from '/app/molecules/InterventionModal'
 import {
   SimpleWizardBody,
   SimpleWizardBodyContainer,
-} from '/app/molecules/SimpleWizardBody'
+} from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { SmallButton } from '/app/components/ODD/buttons'
+import { ModalContentOneColSimpleButtons } from '/app/components/ODD/modals/InterventionModal'
+import { i18n } from '/app/i18n'
+import { getCalibratedPipetteForModuleSetup } from '/app/local-resources/instruments'
+import { useModuleUSBPort } from '/app/local-resources/modules'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 
 import type { AttachedModule } from '@opentrons/api-client'

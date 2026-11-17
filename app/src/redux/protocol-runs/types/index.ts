@@ -1,3 +1,4 @@
+import type { setDropTipPromptDismissed } from '../actions'
 import type { LPCWizardAction, LPCWizardState } from './lpc'
 import type { RunSetupStatus, RunSetupStepsAction } from './setup'
 
@@ -7,10 +8,14 @@ export * from './lpc'
 export interface PerRunUIState {
   setup: RunSetupStatus
   lpc?: LPCWizardState
+  dropTipPromptDismissed?: boolean
 }
 
 export interface ProtocolRunState {
   readonly [runId: string]: PerRunUIState
 }
 
-export type ProtocolRunAction = RunSetupStepsAction | LPCWizardAction
+export type ProtocolRunAction =
+  | RunSetupStepsAction
+  | LPCWizardAction
+  | ReturnType<typeof setDropTipPromptDismissed>

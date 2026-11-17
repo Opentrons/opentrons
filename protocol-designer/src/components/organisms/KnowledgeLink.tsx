@@ -13,7 +13,7 @@ export const RELEASE_NOTES_URL =
 
 export const DOC_URL = 'https://docs.opentrons.com/protocol-designer/'
 
-export function KnowledgeLink(props: KnowledgeLinkProps): JSX.Element {
+export function KnowledgeLink(props: KnowledgeLinkProps): ReactNode {
   const { children } = props
   return (
     <Link external href={DOC_URL} css={LINK_BUTTON_STYLE}>

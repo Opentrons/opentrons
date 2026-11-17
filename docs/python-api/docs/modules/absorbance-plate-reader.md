@@ -3,9 +3,12 @@ title: "Python API: Absorbance Plate Reader"
 description: "Initialize and read data from the Absorbance Plate Reader in Python protocols."
 ---
 
-The Absorbance Plate Reader Module is an on-deck microplate spectrophotometer that works with the Flex robot only. The module uses light absorbance to determine sample concentrations in 96-well plates.
+The Absorbance Plate Reader Module is an on-deck microplate spectrophotometer that works with the Flex robot only. The module uses light absorbance to determine sample concentrations in 96-well plates. 
 
 The Absorbance Plate Reader is represented in code by an [`AbsorbanceReaderContext`][opentrons.protocol_api.AbsorbanceReaderContext] object, which has methods for moving the module lid with the Flex Gripper, initializing the module to read at a single wavelength or multiple wavelengths, and reading a plate. With the Python Protocol API, you can process plate reader data immediately in your protocol or export it to a CSV for post-run use.
+
+!!! note
+    Use of the Absorbance Plate Reader requires an installed Flex Gripper. Only the gripper can move the module's illumination unit (lid). The API does not support manual lid movement or plate reader protocols without a gripper.
 
 This page explains the actions necessary for using the Absorbance Plate Reader. These combine to form the typical reader workflow:
 
@@ -32,7 +35,7 @@ pr_mod = protocol.load_module(
 
 ## Lid control
 
-Flex uses the gripper to move the lid between its two positions.
+Flex requires the gripper to move the lid between its two positions. You cannot use the plate reader without an attached gripper.
 
 - [`AbsorbanceReaderContext.open_lid()`][opentrons.protocol_api.AbsorbanceReaderContext.open_lid] moves the lid to the righthand side of the caddy, in deck column 4.
 - [`AbsorbanceReaderContext.close_lid()`][opentrons.protocol_api.AbsorbanceReaderContext.close_lid] moves the lid onto the detection unit, in deck column 3.

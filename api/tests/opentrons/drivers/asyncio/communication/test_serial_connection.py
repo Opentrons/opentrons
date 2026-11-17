@@ -5,6 +5,9 @@ import mock
 import pytest
 from _pytest.fixtures import SubRequest
 from mock import AsyncMock, call
+from serial.serialutil import (  # type: ignore[import-untyped]
+    SerialException as PySerialSerialException,
+)
 
 from opentrons.drivers.asyncio.communication.async_serial import AsyncSerial
 from opentrons.drivers.asyncio.communication.errors import (
@@ -181,31 +184,37 @@ async def test_send_command_response(
 
 
 @pytest.mark.parametrize(
-    argnames=["response", "exception_type", "async_only"],
+    argnames=["response", "exception_type"],
     argvalues=[
-        ["error", ErrorResponse, False],
-        ["Error", ErrorResponse, False],
-        ["Error: was found.", ErrorResponse, False],
-        ["alarm", AlarmResponse, False],
-        ["ALARM", AlarmResponse, False],
-        ["This is an Alarm", AlarmResponse, False],
-        ["error:Alarm lock", AlarmResponse, False],
-        ["alarm:error", AlarmResponse, False],
-        ["ALARM: Hard limit -X", AlarmResponse, False],
-        ["ERR003:unhandled gcode OK ", UnhandledGcode, True],
+        ["error", ErrorResponse],
+        ["Error", ErrorResponse],
+        ["Error: was found.", ErrorResponse],
+        ["alarm", AlarmResponse],
+        ["ALARM", AlarmResponse],
+        ["This is an Alarm", AlarmResponse],
+        ["error:Alarm lock", AlarmResponse],
+        ["alarm:error", AlarmResponse],
+        ["ALARM: Hard limit -X", AlarmResponse],
     ],
 )
 def test_raise_on_error(
     subject: SerialKind,
     response: str,
     exception_type: Type[Exception],
-    async_only: bool,
 ) -> None:
     """It should raise an exception on error/alarm responses."""
-    if isinstance(subject, SerialConnection) and async_only:
-        pytest.skip()
     with pytest.raises(expected_exception=exception_type, match=response):
         subject.raise_on_error(response, "fake request")
+
+
+def test_raise_on_error_async_only(
+    async_subject: AsyncResponseSerialConnection,
+) -> None:
+    """It should raise an exception on error/alarm responses."""
+    with pytest.raises(
+        expected_exception=UnhandledGcode, match="ERR003:unhandled gcode OK "
+    ):
+        async_subject.raise_on_error("ERR003:unhandled gcode OK ", "fake request")
 
 
 def test_raise_on_error_no_raise_on_keyword_in_body(
@@ -436,6 +445,50 @@ async def test_send_data_does_not_retry_async_error(
     assert mock_serial_port.read_until.await_count == 1
 
 
+async def test_send_data_does_not_log_traceback_for_async_error(
+    mock_serial_port: AsyncMock,
+    async_subject: AsyncResponseSerialConnection,
+    ack: str,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Device-reported async errors are valid responses, not unexpected send failures."""
+    data = "M121 "
+    async_line = "async ERR400:vacuum:target pressure not reached"
+    combined_response = f"{async_line}\nM121 T:0.0 C:-4.7 V:1 {ack}".encode()
+    mock_serial_port.read_until.side_effect = [combined_response]
+
+    with caplog.at_level("DEBUG"):
+        with pytest.raises(ErrorResponse, match="ERR400"):
+            await async_subject._send_data_multiack(data=data, retries=2, acks=1)
+
+    assert "Got an error during send" not in caplog.text
+    assert "Already used" not in caplog.text
+    assert "Traceback" not in caplog.text
+    assert "Device reported an error during send" in caplog.text
+
+
+async def test_send_data_does_not_log_traceback_for_serial_io_error(
+    mock_serial_port: AsyncMock,
+    async_subject: AsyncResponseSerialConnection,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Unplug I/O errors should retry without a traceback on every attempt."""
+    mock_serial_port.write.side_effect = PySerialSerialException(
+        "write failed: [Errno 5] Input/output error"
+    )
+
+    with caplog.at_level("DEBUG"):
+        with pytest.raises(PySerialSerialException, match="write failed"):
+            await async_subject._send_data_multiack(data="M121 ", retries=2, acks=1)
+
+    assert mock_serial_port.write.await_count == 3
+    assert "Got an error during send" not in caplog.text
+    assert "Traceback" not in caplog.text
+    assert "retrying 0/2" in caplog.text
+    assert "retrying 1/2" in caplog.text
+    assert "send failed after 2 retries" in caplog.text
+
+
 async def test_send_data_still_retries_missing_response(
     mock_serial_port: AsyncMock,
     async_subject: AsyncResponseSerialConnection,
@@ -648,8 +701,9 @@ def test_partition_serial_read_permutations(
     argnames=["build_raw", "build_expected"],
     argvalues=[
         pytest.param(
-            lambda ack, ending: _async_error_no_ack(line_ending=ending)
-            + _command_response(ack),
+            lambda ack, ending: (
+                _async_error_no_ack(line_ending=ending) + _command_response(ack)
+            ),
             lambda ack, ending: [
                 ("error", _async_error_no_ack(line_ending=ending)),
                 ("response", _command_response(ack)),
@@ -657,8 +711,9 @@ def test_partition_serial_read_permutations(
             id="async-then-response",
         ),
         pytest.param(
-            lambda ack, ending: _command_response(ack)
-            + _async_error_no_ack(line_ending=ending),
+            lambda ack, ending: (
+                _command_response(ack) + _async_error_no_ack(line_ending=ending)
+            ),
             lambda ack, ending: [
                 ("response", _command_response(ack)),
                 ("error", _async_error_no_ack(line_ending=ending)),
@@ -691,8 +746,9 @@ def test_partition_serial_read_permutations(
         pytest.param(
             # Async line uses LF while the command ack uses the device terminator
             # (e.g. firmware prints async with \n even when OK is \r\n).
-            lambda ack, ending: _async_error_no_ack(line_ending="\n")
-            + _command_response(ack),
+            lambda ack, ending: (
+                _async_error_no_ack(line_ending="\n") + _command_response(ack)
+            ),
             lambda ack, ending: [
                 ("error", _async_error_no_ack(line_ending="\n")),
                 ("response", _command_response(ack)),

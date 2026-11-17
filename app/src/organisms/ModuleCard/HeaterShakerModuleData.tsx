@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import {
   Chip,
+  COLORS,
   DIRECTION_ROW,
   Flex,
   Icon,
@@ -14,8 +15,6 @@ import {
 import {
   MODULE_INFO_CONTAINER_STYLE,
   MODULE_INFO_DETAIL_CONTAINER_STYLE,
-  MODULE_INFO_DETAIL_TEXT_STYLE,
-  MODULE_INFO_HEADER_TEXT_STYLE,
   MODULE_INFO_SUB_CONTAINER_STYLE,
 } from './constants'
 
@@ -97,7 +96,7 @@ export const HeaterShakerModuleData = (
           css={MODULE_INFO_SUB_CONTAINER_STYLE}
           data-testid="heater_shaker_module_data_temp"
         >
-          <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
+          <StyledText forwardedAs="h3" color={COLORS.grey60}>
             {t('heater')}
           </StyledText>
           <Flex css={MODULE_INFO_DETAIL_CONTAINER_STYLE}>
@@ -114,10 +113,7 @@ export const HeaterShakerModuleData = (
               textTransform="capitalize"
               data-testid="tempStatus"
             />
-            <StyledText
-              title="heater_target_temp"
-              css={MODULE_INFO_DETAIL_TEXT_STYLE}
-            >
+            <StyledText forwardedAs="h3" title="heater_target_temp">
               {t(
                 moduleData.targetTemperature != null
                   ? 'target_temp'
@@ -127,7 +123,7 @@ export const HeaterShakerModuleData = (
                 }
               )}
             </StyledText>
-            <StyledText title="heater_temp" css={MODULE_INFO_DETAIL_TEXT_STYLE}>
+            <StyledText forwardedAs="h3" title="heater_temp">
               {t('current_temp', { temp: moduleData.currentTemperature })}
             </StyledText>
           </Flex>
@@ -137,7 +133,7 @@ export const HeaterShakerModuleData = (
         css={MODULE_INFO_SUB_CONTAINER_STYLE}
         data-testid="heater_shaker_module_data_shaker"
       >
-        <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE}>
+        <StyledText forwardedAs="h3" color={COLORS.grey60}>
           {t('shaker')}
         </StyledText>
         <Flex css={MODULE_INFO_DETAIL_CONTAINER_STYLE}>
@@ -154,18 +150,12 @@ export const HeaterShakerModuleData = (
             textTransform="capitalize"
             data-testid="shakerStatus"
           />
-          <StyledText
-            title="shaker_target_speed"
-            css={MODULE_INFO_DETAIL_TEXT_STYLE}
-          >
+          <StyledText forwardedAs="h3" title="shaker_target_speed">
             {t(moduleData.targetSpeed != null ? 'target_speed' : 'na_speed', {
               speed: moduleData.targetSpeed,
             })}
           </StyledText>
-          <StyledText
-            title="shaker_current_speed"
-            css={MODULE_INFO_DETAIL_TEXT_STYLE}
-          >
+          <StyledText forwardedAs="h3" title="shaker_current_speed">
             {t('current_speed', { speed: moduleData.currentSpeed ?? 0 })}
           </StyledText>
         </Flex>
@@ -174,7 +164,7 @@ export const HeaterShakerModuleData = (
         css={MODULE_INFO_SUB_CONTAINER_STYLE}
         data-testid="heater_shaker_module_data_latch"
       >
-        <StyledText css={MODULE_INFO_HEADER_TEXT_STYLE} title="latch_status">
+        <StyledText forwardedAs="h3" color={COLORS.grey60} title="latch_status">
           {t('labware_latch', { ns: 'heater_shaker' })}
         </StyledText>
         <Flex
@@ -190,7 +180,7 @@ export const HeaterShakerModuleData = (
               size={SIZE_1}
             />
           )}
-          <StyledText css={MODULE_INFO_DETAIL_TEXT_STYLE}>
+          <StyledText forwardedAs="h3">
             {getLatchStatus(moduleData.labwareLatchStatus)}
           </StyledText>
         </Flex>

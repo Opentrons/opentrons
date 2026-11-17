@@ -27,6 +27,9 @@ from server_utils.auth.resource_server.fastapi import (
     handle_authorization_error,
     install_authentication_checker,
 )
+from server_utils.robot.fastapi import build_robot_client, install_robot_server_client
+from server_utils.robot.robot_server import Client as RobotClient
+from server_utils.robot.robot_server import RobotCurrentRunLog, RobotNameandSerial
 
 from auth_server.api_error import APIError, handle_api_error
 from auth_server.authentication_checker import build_authentication_checker
@@ -58,6 +61,19 @@ from auth_server.users.store import UserStore
 _REDOC_CDN_URL = "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js"
 
 _LOG = logging.getLogger(__name__)
+
+
+class _UnconfiguredRobotServerClient(RobotClient):
+    """Fail closed when robot-server is not configured."""
+
+    async def get_name_and_serial(self) -> RobotNameandSerial:
+        raise RuntimeError("robot-server is not configured")
+
+    async def get_current_run_log(self) -> RobotCurrentRunLog:
+        raise RuntimeError("robot-server is not configured")
+
+    async def enable_pyro_subprocess_flags(self) -> None:
+        raise RuntimeError("robot-server is not configured")
 
 
 def _get_persistence_directory_root(settings: AuthServerSettings) -> Optional[Path]:
@@ -109,6 +125,25 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             )
         )
         install_audit_client(app.state, audit_client)
+
+        if (
+            settings.robot_server_uds is not None
+            or settings.robot_server_url is not None
+        ):
+            robot_client = await exit_stack.enter_async_context(
+                build_robot_client(
+                    robot_server_uds=settings.robot_server_uds,
+                    robot_server_url=settings.robot_server_url,
+                )
+            )
+        else:
+            _LOG.warning(
+                "robot-server is not configured."
+                " Enabling CRS will fail until OT_AUTH_SERVER_robot_server_uds"
+                " or OT_AUTH_SERVER_robot_server_url is set."
+            )
+            robot_client = _UnconfiguredRobotServerClient()
+        install_robot_server_client(app.state, robot_client)
 
         user_store = UserStore(sql_engine=engine)
         settings_store = SettingsStore(sql_engine=engine)

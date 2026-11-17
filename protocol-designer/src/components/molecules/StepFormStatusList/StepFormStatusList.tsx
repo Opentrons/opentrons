@@ -1,9 +1,9 @@
 import { DIRECTION_COLUMN, DISPLAY_FLEX, SPACING } from '@opentrons/components'
 
-import type { PropsWithChildren } from 'react'
+import type { PropsWithChildren, ReactNode } from 'react'
 
 /** A list to contain `StepFormStatus` elements. */
-export function StepFormStatusList(props: PropsWithChildren): JSX.Element {
+export function StepFormStatusList(props: PropsWithChildren): ReactNode {
   const { children } = props
   return (
     <dl

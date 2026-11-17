@@ -4,6 +4,7 @@ import asyncio
 import enum
 import logging
 import os
+import pwd
 import subprocess
 import sys
 import time
@@ -13,15 +14,16 @@ from uuid import uuid4
 
 import Pyro5.api
 
-from opentrons.config import feature_flags
+from opentrons.config import feature_flags, robot_configs
 from opentrons.util.pyro.pyro_proxy_utility import wait_for_proxy
 
+from ..persistence.protocol_user_permissions import PROTOCOL_USER_NAME
 from . import run_process_entry_point
 from .run_process import DirectedRunProcess, register_process_types
 
 _log = logging.getLogger(__name__)
 
-_RESTRICTED_USER_NAME = "ot-protocol"
+_RESTRICTED_USER_NAME = PROTOCOL_USER_NAME
 _ROOT_USER_NAME = "root"
 
 _RUN_PROXY_NAME = (
@@ -33,8 +35,9 @@ _RUN_PROCESS_LIMIT = 1  # Number of run processes to keep qeueued
 _SIMULATING_PROCESS_LIMIT = 1  # Number of simulation processes to keep qeueued
 
 
-_RUN_PROXY_TIMEOUT = 30  # seconds
+_RUN_PROCESS_TIMEOUT = 60  # seconds
 _RUN_PROCESS_TERMINATE_TIMEOUT = 10  # seconds
+_RUN_PROXY_READY_TIMEOUT = 180  # seconds
 
 
 class _ProcessStatus(enum.Enum):
@@ -57,11 +60,14 @@ class RunProcessPyroProvider:
         self._run_processes: Optional[List[_RunProcess]] = None
         self._simulating_run_processes: Optional[List[_RunProcess]] = None
 
-        # The protocol subprocess username defaults to root unless otherwise specified
-        self._protocol_username: str = "root"
+        self._update_user_subprocess(False)
 
         self._teardown_signal = asyncio.Event()
         self._process_maintainer_task: asyncio.Task[None] | None = None
+        config = robot_configs.load()
+        self._run_log_level = logging._levelToName[
+            logging._nameToLevel.get(config.log_level.upper(), logging.INFO)
+        ]
 
     def initialize(self, access_control_mode: bool) -> None:
         """Called when server first starts up.
@@ -73,7 +79,6 @@ class RunProcessPyroProvider:
         If feature flag is on for running as a user with limited permissions then
         ensure the protocol user name is set.
         """
-        self._protocol_username = _ROOT_USER_NAME
         self._update_user_subprocess(access_control_mode)
         if feature_flags.protocol_subprocess_enabled():
             register_process_types()
@@ -113,7 +118,9 @@ class RunProcessPyroProvider:
                 self._run_processes.append(
                     _RunProcess(
                         pyroname=pyro_id,
-                        process=self._start_run_process(process_name=pyro_id),
+                        process=self._start_run_process(
+                            process_name=pyro_id, log_level=self._run_log_level
+                        ),
                         status=_ProcessStatus.UNUSED,
                     )
                 )
@@ -122,7 +129,9 @@ class RunProcessPyroProvider:
                 self._simulating_run_processes.append(
                     _RunProcess(
                         pyroname=sim_pyro_id,
-                        process=self._start_run_process(process_name=sim_pyro_id),
+                        process=self._start_run_process(
+                            process_name=sim_pyro_id, log_level="NONE"
+                        ),
                         status=_ProcessStatus.UNUSED,
                     )
                 )
@@ -165,12 +174,17 @@ class RunProcessPyroProvider:
                     return process
         return None
 
-    def _set_active_process(self, process_registry: List[_RunProcess]) -> _RunProcess:
+    async def _set_active_process(
+        self, process_registry: List[_RunProcess]
+    ) -> _RunProcess:
         """Set a run process in a given process registry as the active process to be used by a run."""
-        for process in process_registry:
-            if process.status == _ProcessStatus.UNUSED:
-                process.status = _ProcessStatus.ACTIVE
-                return process
+        start_time = time.monotonic()
+        while time.monotonic() - start_time < _RUN_PROCESS_TIMEOUT:
+            for process in process_registry:
+                if process.status == _ProcessStatus.UNUSED:
+                    process.status = _ProcessStatus.ACTIVE
+                    return process
+            await asyncio.sleep(0.01)
         raise RuntimeError("Could not identify unused process in process registry.")
 
     def set_active_process_as_used(self, simulator: Optional[bool] = False) -> None:
@@ -191,14 +205,14 @@ class RunProcessPyroProvider:
     ) -> List[_RunProcess]:
         """Validate that the process registries have processes that can be used.
 
-        If `simulator` sprovided, this will validate that there is a simulation process available.
+        If `simulator` is provided, this will validate that there is a simulation process available.
         Otherwise, it will validate that a normal run process is available.
         """
         if simulator:
             if self._simulating_run_processes is None:
                 # There are no run processes yet, try again throughout the timeout period and raise if one never appears
                 start_time = time.monotonic()
-                while time.monotonic() - start_time < _RUN_PROXY_TIMEOUT:
+                while time.monotonic() - start_time < _RUN_PROCESS_TIMEOUT:
                     if self._simulating_run_processes is not None:
                         # Simulation process is ready
                         return self._simulating_run_processes
@@ -209,7 +223,7 @@ class RunProcessPyroProvider:
             if self._run_processes is None:
                 # There are no run processes yet, try again throughout the timeout period and raise if one never appears
                 start_time = time.monotonic()
-                while time.monotonic() - start_time < _RUN_PROXY_TIMEOUT:
+                while time.monotonic() - start_time < _RUN_PROCESS_TIMEOUT:
                     if self._run_processes is not None:
                         # Run process is ready
                         return self._run_processes
@@ -224,22 +238,39 @@ class RunProcessPyroProvider:
     ) -> DirectedRunProcess:
         """Returns a proxy for the run process or simulating run process.
 
-        Depending on how recently the desired process started, this may take up to around 25 seconds to resolve.
+        After a process is recycled, the replacement child must import and
+        register with the nameserver before this returns. That can take up to
+        `_RUN_PROXY_READY_TIMEOUT` seconds.
         """
         process_regisry = await self._validate_process_registry_ready(
             simulator=simulator
         )
         run_process = self._get_active_run_process(process_registry=process_regisry)
+        claimed_unused = False
         if run_process is None:
-            run_process = self._set_active_process(process_registry=process_regisry)
+            run_process = await self._set_active_process(
+                process_registry=process_regisry
+            )
+            claimed_unused = True
 
-        run_proxy = await wait_for_proxy(proxy_name=run_process.pyroname)
+        run_proxy = await wait_for_proxy(
+            proxy_name=run_process.pyroname,
+            timeout=_RUN_PROXY_READY_TIMEOUT,
+        )
         if run_proxy is None:
+            if claimed_unused:
+                run_process.status = _ProcessStatus.UNUSED
             raise RuntimeError(f"Can't resolve pyro proxy '{run_process.pyroname}'")
         return cast(DirectedRunProcess, cast(object, run_proxy))
 
     @staticmethod
-    def _open_process(process_name: str, user_name: str) -> subprocess.Popen[bytes]:
+    def _open_process(
+        process_name: str,
+        user_name: str,
+        main_group_id: int,
+        supplemental_group_ids: list[int],
+        log_level: str,
+    ) -> subprocess.Popen[bytes]:
         return subprocess.Popen(
             args=[
                 sys.executable,
@@ -247,9 +278,13 @@ class RunProcessPyroProvider:
                 run_process_entry_point.__name__,
                 "--pyroname",
                 process_name,
+                "--loglevel",
+                log_level,
             ],
             env={k: v for k, v in os.environ.items()},
             user=user_name,
+            group=main_group_id,
+            extra_groups=supplemental_group_ids,
         )
 
     @staticmethod
@@ -276,14 +311,30 @@ class RunProcessPyroProvider:
         await self._end_process(process=process.process)
         process_registry.remove(process)
 
-    def _start_run_process(self, process_name: str) -> subprocess.Popen[bytes]:
+    def _start_run_process(
+        self, process_name: str, log_level: str
+    ) -> subprocess.Popen[bytes]:
         return self._open_process(
-            process_name=process_name, user_name=self._protocol_username
+            process_name=process_name,
+            user_name=self._process_username,
+            main_group_id=self._process_gid,
+            supplemental_group_ids=self._supplemental_gids,
+            log_level=log_level,
         )
+
+    def _set_user_subprocess_for(self, username: str) -> None:
+        gid = pwd.getpwnam(username).pw_gid
+        supplemental_gids = os.getgrouplist(username, gid)
+        _log.info(
+            f"Configuring subprocesses to run as {username}: username={username}, main gid={gid}, supplemental gids={', '.join([str(gid) for gid in supplemental_gids])}"
+        )
+        self._process_username = username
+        self._process_gid = gid
+        self._supplemental_gids = supplemental_gids
 
     def _update_user_subprocess(self, access_control_mode: bool) -> None:
         """Update which system user should execute the protocol subprocess."""
         if feature_flags.run_protocol_as_restricted_user() or access_control_mode:
-            self._protocol_username = _RESTRICTED_USER_NAME
+            self._set_user_subprocess_for(_RESTRICTED_USER_NAME)
         else:
-            self._protocol_username = _ROOT_USER_NAME
+            self._set_user_subprocess_for(_ROOT_USER_NAME)

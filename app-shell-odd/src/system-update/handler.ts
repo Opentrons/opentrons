@@ -313,18 +313,10 @@ export function createUpdateDriver(dispatch: Dispatch): UpdateDriver {
           }
           return new Promise(resolve => {
             const details = getDetails()
-            if (details === 'ongoing') {
+            if (details === 'ongoing' || details == null) {
               dispatch({
                 type: 'robotUpdate:CHECKING_FOR_UPDATE',
                 payload: 'flex',
-              })
-              resolve()
-              return
-            }
-            if (details == null) {
-              dispatch({
-                type: 'robotUpdate:UNEXPECTED_ERROR',
-                payload: { message: 'System update file not downloaded' },
               })
               resolve()
               return

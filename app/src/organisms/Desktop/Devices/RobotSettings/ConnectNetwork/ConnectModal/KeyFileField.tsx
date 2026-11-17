@@ -7,6 +7,7 @@ import { useConnectFormField } from './form-state'
 import { FormRow } from './FormRow'
 import { UploadKeyInput } from './UploadKeyInput'
 
+import type { ReactNode } from 'react'
 import type {
   ControllerFieldState,
   ControllerRenderProps,
@@ -35,7 +36,7 @@ const makeKeyOptions = (
   options: keys.map(k => ({ value: k.id, label: k.name })),
 })
 
-export const KeyFileField = (props: KeyFileFieldProps): JSX.Element => {
+export const KeyFileField = (props: KeyFileFieldProps): ReactNode => {
   const {
     id,
     name,

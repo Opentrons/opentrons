@@ -91,7 +91,7 @@ def check_safe_for_pipette_movement(  # noqa: C901
 
     if isinstance(well_location, DropTipWellLocation):
         # convert to WellLocation
-        well_location = engine_state.geometry.get_checked_tip_drop_location(
+        well_location = engine_state.instrument_interface.get_checked_tip_drop_location(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_location=well_location,
@@ -99,7 +99,7 @@ def check_safe_for_pipette_movement(  # noqa: C901
             api_version_allows_partial_return_tip=version
             >= _PARTIAL_TIP_RETURN_VERSION_GATE,
         )
-    well_location_point = engine_state.geometry.get_well_position(
+    well_location_point = engine_state.instrument_interface.get_well_position(
         labware_id=labware_id,
         well_name=well_name,
         well_location=well_location,

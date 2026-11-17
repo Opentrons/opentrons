@@ -1226,7 +1226,7 @@
   "errors": [
     {
       "createdAt": "TIMESTAMP",
-      "detail": "ValueError [line 167]: Partial column configuration is only supported on 8-Channel pipettes.",
+      "detail": "ValueError [line 153]: Partial column configuration is only supported on 8-Channel pipettes.",
       "errorCode": "4000",
       "errorInfo": {},
       "errorType": "ExceptionInProtocolError",

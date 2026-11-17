@@ -11,13 +11,14 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { SavedStepFormState } from '../../step-forms'
 
 interface StepsInfoProps {
   savedStepForms: SavedStepFormState
 }
 
-export function StepsInfo({ savedStepForms }: StepsInfoProps): JSX.Element {
+export function StepsInfo({ savedStepForms }: StepsInfoProps): ReactNode {
   const { t } = useTranslation('protocol_overview')
 
   return (

@@ -126,6 +126,7 @@ export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
             type="button"
             className={styles.speed_button}
             onClick={handlePerStepOverflowClick}
+            aria-label={`${t('playback_speed')}, ${getSpeedMultiplierText(milliSecondsPerFrame)}`}
           >
             <StyledText desktopStyle="captionSemiBold">
               {getSpeedMultiplierText(milliSecondsPerFrame)}
@@ -149,7 +150,12 @@ export function PlayBackControls(props: PlayBackControlsProps): ReactNode {
           onClick={() => {
             onClickStepDetails(!showStepDetails)
           }}
-          className={styles.icon_button}
+          className={
+            showStepDetails
+              ? `${styles.icon_button} ${styles.icon_button_toggled}`
+              : styles.icon_button
+          }
+          aria-pressed={showStepDetails}
           aria-label={t('step_details')}
         >
           <Icon name="step-detail" size="1rem" />

@@ -9,11 +9,22 @@ from pwdlib import PasswordHash
 from auth_server.persistence.orm_models import User
 from auth_server.settings.models import SettingsResponseData
 from auth_server.settings.store import SettingsStore
+from auth_server.users.credential_characters import (
+    CREDENTIAL_SPECIAL_CHARACTERS,
+    temp_password_characters,
+)
 from auth_server.users.is_account_locked import is_account_locked
 from auth_server.users.models import (
+    SERVICE_ACCOUNT_FULL_NAME,
     AccountType,
     TemporaryPasswordResponse,
+    UserLoginStatus,
+    UserLoginStatusReason,
     UserResponse,
+)
+from auth_server.users.software_keyboard_characters import (
+    has_only_allowed_password_characters,
+    has_only_allowed_username_characters,
 )
 from auth_server.users.store import UserStore
 
@@ -21,7 +32,6 @@ password_hash = PasswordHash.recommended()
 
 _DEFAULT_MIN_PASSWORD_LENGTH = 8
 _ALPHANUMERIC = string.ascii_letters + string.digits
-_PASSWORD_SPECIAL_CHARACTERS = string.punctuation
 
 
 def _generate_temporary_password(
@@ -31,10 +41,13 @@ def _generate_temporary_password(
     if not require_special_characters:
         return "".join(secrets.choice(_ALPHANUMERIC) for _ in range(min_length))
 
-    return "".join(
-        secrets.choice(_ALPHANUMERIC + _PASSWORD_SPECIAL_CHARACTERS)
-        for _ in range(min_length)
-    )
+    # Force at least one special so generated temps meet the same rule as user-chosen
+    # passwords.
+    chars = [secrets.choice(CREDENTIAL_SPECIAL_CHARACTERS)]
+    alphabet = temp_password_characters()
+    chars.extend(secrets.choice(alphabet) for _ in range(max(min_length - 1, 0)))
+    secrets.SystemRandom().shuffle(chars)
+    return "".join(chars)
 
 
 def _password_complexity_requirements(
@@ -58,7 +71,13 @@ def _validate_password_complexity(
         raise PasswordTooShortError(
             actual_length=actual_length, required_length=min_length
         )
-    if require_special and not any(c in _PASSWORD_SPECIAL_CHARACTERS for c in password):
+    if not has_only_allowed_password_characters(password):
+        raise PasswordContainsInvalidCharactersError(
+            "password contains characters not supported by the ODD software keyboard"
+        )
+    if require_special and not any(
+        c in CREDENTIAL_SPECIAL_CHARACTERS for c in password
+    ):
         raise PasswordMissingSpecialCharactersError()
 
 
@@ -89,8 +108,44 @@ class PasswordMissingSpecialCharactersError(InvalidInputError):
     """Raised when a password does not meet the configured requirements on special chars."""
 
 
+class PasswordContainsInvalidCharactersError(InvalidInputError):
+    """Raised when a password contains characters not supported by the ODD keyboard."""
+
+
 class PasswordPreviouslyUsedError(InvalidInputError):
-    """Raised when a new password matches the user's current password."""
+    """Raised when a new password matches the user's current or temporary password."""
+
+
+def _reject_reused_password(password: str, user: User | None) -> None:
+    """Raise if ``password`` matches the user's current or temporary password."""
+    if user is None:
+        return
+    if user.hashed_password is not None and password_hash.verify(
+        password, user.hashed_password
+    ):
+        raise PasswordPreviouslyUsedError(
+            "New password must be different from the current password."
+        )
+    if user.temporary_hashed_password is not None and password_hash.verify(
+        password, user.temporary_hashed_password
+    ):
+        raise PasswordPreviouslyUsedError(
+            "New password must be different from the temporary password."
+        )
+
+
+class UsernameContainsInvalidCharactersError(InvalidInputError):
+    """Raised when a username contains whitespace or other disallowed characters."""
+
+
+def _validate_username_characters(username: str | None) -> None:
+    """Reject usernames that include space or characters outside the allowlist."""
+    if username is None:
+        return
+    if not has_only_allowed_username_characters(username):
+        raise UsernameContainsInvalidCharactersError(
+            "username must not contain spaces or other disallowed characters"
+        )
 
 
 def _validate_fields_non_empty(
@@ -110,16 +165,71 @@ def _validate_fields_non_empty(
             raise InvalidInputError(f"{field_name} must not be empty")
 
 
-def must_reset_password(
+def _reject_disallowed_service_account_mutations(
+    existing_user: User,
+    *,
+    new_username: str | None,
+    new_full_name: str | None,
+    new_account_type: str | None,
+    new_locked: bool | None,
+) -> None:
+    """Reject identity and lock changes that service accounts do not allow."""
+    existing_type = AccountType(existing_user.account_type)
+    if (
+        new_account_type is not None
+        and AccountType(new_account_type) == AccountType.SERVICE
+        and existing_type != AccountType.SERVICE
+    ):
+        raise InvalidInputError("Cannot change an account's type to service.")
+
+    if existing_type != AccountType.SERVICE:
+        return
+
+    if new_username is not None and new_username != existing_user.username:
+        raise InvalidInputError("Service account username cannot be changed.")
+    if new_full_name is not None and new_full_name != existing_user.full_name:
+        raise InvalidInputError("Service account legal name cannot be changed.")
+    if (
+        new_account_type is not None
+        and AccountType(new_account_type) != AccountType.SERVICE
+    ):
+        raise InvalidInputError("Service account type cannot be changed.")
+    if new_locked is not None:
+        raise InvalidInputError("Service accounts cannot be locked or unlocked.")
+
+
+def _password_is_expired(
     user: User, now: datetime.datetime, password_reset_time_sec: float | None
 ) -> bool:
-    """Return whether the user must reset their password before full robot access."""
-    password_is_expired = (
+    """Return whether the user's password has passed the configured expiration window."""
+    return (
         password_reset_time_sec is not None
         and now
         > user.password_set_at + datetime.timedelta(seconds=password_reset_time_sec)
     )
-    return password_is_expired or user.reset_password
+
+
+def must_reset_password(
+    user: User, now: datetime.datetime, password_reset_time_sec: float | None
+) -> bool:
+    """Return whether the user must reset their password before full robot access."""
+    return (
+        _password_is_expired(user, now, password_reset_time_sec) or user.reset_password
+    )
+
+
+def password_reset_reason(
+    user: User, now: datetime.datetime, password_reset_time_sec: float | None
+) -> UserLoginStatusReason | None:
+    """Return why a password change is needed, if a specific reason is known.
+
+    Prefers temporary-password over expiration when both could apply.
+    """
+    if user.temporary_hashed_password is not None:
+        return UserLoginStatusReason.TEMPORARY_PASSWORD
+    if _password_is_expired(user, now, password_reset_time_sec):
+        return UserLoginStatusReason.PASSWORD_EXPIRED
+    return None
 
 
 class UserDataManager:
@@ -131,12 +241,16 @@ class UserDataManager:
 
     def _to_response(self, user: User) -> UserResponse:
         settings = self._settings_store.get_settings()
-        is_failed_login_locked, _ = is_account_locked(
-            failed_login_count=self._user_store.get_failed_login_count(user.username),
-            max_attempts=settings.maxNumberOfLoginAttempts,
-        )
-
         account_type = AccountType(user.account_type)
+        is_failed_login_locked = False
+        if account_type != AccountType.SERVICE:
+            is_failed_login_locked, _ = is_account_locked(
+                failed_login_count=self._user_store.get_failed_login_count(
+                    user.username
+                ),
+                max_attempts=settings.maxNumberOfLoginAttempts,
+            )
+
         now = datetime.datetime.now(tz=datetime.UTC)
 
         return UserResponse(
@@ -145,6 +259,9 @@ class UserDataManager:
             accountType=account_type,
             locked=user.deactivated or is_failed_login_locked,
             resetPassword=must_reset_password(user, now, settings.passwordResetTime),
+            passwordResetReason=password_reset_reason(
+                user, now, settings.passwordResetTime
+            ),
         )
 
     def create_user(
@@ -156,25 +273,33 @@ class UserDataManager:
         now: datetime.datetime,
     ) -> TemporaryPasswordResponse:
         """Validate inputs, check for duplicates, and create a new user."""
+        if account_type == AccountType.SERVICE:
+            full_name = SERVICE_ACCOUNT_FULL_NAME
         _validate_fields_non_empty(
             username=username,
             password=password,
             full_name=full_name,
             account_type=account_type,
         )
+        _validate_username_characters(username)
         settings = self._settings_store.get_settings()
         reset_password = password is None
+        temporary_password_hash: str | None = None
+        real_hashed_password: str | None = None
         if reset_password:
             min_length, require_special = _password_complexity_requirements(settings)
             password = _generate_temporary_password(min_length, require_special)
+            temporary_password_hash = password_hash.hash(password)
         elif password is not None:
             _validate_password_complexity(password, settings)
+            real_hashed_password = password_hash.hash(password)
         assert password is not None
         if self._user_store.get(username) is not None:
             raise UserAlreadyExistsError(f"User {username!r} already exists")
         new_user = self._user_store.add(
             username=username,
-            hashed_password=password_hash.hash(password),
+            hashed_password=real_hashed_password,
+            temporary_password=temporary_password_hash,
             full_name=full_name,
             account_type=account_type,
             now=now,
@@ -192,12 +317,29 @@ class UserDataManager:
             raise UserNotFoundError(f"User {username!r} not found")
         return self._to_response(user)
 
+    def get_login_status(self, username: str) -> UserLoginStatus:
+        """Return pre-auth login UI hints for ``username``.
+
+        Prefers temporary-password over expiration when both could apply.
+        """
+        user = self._user_store.get(username)
+        if user is None:
+            raise UserNotFoundError(f"User {username!r} not found")
+        settings = self._settings_store.get_settings()
+        now = datetime.datetime.now(tz=datetime.UTC)
+        return UserLoginStatus(
+            reason=password_reset_reason(user, now, settings.passwordResetTime)
+        )
+
     def get_users_list(self) -> list[UserResponse]:
         """Return all users."""
         return [self._to_response(user) for user in self._user_store.get_all()]
 
     def delete_user(self, username: str) -> None:
         """Delete a user or raise UserNotFoundError."""
+        user = self._user_store.get(username)
+        if user is not None and AccountType(user.account_type) == AccountType.SERVICE:
+            raise InvalidInputError("Service accounts cannot be deleted.")
         try:
             self._user_store.remove(username)
         except ValueError as e:
@@ -222,17 +364,21 @@ class UserDataManager:
             full_name=new_full_name,
             account_type=new_account_type,
         )
+        _validate_username_characters(new_username)
+        existing_user = self._user_store.get(username_to_update)
+        if existing_user is not None:
+            _reject_disallowed_service_account_mutations(
+                existing_user,
+                new_username=new_username,
+                new_full_name=new_full_name,
+                new_account_type=new_account_type,
+                new_locked=new_locked,
+            )
         if new_password is not None:
             _validate_password_complexity(
                 new_password, self._settings_store.get_settings()
             )
-            existing_user = self._user_store.get(username_to_update)
-            if existing_user is not None and password_hash.verify(
-                new_password, existing_user.hashed_password
-            ):
-                raise PasswordPreviouslyUsedError(
-                    "New password must be different from the current password."
-                )
+            _reject_reused_password(new_password, existing_user)
         if (
             new_username is not None
             and new_username != username_to_update
@@ -250,30 +396,46 @@ class UserDataManager:
                     deactivated = False
             if new_password is not None:
                 reset_password = False
-            updated_user = self._user_store.update(
-                username_to_update,
-                new_username=new_username,
-                hashed_password=(
-                    password_hash.hash(new_password)
-                    if new_password is not None
-                    else None
-                ),
-                full_name=new_full_name,
-                account_type=new_account_type,
-                reset_password=reset_password,
-                deactivated=deactivated,
-                now=now,
-            )
+                updated_user = self._user_store.update(
+                    username_to_update,
+                    new_username=new_username,
+                    hashed_password=password_hash.hash(new_password),
+                    full_name=new_full_name,
+                    account_type=new_account_type,
+                    reset_password=reset_password,
+                    deactivated=deactivated,
+                    clear_temporary_hashed_password=True,
+                    now=now,
+                )
+            else:
+                updated_user = self._user_store.update(
+                    username_to_update,
+                    new_username=new_username,
+                    hashed_password=None,
+                    full_name=new_full_name,
+                    account_type=new_account_type,
+                    reset_password=reset_password,
+                    deactivated=deactivated,
+                    now=now,
+                )
             return self._to_response(updated_user)
         except ValueError as e:
             raise UserNotFoundError(e) from e
+
+    def validate_new_password(self, username: str, password: str) -> None:
+        """Validate password complexity and password reuse."""
+        user = self._user_store.get(username)
+        if user is None:
+            raise UserNotFoundError(f"User {username!r} not found")
+        _validate_password_complexity(password, self._settings_store.get_settings())
+        _reject_reused_password(password, user)
 
     def reset_user_password(
         self,
         username: str,
         now: datetime.datetime,
     ) -> TemporaryPasswordResponse:
-        """Reset a user's password to a random temporary password.
+        """Reset a user's password to a newly generated temporary password.
 
         Clears failed login attempts so locked accounts become active again.
         Flag the account so the user is required to set a real password before
@@ -287,7 +449,7 @@ class UserDataManager:
             self._user_store.clear_failed_logins(username)
             updated_user = self._user_store.update(
                 username,
-                hashed_password=password_hash.hash(temporary_password),
+                temporary_hashed_password=password_hash.hash(temporary_password),
                 reset_password=True,
                 deactivated=False,
                 now=now,

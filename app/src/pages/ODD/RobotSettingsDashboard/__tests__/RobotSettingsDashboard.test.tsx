@@ -4,6 +4,9 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  useAccessControlEnabledQuery,
+  useLogLevelQuery,
+  usePostLogLevelMutation,
   usePostLogMessageMutation,
   usePostWifiConfigureMutation,
   useRobotSettingsQuery,
@@ -11,9 +14,9 @@ import {
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { Navigation } from '/app/components/ODD/headers/Navigation'
 import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
-import { Navigation } from '/app/organisms/ODD/Navigation'
 import {
   DeviceReset,
   Devices,
@@ -42,13 +45,14 @@ import { useErrorRecoverySettingsToggle } from '/app/resources/errorRecovery'
 import { useNetworkConnection, useWifiList } from '/app/resources/networking'
 import {
   useDisableStackerSensors,
+  useDisableVacuumModuleWasteDetection,
   useLEDLights,
 } from '/app/resources/robot-settings'
 
 import { RobotSettingsDashboard } from '../'
 
 import type { UseQueryResult } from 'react-query'
-import type { RobotSettingsResponse } from '@opentrons/api-client'
+import type { LogLevels, RobotSettingsResponse } from '@opentrons/api-client'
 import type { Config } from '/app/redux/config'
 
 vi.mock('react-redux', async () => {
@@ -71,11 +75,18 @@ vi.mock('/app/resources/networking', async () => {
   }
 })
 vi.mock('/app/redux/discovery')
-vi.mock('/app/redux/robot-update')
+vi.mock('/app/redux/robot-update', async importOriginal => {
+  const actual = await vi.importActual('/app/redux/robot-update')
+  return {
+    ...actual,
+    getRobotUpdateAvailable: vi.fn(),
+    getRobotUpdateInfoForRobot: vi.fn(),
+  }
+})
 vi.mock('/app/redux/config')
 vi.mock('/app/resources/robot-settings')
 vi.mock('/app/resources/errorRecovery')
-vi.mock('/app/organisms/ODD/Navigation')
+vi.mock('/app/components/ODD/headers/Navigation')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/TouchScreenSleep')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/NetworkSettings')
 vi.mock('/app/organisms/ODD/RobotSettingsDashboard/DeviceReset')
@@ -94,6 +105,7 @@ vi.mock(
 const mockToggleLights = vi.fn()
 const mockToggleER = vi.fn()
 const mockToggleStackerSensors = vi.fn()
+const mockToggleWasteDetection = vi.fn()
 const mockUpdateRobotSetting = vi.fn()
 const mockPostWifiConfigure = vi.fn()
 const mockResetWifiConfigure = vi.fn()
@@ -116,8 +128,24 @@ const mockDispatch = vi.fn()
 
 // Note kj 01/25/2023 Currently test cases only check text since this PR is bare-bones for RobotSettings Dashboard
 describe('RobotSettingsDashboard', () => {
+  let logLevel: LogLevels = 'warning'
+  const mockChangeLogLevel: ReturnType<
+    typeof usePostLogLevelMutation
+  >['postLogLevel'] = async newLevel => {
+    logLevel = newLevel
+    return newLevel
+  }
   beforeEach(() => {
+    vi.when(useLogLevelQuery)
+      .calledWith()
+      .thenReturn({ status: 'success', data: { log_level: logLevel } } as any)
+    vi.when(usePostLogLevelMutation)
+      .calledWith(expect.anything())
+      .thenReturn({ postLogLevel: mockChangeLogLevel } as any)
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
+    vi.mocked(useAccessControlEnabledQuery).mockReturnValue({
+      data: { data: { accessControlEnabled: false } },
+    } as ReturnType<typeof useAccessControlEnabledQuery>)
     vi.mocked(useUpdateRobotSettingMutation).mockReturnValue({
       updateRobotSetting: mockUpdateRobotSetting,
     } as unknown as ReturnType<typeof useUpdateRobotSettingMutation>)
@@ -144,6 +172,10 @@ describe('RobotSettingsDashboard', () => {
     vi.mocked(useDisableStackerSensors).mockReturnValue({
       sensorsDisabled: false,
       toggleSensors: mockToggleStackerSensors,
+    })
+    vi.mocked(useDisableVacuumModuleWasteDetection).mockReturnValue({
+      wasteDetectionDisabled: false,
+      toggleWasteDetection: mockToggleWasteDetection,
     })
     vi.mocked(useNetworkConnection).mockReturnValue({} as any)
     vi.mocked(useWifiList).mockReturnValue([])
@@ -180,39 +212,39 @@ describe('RobotSettingsDashboard', () => {
 
   it('should render setting buttons', () => {
     render()
-    screen.getByText('Robot Name')
+    screen.getByText('Robot name')
     screen.getByText('opentrons-robot-name')
-    screen.getByText('Robot System Version')
-    screen.getByText('Network Settings')
+    screen.getByText('Robot system version')
+    screen.getByText('Network settings')
     screen.getByText('Status LEDs')
-    screen.getByText('Recovery Mode')
+    screen.getByText('Recovery mode')
     screen.getByText(
       'Control the strip of color lights on the front of the robot.'
     )
-    screen.getByText('File Manager')
+    screen.getByText('File manager')
     screen.getByText('Download and delete robot files.')
-    screen.getByText('Touchscreen Sleep')
-    screen.getByText('Touchscreen Brightness')
+    screen.getByText('Touchscreen sleep')
+    screen.getByText('Touchscreen brightness')
     screen.getByText('Privacy')
     screen.getByText('Choose what data to share with Opentrons.')
-    screen.getByText('Device Reset')
-    screen.getByText('Camera Preferences')
+    screen.getByText('Device reset')
+    screen.getByText('Camera preferences')
     screen.getByText('Devices')
-    screen.getByText('Update Channel')
-    screen.getByText('Developer Tools')
+    screen.getByText('Update channel')
+    screen.getByText('Developer tools')
     screen.getByText('Access additional logging and feature flags.')
   })
 
   it('should render component when tapping robot name button', () => {
     render()
-    const button = screen.getByText('Robot Name')
+    const button = screen.getByText('Robot name')
     fireEvent.click(button)
-    screen.getByText('Robot Name')
+    screen.getByText('Robot name')
   })
 
   it('should render component when tapping robot system version', () => {
     render()
-    const button = screen.getByText('Robot System Version')
+    const button = screen.getByText('Robot system version')
     fireEvent.click(button)
     expect(vi.mocked(RobotSystemVersion)).toHaveBeenCalled()
   })
@@ -269,9 +301,9 @@ describe('RobotSettingsDashboard', () => {
         'RobotSettingButton_include_protocol_source_in_run_download'
       )
     ).toHaveTextContent('Off')
-    screen.getByText('Download Protocol Source File')
-    screen.getByText('Include protocol source file in run record downloads')
-    const toggle = screen.getByText('Download Protocol Source File')
+    screen.getByText('Download protocol source file')
+    screen.getByText('Include protocol source file in run record downloads.')
+    const toggle = screen.getByText('Download protocol source file')
     fireEvent.click(toggle)
     expect(mockDispatch).toHaveBeenCalledWith(
       toggleConfigValue('protocols.includeProtocolSourceInRunDownload')
@@ -315,7 +347,7 @@ describe('RobotSettingsDashboard', () => {
 
   it('should render disable stacker sensors copy, and calls toggleSensors', () => {
     render()
-    screen.getByText('Disable Stacker Sensors for Labware Detection')
+    screen.getByText('Disable Stacker sensors for labware detection')
 
     const toggle = screen.getByTestId(
       'RobotSettingButton_disable_stacker_sensors'
@@ -337,30 +369,56 @@ describe('RobotSettingsDashboard', () => {
     ).toHaveTextContent('On')
   })
 
+  it('should render disable vacuum module waste detection copy, and calls toggleWasteDetection', () => {
+    render()
+    screen.getByText('Disable Vacuum Module waste detection')
+
+    const toggle = screen.getByTestId(
+      'RobotSettingButton_disable_vacuum_module_waste_detection'
+    )
+    expect(toggle).toHaveTextContent('Off')
+
+    fireEvent.click(toggle)
+    expect(mockToggleWasteDetection).toHaveBeenCalled()
+  })
+
+  it('should render on toggle with vacuum module waste detection disabled', () => {
+    vi.mocked(useDisableVacuumModuleWasteDetection).mockReturnValue({
+      wasteDetectionDisabled: true,
+      toggleWasteDetection: mockToggleWasteDetection,
+    })
+    render()
+    expect(
+      screen.getByTestId(
+        'RobotSettingButton_disable_vacuum_module_waste_detection'
+      )
+    ).toHaveTextContent('On')
+  })
+
   it('should render component when tapping network settings', () => {
     render()
-    const button = screen.getByText('Network Settings')
+    const button = screen.getByText('Network settings')
     fireEvent.click(button)
     expect(vi.mocked(NetworkSettings)).toHaveBeenCalled()
   })
 
   it('should render component when tapping display touchscreen sleep', () => {
     render()
-    const button = screen.getByText('Touchscreen Sleep')
+    const button = screen.getByText('Touchscreen sleep')
     fireEvent.click(button)
     expect(vi.mocked(TouchScreenSleep)).toHaveBeenCalled()
   })
 
   it('should render component when tapping touchscreen brightness', () => {
     render()
-    const button = screen.getByText('Touchscreen Brightness')
+    const button = screen.getByText('Touchscreen brightness')
     fireEvent.click(button)
     expect(vi.mocked(TouchscreenBrightness)).toHaveBeenCalled()
   })
 
   it('should render component when tapping camera preferences', () => {
     render()
-    const button = screen.getByText('Camera Preferences')
+    const button = screen.getByText('Camera preferences')
     fireEvent.click(button)
     expect(vi.mocked(CameraPreferences)).toHaveBeenCalled()
   })
@@ -374,14 +432,14 @@ describe('RobotSettingsDashboard', () => {
 
   it('should render component when tapping device rest', () => {
     render()
-    const button = screen.getByText('Device Reset')
+    const button = screen.getByText('Device reset')
     fireEvent.click(button)
     expect(vi.mocked(DeviceReset)).toHaveBeenCalled()
   })
 
   it('should render component when tapping update channel', () => {
     render()
-    const button = screen.getByText('Update Channel')
+    const button = screen.getByText('Update channel')
     fireEvent.click(button)
     expect(vi.mocked(UpdateChannel)).toHaveBeenCalled()
   })
@@ -408,7 +466,7 @@ describe('RobotSettingsDashboard', () => {
 
   it('should call a mock function when tapping enable dev tools', () => {
     render()
-    const button = screen.getByText('Developer Tools')
+    const button = screen.getByText('Developer tools')
     fireEvent.click(button)
     expect(vi.mocked(toggleDevtools)).toHaveBeenCalled()
   })
@@ -417,6 +475,18 @@ describe('RobotSettingsDashboard', () => {
     vi.mocked(getRobotUpdateAvailable).mockReturnValue('upgrade')
     render()
     screen.getByText('Update available')
+  })
+
+  it('should return an update available when the channel version is a downgrade', () => {
+    vi.mocked(getRobotUpdateAvailable).mockReturnValue('downgrade')
+    render()
+    screen.getByText('Update available')
+  })
+
+  it('should not return an update available for a reinstall', () => {
+    vi.mocked(getRobotUpdateAvailable).mockReturnValue('reinstall')
+    render()
+    expect(screen.queryByText('Update available')).not.toBeInTheDocument()
   })
 
   it('should render component when tapping Language', () => {
@@ -428,10 +498,10 @@ describe('RobotSettingsDashboard', () => {
     expect(vi.mocked(LanguageSetting)).toHaveBeenCalled()
   })
 
-  it('should render component when tapping File Manager', () => {
+  it('should render component when tapping File manager', () => {
     render()
 
-    const button = screen.getByText('File Manager')
+    const button = screen.getByText('File manager')
     fireEvent.click(button)
     expect(vi.mocked(FileManager)).toHaveBeenCalled()
   })

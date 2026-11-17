@@ -8,16 +8,17 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SIZE_2,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '/app/atoms/buttons'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import { addManualIp } from '/app/redux/config'
 import { startDiscovery } from '/app/redux/discovery'
 
+import type { ReactNode } from 'react'
 import type { FieldError, Resolver } from 'react-hook-form'
 import type { Dispatch } from '/app/redux/types'
 
@@ -65,7 +66,7 @@ interface ManualIpHostnameFormProps {
 
 export function ManualIpHostnameForm({
   setMostRecentAddition,
-}: ManualIpHostnameFormProps): JSX.Element {
+}: ManualIpHostnameFormProps): ReactNode {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
   const addManualIpAndHostname = (ip: string): void => {
@@ -144,13 +145,13 @@ export function ManualIpHostnameForm({
         </TertiaryButton>
       </FlexForm>
       {formState.errors?.ip != null && (
-        <LegacyStyledText
+        <StyledText
           forwardedAs="label"
           marginTop={SPACING.spacing4}
           color={COLORS.red50}
         >
           {formState.errors.ip.message}
-        </LegacyStyledText>
+        </StyledText>
       )}
     </Flex>
   )

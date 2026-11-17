@@ -10,11 +10,11 @@ import {
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
+} from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { getIsOnDevice } from '/app/redux/config'
 
 import {
@@ -24,6 +24,7 @@ import {
   SUCCESSFULLY_DETACHED,
 } from './constants'
 
+import type { ReactNode } from 'react'
 import type { GripperWizardStepProps, SuccessStep } from './types'
 
 const HEADER_STYLE = css`
@@ -39,7 +40,7 @@ export const Success = (
   props: Pick<GripperWizardStepProps, 'proceed'> &
     Pick<GripperWizardStepProps, 'isRobotMoving'> &
     SuccessStep
-): JSX.Element => {
+): ReactNode => {
   const { proceed, successfulAction, isRobotMoving } = props
   const { t, i18n } = useTranslation([
     'gripper_wizard_flows',

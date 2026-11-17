@@ -12,18 +12,18 @@ import {
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { DeckConfigurationDiscardChangesModal } from '/app/organisms/DeviceDetailsDeckConfiguration/DeckConfigurationDiscardChangesModal'
 import { DeckFixtureSetupInstructionsModal } from '/app/organisms/DeviceDetailsDeckConfiguration/DeckFixtureSetupInstructionsModal'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import {
   useDeckConfigurationEditingTools,
   useNotifyDeckConfigurationQuery,
 } from '/app/resources/deck_configuration'
 
-import type { ComponentProps } from 'react'
-import type { SmallButton } from '/app/atoms/buttons'
+import type { ComponentProps, ReactNode } from 'react'
+import type { SmallButton } from '/app/components/ODD/buttons'
 
-export function DeckConfigurationEditor(): JSX.Element {
+export function DeckConfigurationEditor(): ReactNode {
   const { t, i18n } = useTranslation([
     'protocol_setup',
     'devices_landing',
@@ -81,7 +81,7 @@ export function DeckConfigurationEditor(): JSX.Element {
       >
         <ChildNavigation
           header={t('devices_landing:deck_configuration')}
-          buttonText={i18n.format(t('shared:save'), 'capitalize')}
+          buttonText={t('shared:save')}
           onClickButton={handleClickConfirm}
           secondaryButtonProps={secondaryButtonProps}
         />

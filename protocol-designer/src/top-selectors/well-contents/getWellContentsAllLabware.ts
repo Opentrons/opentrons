@@ -106,7 +106,7 @@ export const getWellContentsForLabwareStack = createSelector(
     highlightedWells
   ): WellContentsByLabware => {
     const selectedLabwareStack = selectedLabwareId
-      ? initialRobotState.labware[selectedLabwareId].stack
+      ? (initialRobotState.labware[selectedLabwareId]?.stack ?? [])
       : []
 
     const allLabwareIds: string[] = selectedLabwareStack ?? []

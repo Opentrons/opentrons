@@ -94,7 +94,7 @@ async def test_aspirate_implementation_no_prep(
     decoy.when(state_view.pipettes.get_ready_to_aspirate(pipette_id)).then_return(True)
 
     decoy.when(
-        state_view.geometry.get_nozzles_per_well(
+        state_view.instrument_interface.get_nozzles_per_well(
             labware_id=labware_id,
             target_well_name=well_name,
             pipette_id=pipette_id,
@@ -102,7 +102,7 @@ async def test_aspirate_implementation_no_prep(
     ).then_return(2)
 
     decoy.when(
-        state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+        state_view.instrument_interface.get_wells_covered_by_pipette_with_active_well(
             labware_id, well_name, pipette_id
         )
     ).then_return(["covered-well-1", "covered-well-2"])
@@ -187,7 +187,7 @@ async def test_aspirate_implementation_with_prep(
 
     decoy.when(state_view.pipettes.get_ready_to_aspirate(pipette_id)).then_return(False)
     decoy.when(
-        state_view.geometry.get_nozzles_per_well(
+        state_view.instrument_interface.get_nozzles_per_well(
             labware_id=labware_id,
             target_well_name=well_name,
             pipette_id=pipette_id,
@@ -195,7 +195,7 @@ async def test_aspirate_implementation_with_prep(
     ).then_return(2)
 
     decoy.when(
-        state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+        state_view.instrument_interface.get_wells_covered_by_pipette_with_active_well(
             labware_id, well_name, pipette_id
         )
     ).then_return(["covered-well-1", "covered-well-2"])
@@ -300,7 +300,7 @@ async def test_aspirate_raises_volume_error(
 
     decoy.when(state_view.pipettes.get_ready_to_aspirate(pipette_id)).then_return(True)
     decoy.when(
-        state_view.geometry.get_nozzles_per_well(
+        state_view.instrument_interface.get_nozzles_per_well(
             labware_id=labware_id,
             target_well_name=well_name,
             pipette_id=pipette_id,
@@ -308,7 +308,7 @@ async def test_aspirate_raises_volume_error(
     ).then_return(2)
 
     decoy.when(
-        state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+        state_view.instrument_interface.get_wells_covered_by_pipette_with_active_well(
             labware_id, well_name, pipette_id
         )
     ).then_return(["covered-well-1", "covered-well-2"])
@@ -374,7 +374,7 @@ async def test_overpressure_error(
     )
 
     decoy.when(
-        state_view.geometry.get_nozzles_per_well(
+        state_view.instrument_interface.get_nozzles_per_well(
             labware_id=labware_id,
             target_well_name=well_name,
             pipette_id=pipette_id,
@@ -382,7 +382,7 @@ async def test_overpressure_error(
     ).then_return(2)
 
     decoy.when(
-        state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+        state_view.instrument_interface.get_wells_covered_by_pipette_with_active_well(
             labware_id, well_name, pipette_id
         )
     ).then_return(["covered-well-1", "covered-well-2"])
@@ -475,7 +475,7 @@ async def test_aspirate_implementation_meniscus(
     )
 
     decoy.when(
-        state_view.geometry.get_nozzles_per_well(
+        state_view.instrument_interface.get_nozzles_per_well(
             labware_id=labware_id,
             target_well_name=well_name,
             pipette_id=pipette_id,
@@ -483,7 +483,7 @@ async def test_aspirate_implementation_meniscus(
     ).then_return(2)
 
     decoy.when(
-        state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+        state_view.instrument_interface.get_wells_covered_by_pipette_with_active_well(
             labware_id, well_name, pipette_id
         )
     ).then_return(["covered-well-1", "covered-well-2"])
@@ -700,7 +700,7 @@ async def test_overpressure_during_preparation(
 
     retry_location = Point(1, 2, 3)
     decoy.when(
-        state_view.geometry.get_well_position(
+        state_view.instrument_interface.get_well_position(
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,

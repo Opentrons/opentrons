@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { DIRECTION_ROW, Flex, POSITION_FIXED } from '@opentrons/components'
 
 import { initializeSentry } from '/app/App/sentry'
-import { GlobalStyle } from '/app/atoms/GlobalStyle'
+import { GlobalStyle } from '/app/components/GlobalStyle'
 import { getConfig } from '/app/redux/config'
 
 import { DesktopApp } from './DesktopApp'

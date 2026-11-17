@@ -19,6 +19,7 @@ import {
 import { Substep } from './Substep'
 import { formatVolume } from './utils'
 
+import type { ReactNode } from 'react'
 import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type {
   StepItemSourceDestRow,
@@ -37,7 +38,7 @@ interface MultichannelSubstepProps {
 
 export function MultichannelSubstep(
   props: MultichannelSubstepProps
-): JSX.Element {
+): ReactNode {
   const {
     rowGroup,
     stepId,

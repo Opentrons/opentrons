@@ -10,15 +10,16 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
+} from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { SmallButton } from '/app/components/ODD/buttons'
 import { getIsOnDevice } from '/app/redux/config'
 
 import { GRIPPER_FLOW_TYPES } from './constants'
 
+import type { ReactNode } from 'react'
 import type { GripperWizardFlowType } from './types'
 
 interface ExitConfirmationProps {
@@ -28,7 +29,7 @@ interface ExitConfirmationProps {
   isRobotMoving: boolean
 }
 
-export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
+export function ExitConfirmation(props: ExitConfirmationProps): ReactNode {
   const { handleGoBack, handleExit, flowType, isRobotMoving } = props
   const { i18n, t } = useTranslation(['gripper_wizard_flows', 'shared'])
 

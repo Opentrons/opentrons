@@ -130,7 +130,7 @@ def test_location_state_update(subject: PipetteStore) -> None:
             ),
         )
     )
-    assert subject.state.current_location == CurrentAddressableArea(
+    assert subject.state.current_location == CurrentAddressableArea(  # type: ignore[comparison-overlap]
         pipette_id="pipette-id", addressable_area_name="na na na na na"
     )
     assert subject.state.current_deck_point == CurrentDeckPoint(

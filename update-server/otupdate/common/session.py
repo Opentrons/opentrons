@@ -2,17 +2,23 @@
 Update session object for tracking state across multiple calls
 """
 
+import asyncio
 import base64
 import enum
 import logging
 import os
 import shutil
+import threading
 import uuid
 from typing import Mapping, NamedTuple, Optional, Union
 
 from server_utils.fastapi_utils.app_state import AppState, AppStateAccessor
 
 LOG = logging.getLogger(__name__)
+
+
+class UpdateCancelled(Exception):
+    """Raised when an update session is cancelled during validate or write."""
 
 
 class Value(NamedTuple):
@@ -49,6 +55,9 @@ class UpdateSession:
 
         self._storage_path = storage_path
         self._auto_commit_and_restart = auto_commit_and_restart
+        self._cancelled = threading.Event()
+        self._pipeline_task: asyncio.Task[None] | None = None
+        self._commit_started = False
 
         self._setup_dl_area()
 
@@ -63,6 +72,50 @@ class UpdateSession:
         """Clean up the storage used by this session."""
         shutil.rmtree(self._storage_path)
         LOG.info(f"Update session: removed {self._token}")
+
+    def request_cancel(self) -> None:
+        """Signal the pipeline to stop at the next progress checkpoint."""
+        self._cancelled.set()
+
+    def check_not_cancelled(self) -> None:
+        """Raise UpdateCancelled if cancel has been requested."""
+        if self._cancelled.is_set():
+            raise UpdateCancelled()
+
+    def set_pipeline_task(self, task: asyncio.Task[None]) -> None:
+        """Record the background validate/write/commit task for this session."""
+        self._pipeline_task = task
+
+    async def wait_for_pipeline(self) -> None:
+        """Wait until the background pipeline has stopped.
+
+        Must be called after request_cancel() so the pipeline can abort. Do not
+        delete session storage until this returns.
+        """
+        task = self._pipeline_task
+        if task is None:
+            return
+        try:
+            await task
+        except Exception:
+            LOG.exception(
+                f"Update session {self._token}: pipeline finished with an error during cancel"
+            )
+
+    def start_commit(self) -> bool:
+        """Claim commit for this session.
+
+        Returns False if the session is not ready, has been cancelled, or a
+        commit is already in progress. Does not change the public stage.
+        """
+        if self._cancelled.is_set():
+            return False
+        if self._stage != Stages.DONE:
+            return False
+        if self._commit_started:
+            return False
+        self._commit_started = True
+        return True
 
     def set_stage(self, stage: Stages) -> None:
         """Convenience method to set the stage and lookup message"""
@@ -80,6 +133,7 @@ class UpdateSession:
         self.set_stage(Stages.ERROR)
 
     def set_progress(self, progress: float) -> None:
+        self.check_not_cancelled()
         self._progress = progress
 
     @property
@@ -139,6 +193,19 @@ class UpdateSession:
 
 
 _session_accessor = AppStateAccessor[UpdateSession]("otupdate_session")
+_session_lock_accessor = AppStateAccessor[asyncio.Lock]("otupdate_session_lock")
+
+
+def install_session_lock(app_state: AppState) -> None:
+    """Create the lock that serializes begin/cancel. Call during server startup."""
+    _session_lock_accessor.set_on(app_state, asyncio.Lock())
+
+
+def get_session_lock(app_state: AppState) -> asyncio.Lock:
+    """Return the lock that serializes begin/cancel."""
+    session_lock = _session_lock_accessor.get_from(app_state)
+    assert session_lock is not None, "Forgot to install_session_lock() during startup?"
+    return session_lock
 
 
 def get_current_session(app_state: AppState) -> UpdateSession | None:

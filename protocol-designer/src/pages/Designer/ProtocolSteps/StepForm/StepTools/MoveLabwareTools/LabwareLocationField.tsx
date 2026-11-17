@@ -43,6 +43,7 @@ import { getIsAdapter } from '/protocol-designer/utils'
 
 import { getSortedAddressableArea } from './utils'
 
+import type { ReactNode } from 'react'
 import type { AddressableAreaName } from '@opentrons/shared-data'
 import type { Option } from '/protocol-designer/top-selectors/labware-locations'
 import type { FieldProps } from '../../types'
@@ -54,7 +55,7 @@ interface LabwareLocationFieldProps extends FieldProps {
 }
 export function LabwareLocationField(
   props: LabwareLocationFieldProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation(['form', 'protocol_steps'])
   const { labware, useGripper } = props
   const { labware: deckSetupLabware } = useSelector(getDeckSetupForActiveItem)
@@ -196,6 +197,13 @@ export function LabwareLocationField(
     movingLabwareDef != null && getIsAdapter(labware, labwareEntities)
   const isMovingLabwareFilterPlate =
     movingLabwareDef?.parameters.quirks?.includes('filterPlate') ?? false
+  // filter plates cannot sit directly on the vacuum module
+  if (isMovingLabwareFilterPlate) {
+    unoccupiedLabwareLocationsOptions =
+      unoccupiedLabwareLocationsOptions.filter(
+        ({ value }) => moduleEntities[value]?.type !== VACUUM_MODULE_TYPE
+      )
+  }
   if (movingLabwareDef != null && !isMovingLabwareFilterPlate) {
     unoccupiedLabwareLocationsOptions =
       unoccupiedLabwareLocationsOptions.filter(({ value }) => {

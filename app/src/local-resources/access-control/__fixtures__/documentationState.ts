@@ -13,12 +13,25 @@ type AskForDocumentation = (
   username?: string
 ) => Promise<DocumentationReport>
 
+type AccessControlEnabledState = Extract<
+  DocumentationState,
+  { accessControlEnabled: true }
+>
+type ReasonNotRequiredState = Extract<
+  AccessControlEnabledState,
+  { reasonForInteractionRequired: false }
+>
+type ReasonRequiredState = Extract<
+  AccessControlEnabledState,
+  { reasonForInteractionRequired: true }
+>
+
 export const ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE: DocumentationState = {
   isLoading: false,
   accessControlEnabled: false,
 }
 
-export function createReasonNotRequiredDocumentationState(): DocumentationState {
+export function createReasonNotRequiredDocumentationState(): ReasonNotRequiredState {
   return {
     isLoading: false,
     accessControlEnabled: true,
@@ -30,7 +43,7 @@ export function createReasonNotRequiredDocumentationState(): DocumentationState 
 
 export function createReasonRequiredWithDocReport(
   docreport: DocumentationReport
-): DocumentationState {
+): ReasonRequiredState {
   return {
     isLoading: false,
     accessControlEnabled: true,
@@ -44,7 +57,7 @@ export function createReasonRequiredWithDocReport(
 
 export function createReasonRequiredWithoutDocReport(
   askForDocumentation: AskForDocumentation
-): DocumentationState {
+): ReasonRequiredState {
   return {
     isLoading: false,
     accessControlEnabled: true,

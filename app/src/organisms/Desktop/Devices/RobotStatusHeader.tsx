@@ -14,13 +14,11 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   OVERFLOW_WRAP_ANYWHERE,
   SPACING,
   StyledText,
   Tooltip,
   truncateString,
-  TYPOGRAPHY,
   useHoverTooltip,
 } from '@opentrons/components'
 import {
@@ -28,7 +26,7 @@ import {
   useProtocolQuery,
 } from '@opentrons/react-api-client'
 
-import { QuaternaryButton } from '/app/atoms/buttons'
+import { QuaternaryButton } from '/app/components/desktop/buttons/QuaternaryButton'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
 import {
   getRobotAddressesByName,
@@ -38,7 +36,7 @@ import {
 import { useNetworkInterfaces } from '/app/resources/networking/hooks'
 import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type { IconName, StyleProps } from '@opentrons/components'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { State } from '/app/redux/types'
@@ -54,7 +52,7 @@ interface RobotNameContainerProps {
   isGoToRun: boolean
 }
 
-export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
+export function RobotStatusHeader(props: RobotStatusHeaderProps): ReactNode {
   const { name, local, robotModel, ...styleProps } = props
   const { t, i18n } = useTranslation([
     'devices_landing',
@@ -89,15 +87,12 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
         }}
         gridGap={SPACING.spacing8}
       >
-        <LegacyStyledText
-          forwardedAs="label"
-          overflowWrap={OVERFLOW_WRAP_ANYWHERE}
-        >
+        <StyledText forwardedAs="label" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
           {`${truncateString(displayName, 68)}; ${i18n.format(
             t(`run_details:status_${currentRunStatus}`),
             'lowerCase'
           )}`}
-        </LegacyStyledText>
+        </StyledText>
         <Link
           to={`/devices/${name}/protocol-runs/${currentRunId}/${
             currentRunStatus === RUN_STATUS_IDLE ? 'setup' : 'run-preview'
@@ -157,11 +152,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} {...styleProps} width="100%">
       <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing2}>
-        <StyledText
-          desktopStyle="bodyDefaultRegular"
-          color={COLORS.grey60}
-          textTransform={TYPOGRAPHY.textTransformUppercase}
-        >
+        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
           {robotModel}
         </StyledText>
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>

@@ -82,6 +82,10 @@ const FOOTPRINT_DIAGRAMS: Diagrams = {
     new URL(FOOTPRINT_IMAGE_RELATIVE_PATH, import.meta.url).href,
     new URL(DIMENSIONS_HEIGHT_PLATE_IMAGE_RELATIVE_PATH, import.meta.url).href,
   ],
+  filterPlate: [
+    new URL(FOOTPRINT_IMAGE_RELATIVE_PATH, import.meta.url).href,
+    new URL(DIMENSIONS_HEIGHT_PLATE_IMAGE_RELATIVE_PATH, import.meta.url).href,
+  ],
   tipRack: [
     new URL(FOOTPRINT_IMAGE_RELATIVE_PATH, import.meta.url).href,
     new URL(DIMENSIONS_HEIGHT_TIP_RACK_IMAGE_RELATIVE_PATH, import.meta.url)
@@ -244,7 +248,7 @@ export function getFootprintDiagram(props: DiagramProps): string[] {
   } else if (category === 'tubeRack' && irregular) {
     return FOOTPRINT_DIAGRAMS.irregular
   }
-  return category ? FOOTPRINT_DIAGRAMS[category] : []
+  return category != null ? (FOOTPRINT_DIAGRAMS[category] ?? []) : []
 }
 
 export function getSpacingDiagram(props: DiagramProps): string[] {
@@ -261,7 +265,7 @@ export function getSpacingDiagram(props: DiagramProps): string[] {
 export function getMeasurementDiagram(props: DiagramProps): string[] {
   const { category, wellBottomShape, shape } = props
   if (category === 'tipRack') return TIPRACK_MEASUREMENT_DIAGRAMS
-  else if (category === 'wellPlate') {
+  else if (category === 'wellPlate' || category === 'filterPlate') {
     return wellBottomShape && shape
       ? PLATE_MEASUREMENT_DIAGRAMS[wellBottomShape][shape]
       : []

@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 import pytest
 from decoy import Decoy
 
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules.vacuum_module import VacuumModule
 from opentrons.protocol_engine.errors import (
     VacuumModuleStillUnderVacuumError,
@@ -32,12 +32,6 @@ from opentrons.types import DeckSlotName
 
 
 @pytest.fixture
-def hardware_api(decoy: Decoy) -> HardwareAPI:
-    """Get a mock in the shape of a HardwareAPI."""
-    return decoy.mock(cls=HardwareAPI)
-
-
-@pytest.fixture
 def equipment(decoy: Decoy) -> EquipmentHandler:
     """Get a mock in the shape of an EquipmentHandler."""
     return decoy.mock(cls=EquipmentHandler)
@@ -52,7 +46,7 @@ def state_store(decoy: Decoy) -> StateStore:
 @pytest.fixture
 def subject(
     state_store: StateStore,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
     equipment: EquipmentHandler,
 ) -> VacuumModuleMovementFlagger:
     """Return a vacuum module movement flagger initialized with mocked dependencies."""
@@ -113,7 +107,7 @@ async def test_ensure_vacuum_module_is_idle_raises_when_pressure_not_equalized(
     decoy: Decoy,
     subject: VacuumModuleMovementFlagger,
     state_store: StateStore,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
 ) -> None:
     """It should raise with gauge pressure when pressure is not equalized."""
     decoy.when(state_store.config).then_return(
@@ -159,7 +153,7 @@ async def test_ensure_vacuum_module_is_idle_noops_when_pressure_equalized(
     decoy: Decoy,
     subject: VacuumModuleMovementFlagger,
     state_store: StateStore,
-    hardware_api: HardwareAPI,
+    hardware_api: HardwareControlAPI,
 ) -> None:
     """It should no-op when the pump is off and the chamber is at atmospheric pressure."""
     decoy.when(state_store.config).then_return(

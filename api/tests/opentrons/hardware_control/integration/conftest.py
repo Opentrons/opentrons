@@ -7,7 +7,7 @@ import pytest
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.emulation.module_server import ModuleStatusClient
 from opentrons.hardware_control.emulation.module_server.helpers import wait_emulators
-from opentrons.hardware_control.emulation.scripts import run_app, run_smoothie
+from opentrons.hardware_control.emulation.scripts import run_app
 from opentrons.hardware_control.emulation.settings import (
     PipetteSettings,
     Settings,
@@ -43,7 +43,6 @@ def emulation_app(emulator_settings: Settings) -> Iterator[None]:
 
         async def _main_task() -> None:
             await asyncio.gather(
-                run_smoothie.run(emulator_settings),
                 run_app.run(emulator_settings, modules=[m.value for m in modules]),
             )
 

@@ -15,12 +15,15 @@ import * as UpdateRobotSoftware from '../'
 
 import type { State } from '/app/redux/types'
 
-const mockStartUpdate = vi.hoisted(() => vi.fn())
+const mockStartUpdate = vi.hoisted(() => vi.fn(() => true))
 
 vi.mock('/app/redux/discovery')
 vi.mock('/app/redux/robot-update')
-vi.mock('/app/resources/robot-update/RobotUpdateContext', () => ({
-  useRobotUpdateContext: () => ({ startUpdate: mockStartUpdate }),
+vi.mock('/app/local-resources/access-control/useGatedStartRobotUpdate', () => ({
+  useGatedStartRobotUpdate: () => ({
+    startUpdate: mockStartUpdate,
+    isLoading: false,
+  }),
 }))
 vi.mock('/app/organisms/UpdateRobotSoftware/CheckUpdates')
 vi.mock('/app/organisms/UpdateRobotSoftware/CompleteUpdateSoftware')
@@ -78,13 +81,15 @@ const mockSession = {
 
 const mockAfterError = vi.fn()
 const mockBeforeCommitting = vi.fn()
+const mockAfterCancel = vi.fn()
 
-const render = () => {
+const render = (afterCancel: () => void = mockAfterCancel) => {
   return renderWithProviders(
     <UpdateRobotSoftware.UpdateRobotSoftware
       localRobot={mockRobot}
       afterError={mockAfterError}
       beforeCommittingSuccessfulUpdate={mockBeforeCommitting}
+      afterCancel={afterCancel}
     />,
     {
       i18nInstance: i18n,
@@ -96,6 +101,10 @@ const render = () => {
 describe('UpdateRobotSoftware', () => {
   beforeEach(() => {
     mockStartUpdate.mockClear()
+    mockAfterError.mockClear()
+    mockBeforeCommitting.mockClear()
+    mockAfterCancel.mockClear()
+    vi.mocked(RobotUpdate.downloadRobotUpdate).mockClear()
     vi.mocked(CompleteUpdateSoftware).mockReturnValue(
       <div>mock CompleteUpdateSoftware</div>
     )
@@ -103,10 +112,17 @@ describe('UpdateRobotSoftware', () => {
   })
 
   it('should start the robot update through the orchestrator on mount', () => {
+    vi.mocked(getRobotUpdateSession).mockReturnValue(null)
+    render()
+    expect(mockStartUpdate).toHaveBeenCalled()
+    expect(RobotUpdate.downloadRobotUpdate).toHaveBeenCalled()
+  })
+
+  it('does not re-download if a session already exists', () => {
     vi.mocked(getRobotUpdateSession).mockReturnValue(mockSession)
     render()
-    expect(mockStartUpdate).toHaveBeenCalledWith('oddtie')
-    expect(RobotUpdate.downloadRobotUpdate).toHaveBeenCalled()
+    expect(mockStartUpdate).toHaveBeenCalled()
+    expect(RobotUpdate.downloadRobotUpdate).not.toHaveBeenCalled()
   })
 
   it('should render complete screen when finished', () => {
@@ -179,5 +195,33 @@ describe('UpdateRobotSoftware', () => {
     vi.mocked(getRobotUpdateSession).mockReturnValue(mockInstallingSession)
     render()
     screen.getByText('mock UpdateSoftware')
+  })
+
+  it('should call afterCancel when the session is cleared', () => {
+    vi.mocked(getRobotUpdateSession).mockReturnValue(mockSession)
+    const [{ rerender }, store] = render(mockAfterCancel)
+    expect(mockAfterCancel).not.toHaveBeenCalled()
+
+    vi.mocked(getRobotUpdateSession).mockReturnValue(null)
+    vi.mocked(store.getState).mockReturnValue({
+      ...MOCK_STATE,
+      nonce: 1,
+    } as any)
+    rerender(
+      <UpdateRobotSoftware.UpdateRobotSoftware
+        localRobot={mockRobot}
+        afterError={mockAfterError}
+        beforeCommittingSuccessfulUpdate={mockBeforeCommitting}
+        afterCancel={mockAfterCancel}
+      />
+    )
+    expect(mockAfterCancel).toHaveBeenCalled()
+  })
+
+  it('should not call afterCancel before a session exists', () => {
+    vi.mocked(getRobotUpdateSession).mockReturnValue(null)
+    render(mockAfterCancel)
+    expect(mockAfterError).not.toHaveBeenCalled()
+    expect(mockAfterCancel).not.toHaveBeenCalled()
   })
 })

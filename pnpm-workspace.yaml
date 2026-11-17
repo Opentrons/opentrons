@@ -13,19 +13,16 @@ packages:
   - 'step-generation'
   - 'api-client'
   - 'react-api-client'
-  - 'usb-bridge/node-client'
-  - 'js-package-testing'
+  - 'usb-bridge/*'
 
-onlyBuiltDependencies:
-  - electron
-  - electron-winstaller
-  - esbuild
-  - '@serialport/bindings-cpp'
-  - usb
-  - '@sentry/cli'
-  - sharp
+blockExoticSubdeps: False
 
 minimumReleaseAge: 10080 # 1 week
+
+fetchTimeout: 60000
+
+overrides:
+  '@types/react': 18.2.51
 
 catalog:
   lodash: 4.18.1
@@ -38,3 +35,16 @@ catalogs:
     react: 18.2.0
     react-dom: 18.2.0
     '@types/react-dom': 18.2.0
+
+allowBuilds:
+  '@sentry/cli': true
+  '@serialport/bindings-cpp': true
+  aws-sdk: true
+  browser-tabs-lock: true
+  core-js: true
+  core-js-pure: true
+  electron-winstaller: true
+  es5-ext: true
+  esbuild: true
+  styled-components: true
+  usb: true

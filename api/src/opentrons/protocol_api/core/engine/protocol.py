@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, Type, Union
 
 from opentrons_shared_data import liquid_classes
-from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
+from opentrons_shared_data.deck.types import DeckDefinitionV6, SlotDefV3
 from opentrons_shared_data.labware.labware_definition import (
     labware_definition_type_adapter,
 )
@@ -83,7 +83,6 @@ from opentrons.protocol_engine.types import (
     ModuleModel as ProtocolEngineModuleModel,
 )
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.types import (
     DeckSlotName,
     Location,
@@ -198,10 +197,6 @@ class ProtocolCore(
         """Get disposal locations."""
         return self._disposal_locations
 
-    def get_max_speeds(self) -> AxisMaxSpeeds:
-        """Get a control interface for maximum move speeds."""
-        raise NotImplementedError("ProtocolCore.get_max_speeds not implemented")
-
     def get_hardware(self) -> SyncHardwareAPI:
         """Get direct access to a hardware control interface."""
         return self._sync_hardware
@@ -302,6 +297,7 @@ class ProtocolCore(
         location: Union[
             DeckSlotName,
             StagingSlotName,
+            LabwareCore,
             ModuleCore,
             NonConnectedModuleCore,
             ModuleFixtureLocation,
@@ -311,7 +307,7 @@ class ProtocolCore(
         version: Optional[int],
     ) -> LabwareCore:
         """Load an adapter using its identifying parameters"""
-        load_location = self._get_non_stacked_location(location=location)
+        load_location = self._convert_labware_location(location=location)
         custom_labware_params = (
             self._engine_client.state.labware.find_custom_labware_load_params()
         )
@@ -1091,7 +1087,7 @@ class ProtocolCore(
 
         return labware_core
 
-    def get_deck_definition(self) -> DeckDefinitionV5:
+    def get_deck_definition(self) -> DeckDefinitionV6:
         """Get the geometry definition of the robot's deck."""
         return self._engine_client.state.labware.get_deck_definition()
 

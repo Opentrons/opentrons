@@ -81,6 +81,7 @@ async def test_pump_motor(
 
 async def run(vacuum: VacuumModule, report: CSVReport, section: str) -> None:
     """Run."""
+    ui.get_user_ready("Make sure the hose is NOT connected to the module")
     print("Set Pump State")
     # Turn off pump
     await vacuum.set_pump_state(False)

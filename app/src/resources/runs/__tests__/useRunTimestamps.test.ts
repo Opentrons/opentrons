@@ -1,6 +1,5 @@
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { when } from 'vitest-when'
 
 import {
   mockCommand,
@@ -23,13 +22,13 @@ vi.mock('../useNotifyRunQuery')
 
 describe('useRunTimestamps hook', () => {
   beforeEach(() => {
-    when(useRunCommands)
+    vi.when(useRunCommands)
       .calledWith(RUN_ID_2, { pageLength: 1 }, expect.any(Object))
       .thenReturn([mockCommand.data as any])
   })
 
   it('returns the start time of the current run', async () => {
-    when(useNotifyRunQuery)
+    vi.when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
       .thenReturn({
         data: { data: mockRunningRun },
@@ -40,7 +39,7 @@ describe('useRunTimestamps hook', () => {
   })
 
   it('returns null when pause is not the last action', async () => {
-    when(useNotifyRunQuery)
+    vi.when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
       .thenReturn({
         data: { data: mockRunningRun },
@@ -51,7 +50,7 @@ describe('useRunTimestamps hook', () => {
   })
 
   it('returns the pause time of the current run when pause is the last action', async () => {
-    when(useNotifyRunQuery)
+    vi.when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
       .thenReturn({
         data: { data: mockPausedRun },
@@ -62,7 +61,7 @@ describe('useRunTimestamps hook', () => {
   })
 
   it('returns stopped time null when stop is not the last action', async () => {
-    when(useNotifyRunQuery)
+    vi.when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
       .thenReturn({
         data: { data: mockRunningRun },
@@ -73,7 +72,7 @@ describe('useRunTimestamps hook', () => {
   })
 
   it('returns the stop time of the current run when stop is the last action', async () => {
-    when(useNotifyRunQuery)
+    vi.when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
       .thenReturn({
         data: { data: mockStoppedRun },
@@ -84,7 +83,7 @@ describe('useRunTimestamps hook', () => {
   })
 
   it('returns the complete time of a successful current run', async () => {
-    when(useNotifyRunQuery)
+    vi.when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
       .thenReturn({
         data: { data: mockSucceededRun },
@@ -95,7 +94,7 @@ describe('useRunTimestamps hook', () => {
   })
 
   it('returns the complete time of a failed current run', async () => {
-    when(useNotifyRunQuery)
+    vi.when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
       .thenReturn({
         data: { data: mockFailedRun },
@@ -106,7 +105,7 @@ describe('useRunTimestamps hook', () => {
   })
 
   it('returns the complete time of a stopped current run', async () => {
-    when(useNotifyRunQuery)
+    vi.when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
       .thenReturn({
         data: { data: mockStoppedRun },

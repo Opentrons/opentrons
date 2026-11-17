@@ -35,7 +35,7 @@ interface TipSelectionModalProps {
   errorReason: TipSelectionBannerReason | null
 }
 
-export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
+export function TipSelectionModal(props: TipSelectionModalProps): ReactNode {
   const {
     onClose,
     onBack,

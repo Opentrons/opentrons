@@ -95,6 +95,10 @@ class _StubRobotServerClient(RobotClientABC):
     async def get_current_run_log(self) -> RobotCurrentRunLog:
         return RobotCurrentRunLog(serialized_log=None)
 
+    @override
+    async def enable_pyro_subprocess_flags(self) -> None:
+        return None
+
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:

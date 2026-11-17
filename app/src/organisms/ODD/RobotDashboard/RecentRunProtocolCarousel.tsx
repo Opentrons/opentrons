@@ -7,8 +7,9 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { RecentRunProtocolCard } from './RecentRunProtocolCard'
+import { RecentRunProtocolCard } from '/app/components/ODD/cards/RecentRunProtocolCard'
 
+import type { ReactNode } from 'react'
 import type { RunData } from '@opentrons/api-client'
 
 interface RecentRunProtocolCarouselProps {
@@ -32,7 +33,7 @@ const CarouselWrapper = styled.div`
 export function RecentRunProtocolCarousel({
   recentRunsOfUniqueProtocols,
   onCardResolved,
-}: RecentRunProtocolCarouselProps): JSX.Element {
+}: RecentRunProtocolCarouselProps): ReactNode {
   return (
     <CarouselWrapper>
       <Flex

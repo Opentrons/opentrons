@@ -57,6 +57,7 @@ from robot_server.service.notifications import (
 from robot_server.service.pyro_utils.resource_utilities import (
     get_pyro_resource,
     register_run_orchestrator_store_to_pyro_resource,
+    register_run_store_provider_to_pyro_resource,
 )
 from robot_server.service.task_runner import get_task_runner
 from robot_server.settings import get_settings
@@ -81,6 +82,9 @@ async def get_run_store(
 
     if run_store is None:
         run_store = RunStore(sql_engine=sql_engine)
+        register_run_store_provider_to_pyro_resource(
+            app_state=app_state, run_store_provider=run_store.get_run_store_provider()
+        )
         _run_store_accessor.set_on(app_state, run_store)
 
     return run_store
@@ -182,6 +186,7 @@ async def get_run_orchestrator_store(
         RunProcessPyroProvider, Depends(get_run_process_pyro_provider)
     ],
     access_control_status: Annotated[bool, Depends(get_access_control_status)],
+    run_store: Annotated[RunStore, Depends(get_run_store)],
 ) -> RunOrchestratorStore:
     """Get a singleton EngineStore to keep track of created engines / runners."""
     run_orchestrator_store = _run_orchestrator_store_accessor.get_from(app_state)
@@ -193,6 +198,7 @@ async def get_run_orchestrator_store(
             deck_type=deck_type,
             run_process_pyro_provider=run_process_pyro_provider,
             access_control_status=access_control_status,
+            command_store_provider=run_store.get_run_store_provider(),
         )
         _run_orchestrator_store_accessor.set_on(app_state, run_orchestrator_store)
         # Handle remote hardware registry, if needed
@@ -201,7 +207,7 @@ async def get_run_orchestrator_store(
                 app_state=app_state, run_orchestrator_store=run_orchestrator_store
             )
             pyro_resource = await get_pyro_resource()
-            hardware_api.register_callback(
+            await hardware_api.register_callback_async(
                 pyro_resource.create_run_hardware_event_callback()
             )
 
@@ -223,7 +229,10 @@ async def get_is_okay_to_create_maintenance_run(
         orchestrator = run_orchestrator_store.run_coordinator
     except NoRunCoordinator:
         return True
-    return not orchestrator.run_has_started() or orchestrator.get_is_run_terminal()
+    return (
+        not await orchestrator.run_has_started()
+        or await orchestrator.get_is_run_terminal()
+    )
 
 
 async def get_run_data_manager(

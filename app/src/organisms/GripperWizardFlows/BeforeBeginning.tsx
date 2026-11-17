@@ -1,16 +1,16 @@
 import { useEffect, useRef } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
-import { COLORS, LegacyStyledText } from '@opentrons/components'
+import { COLORS, StyledText } from '@opentrons/components'
 import { EXTENSION } from '@opentrons/shared-data'
 
-import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
-import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
+import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
 import {
   SimpleWizardBody,
   SimpleWizardInProgressBody,
-} from '/app/molecules/SimpleWizardBody'
-import { WizardRequiredEquipmentList } from '/app/molecules/WizardRequiredEquipmentList'
+} from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { WizardRequiredEquipmentList } from '/app/components/adhoc/shared/wizards/WizardRequiredEquipmentList'
+import { isDocumentationProvided } from '/app/local-resources/access-control/utils'
 
 import {
   CAL_PIN_LOADNAME,
@@ -157,9 +157,14 @@ export const BeforeBeginning = (
     />
   ) : (
     <GenericWizardTile
-      header={t('before_you_begin')}
-      //  TODO(BC, 11/8/22): wire up this URL and unhide the link!
-      // getHelp={BEFORE_YOU_BEGIN_URL}
+      header={
+        <StyledText
+          desktopStyle="headingSmallBold"
+          oddStyle="level4HeaderSemiBold"
+        >
+          {t('before_you_begin')}
+        </StyledText>
+      }
       rightHandBody={
         <WizardRequiredEquipmentList equipmentList={equipmentList} />
       }
@@ -167,7 +172,14 @@ export const BeforeBeginning = (
         <Trans
           t={t}
           i18nKey={bodyI18nKey}
-          components={{ block: <LegacyStyledText forwardedAs="p" /> }}
+          components={{
+            block: (
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
+                oddStyle="bodyTextRegular"
+              />
+            ),
+          }}
         />
       }
       proceedButtonText={t('move_gantry_to_front')}

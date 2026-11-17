@@ -3,12 +3,13 @@ import { useSelector } from 'react-redux'
 
 import { RobotInfoLabel, StyledText } from '@opentrons/components'
 
-import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+import { OddInfoScreen } from '/app/components/ODD/ODDInfoScreen'
 import { getUsbDeviceDisplayRows } from '/app/redux/system-info/selectors'
 
 import styles from './devices.module.css'
 
+import type { ReactNode } from 'react'
 import type { SetSettingOption } from '../types'
 
 interface DevicesProps {
@@ -19,7 +20,7 @@ interface DevicesProps {
 export function Devices({
   robotName,
   setCurrentOption,
-}: DevicesProps): JSX.Element {
+}: DevicesProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const deviceRows = useSelector(getUsbDeviceDisplayRows)
 

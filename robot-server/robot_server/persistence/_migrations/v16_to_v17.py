@@ -9,16 +9,12 @@ to root, this was fine when there were no other users or groups but must be chan
 access to protocol related files.
 """
 
-import os
 from pathlib import Path
 
-from server_utils.persistence.folder_migrator import (
-    PROTOCOL_DIR_PERMISSIONS,
-    PROTOCOL_FILE_PERMISSIONS,
-    Migration,
-)
+from server_utils.persistence.folder_migrator import Migration
 
 from ..file_and_directory_names import PROTOCOLS_DIRECTORY
+from ..protocol_user_permissions import apply_protocol_user_permissions
 from ._util import copy_contents
 
 
@@ -35,11 +31,4 @@ def _migrate_permissions(dest_dir: Path) -> None:
 
     # Ensure a protocols directory is present before setting permissions
     if protocols_dir.is_dir():
-        os.chmod(protocols_dir, PROTOCOL_DIR_PERMISSIONS)
-        for item in protocols_dir.glob("**/*"):
-            if item.is_dir():
-                os.chmod(item, PROTOCOL_DIR_PERMISSIONS)
-            else:
-                # Gaurantee read permissions on migrated files to ensure accessibility, even
-                # if they were already readable under the existing umask rules.
-                os.chmod(item, PROTOCOL_FILE_PERMISSIONS)
+        apply_protocol_user_permissions(protocols_dir, recursive=True)

@@ -24,27 +24,24 @@ describe('DeleteRecordsModal', () => {
     screen.getByText(
       'We recommend downloading all protocol files before proceeding.'
     )
+    screen.getByText('Delete all')
   })
 
   it('renders selectedRuns copy', () => {
     render('selectedRuns')
-    screen.getByText('Delete selected protocol run records?')
+    screen.getByText('Download and delete selected protocol run records?')
     screen.getByText(
-      'Deleting the selected protocol run records will permanently remove them from the robot, along with all associated files. This action cannot be undone.'
+      'Download the selected protocol run records before continuing. Once downloaded, the files will be permanently deleted from the robot and cannot be recovered.'
     )
-    screen.getByText(
-      'We recommend downloading all protocol files before proceeding.'
-    )
+    screen.getByText('Download and delete all')
   })
 
   it('renders selectedLogs copy', () => {
     render('selectedLogs')
-    screen.getByText('Delete all selected user action logs?')
+    screen.getByText('Download and delete all selected audit logs?')
     screen.getByText(
-      'Deleting all selected user action logs will permanently remove them from the robot. This action cannot be undone.'
+      'Download the robot’s audit logs before continuing. Once downloaded, the logs will be permanently deleted from the robot and cannot be recovered.'
     )
-    screen.getByText(
-      'We recommend downloading all user action logs before proceeding.'
-    )
+    screen.getByText('Download and delete all')
   })
 })

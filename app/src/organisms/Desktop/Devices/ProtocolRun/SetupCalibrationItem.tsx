@@ -9,9 +9,9 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SIZE_1,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -49,7 +49,7 @@ export function SetupCalibrationItem({
       : t('not_calibrated')
 
   const calibrationDataNotAvailableText = runHasStarted ? (
-    <LegacyStyledText>{t('calibration_data_not_available')}</LegacyStyledText>
+    <StyledText>{t('calibration_data_not_available')}</StyledText>
   ) : null
   return (
     <Flex
@@ -72,23 +72,24 @@ export function SetupCalibrationItem({
           ) : null}
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             {label != null && (
-              <LegacyStyledText
+              <StyledText
+                forwardedAs="h6"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 color={COLORS.grey60}
-                css={TYPOGRAPHY.h6SemiBold}
                 textTransform={TYPOGRAPHY.textTransformUppercase}
                 id={id}
               >
                 {label}
-              </LegacyStyledText>
+              </StyledText>
             )}
             {title != null && (
-              <LegacyStyledText forwardedAs="p" color={COLORS.black90} id={id}>
+              <StyledText forwardedAs="p" color={COLORS.black90} id={id}>
                 {title}
-              </LegacyStyledText>
+              </StyledText>
             )}
-            <LegacyStyledText forwardedAs="label" color={COLORS.grey60}>
+            <StyledText forwardedAs="label" color={COLORS.grey60}>
               {calibrationDataNotAvailableText ?? subText ?? calibratedText}
-            </LegacyStyledText>
+            </StyledText>
           </Flex>
         </Flex>
       </Flex>

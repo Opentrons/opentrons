@@ -9,14 +9,14 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { SLEEP_NEVER_MS } from '/app/local-resources/dom-utils'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
 } from '/app/redux/config'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 import type { SetSettingOption } from './types'
 
@@ -28,7 +28,7 @@ interface TouchScreenSleepProps {
 
 export function TouchScreenSleep({
   setCurrentOption,
-}: TouchScreenSleepProps): JSX.Element {
+}: TouchScreenSleepProps): ReactNode {
   const { t } = useTranslation(['device_settings'])
   const { sleepMs } = useSelector(getOnDeviceDisplaySettings) ?? SLEEP_NEVER_MS
   const dispatch = useDispatch<Dispatch>()

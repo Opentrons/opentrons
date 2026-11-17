@@ -3,7 +3,16 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import NiceModal, { useModal } from '@ebay/nice-modal-react'
 
-import { Icon, Modal, PrimaryButton, StyledText } from '@opentrons/components'
+import {
+  ERROR_TOAST,
+  Icon,
+  INFO_TOAST,
+  Modal,
+  PrimaryButton,
+  StyledText,
+  SUCCESS_TOAST,
+} from '@opentrons/components'
+import { isDocumentedMutationError } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
@@ -11,18 +20,24 @@ import { useCurrentRobotName } from '/app/redux/robot-auth'
 import { useDownloadAndDeleteAuditLog } from '/app/resources/audit/useDownloadAndDeleteAuditLog'
 import { useIsLogDeleted } from '/app/resources/audit/useIsLogDeleted'
 
+import { useToaster } from '../../ToasterOven'
 import styles from './downloadauditlogsmodal.module.css'
 
+import type { ReactNode } from 'react'
+import type { IconProps } from '@opentrons/components'
+
 export interface DownloadAuditLogsModalProps {
-  logPeriodId: string
   onDownload: () => void
   isLoading: boolean
+  closeOnOutsideClick?: boolean
+  onClose?: () => void
 }
 
 export function DownloadAuditLogsModal({
-  logPeriodId: _logPeriodId,
   onDownload,
   isLoading,
+  closeOnOutsideClick = false,
+  onClose,
 }: DownloadAuditLogsModalProps): JSX.Element {
   const { t } = useTranslation('access_control')
 
@@ -30,8 +45,9 @@ export function DownloadAuditLogsModal({
     <Modal
       type="warning"
       title={t('download_audit_logs')}
-      closeOnOutsideClick={false}
+      closeOnOutsideClick={closeOnOutsideClick}
       childrenPadding="var(--spacing-24)"
+      onClose={onClose}
     >
       <div className={styles.content}>
         <StyledText desktopStyle="bodyDefaultRegular">
@@ -46,7 +62,7 @@ export function DownloadAuditLogsModal({
                 aria-hidden
                 spin={isLoading}
               />
-              {t('download_audit_logs')}
+              {t('download_now')}
             </span>
           </PrimaryButton>
         </div>
@@ -84,22 +100,42 @@ function DownloadAuditLogsModalContent({
   logPeriodId,
 }: {
   logPeriodId: string
-}): JSX.Element {
+}): ReactNode {
+  const { t } = useTranslation('device_details')
   const modal = useModal()
+  const { makeToast, eatToast } = useToaster()
 
   const { downloadAndDeleteAuditLog, isLoading } =
     useDownloadAndDeleteAuditLog(logPeriodId)
 
   const handleDownload = (): void => {
+    const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
+    const inProgressToastId = makeToast(
+      t('downloading_log_periods') as string,
+      INFO_TOAST,
+      { disableTimeout: true, icon: toastIcon }
+    )
     downloadAndDeleteAuditLog()
       .then(() => {
+        makeToast(t('files_successfully_downloaded') as string, SUCCESS_TOAST)
         modal.resolve(true)
+        modal.remove()
       })
-      .catch(error => {
+      .catch((error: unknown) => {
+        if (isDocumentedMutationError(error)) {
+          return
+        }
+        const message =
+          error instanceof Error && error.message.length > 0
+            ? error.message
+            : String(error)
+        const casedMessage = message.charAt(0).toUpperCase() + message.slice(1)
+        makeToast(casedMessage, ERROR_TOAST, { closeButton: true })
         modal.reject(error)
+        modal.remove()
       })
       .finally(() => {
-        modal.remove()
+        eatToast(inProgressToastId)
       })
   }
 
@@ -114,11 +150,7 @@ function DownloadAuditLogsModalContent({
   }, [isDeleted, isLogDeletedLoading, modal])
 
   return (
-    <DownloadAuditLogsModal
-      logPeriodId={logPeriodId}
-      onDownload={handleDownload}
-      isLoading={isLoading}
-    />
+    <DownloadAuditLogsModal onDownload={handleDownload} isLoading={isLoading} />
   )
 }
 

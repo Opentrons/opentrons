@@ -8,8 +8,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { SmallButton } from '/app/atoms/buttons'
-import { SimpleWizardBody } from '/app/molecules/SimpleWizardBody'
+import { SimpleWizardBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
+import { SmallButton } from '/app/components/ODD/buttons'
+
+import type { ReactNode } from 'react'
 
 interface UnskippableModalProps {
   goBack: () => void
@@ -18,7 +20,7 @@ interface UnskippableModalProps {
   isOnDevice: boolean | null
 }
 
-export function UnskippableModal(props: UnskippableModalProps): JSX.Element {
+export function UnskippableModal(props: UnskippableModalProps): ReactNode {
   const { goBack, proceed, isOnDevice, isRobotMoving } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   return (

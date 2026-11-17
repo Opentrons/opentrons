@@ -8,14 +8,14 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   SPACING,
   SPACING_AUTO,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { TertiaryButton } from '/app/atoms/buttons'
+import { TertiaryButton } from '/app/components/desktop/buttons/TertiaryButton'
 import {
   ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
   useTrackEvent,
@@ -26,9 +26,10 @@ import {
   openCustomLabwareDirectory,
 } from '/app/redux/custom-labware'
 
+import type { ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
-export function AdditionalCustomLabwareSourceFolder(): JSX.Element {
+export function AdditionalCustomLabwareSourceFolder(): ReactNode {
   const { t } = useTranslation('app_settings')
   const dispatch = useDispatch<Dispatch>()
   const labwarePath = useSelector(getCustomLabwareDirectory)
@@ -41,23 +42,24 @@ export function AdditionalCustomLabwareSourceFolder(): JSX.Element {
       gridGap={SPACING.spacing40}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText
-          css={TYPOGRAPHY.h3SemiBold}
+        <StyledText
+          forwardedAs="h3"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           paddingBottom={SPACING.spacing8}
         >
           {t('additional_labware_folder_title')}
-        </LegacyStyledText>
-        <LegacyStyledText forwardedAs="p" paddingBottom={SPACING.spacing8}>
+        </StyledText>
+        <StyledText forwardedAs="p" paddingBottom={SPACING.spacing8}>
           {t('additional_folder_description')}
-        </LegacyStyledText>
-        <LegacyStyledText
+        </StyledText>
+        <StyledText
           forwardedAs="h6"
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.grey50}
           paddingBottom={SPACING.spacing4}
         >
           {t('additional_folder_location')}
-        </LegacyStyledText>
+        </StyledText>
         {labwarePath !== '' ? (
           <Link
             role="button"
@@ -73,7 +75,7 @@ export function AdditionalCustomLabwareSourceFolder(): JSX.Element {
             />
           </Link>
         ) : (
-          <LegacyStyledText forwardedAs="p">{t('no_folder')}</LegacyStyledText>
+          <StyledText forwardedAs="p">{t('no_folder')}</StyledText>
         )}
       </Flex>
       {

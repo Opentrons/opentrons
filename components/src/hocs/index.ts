@@ -1,0 +1,1 @@
+export { withStyleProps } from './withStyleProps'

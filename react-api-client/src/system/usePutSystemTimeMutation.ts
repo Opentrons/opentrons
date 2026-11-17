@@ -1,7 +1,10 @@
+import { useQueryClient } from 'react-query'
+
 import { putSystemTime } from '@opentrons/api-client'
 
 import { useDocumentedMutation } from '../accessControl'
 import { useHost } from '../api'
+import { systemTimeQueryKey } from './useSystemTimeQuery'
 
 import type { AxiosError } from 'axios'
 import type {
@@ -35,6 +38,7 @@ export function usePutSystemTimeMutation(
   const contextHost = useHost()
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
+  const queryClient = useQueryClient()
 
   const mutation = useDocumentedMutation<
     SystemTimeResponse,
@@ -47,9 +51,10 @@ export function usePutSystemTimeMutation(
       variables: systemTime,
       userNotes,
     }: DocumentedMutationParameters<string>) =>
-      putSystemTime(host!, systemTime, userNotes).then(
-        response => response.data
-      ),
+      putSystemTime(host!, systemTime, userNotes).then(response => {
+        queryClient.setQueryData(systemTimeQueryKey(host), response.data)
+        return response.data
+      }),
     options
   )
 

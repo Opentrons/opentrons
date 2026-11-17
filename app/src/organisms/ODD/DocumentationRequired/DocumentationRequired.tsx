@@ -3,14 +3,15 @@ import { useTranslation } from 'react-i18next'
 import NiceModal from '@ebay/nice-modal-react'
 import clsx from 'clsx'
 
-import { AccordionKeyboard } from '/app/atoms/AccordionKeyboard'
-import { FullKeyboard } from '/app/atoms/SoftwareKeyboard'
-import { TouchTextAreaField } from '/app/molecules/TouchTextAreaField'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+import { TouchTextAreaField } from '/app/components/ODD/input/TouchTextAreaField'
+import { FullKeyboard } from '/app/components/ODD/keyboard'
+import { AccordionKeyboard } from '/app/components/ODD/keyboard/AccordionKeyboard'
 
 import { ActionsView } from './ActionsView'
 import styles from './documentationrequired.module.css'
 
+import type { ReactNode } from 'react'
 import type {
   DocumentationReport,
   DocumentedAction,
@@ -32,7 +33,7 @@ export function DocumentationRequired({
   onBack,
   minReportLength,
   initialDocreport,
-}: DocumentationRequiredProps): JSX.Element {
+}: DocumentationRequiredProps): ReactNode {
   const { t } = useTranslation(['access_control', 'shared'])
   const [inputText, setInputText] = useState<string>(initialDocreport ?? '')
   const [error, setError] = useState<string | null>(null)
@@ -51,10 +52,15 @@ export function DocumentationRequired({
 
   const trimmedNote = inputText.trim()
   const handleConfirm = (): void => {
-    if (trimmedNote === '') return
+    if (trimmedNote === '') {
+      setError(t('documentation_is_required') as string)
+      return
+    }
     if (trimmedNote.length < minReportLength) {
       setError(
-        '' + t('must_be_at_least_characters', { minLength: minReportLength })
+        t('must_be_at_least_characters', {
+          minLength: minReportLength,
+        }) as string
       )
       return
     }
@@ -74,9 +80,8 @@ export function DocumentationRequired({
           header={t('documentation_required')}
           buttonText={t('shared:confirm')}
           onClickButton={handleConfirm}
-          buttonIsDisabled={trimmedNote === ''}
           secondaryButtonProps={{
-            buttonText: 'View actions',
+            buttonText: t('view_actions'),
             buttonType: 'tertiaryHighLight',
             iconName: 'information',
             iconPlacement: 'startIcon',
@@ -111,15 +116,13 @@ export function DocumentationRequired({
       </div>
       <div className={styles.keyboard_container}>
         <AccordionKeyboard
+          inputRef={textAreaRef}
           isOpen={keyboardExpanded}
           onToggle={handleKeyboardToggle}
         >
           <FullKeyboard
-            onChange={(input: string) => {
-              handleInputChange(input)
-              textAreaRef.current?.focus()
-            }}
             keyboardRef={keyboardRef}
+            inputElementRef={textAreaRef}
           />
         </AccordionKeyboard>
       </div>

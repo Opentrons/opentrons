@@ -4,7 +4,7 @@ import { css } from 'styled-components'
 
 import { BORDERS, COLORS, Flex, RESPONSIVENESS } from '@opentrons/components'
 
-import { MultiDeckLabelTagBtns } from '/app/molecules/MultiDeckLabelTagBtns'
+import { MultiDeckLabelTagBtns } from '/app/components/adhoc/shared/MultiDeckLabelTagBtns'
 import { LabwareOffsetsDeckInfoLabels } from '/app/organisms/LabwareOffsetsDeckInfoLabels'
 import { useLPCSnackbars } from '/app/organisms/LabwarePositionCheck/hooks'
 import { OffsetTag } from '/app/organisms/LabwarePositionCheck/OffsetTag'
@@ -18,6 +18,7 @@ import {
   setSelectedLabware,
 } from '/app/redux/protocol-runs'
 
+import type { ReactNode } from 'react'
 import type { OffsetTagProps } from '/app/organisms/LabwarePositionCheck/OffsetTag'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 import type { LocationSpecificOffsetDetails } from '/app/redux/protocol-runs'
@@ -32,7 +33,7 @@ export function LabwareLocationItem({
   locationSpecificOffsetDetails,
   commandUtils,
   slotCopy,
-}: LabwareLocationItemProps): JSX.Element {
+}: LabwareLocationItemProps): ReactNode {
   const { t: lpcTextT } = useTranslation('labware_position_check')
   const { toggleRobotMoving, handleCheckItemsPrepModules } = commandUtils
   const { locationDetails } = locationSpecificOffsetDetails

@@ -42,17 +42,17 @@ For this tutorial, you'll write very little Python outside of the `run()` functi
 
 ### Metadata
 
-Every protocol needs to have a metadata dictionary with information about the protocol. At minimum, you need to specify what version of the API the protocol requires. The scripts for this tutorial were validated against API version 2.16, so specify:
+Every protocol needs to have a metadata dictionary with information about the protocol. At minimum, you need to specify what version of the API the protocol requires. The scripts for this tutorial were validated against API version 2.28, so specify:
 
 ```python
-metadata = {"apiLevel": "2.16"}
+metadata = {"apiLevel": "2.28"}
 ```
 
 You can include any other information you like in the metadata dictionary. The fields `protocolName`, `description`, and `author` are all displayed in the Opentrons App, so it's a good idea to expand the dictionary to include them:
 
 ```python
 metadata = {
-    "apiLevel": "2.16",
+    "apiLevel": "2.28",
     "protocolName": "Serial Dilution Tutorial",
     "description": """This protocol is the outcome of following the
                    Python Protocol API Tutorial located at
@@ -72,13 +72,13 @@ Whether you need a `requirements` block depends on your robot model and API vers
 - **Flex:** The `requirements` block is always required. And, the API version does not go in the `metadata` section. The API version belongs in the `requirements`. For example:
 
 ```python
-requirements = {"robotType": "Flex", "apiLevel": "2.16"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 ```
 
 - **OT-2:** The `requirements` block is optional, but including it is a recommended best practice, particularly if you're using API version 2.15 or greater. If you do use it, remember to remove the API version from the `metadata`. For example:
 
 ```python
-requirements = {"robotType": "OT-2", "apiLevel": "2.16"}
+requirements = {"robotType": "OT-2", "apiLevel": "2.28"}
 ```
 
 ### The `run()` function
@@ -233,7 +233,7 @@ Here are the complete protocols for both single-channel and 8-channel configurat
 ```python
 from opentrons import protocol_api
 
-requirements = {"robotType": "Flex", "apiLevel": "2.16"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 metadata = {
     "protocolName": "Serial Dilution Tutorial",
@@ -276,7 +276,7 @@ def run(protocol: protocol_api.ProtocolContext):
 ```python
 from opentrons import protocol_api
 
-requirements = {"robotType": "OT-2", "apiLevel": "2.16"}
+requirements = {"robotType": "OT-2", "apiLevel": "2.28"}
 
 metadata = {
     "protocolName": "Serial Dilution Tutorial",
@@ -366,7 +366,7 @@ metadata = {
 
 requirements = {
     "robotType": "OT-2",
-    "apiLevel": "2.19"
+    "apiLevel": "2.28"
 }
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -453,7 +453,7 @@ metadata = {
 
 requirements = {
     "robotType": "OT-2",
-    "apiLevel": "2.19"
+    "apiLevel": "2.28"
 }
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -517,7 +517,7 @@ Metadata:
 
 Requirements:
 
-- requirements = {"robotType": "Flex", "apiLevel": "2.16"}
+- requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 Labware:
 
@@ -551,7 +551,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.16"
+    "apiLevel": "2.28"
     }
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -599,7 +599,7 @@ Metadata:
 
 Requirements:
 
-- requirements = {"robotType": "Flex", "apiLevel": "2.16"}
+- requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 Labware:
 
@@ -628,7 +628,7 @@ Metadata:
 
 Requirements:
 
-- requirements = {"robotType": "Flex", "apiLevel": "2.16"}
+- requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 Labware:
 
@@ -667,7 +667,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.16"
+    "apiLevel": "2.28"
     }
 
 def run(protocol: protocol_api.ProtocolContext):
@@ -705,12 +705,12 @@ Metadata:
 - Author: New API User
 - ProtocolName: Serial Dilution Tutorial – OT-2 single-channel
 - Description: This protocol is the outcome of following the Python Protocol API Tutorial located at https://docs.opentrons.com/v2/tutorial.html. It takes a solution and progressively dilutes it by transferring it stepwise across a plate.
-- apiLevel: 2.16
+- apiLevel: 2.28
 
 Requirements:
 
 - robotType: OT-2
-- apiLevel: 2.16
+- apiLevel: 2.28
 
 Labware:
 
@@ -737,7 +737,7 @@ Commands:
 from opentrons import protocol_api
 
 metadata = {
-    "apiLevel": "2.16",
+    "apiLevel": "2.28",
     "protocolName": "Serial Dilution Tutorial – OT-2 single-channel",
     "description": """This protocol is the outcome of following the
                    Python Protocol API Tutorial located at
@@ -781,12 +781,12 @@ Metadata:
 - Author: New API User
 - ProtocolName: Serial Dilution Tutorial – OT-2 8-channel
 - Description: This protocol is the outcome of following the Python Protocol API Tutorial located at https://docs.opentrons.com/v2/tutorial.html. It takes a solution and progressively dilutes it by transferring it stepwise across a plate.
-- apiLevel: 2.16
+- apiLevel: 2.28
 
 Requirements:
 
 - robotType: OT-2
-- apiLevel: 2.16
+- apiLevel: 2.28
 
 Labware:
 
@@ -811,7 +811,7 @@ Commands:
 from opentrons import protocol_api
 
 metadata = {
-    "apiLevel": "2.16",
+    "apiLevel": "2.28",
     "protocolName": "Serial Dilution Tutorial – OT-2 8-channel",
     "description": """This protocol is the outcome of following the
                    Python Protocol API Tutorial located at
@@ -855,11 +855,11 @@ Metadata:
 - ProtocolName: Serial Dilution for Eskil
 - Description: Execute serial dilution protocol
 - Source: Custom Protocol Request
-- API Level: 2.19
+- API Level: 2.28
 
 Requirements:
 
-- requirements = {"robotType": "OT-2", "apiLevel": "2.19"}
+- requirements = {"robotType": "OT-2", "apiLevel": "2.28"}
 
 Constants:
 
@@ -916,7 +916,7 @@ metadata = {
     'protocolName': 'Serial Dilution for Eskil',
     'author': 'John C. Lynch',
     'source': 'Custom Protocol Request',
-    'apiLevel': '2.19'
+    'apiLevel': '2.28'
 }
 
 def run(protocol):
@@ -996,7 +996,7 @@ Metadata:
 
 Requirements:
 
-- requirements = {"robotType": "Flex", "apiLevel": "2.19"}
+- requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 Inside the run function:
 
@@ -1067,7 +1067,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.19"
+    "apiLevel": "2.28"
 }
 
 def run(protocol):
@@ -1177,7 +1177,7 @@ Metadata:
 
 Requirements:
 
-- requirements = {"robotType": "Flex", "apiLevel": "2.19"}
+- requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 Inside the run function:
 
@@ -1248,7 +1248,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.19"
+    "apiLevel": "2.28"
 }
 
 def run(protocol):

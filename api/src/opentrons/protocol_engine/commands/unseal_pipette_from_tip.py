@@ -85,15 +85,19 @@ class UnsealPipetteFromTipImplementation(
 
         well_location = params.wellLocation
 
-        tip_geometry = self._state_view.geometry.get_nominal_tip_geometry(
+        tip_geometry = self._state_view.instrument_interface.get_nominal_tip_geometry(
             pipette_id, labware_id, well_name
         )
 
-        tip_drop_location = self._state_view.geometry.get_checked_tip_drop_location(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_location=well_location,
-            override_default_offset=-(tip_geometry.length - CUSTOM_TIP_LENGTH_MARGIN),
+        tip_drop_location = (
+            self._state_view.instrument_interface.get_checked_tip_drop_location(
+                pipette_id=pipette_id,
+                labware_id=labware_id,
+                well_location=well_location,
+                override_default_offset=-(
+                    tip_geometry.length - CUSTOM_TIP_LENGTH_MARGIN
+                ),
+            )
         )
 
         move_result = await move_to_well(

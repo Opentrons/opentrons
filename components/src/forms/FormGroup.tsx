@@ -1,6 +1,6 @@
 import cx from 'classnames'
 
-import { Icon } from '../icons'
+import { Icon } from '../helix/icons'
 import styles from './forms.module.css'
 
 import type { ReactNode } from 'react'
@@ -23,7 +23,7 @@ export interface FormGroupProps {
   isPipetteSettingsSlideout?: boolean
 }
 
-export function FormGroup(props: FormGroupProps): JSX.Element {
+export function FormGroup(props: FormGroupProps): ReactNode {
   const error = props.error != null
   const className = cx(props.className, {
     [styles.error]: error,

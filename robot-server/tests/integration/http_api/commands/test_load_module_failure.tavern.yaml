@@ -2,7 +2,7 @@ test_name: loadModule command failure
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
   - parametrize:
       key: model
       vals:
@@ -11,7 +11,7 @@ marks:
 stages:
   - name: Create Empty Run
     request:
-      url: '{ot2_server_base_url}/runs'
+      url: '{ot3_server_base_url}/runs'
       json:
         data: {}
       method: POST
@@ -29,7 +29,7 @@ stages:
           run_id: data.id
   - name: Create loadModule Command
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      url: '{ot3_server_base_url}/runs/{run_id}/commands'
       method: POST
       params:
         waitUntilComplete: true
@@ -39,7 +39,7 @@ stages:
           params:
             model: '{model}'
             location:
-              slotName: '10'
+              slotName: 'D3'
     response:
       strict:
         - json:off

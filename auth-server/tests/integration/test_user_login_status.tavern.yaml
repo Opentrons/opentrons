@@ -1,0 +1,58 @@
+test_name: User login status endpoint
+
+marks:
+  - usefixtures:
+      - run_server
+      - admin_access_token
+      - seed_users
+
+stages:
+  - name: Login status has no reason for a normal user
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/byUsername/testuser/loginStatus'
+    response:
+      status_code: 200
+      json:
+        # Optional nulls are omitted by BaseResponseBody (exclude_none).
+        data: {}
+
+  - name: Create a user without a password
+    request:
+      method: POST
+      url: '{run_server.base_url}/auth/users'
+      json:
+        data:
+          username: login_status_user
+          fullName: Login Status User
+          accountType: user
+      headers:
+        Authorization: '{admin_access_token}'
+    response:
+      status_code: 201
+      json:
+        data:
+          username: login_status_user
+          fullName: Login Status User
+          accountType: user
+          locked: false
+          resetPassword: true
+          passwordResetReason: temporaryPassword
+          temporaryPassword: !anystr
+
+  - name: Login status is temporaryPassword when a temporary password was issued
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/byUsername/login_status_user/loginStatus'
+    response:
+      status_code: 200
+      json:
+        data:
+          reason: temporaryPassword
+
+  - name: Login status returns 404 for unknown user
+    request:
+      method: GET
+      url: '{run_server.base_url}/auth/users/byUsername/unknown_user/loginStatus'
+    response:
+      status_code: 404

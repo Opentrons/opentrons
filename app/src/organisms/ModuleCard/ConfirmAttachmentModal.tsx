@@ -9,11 +9,11 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   Link,
   Modal,
   PrimaryButton,
   SPACING,
+  StyledText,
   TEXT_ALIGN_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -65,16 +65,14 @@ export const ConfirmAttachmentModal = (
         flexDirection={DIRECTION_COLUMN}
         fontSize={TYPOGRAPHY.fontSizeP}
       >
-        <LegacyStyledText paddingBottom={SPACING.spacing4}>
+        <StyledText paddingBottom={SPACING.spacing4}>
           {t(
             isProceedToRunModal
               ? 'module_anchors_extended'
               : 'module_should_have_anchors'
           )}
-        </LegacyStyledText>
-        <LegacyStyledText>
-          {t('thermal_adapter_attached_to_module')}
-        </LegacyStyledText>
+        </StyledText>
+        <StyledText>{t('thermal_adapter_attached_to_module')}</StyledText>
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -90,13 +88,13 @@ export const ConfirmAttachmentModal = (
           }}
           value={isDismissed}
         />
-        <LegacyStyledText
+        <StyledText
           paddingTop="1px"
           paddingLeft={SPACING.spacing8}
           fontSize={TYPOGRAPHY.fontSizeP}
         >
           {t('dont_show_me_again', { ns: 'shared' })}
-        </LegacyStyledText>
+        </StyledText>
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}

@@ -8,7 +8,7 @@ from decoy import Decoy, matchers
 from opentrons.protocol_engine import (
     CommandNote,
     CommandPointer,
-    CommandSlice,
+    JsonCommandSlice,
 )
 from opentrons.protocol_engine import (
     commands as pe_commands,
@@ -112,10 +112,12 @@ async def test_create_run_command(
         params=pe_commands.WaitForResumeParams(message="Hello"),
     )
 
-    def _stub_queued_command_state(*_a: object, **_k: object) -> pe_commands.Command:
-        decoy.when(mock_run_orchestrator_store.get_command("command-id")).then_return(
-            command_once_added
-        )
+    async def _stub_queued_command_state(
+        *_a: object, **_k: object
+    ) -> pe_commands.Command:
+        decoy.when(
+            await mock_run_orchestrator_store.get_command("command-id")
+        ).then_return(command_once_added)
         return command_once_added
 
     decoy.when(
@@ -201,7 +203,7 @@ async def test_create_run_command_blocking_completion(
         )
     ).then_return(command_once_completed)
 
-    decoy.when(mock_run_orchestrator_store.get_command("command-id")).then_return(
+    decoy.when(await mock_run_orchestrator_store.get_command("command-id")).then_return(
         command_once_completed
     )
 
@@ -338,7 +340,9 @@ async def test_get_run_commands(
             index=101,
         )
     )
-    decoy.when(mock_run_data_manager.get_recovery_target_command("run-id")).then_return(
+    decoy.when(
+        await mock_run_data_manager.get_recovery_target_command("run-id")
+    ).then_return(
         CommandPointer(
             command_id="recovery-target-command-id",
             command_key="recovery-target-command-key",
@@ -347,10 +351,16 @@ async def test_get_run_commands(
         )
     )
     decoy.when(
-        mock_run_data_manager.get_commands_slice(
+        await mock_run_data_manager.get_commands_slice(
             run_id="run-id", cursor=None, length=42, include_fixit_commands=True
         )
-    ).then_return(CommandSlice(commands=[command], cursor=1, total_length=3))
+    ).then_return(
+        JsonCommandSlice(
+            commands=[command.model_dump_json(exclude_none=True, by_alias=True)],
+            cursor=1,
+            total_length=3,
+        )
+    )
 
     result = await get_run_commands(
         runId="run-id",
@@ -377,9 +387,9 @@ async def test_get_run_commands(
                 createdAt=datetime(year=2024, month=4, day=4),
                 detail="Things are not looking good.",
             ),
-            notes=[long_note, unenumed_note],
             failedCommandId="failed-command-id",
-        )
+            notes=[long_note, unenumed_note],
+        ).model_dump(by_alias=True, exclude_none=True)
     ]
     assert result.content.meta == MultiBodyMeta(cursor=1, totalLength=3)
     assert result.content.links == CommandCollectionLinks(
@@ -414,10 +424,10 @@ async def test_get_run_commands_empty(
     """It should return an empty commands list if no commands."""
     decoy.when(mock_run_data_manager.get_current_command("run-id")).then_return(None)
     decoy.when(
-        mock_run_data_manager.get_commands_slice(
+        await mock_run_data_manager.get_commands_slice(
             run_id="run-id", cursor=21, length=42, include_fixit_commands=True
         )
-    ).then_return(CommandSlice(commands=[], cursor=0, total_length=0))
+    ).then_return(JsonCommandSlice(commands=[], cursor=0, total_length=0))
 
     result = await get_run_commands(
         runId="run-id",
@@ -441,7 +451,7 @@ async def test_get_run_commands_not_found(
     not_found_error = RunNotFoundError("oh no")
 
     decoy.when(
-        mock_run_data_manager.get_commands_slice(
+        await mock_run_data_manager.get_commands_slice(
             run_id="run-id", cursor=21, length=42, include_fixit_commands=True
         )
     ).then_raise(not_found_error)
@@ -471,9 +481,9 @@ async def test_get_run_command_by_id(
         params=pe_commands.MoveToWellParams(pipetteId="a", labwareId="b", wellName="c"),
     )
 
-    decoy.when(mock_run_data_manager.get_command("run-id", "command-id")).then_return(
-        command
-    )
+    decoy.when(
+        await mock_run_data_manager.get_command("run-id", "command-id")
+    ).then_return(command)
 
     result = await get_run_command(
         runId="run-id",
@@ -499,7 +509,9 @@ async def test_get_run_command_missing(
 ) -> None:
     """It should 404 if you attempt to get a non-existent command."""
     decoy.when(
-        mock_run_data_manager.get_command(run_id="run-id", command_id="command-id")
+        await mock_run_data_manager.get_command(
+            run_id="run-id", command_id="command-id"
+        )
     ).then_raise(exception)
 
     with pytest.raises(ApiError) as exc_info:

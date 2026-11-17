@@ -14,19 +14,19 @@ import {
   Icon,
   InputField,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   Link,
   POSITION_ABSOLUTE,
   SIZE_6,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { Divider } from '/app/atoms/structure'
+import { Divider } from '/app/components/adhoc/shared/structure'
+import { RobotCard } from '/app/components/desktop/cards/RobotCard'
+import { CollapsibleSection } from '/app/components/desktop/CollapsibleSection'
 import { ApiHostProvider } from '/app/local-resources/api-host-provider/ApiHostProvider'
-import { CollapsibleSection } from '/app/molecules/CollapsibleSection'
 import { DevicesEmptyState } from '/app/organisms/Desktop/Devices/DevicesEmptyState'
-import { RobotCard } from '/app/organisms/Desktop/Devices/RobotCard'
 import { RobotCertRotator } from '/app/organisms/Desktop/RobotCertImport/RobotCertRotator'
 import { useFeatureFlag } from '/app/redux/config'
 import {
@@ -45,7 +45,7 @@ import type { State } from '/app/redux/types'
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
   'https://support.opentrons.com/en/articles/2687601-troubleshooting-connection-problems'
 
-export function DevicesLanding(): JSX.Element {
+export function DevicesLanding(): ReactNode {
   const { t } = useTranslation('devices_landing')
   const showSearchBar = useFeatureFlag('robotSearchBar')
 
@@ -105,7 +105,7 @@ export function DevicesLanding(): JSX.Element {
         marginTop={SPACING.spacing8}
         height="2.25rem"
       >
-        <LegacyStyledText forwardedAs="h1">{t('devices')}</LegacyStyledText>
+        <StyledText forwardedAs="h1">{t('devices')}</StyledText>
         <NewRobotSetupHelp />
       </Flex>
       {showSearchBar ? (
@@ -174,7 +174,7 @@ export function DevicesLanding(): JSX.Element {
   )
 }
 
-function DevicesLoadingState(): JSX.Element {
+function DevicesLoadingState(): ReactNode {
   const { t } = useTranslation('devices_landing')
   return (
     <Flex
@@ -183,9 +183,7 @@ function DevicesLoadingState(): JSX.Element {
       marginTop="10vh"
       marginBottom="10vh"
     >
-      <LegacyStyledText forwardedAs="h1">
-        {t('looking_for_robots')}
-      </LegacyStyledText>
+      <StyledText forwardedAs="h1">{t('looking_for_robots')}</StyledText>
       <Icon
         name="ot-spinner"
         aria-label="ot-spinner"
@@ -228,7 +226,7 @@ function DevicesLoadingState(): JSX.Element {
 function ApiHostProviderForRobot(props: {
   robot: DiscoveredRobot
   children: ReactNode
-}): JSX.Element {
+}): ReactNode {
   const { robot, children } = props
   return <ApiHostProvider robotName={robot.name}>{children}</ApiHostProvider>
 }

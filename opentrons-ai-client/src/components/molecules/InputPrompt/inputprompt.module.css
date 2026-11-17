@@ -44,7 +44,7 @@
   border: none;
   background-color: var(--white);
   box-shadow: none;
-  font-size: var(--font-size-h3);
+  font-size: var(--font-size-14);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-20);
   outline: none;
@@ -54,7 +54,7 @@
 
 .textarea::placeholder {
   color: var(--grey-50);
-  font-size: var(--font-size-h3);
+  font-size: var(--font-size-14);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-20);
 }

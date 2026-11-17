@@ -50,12 +50,13 @@ export function useUpdateDeckConfigurationMutation(
     getQueryKey(host, 'deck_configuration'),
     ({ variables: deckConfig, userNotes }) =>
       updateDeckConfiguration(host!, deckConfig, userNotes).then(response => {
-        queryClient
-          .invalidateQueries(getQueryKey(host, 'deck_configuration'))
-          .catch((e: Error) => {
-            throw e
-          })
-        return response.data?.data?.cutoutFixtures ?? []
+        const updatedDeckConfiguration =
+          response.data?.data?.cutoutFixtures ?? []
+        queryClient.setQueryData(
+          getQueryKey(host, 'deck_configuration'),
+          updatedDeckConfiguration
+        )
+        return updatedDeckConfiguration
       }),
     options
   )

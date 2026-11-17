@@ -93,9 +93,7 @@ describe('DataFilesInfoBanner', () => {
     const link = screen.getByText('View Recent Runs')
     fireEvent.click(link)
 
-    expect(mockNavigate).toHaveBeenCalledWith(
-      '/devices/test-robot/#recent-protocol-runs'
-    )
+    expect(mockNavigate).toHaveBeenCalledWith('/devices/test-robot/run-history')
   })
 
   it('navigates with correct robot name', () => {
@@ -109,7 +107,7 @@ describe('DataFilesInfoBanner', () => {
     fireEvent.click(link)
 
     expect(mockNavigate).toHaveBeenCalledWith(
-      '/devices/different-robot/#recent-protocol-runs'
+      '/devices/different-robot/run-history'
     )
   })
 })

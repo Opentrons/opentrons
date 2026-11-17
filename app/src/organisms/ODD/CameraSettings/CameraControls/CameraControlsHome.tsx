@@ -4,15 +4,16 @@ import { useTranslation } from 'react-i18next'
 import { Icon, ListButton, StyledText } from '@opentrons/components'
 import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
-import { MediumButton } from '/app/atoms/buttons'
+import { MediumButton } from '/app/components/ODD/buttons'
+import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { zoomNumberToString } from '/app/local-resources/images/utils/cameraUtils'
-import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import { usePreviewImage } from '/app/resources/camera/usePreviewImage'
 
 import styles from '../preferences.module.css'
 import { ImagePreviewModal } from './ImagePreviewModal'
 
+import type { ReactNode } from 'react'
 import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 import type { ActiveControlView } from '.'
 
@@ -28,7 +29,7 @@ export function CameraControlsHome({
   toggleShowControls,
   settings,
   runId,
-}: CameraControlsHomeProps): JSX.Element {
+}: CameraControlsHomeProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const documentationState = useDocumentationState()
   const {
@@ -159,7 +160,7 @@ function SettingButton({
   onClick,
   title,
   value,
-}: SettingButtonProps): JSX.Element {
+}: SettingButtonProps): ReactNode {
   return (
     <ListButton
       type="noActive"

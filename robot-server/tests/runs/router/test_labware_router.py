@@ -91,10 +91,10 @@ async def test_add_labware_offsets(
     )
 
     decoy.when(
-        mock_run_orchestrator_store.add_labware_offset(labware_offset_request_1)
+        await mock_run_orchestrator_store.add_labware_offset(labware_offset_request_1)
     ).then_return(labware_offset_1)
     decoy.when(
-        mock_run_orchestrator_store.add_labware_offset(labware_offset_request_2)
+        await mock_run_orchestrator_store.add_labware_offset(labware_offset_request_2)
     ).then_return(labware_offset_2)
 
     result = await add_labware_offset(
@@ -159,7 +159,7 @@ async def test_add_labware_definition(
     uri = pe_types.LabwareUri("some/definition/uri")
 
     decoy.when(
-        mock_run_orchestrator_store.add_labware_definition(labware_definition)
+        await mock_run_orchestrator_store.add_labware_definition(labware_definition)
     ).then_return(uri)
 
     result = await add_labware_definition(
@@ -197,7 +197,7 @@ async def test_get_run_labware_definition(
 ) -> None:
     """It should wrap the run's labware defintion in a response."""
     decoy.when(
-        mock_run_data_manager.get_run_loaded_labware_definitions(run_id="run-id")
+        await mock_run_data_manager.get_run_loaded_labware_definitions(run_id="run-id")
     ).then_return(
         [
             SD_LabwareDefinition2.model_construct(namespace="test_1"),  # type: ignore[call-arg]
