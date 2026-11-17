@@ -1599,7 +1599,7 @@ async def test_get_protocol_analysis_as_document(
     )
 
     assert result.status_code == 200
-    assert result.body.decode(result.charset) == analysis
+    assert bytes(result.body).decode(result.charset) == analysis
 
 
 async def test_get_protocol_analysis_as_document_protocol_not_found(
