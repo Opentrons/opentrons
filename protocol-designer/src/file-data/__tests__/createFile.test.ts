@@ -3,17 +3,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   commandSchemaV8,
+  fixture_12_trough,
+  fixture_96_plate,
+  fixture_tiprack_10_ul,
+  fixture_tiprack_300_ul,
   fixtureP10SingleV2Specs,
   fixtureP300SingleV2Specs,
   labwareSchemaV2,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import {
-  fixture_12_trough,
-  fixture_96_plate,
-  fixture_tiprack_10_ul,
-  fixture_tiprack_300_ul,
-} from '@opentrons/shared-data/labware/fixtures/2'
 import { formatPyStr, PAPI_VERSION } from '@opentrons/step-generation'
 
 import {

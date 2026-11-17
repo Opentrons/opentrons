@@ -4,7 +4,7 @@ import {
   fixture_12_trough,
   fixture_96_plate,
   fixture_trash,
-} from '@opentrons/shared-data/labware/fixtures/2'
+} from '@opentrons/shared-data'
 
 import { getLabwareLiquidState } from '../selectors'
 

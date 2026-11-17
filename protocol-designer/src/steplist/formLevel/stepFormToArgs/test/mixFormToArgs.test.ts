@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  fixture96Plate,
   fixtureP10SingleV2Specs,
   getLabwareDefURI,
   POSITION_REFERENCE_CENTER,
 } from '@opentrons/shared-data'
-import { fixture_96_plate } from '@opentrons/shared-data/labware/fixtures/2'
 import { AUTOMATIC } from '@opentrons/step-generation'
 
 import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '/protocol-designer/constants'
@@ -20,7 +20,7 @@ import type { GetCastFormData } from '/protocol-designer/steplist/fieldLevel'
 vi.mock('../../../utils/getOrderedWells')
 
 let castForm: GetCastFormData<HydratedMixFormData>
-const labwareDef = fixture_96_plate as LabwareDefinition2
+const labwareDef = fixture96Plate as LabwareDefinition2
 const labwareType = getLabwareDefURI(labwareDef)
 
 beforeEach(() => {

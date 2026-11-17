@@ -138,7 +138,7 @@
     "stylelint": "16.25.0",
     "stylelint-config-idiomatic-order": "10.0.0",
     "stylelint-config-standard": "39.0.1",
-    "typescript": "5.3.3",
+    "typescript": "6.0.3",
     "vite": "7.3.5",
     "vitest": "4.1.10",
     "vitest-when": "0.10.0",

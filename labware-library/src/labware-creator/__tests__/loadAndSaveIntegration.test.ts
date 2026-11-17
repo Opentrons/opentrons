@@ -6,7 +6,7 @@ import {
   fixture_24_tuberack,
   fixture_96_plate,
   fixture_tiprack_300_ul,
-} from '@opentrons/shared-data/labware/fixtures/2'
+} from '@opentrons/shared-data'
 
 import { fieldsToLabware } from '../fieldsToLabware'
 import { labwareDefToFields } from '../labwareDefToFields'

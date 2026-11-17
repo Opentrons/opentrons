@@ -1,4 +1,4 @@
-import type { ConcurrentRunTimeCommand } from '@opentrons/shared-data/command'
+import type { ConcurrentRunTimeCommand } from '@opentrons/shared-data'
 import type { HandlesCommands } from '../types'
 
 export function getConcurrentCommandText({

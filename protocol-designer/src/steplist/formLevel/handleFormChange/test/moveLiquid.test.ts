@@ -7,7 +7,7 @@ import {
 import {
   fixture_tiprack_10_ul,
   fixture_tiprack_300_ul,
-} from '@opentrons/shared-data/labware/fixtures/2'
+} from '@opentrons/shared-data'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,

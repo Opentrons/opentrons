@@ -1,6 +1,11 @@
 export * from '../command'
 export * from '../deck'
 export * from '../protocol'
+export { fixture_corning_24_plate as fixtureCorning24Plate } from '../labware/fixtures/3'
+export type {
+  CommandAnnotationV1,
+  CommandAnnotationV2,
+} from '../commandAnnotation/types'
 export * from './constants'
 export * from './deck'
 export * from './errors'

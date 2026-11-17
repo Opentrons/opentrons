@@ -1,9 +1,9 @@
 import type {
+  CommandAnnotationV2,
   CompletedProtocolAnalysis,
   ProtocolAnalysisOutput,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { CommandAnnotationV2 } from '@opentrons/shared-data/commandAnnotation/types'
 import type { GroupedCommands } from './types'
 
 export const getGroupedCommands = (

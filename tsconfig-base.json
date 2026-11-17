@@ -11,7 +11,7 @@
     "resolveJsonModule": true,
     "noErrorTruncation": true,
     "skipLibCheck": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "types": ["node", "vite/client", "@testing-library/jest-dom"]
   }
 }

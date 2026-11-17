@@ -3,7 +3,7 @@ import { ALL, COLUMN, getIsTiprack, SINGLE } from '@opentrons/shared-data'
 import { DIRTY } from '../constants'
 import { getNozzleConfig } from '../utils'
 
-import type { DropTipParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { DropTipParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 export function forDropTip(

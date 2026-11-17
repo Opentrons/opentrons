@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import {
-  fixture_12_trough,
-  fixture_24_tuberack,
-  fixture_96_plate,
-  fixture_irregular_example_1,
-} from '@opentrons/shared-data/labware/fixtures/2'
+  fixture12Trough,
+  fixture24Tuberack,
+  fixture96Plate,
+  fixtureIrregularExample1,
+} from '@opentrons/shared-data'
 
 import { labwareDefToFields } from '../labwareDefToFields'
 
@@ -14,8 +14,8 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 vi.mock('../../definitions')
 
 describe('labwareDefToFields', () => {
-  it('fixture_96_plate', () => {
-    const def = fixture_96_plate
+  it('fixture96Plate', () => {
+    const def = fixture96Plate
     const result = labwareDefToFields(
       def as LabwareDefinition2,
       [def, def] as LabwareDefinition2[]
@@ -68,7 +68,7 @@ describe('labwareDefToFields', () => {
 
   it('fixture_12_trough', () => {
     // make sure rectangular wells + single row works as expected
-    const def = fixture_12_trough
+    const def = fixture12Trough
     const result = labwareDefToFields(
       def as LabwareDefinition2,
       [def, def] as LabwareDefinition2[]
@@ -80,8 +80,8 @@ describe('labwareDefToFields', () => {
     expect(result).toMatchSnapshot()
   })
 
-  it('fixture_irregular_example_1 should return null (until multi-grid labware is supported in LC)', () => {
-    const def = fixture_irregular_example_1
+  it('fixtureIrregularExample1 should return null (until multi-grid labware is supported in LC)', () => {
+    const def = fixtureIrregularExample1
     const result = labwareDefToFields(
       def as LabwareDefinition2,
       [def, def] as LabwareDefinition2[]
@@ -89,8 +89,8 @@ describe('labwareDefToFields', () => {
     expect(result).toEqual(null)
   })
 
-  it('fixture_24_tuberack should match snapshot', () => {
-    const def = fixture_24_tuberack
+  it('fixture24Tuberack should match snapshot', () => {
+    const def = fixture24Tuberack
     const result = labwareDefToFields(
       def as LabwareDefinition2,
       [def, def] as LabwareDefinition2[]

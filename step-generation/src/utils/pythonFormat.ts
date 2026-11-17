@@ -1,6 +1,6 @@
 /** Utility functions for Python code generation. */
 
-import type { WellLocation } from '@opentrons/shared-data/command/types/support'
+import type { WellLocation } from '@opentrons/shared-data'
 
 /** The variable name for the ProtocolContext object in the run() function.
  * Our docs call it `protocol`, which is slightly misleading since the object is not

@@ -6,7 +6,7 @@ import {
   fixture_tiprack_10_ul,
   fixture_tiprack_300_ul,
   fixture_trash,
-} from '@opentrons/shared-data/labware/fixtures/2'
+} from '@opentrons/shared-data'
 import { AUTOMATIC } from '@opentrons/step-generation'
 
 import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '/protocol-designer/constants'

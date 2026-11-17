@@ -24,16 +24,14 @@ import {
 } from '../thermocyclerUpdates'
 
 import type {
-  TCExtendedProfileParams,
-  TCStartExtendedProfileParams,
-  WaitForTasksParams,
-} from '@opentrons/shared-data'
-import type {
   ModuleOnlyParams,
+  TCExtendedProfileParams,
   TCProfileParams,
+  TCStartExtendedProfileParams,
   TemperatureParams,
   ThermocyclerSetTargetBlockTemperatureParams,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+  WaitForTasksParams,
+} from '@opentrons/shared-data'
 import type { ImmutableStateUpdater } from '../../__utils__'
 import type {
   InvariantContext,

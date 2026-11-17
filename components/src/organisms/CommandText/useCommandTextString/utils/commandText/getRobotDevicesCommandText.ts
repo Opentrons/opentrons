@@ -2,7 +2,7 @@ import type { TFunction } from 'i18next'
 import type {
   CaptureImageRunTimeCommand,
   RobotDevicesRunTimeCommand,
-} from '@opentrons/shared-data/command'
+} from '@opentrons/shared-data'
 import type { HandlesCommands } from '../types'
 
 export function getRobotDevicesCommandText({

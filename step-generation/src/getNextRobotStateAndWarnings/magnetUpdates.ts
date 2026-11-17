@@ -5,7 +5,7 @@ import { getModuleState } from '../robotStateSelectors'
 import type {
   EngageMagnetParams,
   ModuleOnlyParams,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+} from '@opentrons/shared-data'
 import type {
   InvariantContext,
   ModuleTemporalProperties,

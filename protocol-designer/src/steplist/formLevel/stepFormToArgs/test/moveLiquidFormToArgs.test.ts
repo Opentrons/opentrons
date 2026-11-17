@@ -1,13 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  fixture12Trough,
+  fixture96Plate,
   fixtureP10SingleV2Specs,
   getLabwareDefURI,
 } from '@opentrons/shared-data'
-import {
-  fixture_12_trough,
-  fixture_96_plate,
-} from '@opentrons/shared-data/labware/fixtures/2'
 import {
   AUTOMATIC,
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -34,9 +32,9 @@ const invariantContext = makeContext()
 
 describe('move liquid step form -> command creator args', () => {
   let castForm: GetCastFormData<HydratedMoveLiquidFormData>
-  const sourceLabwareDef = fixture_12_trough as LabwareDefinition2
+  const sourceLabwareDef = fixture12Trough as LabwareDefinition2
   const sourceLabwareType = getLabwareDefURI(sourceLabwareDef)
-  const destLabwareDef = fixture_96_plate as LabwareDefinition2
+  const destLabwareDef = fixture96Plate as LabwareDefinition2
   const destLabwareType = getLabwareDefURI(destLabwareDef)
   const tiprackLabwareDef = {
     parameters: {

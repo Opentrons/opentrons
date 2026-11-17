@@ -4,7 +4,7 @@ import type {
   AtomicVacuumProfileStep,
   VacuumModuleStartRunProfileRunTimeCommand,
   VacuumProfileCycle,
-} from '@opentrons/shared-data/command'
+} from '@opentrons/shared-data'
 import type { GetVacuumRunProfileCommandTextResult } from '../..'
 import type { HandlesCommands } from '../types'
 
