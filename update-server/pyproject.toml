@@ -58,6 +58,8 @@ dev = [
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/update-server"
 
 [tool.uv]
+# Keep in sync with repo-root uv.toml and oe-core's Dockerfile
+required-version = "==0.12.1"
 # Stub for systemd-python so uv can resolve on macOS (no libsystemd).
 dependency-metadata = [
     { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [] },
