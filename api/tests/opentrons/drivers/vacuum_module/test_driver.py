@@ -60,13 +60,18 @@ async def test_get_device_info(
     connection.send_command.assert_called_once()
 
 
+@pytest.mark.parametrize(
+    "serial_number",
+    ["VMA1020250119001", "VMWA1020261116001"],
+)
 async def test_set_serial_number(
-    subject: VacuumModuleDriver, connection: AsyncMock
+    subject: VacuumModuleDriver,
+    connection: AsyncMock,
+    serial_number: str,
 ) -> None:
     """It should send a set serial number command"""
     connection.send_command.return_value = "M996"
 
-    serial_number = "VMA1020250119001"
     await subject.set_serial_number(serial_number)
 
     set_serial_number = types.GCODE.SET_SERIAL_NUMBER.build_command().add_element(

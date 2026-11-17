@@ -39,6 +39,10 @@ MAX_GAUGE_PRESSURE_MBAR = -800
 THEORETICAL_MAX_GAUGE_PRESSURE_MBAR = -1013.25
 MAX_VAC_DURATION_S = 60 * 60 * 24  # 24hrs
 
+# Vacuum Module serial numbers use the original ``VMA`` prefix or the newer
+# ``VMWA`` prefix, followed by the date and unit identifier digits.
+VACUUM_MODULE_SERIAL_NUMBER_RE = re.compile(r"^VM(?:A|WA)\d{2}\d{8}\d+$")
+
 # Waste M127 range — match firmware waste_detector.hpp configure().
 WASTE_H_MAX = 500.0
 WASTE_G_MAX = float(MAX_PUMP_RPM)
@@ -246,9 +250,10 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
 
     async def set_serial_number(self, sn: str) -> None:
         """Set Serial Number."""
-        if not re.match(r"^VM[\w]{1}[\d]{2}[\d]{8}[\d]+$", sn):
+        if not VACUUM_MODULE_SERIAL_NUMBER_RE.match(sn):
             raise ValueError(
-                f"Invalid serial number: ({sn}) expected format: VMA1020250119001"
+                "Invalid serial number: "
+                f"({sn}) expected format: VMA1020250119001 or VMWA1020261116001"
             )
         resp = await self._connection.send_command(
             GCODE.SET_SERIAL_NUMBER.build_command().add_element(sn)
