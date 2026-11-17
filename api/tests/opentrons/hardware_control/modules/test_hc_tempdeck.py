@@ -117,7 +117,9 @@ async def test_error_callback(
     monkeypatch.setattr(subject._driver, "get_temperature", mock_get_temp)
     # TODO(sf,rh): this is EXEC-2757. wait_next_poll() doesn't handle disconnects
     # well and will raise before any HC-module-level error handling happens, aka
-    # reconnect logic (driver-level error handling is fine, though)
+    # reconnect logic (driver-level error handling is fine, though).
+    # The reader debounces poll errors and only forwards the callback once
+    # READER_ERROR_DEBOUNCE consecutive failures have landed.
     for _ in range(READER_ERROR_DEBOUNCE - 1):
         with pytest.raises(Exception, match="oh no!"):
             await subject._poller.wait_next_poll()
@@ -135,7 +137,8 @@ async def test_error_callback(
     decoy.verify(
         module_error_callback(
             exc, "temperatureModuleV1", "/dev/ot_module_sim_tempdeck0", "dummySerialTD"
-        )
+        ),
+        times=1,
     )
 
 

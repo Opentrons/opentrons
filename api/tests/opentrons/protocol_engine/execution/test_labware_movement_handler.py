@@ -186,6 +186,7 @@ def test_jaw_open_width_mm() -> None:
     assert _jaw_open_width_mm(50.0, 60.0, 92.0) == 60
 
 
+@pytest.mark.ot3_only
 async def test_raise_error_if_gripper_pickup_failed(
     decoy: Decoy,
     state_store: StateStore,
@@ -314,6 +315,7 @@ async def test_raise_error_if_gripper_pickup_failed(
         ),
     ],
 )
+@pytest.mark.ot3_only
 async def test_move_labware_with_gripper(
     decoy: Decoy,
     state_store: StateStore,
@@ -527,6 +529,7 @@ def _stub_gripper_move(
     return pickup_grip_point, drop_grip_point, mock_tc_context_manager
 
 
+@pytest.mark.ot3_only
 async def test_full_jaw_open_for_normal_pickup(
     decoy: Decoy,
     state_store: StateStore,
@@ -571,6 +574,7 @@ async def test_full_jaw_open_for_normal_pickup(
     decoy.verify(await ot3_hardware_api.idle_gripper(), times=1)
 
 
+@pytest.mark.ot3_only
 async def test_limited_jaw_open_only_next_to_vacuum_collar(
     decoy: Decoy,
     state_store: StateStore,
@@ -677,6 +681,7 @@ async def test_limited_jaw_open_only_next_to_vacuum_collar(
     assert limited_open == 88
 
 
+@pytest.mark.ot3_only
 async def test_slow_pickup_for_vacuum_module_collar(
     decoy: Decoy,
     state_store: StateStore,
@@ -758,6 +763,7 @@ async def test_slow_pickup_for_vacuum_module_collar(
     )
 
 
+@pytest.mark.ot3_only
 async def test_does_not_slow_non_collar_pickup_from_vacuum_module(
     decoy: Decoy,
     state_store: StateStore,
@@ -801,6 +807,7 @@ async def test_does_not_slow_non_collar_pickup_from_vacuum_module(
     )
 
 
+@pytest.mark.ot3_only
 async def test_does_not_slow_collar_pickup_from_a4_dock(
     decoy: Decoy,
     state_store: StateStore,
@@ -844,6 +851,7 @@ async def test_does_not_slow_collar_pickup_from_a4_dock(
     )
 
 
+@pytest.mark.ot3_only
 async def test_does_not_slow_collar_pickup_from_heater_shaker(
     decoy: Decoy,
     state_store: StateStore,
@@ -890,6 +898,7 @@ async def test_does_not_slow_collar_pickup_from_heater_shaker(
     )
 
 
+@pytest.mark.ot3_only
 async def test_labware_movement_skips_for_virtual_gripper(
     decoy: Decoy,
     state_store: StateStore,
@@ -915,6 +924,7 @@ async def test_labware_movement_skips_for_virtual_gripper(
     )
 
 
+@pytest.mark.ot3_only
 async def test_labware_movement_raises_without_gripper(
     decoy: Decoy,
     state_store: StateStore,
