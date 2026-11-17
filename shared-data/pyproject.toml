@@ -39,20 +39,21 @@ robot = [
 # Robot group is always included in dev to ensure dev environment matches robot
 dev = [
     {include-group = "robot"},
-    "mypy==1.19.1",
-    "ruff==0.14.10",
-    "twine==4.0.0",
-    "wheel==0.37.1",
-    "pytest>=9.0.2",
-    "pytest-cov==4.1.0",
-    "pytest-xdist~=3.5.0",
-    "typeguard~=4.4.4",
+    "mypy==2.4.1",
+    "ruff==0.17.4",
+    "coverage==7.16.2",
+    "twine==6.2.0",
+    "wheel==0.48.0",
+    "pytest==9.2.0",
+    "pytest-cov==7.1.0",
+    "pytest-xdist==3.8.0",
+    "typeguard==4.6.0",
     "typing-extensions>=4.0.0,<5",
-    "pytest-clarity~=1.0.0",
-    "build~=1.2.0",
-    "pillow",
-    "types-Pillow",
-    "setuptools==80.9.0",
+    "pytest-clarity==1.0.1",
+    "build==1.6.1",
+    "pillow==12.3.0",
+    "types-Pillow==10.2.0.20240822",
+    "setuptools==84.2.1",
     "zipp==3.21.0",
 ]
 
@@ -202,5 +203,7 @@ module = ["PIL", "PIL.*"]
 ignore_missing_imports = true
 
 [tool.uv]
+# Keep in sync with repo-root uv.toml and oe-core's Dockerfile
+required-version = "==0.12.1"
 # cooldown time for security
 exclude-newer = "1 week"

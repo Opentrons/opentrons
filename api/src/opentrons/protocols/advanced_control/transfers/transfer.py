@@ -32,8 +32,8 @@ AdvancedLiquidHandling = Union[
 
 class TransferStep(TypedDict):
     method: str
-    args: Optional[List[Any]]
-    kwargs: Optional[Dict[Any, Any]]
+    args: List[Any]
+    kwargs: Dict[Any, Any]
 
 
 if TYPE_CHECKING:

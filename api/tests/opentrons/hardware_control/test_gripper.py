@@ -27,18 +27,15 @@ def fake_offset() -> GripperCalibrationOffset:
 
 @pytest.fixture
 def fake_jaw_cal(request: pytest.FixtureRequest) -> GripperJawWidthData:
-    request.node.add_marker("ot3_only")
     return instrument_calibration.load_gripper_jaw_width("fakeid123")
 
 
-@pytest.mark.ot3_only
 def test_id_get_added_to_dict(fake_offset: GripperCalibrationOffset) -> None:
     gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
     assert gripr.as_dict()["gripper_id"] == "fakeid123"
 
 
 @pytest.mark.xfail
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "override,result_accessor",
     [
@@ -63,7 +60,6 @@ def test_critical_point(
     assert gripr.critical_point(override) == result_accessor(gripr)
 
 
-@pytest.mark.ot3_only
 def test_load_gripper_cal_offset(fake_offset: GripperCalibrationOffset) -> None:
     gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
     # if offset data do not exist, loaded values should match DEFAULT
@@ -72,10 +68,8 @@ def test_load_gripper_cal_offset(fake_offset: GripperCalibrationOffset) -> None:
     )
 
 
-@pytest.mark.ot3_only
 def test_gripper_default_jaw_width_calibration(
-    fake_jaw_cal: GripperJawWidthData,
-    fake_offset: GripperCalibrationOffset,
+    fake_jaw_cal: GripperJawWidthData, fake_offset: GripperCalibrationOffset
 ) -> None:
     gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
     assert gripr._jaw_max_offset is None
@@ -84,7 +78,6 @@ def test_gripper_default_jaw_width_calibration(
 
 @pytest.mark.parametrize("loaded_encoder_pos", [24.4, None])
 @pytest.mark.parametrize("existing_encoder_pos", [24.4, None])
-@pytest.mark.ot3_only
 def test_gripper_has_jaw_width_calibration(
     fake_jaw_cal: GripperJawWidthData,
     fake_offset: GripperCalibrationOffset,
@@ -128,13 +121,8 @@ def test_gripper_has_jaw_width_calibration(
             mock_save_gripper_jaw_width_data.assert_called_once()
 
 
-@pytest.mark.ot3_only
 def test_reload_instrument_cal_ot3(fake_offset: GripperCalibrationOffset) -> None:
-    old_gripper = gripper.Gripper(
-        fake_gripper_conf,
-        fake_offset,
-        "fakeid123",
-    )
+    old_gripper = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
     # if only calibration is changed
     new_cal = instrument_calibration.GripperCalibrationOffset(
         offset=Point(3, 4, 5),
@@ -153,15 +141,10 @@ def test_reload_instrument_cal_ot3(fake_offset: GripperCalibrationOffset) -> Non
     assert skip
 
 
-@pytest.mark.ot3_only
 def test_reload_instrument_cal_ot3_conf_changed(
     fake_offset: GripperCalibrationOffset,
 ) -> None:
-    old_gripper = gripper.Gripper(
-        fake_gripper_conf,
-        fake_offset,
-        "fakeid123",
-    )
+    old_gripper = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
     new_conf = fake_gripper_conf.model_copy(
         update={
             "grip_force_profile": fake_gripper_conf.grip_force_profile.model_copy(
@@ -182,14 +165,12 @@ def test_reload_instrument_cal_ot3_conf_changed(
     assert not skip
 
 
-@pytest.mark.ot3_only
 def test_jaw_calibration_error_checking() -> None:
     subject = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")  # type: ignore[arg-type]
     with pytest.raises(MotionFailedError):
         subject.update_jaw_open_position_from_closed_position(0)
 
 
-@pytest.mark.ot3_only
 def test_jaw_calibration() -> None:
     subject = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")  # type: ignore[arg-type]
     subject.update_jaw_open_position_from_closed_position(

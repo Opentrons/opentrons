@@ -45,6 +45,7 @@
     height: 0;
   }
 
+  /* stylelint-disable custom-property-no-missing-var-function */
   --aspect-4-3: {
     @apply --aspect;
 
@@ -56,6 +57,7 @@
 
     padding-bottom: 100%;
   }
+  /* stylelint-enable custom-property-no-missing-var-function */
 
   --aspect-item: {
     position: absolute;

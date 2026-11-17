@@ -592,7 +592,7 @@ def main() -> None:
     accuracy = sorted(
         analysis, key=lambda acc: abs((sum(acc[1]) / len(acc[1])) - acc[0])
     )
-    precision = sorted(analysis, key=lambda per: (max(per[1]) - min(per[1])))
+    precision = sorted(analysis, key=lambda per: max(per[1]) - min(per[1]))
 
     accuracy_score: Dict[str, int] = _score(algorithms, accuracy)
     precision_score: Dict[str, int] = _score(algorithms, precision)

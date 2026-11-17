@@ -29,25 +29,26 @@ dynamic = ['version']
 
 [dependency-groups]
 dev = [
-    "ruff==0.14.10",
-    "pytest>=9.0.2",
-    "pytest-asyncio<2,>=1",
-    "pytest-cov==4.1.0",
-    "pytest-xdist~=2.5.0",
-    "requests==2.31.0",
-    "mock==5.1.0",
-    "mypy==1.19.1",
-    "decoy<3,>=2.2.0",
-    "httpx==0.26.0",
-    "types-requests~=2.31.0",
-    "types-mock~=5.1.0",
+    "ruff==0.17.4",
+    "coverage==7.16.2",
+    "pytest==9.2.0",
+    "pytest-asyncio==1.4.1.post1",
+    "pytest-cov==7.1.0",
+    "pytest-xdist==3.8.0",
+    "requests==2.34.2",
+    "mock==5.2.0",
+    "mypy==2.4.1",
+    "decoy==2.6.0",
+    "httpx==0.27.2",
+    "types-requests==2.33.0.20261030",
+    "types-mock==5.2.0.20260518",
     # Theoretically, this package supports both SQLAlchemy 1.4 and 2.x.
     # Ideally, we'd run all our dev checks on both versions, but we don't currently have a pattern to do that.
     # So let's treat 1.4 as the lowest common denominator and run all the dev checks on that.
     "sqlalchemy==1.4.51",
     "sqlalchemy2-stubs==0.0.2a38",
-    "build~=1.2.0",
-    "setuptools==80.9.0",
+    "build==1.6.1",
+    "setuptools==84.2.1",
     "python-multipart==0.0.28",
 ]
 
@@ -71,6 +72,8 @@ exclude = ["server_utils/_version.py"]
 
 # uv: global settings and dependency tweaks
 [tool.uv]
+# Keep in sync with repo-root uv.toml and oe-core's Dockerfile
+required-version = "==0.12.1"
 # Provide static metadata so uv can resolve systemd-python without building its sdist on
 # macOS, where libsystemd headers are unavailable; Linux installs still see the real wheel.
 dependency-metadata = [

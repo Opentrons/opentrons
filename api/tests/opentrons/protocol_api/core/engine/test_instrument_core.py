@@ -2124,21 +2124,6 @@ def test_liquid_probe_with_recovery_unsafe(
         )
     )
 
-    decoy.when(
-        mock_engine_client.execute_command(  # type: ignore[func-returns-value]
-            cmd.LiquidProbeParams(
-                pipetteId=subject.pipette_id,
-                wellLocation=WellLocation(
-                    origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2.0)
-                ),
-                wellName=well_core.get_name(),
-                labwareId=well_core.labware_id,
-            ),
-            command_annotations=[],
-        )
-    ).then_return(
-        cmd.LiquidProbeResult(position=DeckPoint(x=0, y=0, z=0), z_position=0)
-    )
     loc = Location(Point(0, 0, 0), None)
     with pytest.raises(
         pipette_movement_conflict.PartialTipMovementNotAllowedError,

@@ -383,7 +383,7 @@ async def test_get_commands_slice_current_run(
 
     expected_command_slice = JsonCommandSlice(
         commands=[
-            command.model_dump_json(by_alias=True, exclude_none=True)
+            command.model_dump_json(by_alias=True)
             for command in expected_commands_result
         ],
         cursor=1,

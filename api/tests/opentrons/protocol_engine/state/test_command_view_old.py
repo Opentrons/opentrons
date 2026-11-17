@@ -949,9 +949,9 @@ def test_get_slice() -> None:
 
     assert result == JsonCommandSlice(
         commands=[
-            command_2.model_dump_json(exclude_none=True, by_alias=True),
-            command_3.model_dump_json(exclude_none=True, by_alias=True),
-            command_4.model_dump_json(exclude_none=True, by_alias=True),
+            command_2.model_dump_json(by_alias=True),
+            command_3.model_dump_json(by_alias=True),
+            command_4.model_dump_json(by_alias=True),
         ],
         cursor=1,
         total_length=4,
@@ -961,10 +961,10 @@ def test_get_slice() -> None:
 
     assert result == JsonCommandSlice(
         commands=[
-            command_1.model_dump_json(exclude_none=True, by_alias=True),
-            command_2.model_dump_json(exclude_none=True, by_alias=True),
-            command_3.model_dump_json(exclude_none=True, by_alias=True),
-            command_4.model_dump_json(exclude_none=True, by_alias=True),
+            command_1.model_dump_json(by_alias=True),
+            command_2.model_dump_json(by_alias=True),
+            command_3.model_dump_json(by_alias=True),
+            command_4.model_dump_json(by_alias=True),
         ],
         cursor=0,
         total_length=4,
@@ -984,9 +984,9 @@ def test_get_slice_default_cursor_no_current() -> None:
 
     assert result == JsonCommandSlice(
         commands=[
-            command_2.model_dump_json(exclude_none=True, by_alias=True),
-            command_3.model_dump_json(exclude_none=True, by_alias=True),
-            command_4.model_dump_json(exclude_none=True, by_alias=True),
+            command_2.model_dump_json(by_alias=True),
+            command_3.model_dump_json(by_alias=True),
+            command_4.model_dump_json(by_alias=True),
         ],
         cursor=1,
         total_length=4,
@@ -1019,9 +1019,9 @@ def test_get_slice_default_cursor_failed_command() -> None:
 
     assert result == JsonCommandSlice(
         commands=[
-            command_2.model_dump_json(exclude_none=True, by_alias=True),
-            command_3.model_dump_json(exclude_none=True, by_alias=True),
-            command_4.model_dump_json(exclude_none=True, by_alias=True),
+            command_2.model_dump_json(by_alias=True),
+            command_3.model_dump_json(by_alias=True),
+            command_4.model_dump_json(by_alias=True),
         ],
         cursor=1,
         total_length=4,
@@ -1045,8 +1045,8 @@ def test_get_slice_default_cursor_running() -> None:
 
     assert result == JsonCommandSlice(
         commands=[
-            command_2.model_dump_json(exclude_none=True, by_alias=True),
-            command_3.model_dump_json(exclude_none=True, by_alias=True),
+            command_2.model_dump_json(by_alias=True),
+            command_3.model_dump_json(by_alias=True),
         ],
         cursor=1,
         total_length=5,
@@ -1093,11 +1093,11 @@ def test_get_slice_without_fixit() -> None:
 
     assert result == JsonCommandSlice(
         commands=[
-            command_1.model_dump_json(exclude_none=True, by_alias=True),
-            command_2.model_dump_json(exclude_none=True, by_alias=True),
-            command_3.model_dump_json(exclude_none=True, by_alias=True),
-            command_4.model_dump_json(exclude_none=True, by_alias=True),
-            command_5.model_dump_json(exclude_none=True, by_alias=True),
+            command_1.model_dump_json(by_alias=True),
+            command_2.model_dump_json(by_alias=True),
+            command_3.model_dump_json(by_alias=True),
+            command_4.model_dump_json(by_alias=True),
+            command_5.model_dump_json(by_alias=True),
         ],
         cursor=0,
         total_length=5,
@@ -1119,9 +1119,9 @@ def test_get_slice_large_length() -> None:
 
     assert result == JsonCommandSlice(
         commands=[
-            command_1.model_dump_json(exclude_none=True, by_alias=True),
-            command_2.model_dump_json(exclude_none=True, by_alias=True),
-            command_3.model_dump_json(exclude_none=True, by_alias=True),
+            command_1.model_dump_json(by_alias=True),
+            command_2.model_dump_json(by_alias=True),
+            command_3.model_dump_json(by_alias=True),
         ],
         cursor=0,
         total_length=3,
@@ -1144,9 +1144,9 @@ def test_get_slice_explicit_cursor_with_length() -> None:
 
     assert result == JsonCommandSlice(
         commands=[
-            command_2.model_dump_json(exclude_none=True, by_alias=True),
-            command_3.model_dump_json(exclude_none=True, by_alias=True),
-            command_4.model_dump_json(exclude_none=True, by_alias=True),
+            command_2.model_dump_json(by_alias=True),
+            command_3.model_dump_json(by_alias=True),
+            command_4.model_dump_json(by_alias=True),
         ],
         cursor=1,
         total_length=5,

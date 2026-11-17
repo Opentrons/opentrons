@@ -49,7 +49,7 @@ async def test_latch_status(heatershaker: HeaterShaker) -> None:
     assert heatershaker.labware_latch_status.value == "idle_closed"
 
     await heatershaker.open_labware_latch()
-    assert heatershaker.labware_latch_status.value == "idle_open"
+    assert heatershaker.labware_latch_status.value == "idle_open"  # type: ignore[comparison-overlap]
 
 
 async def test_speed(heatershaker: HeaterShaker) -> None:

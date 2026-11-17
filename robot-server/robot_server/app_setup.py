@@ -103,9 +103,9 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                     True,
                 ),
                 (
-                    lambda _app_state,
-                    _hw_api,
-                    _hw_store: blinker.mark_hardware_init_complete(),
+                    lambda _app_state, _hw_api, _hw_store: (
+                        blinker.mark_hardware_init_complete()
+                    ),
                     False,
                 ),
             ],

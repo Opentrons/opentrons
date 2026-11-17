@@ -173,8 +173,8 @@ async def test_handle_recovery_target_command_change(
 
     assert notification_client.publish_advise_refetch.call_count == 2
 
-    runs_publisher._run_hooks.get_recovery_target_command = (
-        lambda _: make_async_command_pointer("command2")
+    runs_publisher._run_hooks.get_recovery_target_command = lambda _: (
+        make_async_command_pointer("command2")
     )
 
     await runs_publisher._handle_recovery_target_command_change()
