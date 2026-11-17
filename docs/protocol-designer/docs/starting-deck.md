@@ -108,15 +108,18 @@ Each Stacker can only store a single type of labware in a protocol. If you need 
 
 ### Vacuum Module
 
-The Vacuum Module requires a physical deck adapter that spans deck slots A3 and A4.
+You'll need to set up your Vacuum Module once for your entire Protocol Designer protocol. Click the Vacuum Module in slot A3 or A4 on the protocol starting deck to add labware and any required adapters (spacers and collars).
 
-<figure markdown>
-![Deck adapter with labeled features matching slots A3 and A4](images/deck_adapter_features.svg){ width="80%" }
-<figcaption>Vacuum Module deck adapter.</figcaption>
+<figure class="screenshot" markdown>
+![Clicking a module slot to add labware](images/vacuum-add-labware.png){ width="80%" }
+<figcaption>Add well plates and adapters to the Vacuum Module.</figcaption>
 </figure>
 
-* **Slot A3:** The recessed part of the deck adapter that holds the vacuum base, any optional spacers, and collection or filter plates.
+During setup, select the well plates or filter plates along with any adapters you need for your labware.
 
-* **Slot A4:** Known as "the dock," this raised section stages collars when they're not seated on the vacuum base or actively used in a protocol.
+<figure class="screenshot" markdown>
+![View, edit well plates and adapters on the Vacuum Module](images/vacuum-add-labware3.png)
+<figcaption>View, edit, and add Vacuum Module labware.</figcaption>
+</figure>
 
-Filter plates cannot sit directly on an empty deck slot. For staging, place filter plates on a collar on the dock, on top of the vacuum base stack, or nested inside a deep-well plate on the deck.
+While configuring the module, click **Adapters** to add optional spacers in slot A3. Spacers are not compatible with the Flex Gripper. You must place them on the module by hand.
