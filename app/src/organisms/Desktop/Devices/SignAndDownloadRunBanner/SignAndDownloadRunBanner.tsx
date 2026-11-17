@@ -8,12 +8,10 @@ import type { ReactNode } from 'react'
 
 const COPY_BY_BANNER_TYPE = {
   signing: {
-    headingKey: 'signature_required',
     messageKey: 'signature_required_description',
     linkTextKey: 'sign_now',
   },
   downloading: {
-    headingKey: 'audit_log_download_required',
     messageKey: 'audit_log_download_required_description',
     linkTextKey: 'download_now',
   },
@@ -36,13 +34,11 @@ export function SignAndDownloadRunBanner({
   }
 
   const bannerType = isSigningRequired ? 'signing' : 'downloading'
-  const { headingKey, messageKey, linkTextKey } =
-    COPY_BY_BANNER_TYPE[bannerType]
+  const { messageKey, linkTextKey } = COPY_BY_BANNER_TYPE[bannerType]
 
   return (
     <InlineNotification
       type="alert"
-      heading={t(headingKey)}
       message={t(messageKey)}
       linkText={t(linkTextKey)}
       onLinkClick={onLinkClick}
