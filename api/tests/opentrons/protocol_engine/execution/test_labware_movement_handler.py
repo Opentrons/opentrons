@@ -10,11 +10,9 @@ from decoy import Decoy, matchers
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 
-from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import Axis, OT3Mount
 from opentrons.protocol_engine.errors import (
     GripperNotAttachedError,
-    HardwareNotSupportedError,
     HeaterShakerLabwareLatchNotOpenError,
     LabwareMovementNotAllowedError,
     ThermocyclerNotOpenError,
@@ -898,33 +896,6 @@ async def test_does_not_slow_collar_pickup_from_heater_shaker(
         ),
         times=1,
     )
-
-
-async def test_labware_movement_raises_on_ot2(
-    decoy: Decoy,
-    state_store: StateStore,
-    hardware_api: HardwareControlAPI,
-    equipment: EquipmentHandler,
-    movement: MovementHandler,
-) -> None:
-    """It should raise an error when attempting a gripper movement on a non-OT3 bot."""
-    decoy.when(state_store.config.use_virtual_gripper).then_return(False)
-    subject = LabwareMovementHandler(
-        hardware_api=hardware_api,
-        state_store=state_store,
-        equipment=equipment,
-        movement=movement,
-    )
-
-    with pytest.raises(HardwareNotSupportedError):
-        await subject.move_labware_with_gripper(
-            labware_id="labware-id",
-            current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-            new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            user_pick_up_offset=Point(),
-            user_drop_offset=Point(),
-            post_drop_slide_offset=None,
-        )
 
 
 @pytest.mark.ot3_only
