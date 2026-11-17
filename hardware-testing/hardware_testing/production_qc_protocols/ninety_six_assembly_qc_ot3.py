@@ -3498,8 +3498,8 @@ def _upload_formal_report(ctx: ProtocolContext, state: _QCFailureContext) -> Non
         ctx.comment(f"QC CSV upload: {message}")
 
     try:
-        uploaded = data_center_client.upload_data_to_google_drive(
-            report_path, direct_upload=True, progress_callback=report_upload_progress
+        uploaded = data_center_client.upload_data_to_google_drive_legacy(
+            report_path, progress_callback=report_upload_progress
         )
     except Exception as error:
         ctx.comment(f"QC CSV upload failed; saved locally at {report_path}: {error}")

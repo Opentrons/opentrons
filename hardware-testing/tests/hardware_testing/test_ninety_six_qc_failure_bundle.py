@@ -29,7 +29,7 @@ def isolated_archive(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(qc, "upload_failure_log", MagicMock(return_value=True))
     monkeypatch.setattr(
         qc.data_center_client,
-        "upload_data_to_google_drive",
+        "upload_data_to_google_drive_legacy",
         MagicMock(return_value=True),
     )
     monkeypatch.setattr(
@@ -418,11 +418,8 @@ def test_normal_qc_failure_uploads_once_for_any_operator(
     artifacts: List[Path] = []
     upload_message = "Upload record_id=record-96; stage=complete; status=success"
 
-    def upload_report(
-        path: Path, *, direct_upload: bool, progress_callback: Callable[[str], None]
-    ) -> bool:
+    def upload_report(path: Path, *, progress_callback: Callable[[str], None]) -> bool:
         assert path == report.file_path
-        assert direct_upload is True
         assert not operations
         operations.append("csv-started")
         progress_callback(upload_message)
@@ -437,7 +434,9 @@ def test_normal_qc_failure_uploads_once_for_any_operator(
         return True
 
     formal = MagicMock(side_effect=upload_report)
-    monkeypatch.setattr(qc.data_center_client, "upload_data_to_google_drive", formal)
+    monkeypatch.setattr(
+        qc.data_center_client, "upload_data_to_google_drive_legacy", formal
+    )
     monkeypatch.setattr(
         qc.data_center_client,
         "upload_failure_artifact",

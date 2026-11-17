@@ -36,7 +36,9 @@ def environment(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> SimpleNamesp
     tests = Mock()
     monkeypatch.setattr(qc, "_run_test_sections", tests)
     upload = Mock(return_value=True)
-    monkeypatch.setattr(qc.data_center_client, "upload_data_to_google_drive", upload)
+    monkeypatch.setattr(
+        qc.data_center_client, "upload_data_to_google_drive_legacy", upload
+    )
     archive = Mock()
     monkeypatch.setattr(qc, "_archive_failure_log", archive)
     save = Mock(wraps=report.save_to_disk)
@@ -81,13 +83,10 @@ def test_completed_reports_save_then_upload_without_regrading(
 
     env.archive.side_effect = archive
 
-    def upload(
-        path: Path, *, direct_upload: bool, progress_callback: Callable[[str], None]
-    ) -> bool:
+    def upload(path: Path, *, progress_callback: Callable[[str], None]) -> bool:
         env.save.assert_called_once_with()
         assert path == env.report.file_path
         assert path.read_text() == original_csv
-        assert direct_upload is True
         env.archive.assert_not_called()
         progress_callback("Upload record_id=record-96; stage=complete; status=success")
         operations.append("csv-finished")
@@ -111,7 +110,7 @@ def test_completed_reports_save_then_upload_without_regrading(
         env.upload.assert_not_called()
     else:
         env.upload.assert_called_once_with(
-            env.report.file_path, direct_upload=True, progress_callback=ANY
+            env.report.file_path, progress_callback=ANY
         )
     assert operations == (
         ([] if operator == "Unused" else ["csv-finished"])
@@ -133,9 +132,7 @@ def test_upload_failure_preserves_saved_report_and_qc_outcome(
     original_csv = str(env.report) + "\n"
     operations = []
 
-    def upload(
-        path: Path, *, direct_upload: bool, progress_callback: Callable[[str], None]
-    ) -> bool:
+    def upload(path: Path, *, progress_callback: Callable[[str], None]) -> bool:
         assert path.read_text() == original_csv
         env.archive.assert_not_called()
         operations.append("csv-started")
@@ -162,7 +159,7 @@ def test_upload_failure_preserves_saved_report_and_qc_outcome(
         qc.run(env.ctx)
     assert env.report.file_path.read_text() == original_csv
     env.upload.assert_called_once_with(
-        env.report.file_path, direct_upload=True, progress_callback=ANY
+        env.report.file_path, progress_callback=ANY
     )
     assert env.archive.call_count == int(failed)
     assert operations == ["csv-started", "csv-finished"] + (
@@ -185,9 +182,7 @@ def test_pending_upload_is_visible_before_failure_archive(
         "error=Upload is still processing after the client wait timeout",
     ]
 
-    def upload(
-        path: Path, *, direct_upload: bool, progress_callback: Callable[[str], None]
-    ) -> bool:
+    def upload(path: Path, *, progress_callback: Callable[[str], None]) -> bool:
         for message in messages:
             progress_callback(message)
             env.archive.assert_not_called()
