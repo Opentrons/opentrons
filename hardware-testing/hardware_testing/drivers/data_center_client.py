@@ -797,6 +797,122 @@ def _upload_failure_file(
         return False
 
 
+def _legacy_upload_data(
+    csv_file_path: Union[Path, str], zip_file_path: Union[Path, str]
+) -> Dict[str, Any]:
+    """Submit server-side paths without the durable upload-record API.
+
+    This is the upload contract used by the older Data Center service.  Keep
+    it separate from ``upload_data`` so the current record-tracked path never
+    silently loses its idempotency and completion checks.
+    """
+    base_url = get_base_url()
+    try:
+        response = requests.post(
+            f"{base_url}{API_ENDPOINT_UPLOAD}",
+            json={
+                "csv_file_path": str(csv_file_path) if csv_file_path else "",
+                "zip_file_path": str(zip_file_path) if zip_file_path else "",
+            },
+            timeout=DEFAULT_TIMEOUT,
+        )
+        response.raise_for_status()
+        body = response.json()
+        return body if isinstance(body, dict) else {"success": False, "response": body}
+    except requests.exceptions.RequestException as exc:
+        return {"success": False, "error": _upload_request_error(exc)}
+    except Exception as exc:
+        return {"success": False, "error": str(exc)}
+
+
+def _legacy_upload_data_to_google_drive(
+    csv_file_path: Union[Path, str],
+    remove_remote_folder: bool,
+    pull_method: str,
+    include_source_zip: bool,
+    all_files: bool,
+    progress_callback: UploadProgressCallback,
+) -> bool:
+    """Use the pre-upload-record flow for older Data Center deployments."""
+
+    def progress(message: str) -> None:
+        _upload_progress(message, progress_callback)
+
+    folder_name = os.path.dirname(csv_file_path)
+    progress("stage=legacy_health_check")
+    health_result = check_health()
+    if not health_result.get("status", False):
+        progress(f"stage=legacy_health_check failed: {health_result}")
+        return False
+
+    if all_files or include_source_zip:
+        progress(
+            "stage=legacy_upload_submit endpoint="
+            f"{API_ENDPOINT_UPLOAD_MANUAL}"
+        )
+        upload_response = upload_manual_data(
+            csv_file_path=csv_file_path,
+            include_source_zip=include_source_zip or all_files,
+            all_files=all_files,
+            create_record=False,
+        )
+    else:
+        progress(f"stage=legacy_robot_data_pull method={pull_method}")
+        download_response = pull_folder(
+            csv_file_path=csv_file_path,
+            folder_name=folder_name,
+            pull_method=pull_method,
+        )
+        if not download_response.get("success", False):
+            progress(f"stage=legacy_robot_data_pull failed: {download_response}")
+            return False
+        zip_path = download_response.get("zip_path")
+        csv_file = download_response.get("file_name")
+        if not csv_file or not zip_path:
+            progress(
+                "stage=legacy_robot_data_pull failed: response missing "
+                "zip_path or file_name"
+            )
+            return False
+        progress(f"stage=legacy_upload_submit endpoint={API_ENDPOINT_UPLOAD}")
+        upload_response = _legacy_upload_data(csv_file, zip_path)
+
+    result = bool(upload_response.get("success"))
+    if result and remove_remote_folder:
+        delete_folder(folder_name)
+    progress(
+        "stage=legacy_upload_result status="
+        f"{'success' if result else 'failed'} response={upload_response}"
+    )
+    return result
+
+
+def upload_data_to_google_drive_legacy(
+    csv_file_path: Union[Path, str],
+    remove_remote_folder: bool = False,
+    pull_method: str = DEFAULT_PULL_METHOD,
+    include_source_zip: bool = False,
+    all_files: bool = False,
+    *,
+    progress_callback: UploadProgressCallback = None,
+    **kwargs: Any,
+) -> bool:
+    """Upload through the pre-upload-record Data Center contract directly."""
+    if "delete_folder" in kwargs:
+        remove_remote_folder = kwargs.pop("delete_folder")
+    if kwargs:
+        unexpected = ", ".join(sorted(kwargs))
+        raise TypeError(f"Unexpected keyword argument(s): {unexpected}")
+    return _legacy_upload_data_to_google_drive(
+        csv_file_path=csv_file_path,
+        remove_remote_folder=remove_remote_folder,
+        pull_method=pull_method,
+        include_source_zip=include_source_zip,
+        all_files=all_files,
+        progress_callback=progress_callback,
+    )
+
+
 def upload_data_to_google_drive(
     csv_file_path: Union[Path, str],
     remove_remote_folder: bool = False,

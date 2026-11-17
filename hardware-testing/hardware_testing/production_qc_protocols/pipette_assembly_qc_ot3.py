@@ -101,7 +101,7 @@ from hardware_testing.drivers.pressure_fixture import (
 )
 
 from hardware_testing.drivers.data_center_client import (
-    upload_data_to_google_drive,
+    upload_data_to_google_drive_legacy as upload_data_to_google_drive,
     upload_failure_log,
 )
 
