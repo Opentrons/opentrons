@@ -151,21 +151,21 @@ Running Thermocycler profiles is time-consuming, so you can choose to run other 
 
 ## Vacuum Module steps
 
-Adding a Vacuum Module step to your protocol opens a form where you can control the module by changing its state, programming a profile, or creating a cycle. Changing the module state sets a single vacuum or pump action, programming a profile runs a multi-part pressure or power sequence once, and creating a cycle repeats a sequence of operations for a specified number of loops.
+Adding a Vacuum Module step to your protocol opens a form where you can control the module by changing its state, programming a profile, or creating a cycle. Changing the module state sets a single vacuum or pump action, programming a profile runs a multi-part pressure or power sequence once, and creating a cycle repeats a set of operations for a specified number of loops.
 
 Click **Change vacuum state** to turn on the vacuum pump or open the vent. Turning on the pump lets the module create vacuum by regulating gauge pressure (0 to –800 mbar) or by running the pump motor at a fixed percentage of its rated power (1% to 100%). Opening the vent keeps it open until a subsequent vacuum step closes it; when closed, the vent remains in that state until another step opens it.
 
 !!! note
     Both gauge pressure and pump power settings include an optional **Duration** checkbox and an **Vent** toggle.
     
-    * Duration: Check to set a time limit (`mm:ss`). If unchecked, the pump runs indefinitely until the next vacuum step changes the module's state.
-    * Vent: Open or close the pressure valve when the interval set by the duration timer expires.
+    * **Duration:** Check to set a time limit (`mm:ss`). If unchecked, the pump runs indefinitely until the next vacuum step changes the module's state.
+    * **Vent:** Open or close the pressure valve when the interval set by the duration timer expires.
 
 Click **Program a vacuum profile** to chain together multiple pressure or power modes that run once as a sequence of sub-steps within a single protocol step. When building a vacuum profile, you can choose between pressure or power options:
 
-* **Gauge pressure (mbar):** Click to create a closed-loop operation that sets a target gauge pressure (0 to –800 mbar). In a closed loop, the module continuously monitors internal sensors to reach and maintain the desired vacuum pressure.
+* **Gauge pressure (mbar):** Click to create a closed-loop operation that sets a target gauge pressure (0 to –800 mbar). In a closed loop, the module continuously checks its internal sensors to reach and maintain the desired vacuum pressure.
 
-* **Pump power (%):** Click to create an open-loop operation that runs the pump at a fixed percentage of its rated power (1% to 100%). In an open loop, the pump motor runs continuously until another operation changes its state.
+* **Pump power (%):** Click to create an open-loop operation that runs the pump at a fixed percentage of its rated power (1% to 100%). In an open loop, the pump motor runs continuously until another operation turns it off.
 
 <figure class="screenshot side-by-side" markdown>
 ![Pressure profile in a Vacuum Module step](../images/vacuum-pressure-profile.png)
@@ -173,7 +173,7 @@ Click **Program a vacuum profile** to chain together multiple pressure or power 
 <figcaption>Pressure and power profiles showing multiple sub-steps.</figcaption>
 </figure>
 
-Click **Add cycle** when creating a vacuum profile to set up a repeating loop of pressure or power operations within a single step. Looping through multiple operations in a single step makes a cycle ideal for repetitive, multi-stage filtration workflows. You can also combine profiles and cycles within a single step, but all operations must use the same mode type (either pressure or power). Mixed pressure and power cycles are not supported.
+Click **Add cycle** when creating a vacuum profile to set up a repeating loop of pressure or power operations within a single step. Looping through multiple vacuum operations in a single step makes cycles ideal for repetitive, multi-stage filtration workflows. You can also combine profiles and cycles within a single step, but all operations must use the same mode, either pressure or power. Mixed pressure and power cycles are not supported.
 
 <figure class="screenshot" markdown>
 ![Vacuum operation cycle in a Vacuum Module step](../images/vacuum-profile-cycle.png){ width="80%" }

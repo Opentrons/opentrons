@@ -12,7 +12,7 @@ The protocol starting deck view shows how your Flex or OT-2 deck will look at th
 To start, the deck includes your chosen modules and fixtures. Click **Deck hardware** in the upper left to add, move, or delete modules or fixtures. Protocol Designer only shows compatible options for each slot.
 
 !!! note "Vacuum Module placement"
-    The Vacuum Module installs into slots A3–A4 only. If the trash bin is in slot A3, you must move it to another compatible deck location or use the external waste chute. See [Preventing hardware conflicts](create-protocol/modules-fixtures.md#preventing-hardware-conflicts) for details.
+    The Vacuum Module installs into slots A3 and A4 only. If the trash bin is in slot A3, you must move it to another compatible deck location or use the external waste chute. See [Preventing hardware conflicts](create-protocol/modules-fixtures.md#preventing-hardware-conflicts) for details.
 
 <figure class="screenshot" markdown>
   ![Configure hardware](images/configure-hardware.png)
