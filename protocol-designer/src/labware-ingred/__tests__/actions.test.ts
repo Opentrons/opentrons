@@ -2,7 +2,10 @@ import { legacy_configureStore } from 'redux-mock-store'
 import { thunk } from 'redux-thunk'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { fixture_96_plate, fixture_tiprack_10_ul } from '@opentrons/shared-data'
+import {
+  fixture_96_plate,
+  fixture_tiprack_10_ul,
+} from '@opentrons/shared-data/labware/fixtures/2'
 
 import { getRobotType } from '../../file-data/selectors'
 import { getLabwareDefsByURI } from '../../labware-defs/selectors'

@@ -1,4 +1,4 @@
-import { fixture_regular_example_1 } from '@opentrons/shared-data'
+import { fixture_regular_example_1 } from '@opentrons/shared-data/labware/fixtures/2'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 

@@ -4,7 +4,7 @@ import {
   fixture_24_tuberack,
   fixture_96_plate,
   fixture_trash,
-} from '@opentrons/shared-data'
+} from '@opentrons/shared-data/labware/fixtures/2'
 import { CLEAN } from '@opentrons/step-generation'
 
 import {

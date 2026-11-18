@@ -40,12 +40,12 @@ describe('labwareModuleCompatibility', () => {
       labwareDefURI: 'fixture/fixture_96_plate',
       id: 'abcef123',
       stack: ['abcef123', '3'],
-      def: fixture96Plate as LabwareDefinition2,
+      def: fixture_96_plate as LabwareDefinition2,
       pythonName: 'mockPythonName',
     }
     it('returns true when labware is inside custom labwares obj', () => {
       const customLabwares = {
-        'fixture/fixture_96_plate': fixture96Plate as LabwareDefinition2,
+        'fixture/fixture_96_plate': fixture_96_plate as LabwareDefinition2,
       }
       const labwareIsCustom = getLabwareIsCustom(customLabwares, labwareOnDeck)
       expect(labwareIsCustom).toEqual(true)
