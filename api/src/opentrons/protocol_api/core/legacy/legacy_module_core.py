@@ -466,7 +466,7 @@ class LegacyHeaterShakerCore(
                 "Heater-Shaker Module does not have a target temperature set."
             )
 
-        self._sync_module_hardware.await_temperature(target_temperature)
+        self._sync_module_hardware.await_temperature()
 
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
         """Set the shaker's target shake speed and wait for it to spin up."""

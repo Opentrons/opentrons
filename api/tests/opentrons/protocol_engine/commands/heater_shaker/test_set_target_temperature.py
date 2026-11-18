@@ -74,7 +74,7 @@ async def test_set_target_temperature(
     assert task is not None
     await task.asyncioTask
     decoy.verify(await hs_hardware.start_set_temperature(celsius=45.6), times=1)
-    decoy.verify(await hs_hardware.await_temperature(awaiting_temperature=45.6))
+    decoy.verify(await hs_hardware.await_temperature())
     assert result == SuccessData(
         public=heater_shaker.SetTargetTemperatureResult(taskId="taskId"),
     )
