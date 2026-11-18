@@ -2,8 +2,9 @@
 """Inspect, provision, or clear one pipette identity with a JSON-reporting worker.
 
 Adapted from provision_pipette.py; the original production script is unchanged.
-Inspect must precede write or clear, using its identity as the expected state.
-Write replaces the inspected identity with the scanned target serial.
+Inspect must precede clear, using its identity as the expected state.
+Write can use an optional inspected identity snapshot; without one it performs
+the read, write, and readback in one worker transaction.
 Clear normally checks the original serial; an explicit option skips that check
 for clear-then-write, while always requiring the exact inspected snapshot.
 This worker does not move motors, restart firmware, or refresh server caches.
@@ -307,7 +308,11 @@ async def provision(
             action, which, attempts, timeout, allow_clear_without_original
         )
         target = parse_target(requested_serial)
-        expected = _parse_expected(expected_before_hex) if action != "inspect" else None
+        expected = (
+            _parse_expected(expected_before_hex)
+            if action == "clear" or expected_before_hex is not None
+            else None
+        )
         node = NodeId.pipette_left if which == "left" else NodeId.pipette_right
         try:
             device = await query(
@@ -375,7 +380,7 @@ async def run(args: argparse.Namespace) -> Result:
             args.allow_clear_without_original,
         )
         parse_target(args.serial)
-        if args.action != "inspect":
+        if args.action == "clear" or args.expected_before_hex is not None:
             _parse_expected(args.expected_before_hex)
         async with (
             build.driver(build_settings(args)) as driver,

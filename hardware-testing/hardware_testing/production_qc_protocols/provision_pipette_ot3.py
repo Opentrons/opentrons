@@ -163,18 +163,30 @@ SERIAL_PATTERN = re.compile(
 
 
 def add_parameters(parameters: ParameterContext) -> None:
-    """Select one identity operation, keeping read-only inspection the default."""
+    """Select the identity operation and whether a write should restart the service."""
     parameters.add_str(
         variable_name="operation",
         display_name="操作模式",
-        default="inspect",
+        default="write",
         choices=[
             {"display_name": "只读检查", "value": "inspect"},
             {"display_name": "直接写入", "value": "write"},
+            {"display_name": "空白移液器首次烧录", "value": "bootstrap"},
             {"display_name": "清除后写入", "value": "clear_then_write"},
-            {"display_name": "仅清除身份", "value": "clear"},
         ],
-        description="固定左侧。两种写入模式均只扫新码，无需匹配原码；仅清除需核对原码。写入验证并成功结束后重启服务。",
+        description=(
+            "固定左侧。写入模式只扫新码，无需匹配原码；空白移液器首次烧录需在协议启动时暂不连接移液器，"
+            "扫码后按暂停提示安装；协议不提供仅清除身份，避免留下无法识别的空白身份。"
+        ),
+    )
+    parameters.add_bool(
+        variable_name="restart_service",
+        display_name="写入后重启服务",
+        default=False,
+        description=(
+            "仅对直接写入、空白首次烧录和清除后写入生效。开启后，EEPROM 验证通过且协议成功结束时自动重启 robot-server；"
+            "关闭时不重启，但 App 可能暂时保留旧的移液器身份缓存。"
+        ),
     )
 
 
@@ -635,30 +647,66 @@ def run(ctx: ProtocolContext) -> None:
     if not isinstance(operation, str) or operation not in {
         "inspect",
         "write",
+        "bootstrap",
         "clear_then_write",
         "clear",
     }:
         raise ValueError("请选择有效的操作模式：只读检查、直接写入、清除后写入或仅清除身份。")
     if ctx.is_simulating():
         ctx.comment(
-            "序列号配置流程分析完成。真实运行扫码录入，固定配置左侧；默认只读。"
+            "序列号配置流程分析完成。真实运行扫码录入，固定配置左侧；默认直接写入。"
             "直接写入允许将当前身份覆盖为扫码新码，不要求新旧条码一致。"
+            "空白移液器首次烧录需先在未连接移液器时启动，扫码后暂停安装并写入。"
             "清除后写入也只扫描新码，无需匹配原码，确认后在同一次运行中清除并写入。"
-            "最终身份验证通过且协议成功结束后自动重启机器人服务；仅清除身份时不重启服务。"
+            "写入后是否重启机器人服务由参数决定，默认不重启。"
         )
         return
 
     which = TARGET_MOUNT
     command = _worker_command()
-    write_enabled = operation in {"write", "clear_then_write"}
-    restart_plan = _prepare_service_restart() if write_enabled else None
+    write_enabled = operation in {"write", "bootstrap", "clear_then_write"}
+    restart_service = getattr(ctx.params, "restart_service", False)
+    if not isinstance(restart_service, bool):
+        raise ValueError("写入后重启服务参数必须是布尔值。")
+    restart_plan = (
+        _prepare_service_restart() if write_enabled and restart_service else None
+    )
     scan_prompt = {
         "inspect": "只读检查：请扫描左侧移液器实物标签上的完整序列号。",
         "write": "直接写入：请扫描准备写入左侧移液器的新条码，允许与当前身份不同。",
+        "bootstrap": "空白移液器首次烧录：请扫描生产系统分配的目标序列号。",
         "clear": "仅清除身份：请扫描左侧移液器当前已烧录身份对应的原条码。",
         "clear_then_write": "清除后写入：请扫描准备写入左侧移液器的新条码，无需扫描原码。",
     }[operation]
     serial = _scan_serial(ctx, prompt=scan_prompt)
+    if operation in {"write", "bootstrap"}:
+        if operation == "bootstrap":
+            ctx.pause(
+                "请确认左侧移液器当前未连接，且已扫描生产系统分配的目标序列号。"
+                "现在请在机器人保持静止时安装需要首次烧录的空白移液器，"
+                "确认连接牢固后点击继续；继续后将直接通过 CAN 写入并读回验证。"
+            )
+        # The direct-write path is deliberately one worker transaction.  The
+        # worker reads the current identity immediately before writing and
+        # verifies the new bytes by readback, avoiding a duplicate preflight
+        # process and CAN query sequence.
+        target_serial = serial
+        _target_hex(target_serial)
+        written = _invoke_worker(ctx, command, "write", which, target_serial)
+        before = _identity_hex(written, "before")
+        if _identity_hex(written, "after") != _target_hex(target_serial):
+            raise RuntimeError("写入后的读回值不是目标身份，不能判为成功。")
+        ctx.comment(f"左侧 EEPROM 原身份：{_identity_label(before)}；目标：{target_serial}。")
+        ctx.comment(f"EEPROM 序列号核对通过：左侧（{which}），{target_serial}。")
+        if restart_plan is not None:
+            _schedule_service_restart(ctx, restart_plan)
+        else:
+            ctx.comment(
+                "EEPROM 身份已验证。按当前参数不重启 robot-server；App 可能暂时保留旧身份缓存，"
+                "后续运行前请按现场流程刷新服务或重新建立硬件连接。"
+            )
+        return
+
     inspected = _invoke_worker(ctx, command, "inspect", which, serial)
     before = _identity_hex(inspected, "before")
     current = _identity_label(before)
@@ -667,7 +715,7 @@ def run(ctx: ProtocolContext) -> None:
     if operation == "inspect":
         if before not in ("00" * 20, "ff" * 20, _target_hex(serial)):
             if SERIAL_PATTERN.fullmatch(current):
-                ctx.comment("当前非空白身份与扫描条码不同。若需替换，可选择“直接写入”，扫描目标新码并在写入前确认。")
+                ctx.comment("当前非空白身份与扫描条码不同。若需替换，可选择“直接写入”，扫描目标新码后立即写入。")
             else:
                 ctx.comment("当前非空白数据无法解析为有效条码。两种写入模式均可在核对实物及新条码后替换；仅清除身份仍需匹配原码。")
         ctx.comment("只读检查完成，未写入 EEPROM，不重启服务。")
@@ -698,17 +746,14 @@ def run(ctx: ProtocolContext) -> None:
         return
 
     if operation == "clear_then_write":
+        restart_message = (
+            "仅验证通过且协议成功结束后重启服务，App 短暂断连。" if restart_service else "当前关闭重启开关，验证通过后不重启服务。"
+        )
         ctx.pause(
             f"左侧（{which}），当前身份：{current}；新条码：{target_serial}。"
             "无需匹配原码。请核对实物型号和新码，勿拔插。继续即清除 20 字节身份，"
             "读回全 FF 后写入新码并复查。中断可能留下空白或已改变的身份，不自动回滚，需只读核对。"
-            "仅验证通过且协议成功结束后重启服务，App 短暂断连。"
-        )
-    else:
-        ctx.pause(
-            f"目标固定左侧（{which}），当前身份 {current}。扫码及待写入序列号：{target_serial}。"
-            "允许新旧条码不同。请核对实物型号和新条码，勿拔插。继续即把 20 字节身份覆盖为新码，不先清除；"
-            "验证通过且协议成功结束后重启 robot-server 服务，App 短暂断连。"
+            f"{restart_message}"
         )
     if operation == "clear_then_write":
         _invoke_worker(
@@ -731,5 +776,10 @@ def run(ctx: ProtocolContext) -> None:
     if _identity_hex(verified, "before") != _target_hex(target_serial):
         raise RuntimeError("写入后的独立复查未读到目标身份，不能判为成功。")
     ctx.comment(f"EEPROM 序列号核对通过：左侧（{which}），{target_serial}。")
-    assert restart_plan is not None
-    _schedule_service_restart(ctx, restart_plan)
+    if restart_plan is not None:
+        _schedule_service_restart(ctx, restart_plan)
+    else:
+        ctx.comment(
+            "EEPROM 身份已验证。按当前参数不重启 robot-server；App 可能暂时保留旧身份缓存，"
+            "后续运行前请按现场流程刷新服务或重新建立硬件连接。"
+        )

@@ -79,7 +79,7 @@ def context() -> SimpleNamespace:
     """Provide only public protocol operations, with no hardware API."""
     return SimpleNamespace(
         is_simulating=lambda: False,
-        params=SimpleNamespace(operation="inspect"),
+        params=SimpleNamespace(operation="write", restart_service=True),
         comment=Mock(),
         pause=Mock(),
         delay=Mock(),
@@ -164,21 +164,30 @@ def test_serial_has_exact_expected_wire_encoding() -> None:
     assert protocol._target_hex(SERIAL) == TARGET
 
 
-def test_operation_is_a_single_choice_defaulting_to_read_only() -> None:
-    """One explicit operation replaces combinable booleans; scan and mount remain fixed."""
+def test_operation_is_a_single_choice_defaulting_to_write() -> None:
+    """Operation and optional restart settings are explicit protocol parameters."""
     parameters = Mock()
     protocol.add_parameters(parameters)
     parameters.add_str.assert_called_once()
     config = parameters.add_str.call_args.kwargs
     assert config["variable_name"] == "operation"
-    assert config["default"] == "inspect"
+    assert config["default"] == "write"
     assert [choice["value"] for choice in config["choices"]] == [
         "inspect",
         "write",
+        "bootstrap",
         "clear_then_write",
-        "clear",
     ]
-    assert [call[0] for call in parameters.mock_calls] == ["add_str"]
+    parameters.add_bool.assert_called_once_with(
+        variable_name="restart_service",
+        display_name="写入后重启服务",
+        default=False,
+        description=(
+            "仅对直接写入、空白首次烧录和清除后写入生效。开启后，EEPROM 验证通过且协议成功结束时自动重启 robot-server；"
+            "关闭时不重启，但 App 可能暂时保留旧的移液器身份缓存。"
+        ),
+    )
+    assert [call[0] for call in parameters.mock_calls] == ["add_str", "add_bool"]
 
 
 @pytest.fixture
@@ -926,14 +935,14 @@ def prepared_run(
     return context, events, tmp_path
 
 
-def test_default_is_read_only(prepared_run: tuple) -> None:
-    """The default parameter never reaches confirmation or write."""
+def test_default_is_direct_write(prepared_run: tuple) -> None:
+    """The default parameter follows the direct-write path without a pause."""
     ctx, events, _ = prepared_run
     protocol.run(ctx)
-    assert events == [("inspect", None)]
+    assert [event[0] for event in events] == ["write", "restart"]
     ctx.pause.assert_not_called()
-    ctx.restart.assert_not_called()
-    ctx.prepare_restart.assert_not_called()
+    ctx.restart.assert_called_once_with(ctx, ctx.restart_plan)
+    ctx.prepare_restart.assert_called_once_with()
 
 
 @pytest.mark.parametrize("operation", ["inspect", "clear"])
@@ -1021,22 +1030,20 @@ def test_unknown_nonblank_identity_is_visible_and_never_authorizes_clearing(
 
 
 @pytest.mark.parametrize(
-    "before,scanned,target,label",
+    "before,scanned",
     [
-        (NEW_TARGET, SERIAL, TARGET, NEW_SERIAL),
-        (UNKNOWN_IDENTITY, SERIAL, TARGET, "非空白身份"),
-        (TARGET, REPORTED_SERIAL, REPORTED_TARGET, SERIAL),
+        (NEW_TARGET, SERIAL),
+        (UNKNOWN_IDENTITY, SERIAL),
+        (TARGET, REPORTED_SERIAL),
     ],
 )
-def test_direct_write_confirms_and_overwrites_actual_snapshot_without_clearing(
+def test_direct_write_starts_immediately_and_reuses_worker_readback(
     before: str,
     scanned: str,
-    target: str,
-    label: str,
     context: SimpleNamespace,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """One target scan can overwrite any consistent current identity, with no clear command."""
+    """Direct write skips the pause and uses the worker's verified readback."""
     context.params.operation = "write"
     monkeypatch.setattr(protocol, "_worker_command", lambda: ["worker"])
     scanner = Mock(return_value=scanned)
@@ -1046,11 +1053,7 @@ def test_direct_write_confirms_and_overwrites_actual_snapshot_without_clearing(
     restart = Mock()
     monkeypatch.setattr(protocol, "_prepare_service_restart", prepare)
     monkeypatch.setattr(protocol, "_schedule_service_restart", restart)
-    responses = [
-        result(before=before, serial=scanned),
-        result("write", before, scanned),
-        result(before=target, serial=scanned),
-    ]
+    responses = [result("write", before, scanned)]
     processes = []
     for payload in responses:
         process = Mock()
@@ -1071,47 +1074,49 @@ def test_direct_write_confirms_and_overwrites_actual_snapshot_without_clearing(
         "prepare",
         "scan",
         "worker",
-        "pause",
-        "worker",
-        "worker",
         "restart",
     ]
     commands = [call.args[0] for call in spawn.call_args_list]
     assert [command[command.index("--action") + 1] for command in commands] == [
-        "inspect",
         "write",
-        "inspect",
     ]
-    assert commands[1][commands[1].index("--expected-before-hex") + 1] == before
     assert all(
         command[command.index("--serial") + 1] == scanned for command in commands
     )
+    assert "--expected-before-hex" not in commands[0]
     scanner.assert_called_once_with(context, prompt=ANY)
-    context.pause.assert_called_once()
-    confirmation = context.pause.call_args.args[0]
-    assert label in confirmation and scanned in confirmation and "覆盖" in confirmation
+    context.pause.assert_not_called()
     restart.assert_called_once_with(context, plan)
 
 
-def test_direct_overwrite_confirmation_fits_app_with_unknown_identity_and_long_barcode(
+def test_direct_write_does_not_pause_for_unknown_identity(
     prepared_run: tuple, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Even the unknown-identity warning leaves the full overwrite confirmation visible."""
+    """An unknown current identity does not reintroduce a confirmation dialog."""
     ctx, _, _ = prepared_run
     ctx.params.operation = "write"
-    target_serial = "P1KSV31" + "A" * 12
+    target_serial = NEW_SERIAL
     monkeypatch.setattr(protocol, "_scan_serial", Mock(return_value=target_serial))
-    worker = Mock(return_value=result(before=UNKNOWN_IDENTITY, serial=target_serial))
+    worker = Mock(return_value=result("write", UNKNOWN_IDENTITY, serial=target_serial))
     monkeypatch.setattr(protocol, "_invoke_worker", worker)
     ctx.pause.side_effect = RuntimeError("Stop before overwrite")
-    with pytest.raises(RuntimeError, match="Stop before overwrite"):
-        protocol.run(ctx)
-    prompt = ctx.pause.call_args.args[0]
-    assert len(prompt) <= 217
-    assert "非空白身份" in prompt and target_serial in prompt
-    assert "覆盖" in prompt and "不先清除" in prompt and "重启" in prompt
+    protocol.run(ctx)
     worker.assert_called_once()
-    ctx.restart.assert_not_called()
+    ctx.pause.assert_not_called()
+    ctx.restart.assert_called_once_with(ctx, ctx.restart_plan)
+
+
+def test_bootstrap_pauses_to_install_blank_pipette_before_can_write(
+    prepared_run: tuple,
+) -> None:
+    """The App bootstrap mode starts without a pipette, then writes after installation."""
+    ctx, events, _ = prepared_run
+    ctx.params.operation = "bootstrap"
+    protocol.run(ctx)
+    assert [event[0] for event in events] == ["pause", "write", "restart"]
+    assert "未连接" in events[0][1]
+    assert events[1] == ("write", None)
+    ctx.restart.assert_called_once_with(ctx, ctx.restart_plan)
 
 
 @pytest.mark.parametrize("operation", ["inspect", "write", "clear_then_write", "clear"])
@@ -1138,23 +1143,34 @@ def test_run_creates_no_provisioning_files(
     assert list(directory.iterdir()) == []
 
 
-def test_write_requires_confirmation_and_independent_readback(
+def test_write_uses_one_worker_readback_without_pause(
     prepared_run: tuple,
 ) -> None:
-    """Pass the confirmed pre-write bytes to the worker and re-read in a fresh call."""
+    """The direct write path uses one worker transaction without a pause."""
     ctx, events, _ = prepared_run
     ctx.params.operation = "write"
     protocol.run(ctx)
     assert [event[0] for event in events] == [
-        "inspect",
-        "pause",
         "write",
-        "inspect",
         "restart",
     ]
-    assert events[2] == ("write", BLANK)
-    assert "left" in events[1][1] and SERIAL in events[1][1]
+    assert events[0] == ("write", None)
+    ctx.pause.assert_not_called()
     ctx.restart.assert_called_once_with(ctx, ctx.restart_plan)
+
+
+@pytest.mark.parametrize("operation", ["write", "clear_then_write"])
+def test_write_modes_can_skip_service_restart(
+    operation: str, prepared_run: tuple
+) -> None:
+    """EEPROM verification succeeds without a systemd preflight or restart job."""
+    ctx, events, _ = prepared_run
+    ctx.params.operation = operation
+    ctx.params.restart_service = False
+    protocol.run(ctx)
+    assert "restart" not in [event[0] for event in events]
+    ctx.prepare_restart.assert_not_called()
+    ctx.restart.assert_not_called()
 
 
 def test_clear_requires_confirmation_and_independent_readback_without_restart(
@@ -1267,26 +1283,23 @@ def test_cancel_clear_confirmation_never_launches_clear_or_restart(
 def test_write_scans_once_and_always_uses_left(
     prepared_run: tuple, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """One barcode remains the target through confirmation, write and final inspection."""
+    """One barcode remains the target through the single-worker write path."""
     ctx, _, _ = prepared_run
     ctx.params.operation = "write"
     ctx.params.which = "right"
 
     scanner = Mock(return_value=SERIAL)
-    worker = Mock(side_effect=[result(), result("write"), result(before=TARGET)])
+    worker = Mock(return_value=result("write"))
     monkeypatch.setattr(protocol, "_scan_serial", scanner)
     monkeypatch.setattr(protocol, "_invoke_worker", worker)
     protocol.run(ctx)
     scanner.assert_called_once()
     assert protocol.TARGET_MOUNT == "left"
-    assert worker.call_count == 3
-    assert [call.args[2] for call in worker.call_args_list] == [
-        "inspect",
-        "write",
-        "inspect",
-    ]
+    assert worker.call_count == 1
+    assert [call.args[2] for call in worker.call_args_list] == ["write"]
     assert all(call.args[3] == "left" for call in worker.call_args_list)
     assert all(call.args[4] == SERIAL for call in worker.call_args_list)
+    ctx.pause.assert_not_called()
     ctx.restart.assert_called_once_with(ctx, ctx.restart_plan)
 
 
@@ -1307,42 +1320,42 @@ def test_restart_preflight_precedes_scan_and_cannot_create_a_restart_job(
     ctx.restart.assert_not_called()
 
 
-def test_cancel_at_confirmation_never_launches_write(prepared_run: tuple) -> None:
-    """A stopped run cannot progress from the explicit confirmation."""
+def test_direct_write_does_not_wait_for_confirmation(prepared_run: tuple) -> None:
+    """A confirmation cancellation hook cannot block direct write."""
     ctx, events, _ = prepared_run
     ctx.params.operation = "write"
     ctx.pause.side_effect = asyncio.CancelledError
-    with pytest.raises(asyncio.CancelledError):
-        protocol.run(ctx)
-    assert events == [("inspect", None)]
-    ctx.restart.assert_not_called()
+    protocol.run(ctx)
+    assert [event[0] for event in events] == ["write", "restart"]
+    ctx.pause.assert_not_called()
+    ctx.restart.assert_called_once_with(ctx, ctx.restart_plan)
 
 
 @pytest.mark.parametrize("before", [BLANK, NEW_TARGET, UNKNOWN_IDENTITY])
-def test_fresh_inspect_must_still_match_target(
+def test_direct_write_rejects_worker_readback_mismatch(
     before: str, prepared_run: tuple, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """A writer success is insufficient if independent inspection disagrees."""
+    """A worker write success is insufficient if its readback disagrees."""
     ctx, _, _ = prepared_run
     ctx.params.operation = "write"
+    write_result = result("write", before)
+    write_result["after"] = identity(NEW_TARGET)
+    write_result["changed"] = before != NEW_TARGET
+    write_result["write_attempted"] = before != NEW_TARGET
     monkeypatch.setattr(
         protocol,
         "_invoke_worker",
-        Mock(
-            side_effect=[
-                result(before=before),
-                result("write", before),
-                result(before=before),
-            ]
-        ),
+        Mock(return_value=write_result),
     )
-    with pytest.raises(RuntimeError, match="独立复查"):
+    with pytest.raises(RuntimeError, match="读回值"):
         protocol.run(ctx)
     ctx.restart.assert_not_called()
 
 
-@pytest.mark.parametrize("failed_phase", [0, 1, 2])
-@pytest.mark.parametrize("action", ["write", "clear"])
+@pytest.mark.parametrize(
+    "action,failed_phase",
+    [("write", 0), ("clear", 0), ("clear", 1), ("clear", 2)],
+)
 @pytest.mark.parametrize(
     "failure", [RuntimeError("worker failed"), asyncio.CancelledError()]
 )
@@ -1357,7 +1370,9 @@ def test_any_worker_failure_prevents_service_restart(
     ctx, _, _ = prepared_run
     ctx.params.operation = action
     before, after = (BLANK, TARGET) if action == "write" else (TARGET, BLANK)
-    responses = [result(before=before), result(action, before), result(before=after)]
+    responses = [result(action, before)]
+    if action == "clear":
+        responses.append(result(before=after))
     worker = Mock(side_effect=[*responses[:failed_phase], failure])
     monkeypatch.setattr(protocol, "_invoke_worker", worker)
     with pytest.raises(type(failure)):
