@@ -12,7 +12,7 @@ The protocol starting deck view shows how your Flex or OT-2 deck will look at th
 To start, the deck includes your chosen modules and fixtures. Click **Deck hardware** in the upper left to add, move, or delete modules or fixtures. Protocol Designer only shows compatible options for each slot.
 
 !!! note "Vacuum Module placement"
-    The Vacuum Module installs into slots A3 and A4 only. If the trash bin is in slot A3, you must move it to another compatible deck location or use the external waste chute. See [Preventing hardware conflicts](create-protocol/modules-fixtures.md#preventing-hardware-conflicts) for details.
+    The Vacuum Module installs into slots A3 and A4 only. If the trash bin is in slot A3, you must move it to another compatible deck location or use the external waste chute.
 
 <figure class="screenshot" markdown>
   ![Configure hardware](images/configure-hardware.png)
@@ -111,14 +111,14 @@ Each Stacker can only store a single type of labware in a protocol. If you need 
 You'll need to set up your Vacuum Module once for your entire Protocol Designer protocol. Click the Vacuum Module in slot A3 or A4 on the protocol starting deck to add labware and any required adapters (spacers and collars).
 
 <figure class="screenshot" markdown>
-![Clicking a module slot to add labware](images/vacuum-add-labware.png){ width="80%" }
+![Clicking a module slot to add labware](images/vacuum-deck-view.png){ width="80%" }
 <figcaption>Add well plates and adapters to the Vacuum Module.</figcaption>
 </figure>
 
 During setup, select the well plates or filter plates along with any adapters you need for your labware.
 
 <figure class="screenshot" markdown>
-![View, edit well plates and adapters on the Vacuum Module](images/vacuum-add-labware3.png)
+![View, edit well plates and adapters on the Vacuum Module](images/vacuum-add-labware.png)
 <figcaption>View, edit, and add Vacuum Module labware.</figcaption>
 </figure>
 
