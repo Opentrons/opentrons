@@ -369,7 +369,7 @@ describe('ProtocolRunSetup', () => {
       screen.getByText(
         'Gather your labware & liquids and place them on the deck to finish setting up your protocol.'
       )
-      const labwareSetup = screen.getByText('Labware & Liquids')
+      const labwareSetup = screen.getByText('Labware & liquids')
       fireEvent.click(labwareSetup)
       expect(screen.getByText('Mock SetupLabware')).toBeVisible()
       expect(screen.getByTestId('SetupStep_content_expanded')).toBeTruthy()
@@ -518,7 +518,7 @@ describe('ProtocolRunSetup', () => {
       screen.getByText('Deck Hardware')
 
       screen.getByText('Install the required modules.')
-      screen.getByText('Labware & Liquids')
+      screen.getByText('Labware & liquids')
 
       screen.getByText(
         'Gather your labware & liquids and place them on the deck to finish setting up your protocol.'
@@ -551,7 +551,7 @@ describe('ProtocolRunSetup', () => {
       screen.getByText('Deck Hardware')
 
       screen.getByText('Install the required module.')
-      screen.getByText('Labware & Liquids')
+      screen.getByText('Labware & liquids')
       screen.getByText(
         'Gather your labware & liquids and place them on the deck to finish setting up your protocol.'
       )
