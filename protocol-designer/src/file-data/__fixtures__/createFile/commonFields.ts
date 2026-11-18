@@ -1,10 +1,10 @@
 // Named arguments to createFile selector. This data would be the result of several selectors.
+import { fixtureP10SingleV2Specs } from '@opentrons/shared-data'
 import {
   fixture_96_plate,
   fixture_tiprack_10_ul,
   fixture_trash,
-  fixtureP10SingleV2Specs,
-} from '@opentrons/shared-data'
+} from '@opentrons/shared-data/labware/fixtures/2'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
