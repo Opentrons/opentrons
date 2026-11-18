@@ -67,16 +67,16 @@ class WaitForTemperatureImpl(
 
         if params.celsius is None:
             # Raises error if no target temperature
-            target_temp = hs_module_substate.get_plate_target_temperature()
+            hs_module_substate.get_plate_target_temperature()
         else:
-            target_temp = hs_module_substate.validate_target_temperature(params.celsius)
+            hs_module_substate.validate_target_temperature(params.celsius)
 
         hs_hardware_module = self._equipment.get_module_hardware_api(
             hs_module_substate.module_id
         )
 
         if hs_hardware_module is not None:
-            await hs_hardware_module.await_temperature(awaiting_temperature=target_temp)
+            await hs_hardware_module.await_temperature()
 
         return SuccessData(
             public=WaitForTemperatureResult(),
