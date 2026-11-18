@@ -272,6 +272,10 @@ lint-js-oxlint:
 lint-js-prettier:
 	pnpm exec prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
 
+.PHONY: lint-json
+lint-json:
+	pnpm exec prettier --ignore-path .eslintignore --check ".*.@(json)" "**/*.@(json)"
+
 
 .PHONY: lint-css
 lint-css:
