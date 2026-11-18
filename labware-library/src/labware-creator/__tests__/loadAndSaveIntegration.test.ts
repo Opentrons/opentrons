@@ -2,10 +2,10 @@ import { describe, expect, it, vi } from 'vitest'
 
 import {
   DEFAULT_CUSTOM_NAMESPACE,
-  fixture_12_trough,
-  fixture_24_tuberack,
-  fixture_96_plate,
-  fixture_tiprack_300_ul,
+  fixture12Trough,
+  fixture24Tuberack,
+  fixture96Plate,
+  fixtureTiprack300ul,
 } from '@opentrons/shared-data'
 
 import { fieldsToLabware } from '../fieldsToLabware'
@@ -25,26 +25,26 @@ describe('load and immediately save integrity test', () => {
   // (without these fields, Yup schema cast would fail)
   const testCases = [
     {
-      inputDef: fixture_96_plate as LabwareDefinition2,
+      inputDef: fixture96Plate as LabwareDefinition2,
       extraFields: {},
     },
     {
-      inputDef: fixture_12_trough as LabwareDefinition2,
+      inputDef: fixture12Trough as LabwareDefinition2,
       extraFields: {},
     },
     {
-      inputDef: fixture_tiprack_300_ul as LabwareDefinition2,
+      inputDef: fixtureTiprack300ul as LabwareDefinition2,
       extraFields: {},
     },
     {
-      inputDef: fixture_24_tuberack as LabwareDefinition2,
+      inputDef: fixture24Tuberack as LabwareDefinition2,
       extraFields: { tubeRackInsertLoadName: 'customTubeRack' },
     },
   ]
   testCases.forEach(({ inputDef, extraFields }) => {
     it(inputDef.parameters.loadName, () => {
       const initialRawFieldValues = labwareDefToFields(inputDef, [
-        fixture_12_trough,
+        fixture12Trough,
       ] as LabwareDefinition2[])
       // both name fields should be set to null upon import
       expect(initialRawFieldValues?.displayName).toBe(null)

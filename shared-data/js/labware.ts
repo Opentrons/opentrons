@@ -6,6 +6,7 @@ import fixtureCalibrationBlock from '../labware/fixtures/2/fixture_calibration_b
 import fixtureTiprack1000ul from '../labware/fixtures/2/fixture_flex_96_tiprack_1000ul.json'
 import fixtureTiprackAdapter from '../labware/fixtures/2/fixture_flex_96_tiprack_adapter.json'
 import fixtureLid from '../labware/fixtures/2/fixture_lid.json'
+import fixtureIrregularExample1 from '../labware/fixtures/2/fixture_irregular_example_1.json'
 import fixtureTiprack10ul from '../labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixtureTiprack300ul from '../labware/fixtures/2/fixture_tiprack_300_ul.json'
 import fixtureTrash from '../labware/fixtures/2/fixture_trash.json'
@@ -219,6 +220,7 @@ export {
   labwareSchemaV2,
   labwareSchemaV3,
   fixtureLid,
+  fixtureIrregularExample1,
   fixture96Plate,
   fixture12Trough,
   fixture24Tuberack,

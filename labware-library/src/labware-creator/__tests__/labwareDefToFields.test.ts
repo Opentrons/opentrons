@@ -108,13 +108,13 @@ describe('labwareDefToFields', () => {
 
   it('maps a filterPlate definition back to the filter plate labware type', () => {
     const def = {
-      ...fixture_96_plate,
+      ...fixture96Plate,
       metadata: {
-        ...fixture_96_plate.metadata,
+        ...fixture96Plate.metadata,
         displayCategory: 'filterPlate',
       },
       parameters: {
-        ...fixture_96_plate.parameters,
+        ...fixture96Plate.parameters,
         quirks: ['filterPlate', 'noLabwarePositionCheck'],
       },
       skirtHeight: 5,
@@ -126,15 +126,15 @@ describe('labwareDefToFields', () => {
     expect(result?.hasLpcQuirk).toEqual('true')
     expect(result?.skirtHeight).toEqual('5')
     expect(result?.labwareZDimension).toEqual(
-      String(fixture_96_plate.dimensions.zDimension)
+      String(fixture96Plate.dimensions.zDimension)
     )
   })
 
   it('keeps total height as zDimension when wells hang past the skirt', () => {
     const def = {
-      ...fixture_96_plate,
+      ...fixture96Plate,
       dimensions: {
-        ...fixture_96_plate.dimensions,
+        ...fixture96Plate.dimensions,
         zDimension: 35,
       },
       skirtHeight: 10,
@@ -149,9 +149,9 @@ describe('labwareDefToFields', () => {
 
   it('treats a well plate with the filterPlate quirk as a filter plate', () => {
     const def = {
-      ...fixture_96_plate,
+      ...fixture96Plate,
       parameters: {
-        ...fixture_96_plate.parameters,
+        ...fixture96Plate.parameters,
         quirks: ['filterPlate'],
       },
     } as LabwareDefinition2
