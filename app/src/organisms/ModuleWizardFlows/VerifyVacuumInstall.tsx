@@ -272,7 +272,7 @@ function VacuumCheckTubeConnectionsScreen({
     <GenericWizardTile
       header={t('check_tube_connections')}
       rightHandBody={
-        <AnimationVideo width="100%">
+        <AnimationVideo width="100%" css={{ transform: 'scale(2)' }}>
           <source src={CheckConnections} />
         </AnimationVideo>
       }
@@ -285,6 +285,7 @@ function VacuumCheckTubeConnectionsScreen({
       back={onBack}
       proceed={onContinue}
       proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
+      hideOverflowRight
     />
   )
 }
