@@ -235,9 +235,8 @@ describe('RobotOverview', () => {
 
     render(props)
 
-    screen.getByText('Signature required')
     screen.getByText(
-      'A signature is required to verify the protocol run has ended.'
+      'Signature is required to verify the protocol run has ended.'
     )
     screen.getByText('Sign now')
   })

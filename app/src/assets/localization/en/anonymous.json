@@ -83,7 +83,6 @@
   "restore_description": "Reverting to previous software versions is not recommended, but you can access previous releases below. For best results, uninstall the existing app and remove its configuration files before installing the previous version.",
   "retrieve_labware_from_stacker_to": "Retrieve {{primaryDefinitionDisplayName}} from robot Stacker to {{slotName}}",
   "robot_server_version_ot3_description": "The robot software includes the robot server and the touchscreen display interface.",
-  "robot_software_update_required": "A robot software update is required to run protocols with this version of the app.",
   "run_failed_modal_description_desktop": "Contact support for assistance.",
   "secure_labware_explanation_magnetic_module": "<block>Ensure that your labware locks to the Magnetic Module by adjusting the black plate bracket on top of the module.</block> <block>There are two sizes of plate brackets supplied with your module: standard and deep well. These brackets can be removed and swapped by unscrewing the module's thumb screw (the silver knob on the front).</block>",
   "secure_labware_explanation_thermocycler": "Secure your labware to the Thermocycler Module by closing its latch. Doing so ensures level and accurate plate placement for optimal results.",

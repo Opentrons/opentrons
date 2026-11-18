@@ -33,7 +33,7 @@ export function UpdateRobotBanner(
   props: UpdateRobotBannerProps
 ): JSX.Element | null {
   const { robot, ...styleProps } = props
-  const { t } = useTranslation(['device_settings', 'branded'])
+  const { t } = useTranslation(['device_settings'])
 
   const { autoUpdateAction } = useSelector((state: State) => {
     return getRobotUpdateDisplayInfo(state, robot?.name)
@@ -56,7 +56,7 @@ export function UpdateRobotBanner(
           gridGap={SPACING.spacing8}
         >
           <LegacyStyledText forwardedAs="p">
-            {t('branded:robot_software_update_required')}
+            {t('robot_software_update_required')}
           </LegacyStyledText>
           <Btn
             onClick={() => {
@@ -66,7 +66,7 @@ export function UpdateRobotBanner(
             textDecoration={TYPOGRAPHY.textDecorationUnderline}
             whiteSpace="nowrap"
           >
-            {t('view_update')}
+            {t('update_now')}
           </Btn>
         </Flex>
       </Banner>
