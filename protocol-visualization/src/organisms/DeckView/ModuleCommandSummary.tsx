@@ -9,6 +9,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   OT2_STANDARD_DECKID,
   TEMPERATURE_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import type { ReactNode } from 'react'
@@ -20,6 +21,14 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 
+// Same vacuum DeckLabelSet footprint as PD ModuleLabel (RQA-5865 / #22234).
+// Vacuum module def dims do not describe the left plate-holder visual.
+const CENTER_SLOT_WIDTH = 160
+const CENTER_SLOT_HEIGHT = 106
+const VACUUM_OFFSET_X = -19
+const VACUUM_OFFSET_Y = -10
+const VACUUM_DOCK_OFFSET_X = 7
+
 interface ModuleCommandSummaryProps {
   robotType: RobotType
   commandType: RunTimeCommand['commandType']
@@ -28,6 +37,7 @@ interface ModuleCommandSummaryProps {
   position: CoordinateTuple
   orientation: 'left' | 'right'
   slot: DeckSlotId | null
+  isVacuumDock?: boolean
 }
 // NOTE: a lot of this is similar to ModuleLabel in PD so we should try to combine them
 export const ModuleCommandSummary = (
@@ -41,6 +51,7 @@ export const ModuleCommandSummary = (
     showModuleIcon = false,
     robotType,
     commandType,
+    isVacuumDock = false,
   } = props
   const labelContainerRef = useRef<HTMLDivElement>(null)
   const [labelContainerHeight, setLabelContainerHeight] = useState(12)
@@ -79,6 +90,36 @@ export const ModuleCommandSummary = (
       : 0
   const hopperAdjustmentX = showHopperAdjustment ? 190 : 0
   const hopperAdjustmentY = showHopperAdjustment ? -5 : 0
+
+  const deckLabels = [
+    {
+      text: commandSummary,
+      isSelected: true,
+      isLast: true,
+      moduleModel: def?.model,
+      isZoomed: false,
+    },
+  ]
+
+  // Special-case vacuum main/dock area — mirror PD ModuleLabel.
+  if (def?.moduleType === VACUUM_MODULE_TYPE) {
+    return (
+      <DeckLabelSet
+        ref={labelContainerRef}
+        deckLabels={deckLabels}
+        x={
+          position[0] +
+          VACUUM_OFFSET_X +
+          (isVacuumDock ? VACUUM_DOCK_OFFSET_X : 0)
+        }
+        y={position[1] - labelContainerHeight + VACUUM_OFFSET_Y}
+        width={CENTER_SLOT_WIDTH}
+        height={CENTER_SLOT_HEIGHT}
+        showModuleIcon={showModuleIcon}
+      />
+    )
+  }
+
   const x =
     position[0] +
     def.cornerOffsetFromSlot.x +
@@ -99,15 +140,7 @@ export const ModuleCommandSummary = (
   return (
     <DeckLabelSet
       ref={labelContainerRef}
-      deckLabels={[
-        {
-          text: commandSummary,
-          isSelected: true,
-          isLast: true,
-          moduleModel: def?.model,
-          isZoomed: false,
-        },
-      ]}
+      deckLabels={deckLabels}
       x={x}
       y={y}
       width={def?.dimensions.xDimension + (showHopperAdjustment ? -15 : 2)}
