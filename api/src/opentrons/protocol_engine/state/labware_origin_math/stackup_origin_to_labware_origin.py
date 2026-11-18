@@ -56,8 +56,6 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.types import DeckSlotName, Point
 
-_OFFSET_ON_TC_OT2 = Point(x=0, y=0, z=10.7)
-
 LabwareStackupAncestorDefinition = Union[
     DeckLocationDefinition,
     ModuleDefinition,
@@ -102,7 +100,6 @@ def get_stackup_origin_to_labware_origin(
         return _get_stackup_origin_to_lw_origin(
             stackup_lw_info_top_to_bottom=stackup_lw_info_top_to_bottom,
             underlying_ancestor_definition=underlying_ancestor_definition,
-            deck_definition=deck_definition,
             slot_name=slot_name,
         )
     else:
@@ -121,7 +118,6 @@ def get_stackup_origin_to_labware_origin(
         return gripper_offset + _get_stackup_origin_to_lw_origin(
             stackup_lw_info_top_to_bottom=stackup_lw_info_top_to_bottom,
             underlying_ancestor_definition=underlying_ancestor_definition,
-            deck_definition=deck_definition,
             slot_name=slot_name,
         )
 
@@ -129,7 +125,6 @@ def get_stackup_origin_to_labware_origin(
 def _get_stackup_origin_to_lw_origin(
     stackup_lw_info_top_to_bottom: list[tuple[LabwareDefinition, LabwareLocation]],
     underlying_ancestor_definition: LabwareStackupAncestorDefinition,
-    deck_definition: DeckDefinitionV6,
     slot_name: DeckSlotName,
     is_topmost_labware: bool = True,
 ) -> Point:
@@ -145,7 +140,6 @@ def _get_stackup_origin_to_lw_origin(
         return _get_parent_placement_origin_to_lw_origin(
             child_labware=definition,
             parent_deck_item=underlying_ancestor_definition,  # type: ignore[arg-type]
-            deck_definition=deck_definition,
             is_topmost_labware=is_topmost_labware,
             labware_location=location,  # type: ignore[arg-type]
             underlying_ancestor_orientation=underlying_ancestor_orientation,
@@ -157,7 +151,6 @@ def _get_stackup_origin_to_lw_origin(
             _get_parent_placement_origin_to_lw_origin(
                 child_labware=definition,
                 parent_deck_item=parent_definition,
-                deck_definition=deck_definition,
                 is_topmost_labware=is_topmost_labware,
                 labware_location=location,
                 underlying_ancestor_orientation=underlying_ancestor_orientation,
@@ -169,7 +162,6 @@ def _get_stackup_origin_to_lw_origin(
         return parent_placement_origin_to_lw_origin + _get_stackup_origin_to_lw_origin(
             stackup_lw_info_top_to_bottom=remaining_lw_defs_locs_top_to_bottom,
             underlying_ancestor_definition=underlying_ancestor_definition,
-            deck_definition=deck_definition,
             slot_name=slot_name,
             is_topmost_labware=False,
         )
@@ -212,7 +204,6 @@ def _get_underlying_ancestor_orientation(
 def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: ModuleDefinition,
-    deck_definition: DeckDefinitionV6,
     is_topmost_labware: bool,
     labware_location: ModuleLocation,
     underlying_ancestor_orientation: ModuleOrientation,
@@ -223,7 +214,6 @@ def _get_parent_placement_origin_to_lw_origin(
 def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: DeckLocationDefinition,
-    deck_definition: DeckDefinitionV6,
     is_topmost_labware: bool,
     labware_location: Union[DeckSlotLocation, AddressableAreaLocation],
     underlying_ancestor_orientation: ModuleOrientation,
@@ -234,7 +224,6 @@ def _get_parent_placement_origin_to_lw_origin(
 def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: LabwareDefinition,
-    deck_definition: DeckDefinitionV6,
     is_topmost_labware: bool,
     labware_location: OnLabwareLocation,
     underlying_ancestor_orientation: ModuleOrientation,
@@ -244,7 +233,6 @@ def _get_parent_placement_origin_to_lw_origin(
 def _get_parent_placement_origin_to_lw_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: _LabwareStackupDefinition,
-    deck_definition: DeckDefinitionV6,
     is_topmost_labware: bool,
     labware_location: LabwareLocation,
     underlying_ancestor_orientation: ModuleOrientation,
@@ -264,7 +252,6 @@ def _get_parent_placement_origin_to_lw_origin(
             _get_parent_deck_item_origin_to_child_labware_placement_origin(
                 child_labware=child_labware,
                 parent_deck_item=parent_deck_item,
-                deck_definition=deck_definition,
                 labware_location=labware_location,
             )
         )
@@ -315,7 +302,6 @@ def _get_parent_placement_origin_to_lw_origin(
                 _get_parent_deck_item_origin_to_child_labware_placement_origin(
                     child_labware=child_labware,
                     parent_deck_item=parent_deck_item,
-                    deck_definition=deck_definition,
                     labware_location=labware_location,
                 )
             )
@@ -326,8 +312,6 @@ def _get_parent_placement_origin_to_lw_origin(
                 parent_deck_item=_get_standardized_parent_deck_item(parent_deck_item),
                 underlying_ancestor_orientation=underlying_ancestor_orientation,
             )
-        ) + _feature_exception_offsets(
-            deck_definition=deck_definition, parent_deck_item=parent_deck_item
         )
 
         return (
@@ -339,7 +323,6 @@ def _get_parent_placement_origin_to_lw_origin(
 def _get_parent_deck_item_origin_to_child_labware_placement_origin(
     child_labware: LabwareDefinition,
     parent_deck_item: _LabwareStackupDefinition,
-    deck_definition: DeckDefinitionV6,
     labware_location: LabwareLocation,
 ) -> Point:
     """Get the offset vector from parent entity origin to child labware placement origin."""
@@ -353,7 +336,6 @@ def _get_parent_deck_item_origin_to_child_labware_placement_origin(
             _get_child_labware_overlap_with_parent_module(
                 child_labware=child_labware,
                 parent_module_model=parent_deck_item.model,
-                deck_definition=deck_definition,
             )
         )
 
@@ -962,48 +944,15 @@ def _get_child_labware_overlap_with_parent_labware(
 def _get_child_labware_overlap_with_parent_module(
     child_labware: LabwareDefinition,
     parent_module_model: ModuleModel,
-    deck_definition: DeckDefinitionV6,
 ) -> Point:
     """Get the child labware's overlap with the parent module model."""
     child_labware_overlap = child_labware.stackingOffsetWithModule.get(
         str(parent_module_model.value)
     )
     if not child_labware_overlap:
-        if _is_thermocycler_on_ot2(parent_module_model, deck_definition):
-            return _OFFSET_ON_TC_OT2
-        else:
-            return Point(x=0, y=0, z=0)
-
-    return Point.from_xyz_attrs(child_labware_overlap)
-
-
-def _feature_exception_offsets(
-    parent_deck_item: _LabwareStackupDefinition,
-    deck_definition: DeckDefinitionV6,
-) -> Point:
-    """These offsets are intended for legacy reasons only and should generally be avoided post labware schema 2.
-
-    If you need to make exceptions for a parent-child stackup, use the `custom` locating feature.
-    """
-    if isinstance(parent_deck_item, ModuleDefinition) and _is_thermocycler_on_ot2(
-        parent_deck_item.model, deck_definition
-    ):
-        return _OFFSET_ON_TC_OT2
-    else:
         return Point(x=0, y=0, z=0)
 
-
-def _is_thermocycler_on_ot2(
-    parent_module_model: ModuleModel,
-    deck_definition: DeckDefinitionV6,
-) -> bool:
-    """Whether the given parent module is a thermocycler with the current deck being an OT2 deck."""
-    robot_model = deck_definition["robot"]["model"]
-    return (
-        parent_module_model
-        in [ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2]
-        and robot_model == "OT-2 Standard"
-    )
+    return Point.from_xyz_attrs(child_labware_overlap)
 
 
 def _get_labware_footprint_as_child(

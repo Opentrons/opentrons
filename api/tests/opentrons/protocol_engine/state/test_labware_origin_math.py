@@ -610,7 +610,6 @@ _ADDRESSABLE_AREA_WITH_FLEX_TIP_RACK_LID = AddressableArea(
 class ModuleOverlapSpec(NamedTuple):
     """Spec data to test module overlap behavior."""
 
-    spec_deck_definition: DeckDefinitionV6
     module_definition: ModuleDefinition
     child_definition: LabwareDefinition2
     labware_location: ModuleLocation
@@ -659,21 +658,18 @@ class GripperOffsetSpec(NamedTuple):
 
 MODULE_OVERLAP_SPECS: List[ModuleOverlapSpec] = [
     ModuleOverlapSpec(
-        spec_deck_definition=load_deck(DeckType.OT3_STANDARD, 6),
         module_definition=_MODULE_DEF_TEMP_V2,
         child_definition=_LW_V2_WITH_MODULE_STACKING,
         labware_location=ModuleLocation(moduleId="module-1"),
         expected_total_offset=Point(x=100, y=150, z=200),
     ),
     ModuleOverlapSpec(
-        spec_deck_definition=load_deck(DeckType.OT3_STANDARD, 6),
         module_definition=_MODULE_DEF_TC_V2,
         child_definition=_LW_V2,
         labware_location=ModuleLocation(moduleId="module-1"),
         expected_total_offset=Point(x=150, y=250, z=350),
     ),
     ModuleOverlapSpec(
-        spec_deck_definition=load_deck(DeckType.OT3_STANDARD, 6),
         module_definition=_MODULE_DEF_TC_V2,
         child_definition=_LW_V2_WITH_MODULE_STACKING,
         labware_location=ModuleLocation(moduleId="module-1"),
@@ -908,7 +904,6 @@ GRIPPER_OFFSET_SPECS: List[GripperOffsetSpec] = [
     argvalues=MODULE_OVERLAP_SPECS,
 )
 def test_get_parent_placement_origin_to_lw_origin_with_module(
-    spec_deck_definition: DeckDefinitionV6,
     module_definition: ModuleDefinition,
     child_definition: LabwareDefinition2,
     labware_location: ModuleLocation,
@@ -922,7 +917,7 @@ def test_get_parent_placement_origin_to_lw_origin_with_module(
         ],
         underlying_ancestor_definition=module_definition,
         slot_name=DeckSlotName.SLOT_B1,
-        deck_definition=spec_deck_definition,
+        deck_definition=load_deck(DeckType.OT3_STANDARD, 6),
     )
 
     assert result == expected_total_offset
