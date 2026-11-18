@@ -1,4 +1,4 @@
-import type { WaitForResumeRunTimeCommand } from '@opentrons/shared-data/command'
+import type { WaitForResumeRunTimeCommand } from '@opentrons/shared-data'
 import type { HandlesCommands } from '../types'
 
 export function getWaitForResumeCommandText({

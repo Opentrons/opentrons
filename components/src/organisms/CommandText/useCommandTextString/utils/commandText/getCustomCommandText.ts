@@ -1,4 +1,4 @@
-import type { CustomRunTimeCommand } from '@opentrons/shared-data/command'
+import type { CustomRunTimeCommand } from '@opentrons/shared-data'
 import type { HandlesCommands } from '../types'
 
 export function getCustomCommandText({

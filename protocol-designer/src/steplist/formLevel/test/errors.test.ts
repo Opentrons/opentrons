@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { fixture_tiprack_10_ul } from '@opentrons/shared-data/labware/fixtures/2'
+import { fixtureTiprack10ul } from '@opentrons/shared-data'
 
 import { volumeTooHigh } from '../errors'
 
@@ -19,7 +19,7 @@ describe('volumeTooHigh', () => {
             },
           },
         },
-        tiprackLabwareDef: [{ ...fixture_tiprack_10_ul }], // max tip volume is 10 ul
+        tiprackLabwareDef: [{ ...fixtureTiprack10ul }], // max tip volume is 10 ul
       },
     }
   })

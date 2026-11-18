@@ -9,7 +9,7 @@ import {
 } from '../../../fixtures'
 import { thermocyclerProfileStep } from '../thermocyclerProfileStep'
 
-import type { CreateCommand } from '@opentrons/shared-data/command'
+import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   ThermocyclerModuleState,
   ThermocyclerProfileStepArgs,

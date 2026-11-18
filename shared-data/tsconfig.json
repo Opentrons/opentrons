@@ -5,7 +5,7 @@
     "composite": true,
     "rootDir": ".",
     "outDir": "lib",
-    "moduleResolution": "node"
+    "moduleResolution": "bundler"
   },
   "module": "ESNext",
   "include": [
