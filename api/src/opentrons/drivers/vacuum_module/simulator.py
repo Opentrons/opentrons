@@ -1,3 +1,4 @@
+from dataclasses import replace
 from typing import Dict, Optional
 
 from .abstract import AbstractVacuumModuleDriver
@@ -208,5 +209,9 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
             self._waste_config.min_waste_depth_mbar = min_waste_depth_mbar
 
     async def get_waste_configs(self) -> WasteConfigParameters:
-        """Get the waste full detection configs"""
-        return self._waste_config
+        """Get the waste full detection configs.
+
+        Return a copy. The real driver parses a new object from the response,
+        so a later set must not change an earlier readback.
+        """
+        return replace(self._waste_config)
