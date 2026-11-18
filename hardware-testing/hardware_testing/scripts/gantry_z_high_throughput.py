@@ -37,9 +37,9 @@ PARTIAL_PICK_UP_CURRENT = 0.75
 
 # Approximate usable gantry travel used to build deck corner points
 MAX_TRAVEL_MM = {
-    Axis.X: 427,
-    Axis.Y: 408,
-    Axis.Z_L: 249,
+    Axis.X: 427.96,
+    Axis.Y: 408.26,
+    Axis.Z_L: 249.89,
 }
 
 # How far down from current Z to drop before the tip-pick plunge
@@ -48,33 +48,36 @@ MIN_LEFT_X_OFFSET = -70
 MIN_LEFT_Y_OFFSET = 74
 
 # Keep max corner slightly inset from hard travel limits
-MAX_REAR_Y_OFFSET = 21
-MAX_RIGHT_X_OFFSET = 1
+MAX_LEFT_Y_OFFSET = 21
+MAX_LEFT_X_OFFSET = 1
+MAX_LEFT_Z_OFFSET = 1
 
-MAX_RIGHT_POINT = Point(x=MAX_TRAVEL_MM[Axis.X] - MAX_RIGHT_X_OFFSET,
-                            y=MAX_TRAVEL_MM[Axis.Y] - MAX_REAR_Y_OFFSET,
-                            z = MAX_TRAVEL_MM[Axis.Z])
+Z_MIN_OFFSET = 150
+
+POINT_MAX_LEFT = Point(x=MAX_TRAVEL_MM[Axis.X] - MAX_LEFT_X_OFFSET,
+                            y=MAX_TRAVEL_MM[Axis.Y] - MAX_LEFT_Y_OFFSET,
+                            z = MAX_TRAVEL_MM[Axis.Z] - MAX_LEFT_Z_OFFSET)
 MIN_LEFT_POINT = Point(
                         x=MIN_LEFT_X_OFFSET,
                         y=MIN_LEFT_Y_OFFSET,
-                        z=MAX_RIGHT_POINT.z
+                        z=POINT_MAX_LEFT.z - PREP_POSITION_BLOCK_LOCATION
                     )
 
 # Bowtie path on LEFT mount only.
 # int keys → move_to targets; str keys → tip-pick routines (Point unused).
 # Stall axis for int moves is inferred from start→target deltas (see _axis_label_for_move).
 BOWTIE_COORDINATES: Dict[Union[str, int], Point] = {
-    0: MAX_RIGHT_POINT,  # back right and up
-    1: MIN_LEFT_POINT._replace(z=MAX_RIGHT_POINT.z),  # front left and up
+    0: POINT_MAX_LEFT,  # back right and up
+    1: MIN_LEFT_POINT._replace(z=POINT_MAX_LEFT.z),  # front left and up
     2: MIN_LEFT_POINT,  # front left and down
     "Tip Pick Up - 1": Point(0, 0, 0),
-    3: MIN_LEFT_POINT._replace(y=MAX_RIGHT_POINT.y),  # back left and down
-    4: MAX_RIGHT_POINT._replace(x=MIN_LEFT_POINT.x),  # back left and up
-    5: MAX_RIGHT_POINT._replace(y=MIN_LEFT_POINT.y),  # front right and up
-    6: MIN_LEFT_POINT._replace(x=MAX_RIGHT_POINT.x),  # front right and down
+    3: MIN_LEFT_POINT._replace(y=POINT_MAX_LEFT.y),  # back left and down
+    4: POINT_MAX_LEFT._replace(x=MIN_LEFT_POINT.x),  # back left and up
+    5: POINT_MAX_LEFT._replace(y=MIN_LEFT_POINT.y),  # front right and up
+    6: MIN_LEFT_POINT._replace(x=POINT_MAX_LEFT.x),  # front right and down
     "Tip Pick Up - 2": Point(0, 0, 0),
-    7: MAX_RIGHT_POINT._replace(z=MIN_LEFT_POINT.z),  # back right and down
-    8: MAX_RIGHT_POINT,  # back right and up
+    7: POINT_MAX_LEFT._replace(z=MIN_LEFT_POINT.z),  # back right and down
+    8: POINT_MAX_LEFT,  # back right and up
 }
 
 # Per-cycle CSV columns written by _main (includes pick-up current for HT)
@@ -248,8 +251,10 @@ async def _bowtie_move(api) -> tuple:
     # Seed last_point from live position so move 0's stall axis is classified correctly
     cur = await api.current_position_ot3(mount, refresh=True)
     last_point = Point(cur[Axis.X], cur[Axis.Y], cur[Axis.Z_L])
-
+    print(f"bowtie coordinates: {BOWTIE_COORDINATES}\n")
     for key in BOWTIE_COORDINATES.keys():
+        print(f"key: {key}\n")
+        print(f"BOWTIE_COORDINATES[key]: {BOWTIE_COORDINATES[key]}\n")
         if isinstance(key, int):
             # --- Integer keys: gantry move_to segments ---
             print(f">> Move {key} <<\n")
@@ -268,21 +273,25 @@ async def _bowtie_move(api) -> tuple:
             print(f">> {key} <<\n")
             print("Moving mount down to calibration block...\n")
             try:
-                tip_pick_up_pos = await api.current_position_ot3(mount, refresh=True)
+                tip_pick_up_pos = await api.current_position_ot3(mount, 
+                                    critical_point=CriticalPoint.NOZZLE, refresh=True)
                 print(f"tip_pick_up_pos: {tip_pick_up_pos}\n")
                 await api.move_to(
                     mount,
                     Point(
                         tip_pick_up_pos[Axis.X],
                         tip_pick_up_pos[Axis.Y],
-                        tip_pick_up_pos[Axis.Z_L] - PREP_POSITION_BLOCK_LOCATION,
+                        tip_pick_up_pos[Axis.Z_L],
                     ),
+                    critical_point = CriticalPoint.NOZZLE
                 )
-                tip_len = TIP_LENGTH_MM
+                tip_len = TIP_LENGTH_MM - 10.5
                 print(f"tip_len: {tip_len}\n")
                 print(f"picking up tip with mount: {mount}\n")
                 # Plunge as if picking a tip (loads Z); then clear tip state and rise
                 await api.pick_up_tip(mount, tip_len, prep_after=False)
+                current_position = await api.current_position_ot3(mount, critical_point=CriticalPoint.TIP, refresh=True)
+                print(f"current_position: {current_position}\n")
                 api.remove_tip(mount)
                 print(f"Moving mount back up to previous position...\n")
                 await api.move_to(
@@ -292,7 +301,10 @@ async def _bowtie_move(api) -> tuple:
                         tip_pick_up_pos[Axis.Y],
                         tip_pick_up_pos[Axis.Z_L],
                     ),
+                    critical_point = CriticalPoint.NOZZLE,
                 )
+                current_position = await api.current_position_ot3(mount, refresh=True)
+                print(f"current_position: {current_position}\n")
                 last_point = Point(
                     tip_pick_up_pos[Axis.X],
                     tip_pick_up_pos[Axis.Y],
