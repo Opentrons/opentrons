@@ -661,6 +661,7 @@
   "view_realtime_video": "View real-time video of the deck while a running a protocol.",
   "view_recent_runs": "View Recent Runs",
   "view_robot_generated_key": "View robot generated key",
+  "view_update": "View update",
   "welcome_description": "Quickly run protocols and check on your robot's status right on your lab bench.",
   "wifi": "Wi-Fi",
   "wired_ip": "Wired IP",
