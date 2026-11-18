@@ -16,6 +16,8 @@ from opentrons.hardware_control.modules.vacuum_module import VacuumModule
 from opentrons.drivers.vacuum_module.errors import WasteContainerFull
 from opentrons.drivers.vacuum_module.types import VentState
 
+from .common import vent_bleed_failed
+
 
 TARGET_PRESSURES = [-600]
 # waste_detector.hpp arms within 20 mbar for 2 s, then needs 6 s sealed below
@@ -135,9 +137,7 @@ def _diag_from_samples(samples: List[WasteSample], target: float) -> WasteDiag:
             brake_t.append(sample.t_s)
             brake_g.append(sample.gauge)
     mean_abs_ab = sum(abs_ab) / len(abs_ab) if abs_ab else None
-    return WasteDiag(
-        on_target_s, brake_s, mean_abs_ab, _gauge_slope(brake_t, brake_g)
-    )
+    return WasteDiag(on_target_s, brake_s, mean_abs_ab, _gauge_slope(brake_t, brake_g))
 
 
 def _sample_columns() -> List[Any]:
@@ -565,7 +565,10 @@ async def test_waste_full(
 
 async def run(vacuum: VacuumModule, report: CSVReport, section: str) -> None:
     """Run."""
-    print("Waste detection")
+    if vent_bleed_failed(report):
+        ui.print_error("Vent bleed failed. Skipping waste-full.")
+        return
+
     try:
         await test_waste_config_roundtrip(vacuum, report, section)
         await test_waste_empty(vacuum, report, section)

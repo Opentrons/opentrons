@@ -57,12 +57,12 @@ TESTS = [
         test_pressure_atm_basic.run,
     ),
     (
-        TestSection.VENT,
-        test_vent.run,
-    ),
-    (
         TestSection.PUMP_BASIC,
         test_pump_basic.run,
+    ),
+    (
+        TestSection.VENT,
+        test_vent.run,
     ),
     (
         TestSection.VACUUM_FUNCTIONAL,

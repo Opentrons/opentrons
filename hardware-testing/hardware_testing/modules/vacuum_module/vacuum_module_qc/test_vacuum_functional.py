@@ -1,6 +1,5 @@
 """Test the pressure regulation."""
 
-import math
 import asyncio
 import time
 from typing import List, NamedTuple, Optional, Union
@@ -16,6 +15,8 @@ from hardware_testing.data.csv_report import (
 
 from opentrons.hardware_control.modules.vacuum_module import VacuumModule
 from opentrons.drivers.vacuum_module.types import VentState
+
+from .common import ATMOSPHERE_WAIT_S, vent_bleed_failed
 
 
 # 200 samples at 0.45 s = 90 s hold; last 50 samples = 30 s steady window.
@@ -207,16 +208,33 @@ async def test_vacuum_regulation(
     await vacuum.set_vacuum_state(False)
     await vacuum.set_vent_state(VentState.OPENED)
 
-    # Wait for the Pressure to equalize
-    for i in range(10):
-        await vacuum._reader.update_vacuum_state()
-        state = vacuum.vacuum_state
-        equalized = math.isclose(
-            state.pressure_abs_b, state.pressure_atm, abs_tol=PRESSURE_TOLERANCE
+    # The class logs and returns on timeout. It does not raise.
+    await vacuum.wait_for_pressure_equalization(ATMOSPHERE_WAIT_S)
+    if not vacuum.pressure_equalized:
+        gauge = vacuum.current_gauge_pressure_mbar
+        ui.print_error(
+            "atmosphere wait timed out after "
+            f"{ATMOSPHERE_WAIT_S:.0f}s: gauge={gauge:.1f}"
+            " make sure the valve is working."
         )
-        if equalized:
-            break
-        await asyncio.sleep(1)
+
+        # mean_pressure is the gauge still left after the vent wait.
+        report(
+            section,
+            f"vacuum-target-pressure-{target_pressure}",
+            [
+                CSVResult.from_bool(False),
+                -1.0,
+                -1.0,
+                round(gauge, 2),
+                -1.0,
+                -1.0,
+                -1.0,
+                *([None] * PRESSURE_SAMPLES),
+            ],
+        )
+        return
+    print(f"at atmosphere: gauge={vacuum.current_gauge_pressure_mbar:.1f}")
 
     # Make sure the motor is not moving
     await vacuum._reader.update_pump_state()
@@ -299,6 +317,10 @@ async def test_vacuum_regulation(
 
 async def run(vacuum: VacuumModule, report: CSVReport, section: str) -> None:
     """Run."""
+    if vent_bleed_failed(report):
+        ui.print_error("Vent bleed failed. Skipping functional holds.")
+        return
+
     ui.get_user_ready(
         "Make sure the hose is connected to the module and there is a filter\n"
         "plate with liquid on the manifold"
