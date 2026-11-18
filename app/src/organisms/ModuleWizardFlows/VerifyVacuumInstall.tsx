@@ -408,7 +408,7 @@ function VacuumVerificationFailed({
           </>
         ) : (
           <>
-            <SecondaryButton onClick={onContinueAnyway}>
+            <SecondaryButton onClick={onContinueAnyway} isDangerous>
               {t('continue_anyway')}
             </SecondaryButton>
             <PrimaryButton onClick={onRetry}>

@@ -86,6 +86,6 @@
   "target_vacuum_pressure_unmet": "Target vacuum pressure unmet: {{current}} / {{target}} mbar",
   "try_again": "try again",
   "tubes_must_be_secured": "All tubes must be securely connected to maintain an airtight seal.",
-  "vacuum_verification_failed_description": "Ensure tube connections are secure and the collar and non-filter plate are fully seated.",
+  "vacuum_verification_failed_description": "Ensure tube connections are secure and the collar and non-filter plate are fully seated. Try again or continue setup.",
   "verifying_vacuum_seal": "Stand back, reaching target vacuum pressure"
 }
