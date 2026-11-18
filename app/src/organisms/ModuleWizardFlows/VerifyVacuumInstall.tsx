@@ -305,9 +305,14 @@ function VacuumCheckCollarScreen({
         </AnimationVideo>
       }
       bodyText={
-        <StyledText css={BODY_STYLE}>
-          {t('collar_block_description')}
-        </StyledText>
+        <>
+          <StyledText css={BODY_STYLE}>
+            {t('collar_block_description')}
+          </StyledText>
+          <StyledText css={BODY_STYLE}>
+            {t('collar_block_description_2')}
+          </StyledText>
+        </>
       }
       back={onBack}
       proceed={onContinue}
