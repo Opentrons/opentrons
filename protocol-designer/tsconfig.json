@@ -15,6 +15,7 @@
     }
   ],
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "rootDir": "src",
     "outDir": "lib",
     "paths": {

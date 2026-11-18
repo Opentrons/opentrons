@@ -39,7 +39,7 @@ export function DownloadDeleteRunRecordWizard({
   }
 
   return (
-    <DownloadDeleteRecordFlow<null>
+    <DownloadDeleteRecordFlow<void>
       copy={copyProps}
       showChoiceScreen={!initialDeleteAfterDownload}
       initialDeleteAfterDownload={initialDeleteAfterDownload}

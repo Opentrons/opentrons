@@ -12,6 +12,8 @@
     }
   ],
   "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "composite": true,
     "rootDir": "src",
     "outDir": "lib",
