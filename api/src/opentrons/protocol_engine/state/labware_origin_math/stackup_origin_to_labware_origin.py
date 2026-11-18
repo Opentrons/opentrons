@@ -142,27 +142,28 @@ def _get_stackup_origin_to_lw_origin(
     if isinstance(
         location, (AddressableAreaLocation, DeckSlotLocation, ModuleLocation)
     ):
-        return _get_parent_placement_origin_to_lw_origin_by_location(
-            labware_location=location,
-            labware_definition=definition,
-            parent_definition=underlying_ancestor_definition,
+        return _get_parent_placement_origin_to_lw_origin(
+            child_labware=definition,
+            parent_deck_item=underlying_ancestor_definition,  # type: ignore[arg-type]
             deck_definition=deck_definition,
             is_topmost_labware=is_topmost_labware,
+            labware_location=location,  # type: ignore[arg-type]
             underlying_ancestor_orientation=underlying_ancestor_orientation,
         )
     elif isinstance(location, OnLabwareLocation):
         parent_definition = stackup_lw_info_top_to_bottom[1][0]
 
         parent_placement_origin_to_lw_origin = (
-            _get_parent_placement_origin_to_lw_origin_by_location(
-                labware_location=location,
-                labware_definition=definition,
-                parent_definition=parent_definition,
+            _get_parent_placement_origin_to_lw_origin(
+                child_labware=definition,
+                parent_deck_item=parent_definition,
                 deck_definition=deck_definition,
                 is_topmost_labware=is_topmost_labware,
+                labware_location=location,
                 underlying_ancestor_orientation=underlying_ancestor_orientation,
             )
         )
+
         remaining_lw_defs_locs_top_to_bottom = stackup_lw_info_top_to_bottom[1:]
 
         return parent_placement_origin_to_lw_origin + _get_stackup_origin_to_lw_origin(
@@ -205,45 +206,6 @@ def _get_underlying_ancestor_orientation(
         return underlying_ancestor_definition.orientation
     else:
         return underlying_ancestor_definition["orientation"]
-
-
-def _get_parent_placement_origin_to_lw_origin_by_location(
-    labware_location: LabwareLocation,
-    labware_definition: LabwareDefinition,
-    parent_definition: _LabwareStackupDefinition,
-    deck_definition: DeckDefinitionV6,
-    underlying_ancestor_orientation: ModuleOrientation,
-    is_topmost_labware: bool,
-) -> Point:
-    if isinstance(labware_location, ModuleLocation):
-        return _get_parent_placement_origin_to_lw_origin(
-            child_labware=labware_definition,
-            parent_deck_item=parent_definition,  # type: ignore[arg-type]
-            deck_definition=deck_definition,
-            is_topmost_labware=is_topmost_labware,
-            labware_location=labware_location,
-            underlying_ancestor_orientation=underlying_ancestor_orientation,
-        )
-    elif isinstance(labware_location, OnLabwareLocation):
-        return _get_parent_placement_origin_to_lw_origin(
-            child_labware=labware_definition,
-            parent_deck_item=parent_definition,  # type: ignore[arg-type]
-            deck_definition=deck_definition,
-            is_topmost_labware=is_topmost_labware,
-            labware_location=labware_location,
-            underlying_ancestor_orientation=underlying_ancestor_orientation,
-        )
-    elif isinstance(labware_location, (DeckSlotLocation, AddressableAreaLocation)):
-        return _get_parent_placement_origin_to_lw_origin(
-            child_labware=labware_definition,
-            parent_deck_item=parent_definition,  # type: ignore[arg-type]
-            deck_definition=deck_definition,
-            is_topmost_labware=is_topmost_labware,
-            labware_location=labware_location,
-            underlying_ancestor_orientation=underlying_ancestor_orientation,
-        )
-    else:
-        raise ValueError(f"Invalid labware location: {labware_location}")
 
 
 @overload
