@@ -43,7 +43,7 @@ MAX_TRAVEL_MM = {
 }
 
 # How far down from current Z to drop before the tip-pick plunge
-PREP_POSITION_BLOCK_LOCATION = 188
+PREP_POSITION_BLOCK_LOCATION = 158
 MIN_LEFT_X_OFFSET = -70
 MIN_LEFT_Y_OFFSET = 74
 
@@ -276,24 +276,27 @@ async def _bowtie_move(api) -> tuple:
                 tip_pick_up_pos = await api.current_position_ot3(mount, 
                                     critical_point=CriticalPoint.NOZZLE, refresh=True)
                 print(f"tip_pick_up_pos: {tip_pick_up_pos}\n")
+                prep_position = 30
                 await api.move_to(
                     mount,
                     Point(
                         tip_pick_up_pos[Axis.X],
                         tip_pick_up_pos[Axis.Y],
-                        tip_pick_up_pos[Axis.Z_L],
+                        tip_pick_up_pos[Axis.Z_L] - prep_position,
                     ),
                     critical_point = CriticalPoint.NOZZLE
                 )
-                tip_len = TIP_LENGTH_MM - 10.5
+                tip_len = TIP_LENGTH_MM
                 print(f"tip_len: {tip_len}\n")
                 print(f"picking up tip with mount: {mount}\n")
                 # Plunge as if picking a tip (loads Z); then clear tip state and rise
                 await api.pick_up_tip(mount, tip_len, prep_after=False)
-                current_position = await api.current_position_ot3(mount, critical_point=CriticalPoint.TIP, refresh=True)
-                print(f"current_position: {current_position}\n")
+                current_position = await api.current_position_ot3(mount, critical_point=CriticalPoint.NOZZLE, refresh=True)
+                encoder_position = await api.encoder_current_position_ot3(mount, critical_point=CriticalPoint.NOZZLE, refresh=True)
+                print(f"pick up tip: {current_position}\n")
+                print(f"encoder position: {encoder_position}\n")
                 api.remove_tip(mount)
-                print(f"Moving mount back up to previous position...\n")
+                # print(f"Moving mount back up to previous position...\n")
                 await api.move_to(
                     mount,
                     Point(
@@ -303,8 +306,6 @@ async def _bowtie_move(api) -> tuple:
                     ),
                     critical_point = CriticalPoint.NOZZLE,
                 )
-                current_position = await api.current_position_ot3(mount, refresh=True)
-                print(f"current_position: {current_position}\n")
                 last_point = Point(
                     tip_pick_up_pos[Axis.X],
                     tip_pick_up_pos[Axis.Y],
@@ -358,6 +359,8 @@ async def _main(is_simulating: bool, cycles: int, mount: OT3Mount) -> None:
     )
     await api.cache_instruments()
     await api.home()
+    pipette_config = api._pipette_handler.get_pipette(OT3Mount.LEFT).config
+    pipette_config.end_tip_action_retract_distance_mm = 0.0
     load = api.gantry_load
     robot_name = get_robot_name()
     test_name = "gantry-z-lifetime-test"
