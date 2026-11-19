@@ -18,7 +18,6 @@ from opentrons_shared_data.labware.labware_definition import (
 from opentrons_shared_data.labware.types import (
     LocatingFeatures,
     SlotFootprintAsChildFeature,
-    SlotFootprintAsParentFeature,
     SpringDirectionalForce,
 )
 from opentrons_shared_data.labware.types import (
@@ -526,7 +525,7 @@ def _get_standardized_parent_deck_item(
     ],
 ) -> _Labware3SupportedParentDefinition:
     """Returns a standardized parent deck item interface."""
-    if isinstance(parent_deck_item, ModuleDefinition):
+    if isinstance(parent_deck_item, (ModuleDefinition, LabwareDefinition3)):
         return _Labware3SupportedParentDefinition(
             features=parent_deck_item.features, extents=parent_deck_item.extents
         )
@@ -543,10 +542,6 @@ def _get_standardized_parent_deck_item(
         )
         return _Labware3SupportedParentDefinition(
             parent_deck_item.features, extents=extents
-        )
-    elif isinstance(parent_deck_item, LabwareDefinition3):
-        return _Labware3SupportedParentDefinition(
-            features=parent_deck_item.features, extents=parent_deck_item.extents
         )
     # The slotDefV3 case.
     else:
