@@ -91,8 +91,6 @@ export function WellTooltip({
 
   useWellTooltipPopper(tooltipEl, referenceRect)
 
-  console.log('tooltipWellIngreds', tooltipWellIngreds)
-
   const totalLiquidVolume = reduce(
     tooltipWellIngreds,
     (acc, ingred) => acc + ingred.volume,
