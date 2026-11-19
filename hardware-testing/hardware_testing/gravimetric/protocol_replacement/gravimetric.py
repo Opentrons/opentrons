@@ -1,21 +1,26 @@
 """Gravimetric QC protocol."""
 
-from typing import List, Dict, Tuple, Optional
-from dataclasses import dataclass, asdict
+from typing import List, Dict, Tuple, Optional, Any, Union, cast, Generator
+from contextlib import contextmanager
+from dataclasses import dataclass, asdict, replace
 from time import time
 import copy
 import json
 import traceback
+import asyncio
 
 from opentrons.protocol_api import (
     ProtocolContext,
     ParameterContext,
     InstrumentContext,
+    Labware,
     Well,
     Liquid,
     LiquidClass,
     OFF_DECK,
+    TrashBin,
 )
+from opentrons.protocol_api.module_contexts import FlexStackerContext
 from opentrons.protocol_api._liquid_properties import TransferProperties
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     Coordinate,
@@ -25,18 +30,38 @@ from opentrons.protocol_api.core.engine import (
     transfer_components_executor as tx_comps_executor,
     pipette_movement_conflict,
 )
-from opentrons.config import IS_ROBOT
+from opentrons.config import IS_ROBOT, name as get_robot_name
 from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
 from opentrons.hardware_control.types import OT3AxisKind, OT3Mount, Axis
 from opentrons.types import Point, DeckSlotName, Location
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
 
-metadata = {"protocolName": "Gravimetric QC V4"}
-requirements = {"robotType": "Flex", "apiLevel": "2.29"}
+from hardware_testing.data import create_run_id, get_git_description
+from hardware_testing.data.ui import (  # noqa: F401
+    set_output_file,
+    print_info,
+    print_title,
+    print_header,
+    print_warning,
+    print_error,
+)
+
+from hardware_testing.drivers import asair_sensor as AsairDriver
+from hardware_testing.drivers import ImpactProtectionV2
+from hardware_testing.drivers import (
+    ImpactProtection_96ch as ImpactProtection96chDriver,
+)
+from hardware_testing.opentrons_api.helpers_ot3 import (
+    clear_pipette_ul_per_mm,
+)
+
+from hardware_testing.drivers.data_center_client import (
+    upload_data_to_google_drive,
+)
 
 # ------ TODO remove and move necessary libraries into a standard release library. ----
-import importlib.util
+import importlib
 import os
 from opentrons.config import infer_config_base_dir
 from opentrons import version
@@ -79,26 +104,8 @@ if not IS_ROBOT or importlib.util.find_spec("hardware_testing") is None:
         _download_and_extract(release, base_dir)
     sys.path.append(base_dir)
 
-from hardware_testing.drivers import asair_sensor as AsairDriver  # noqa: E402
-from hardware_testing.drivers import ImpactProtectionV2  # noqa: E402
-from hardware_testing.opentrons_api.helpers_ot3 import (  # noqa: E402
-    clear_pipette_ul_per_mm,
-)
-
-from hardware_testing.drivers.data_center_client import (  # noqa: E402
-    upload_data_to_google_drive,
-)
-from hardware_testing.data import create_run_id, get_git_description  # noqa: E402
-from hardware_testing.data.ui import (  # noqa: F401, E402
-    set_output_file,
-    print_info,
-    print_title,
-    print_header,
-    print_warning,
-    print_error,
-)
-
 # ----- END: TODO ------
+
 
 from hardware_testing.gravimetric.measurement import (  # noqa: E402
     create_measurement_tag,
@@ -118,12 +125,64 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
     GravimetricRecorder,
     GravimetricRecorderConfig,
 )
+
 from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
 
+
+metadata = {"protocolName": "Gravimetric QC V4"}
+requirements = {"robotType": "Flex", "apiLevel": "2.29"}
+
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
+IMPACT_96CH_PIPETTE_MOVE_WAIT_SECONDS = 15
+RIGHT_PIPETTE_IDLE_HOLD_CURRENT_AMPS = 0.1
+
+# Dual P50M/P1000M runs use a registered Flex Trash Bin in A1.
+DUAL_MULTI_TRASH_SLOT = "A1"
+
+
+# =============================================================================
+# Merge review map
+# =============================================================================
+#
+# This file is the v9.1.0 gravimetric baseline plus stacker and 96ch impact
+# extensions. Use this map to review what changed without losing sight of the
+# production CSV contract.
+#
+# Files in scope:
+# - gravimetric.py: stacker-aware orchestration, deferred probe flow, and
+#   end-of-run cleanup.
+# - ImpactProtectionV2.py: port-aware V2 driver and ctx-aware connection
+#   helpers used by the protocol.
+# - ImpactProtection_96ch.py: new 96ch impact driver with Home/GetPipette and
+#   left-pipette selection commands.
+#
+# What should stay production-shaped:
+# - create_csv_test_report() call shape.
+# - store_config_gm(), store_serial_numbers(), store_measurement(),
+#   store_trial(), store_volume_per_channel(), store_volume_per_trial(),
+#   store_volume_all(), store_encoder(), store_average_evaporation().
+# - blank_trials handling and measurement loop ordering.
+#
+# Main extension zones:
+# - Runtime params: mounts_to_test, use_96ch_stackers, use_impact_protection_v2.
+# - FixtureSettings.build(): independent impact connections, stacker bootstrap, shared
+#   tiprack offsets, and optional trash-bin setup.
+# - run() / _run_fixture(): per-mount orchestration, cleanup, and upload.
+# - Stacker helpers: supply planning, rack refresh, recovery, and offset lookup.
+# - 96ch hook points: deferred liquid probe, stacker-safe home, and end-of-run
+#   home for the independent 96ch impact fixture.
+#
+# Review rule of thumb:
+# - If a change touches report writes or measurement tags, it may change CSV
+#   shape.
+# - If a change touches stacker inventory, impact fixtures, or mount selection,
+#   review the guarded extension sections.
+# - If a change touches the new 96ch driver, verify command names, response
+#   parsing, and home semantics.
+# =============================================================================
+
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
-
 fast_simulate_measurement = MeasurementData(
     grams_average=10,
     grams_cv=1.0,
@@ -214,6 +273,11 @@ QC_TEST_MIN_REQUIREMENTS: Dict[
 }
 
 
+# -----------------------------------------------------------------------------
+# Production CSV settings model, extended only with mounts_to_test.
+# -----------------------------------------------------------------------------
+
+
 @dataclass(kw_only=True)
 class CSVSettings:
     """All of the settings that are loaded from the CSV runtime parameter."""
@@ -221,6 +285,7 @@ class CSVSettings:
     name: str
     increment: bool
     mount: str
+    mounts_to_test: List[str]
     pipette_volume: int
     pipette_channels: int
     tip_sizes: List[int]
@@ -272,7 +337,8 @@ class CSVSettings:
         if simulating:
             name = f"{name}-simulate"
         increment = bool(lookup_key("increment", csv_params)[0] == "TRUE")
-        mount = lookup_key("mount", csv_params)[0]
+        mounts_to_test = _parse_mounts_to_test(lookup_key("mount", csv_params))
+        mount = mounts_to_test[0]
         pipette_volume = int(lookup_key("pipette", csv_params)[0])
         pipette_channels = int(lookup_key("pipette", csv_params)[1])
         if pipette_channels == 8 and not increment:
@@ -375,6 +441,7 @@ class CSVSettings:
             name=name,
             increment=increment,
             mount=mount,
+            mounts_to_test=mounts_to_test,
             pipette_volume=pipette_volume,
             pipette_channels=pipette_channels,
             tip_sizes=tip_sizes,
@@ -410,6 +477,87 @@ class CSVSettings:
         )
 
 
+# -----------------------------------------------------------------------------
+# Production fixture settings, extended with stacker and 96ch impact state.
+# -----------------------------------------------------------------------------
+
+
+def _build_impact_protection_v2_with_port(
+    simulate: bool, ctx: ProtocolContext, skip_port: str
+) -> Tuple[ImpactProtectionV2.ImpactProtectionBase, Optional[str]]:
+    """Build V2 with either the custom or stock v9.1.0 driver API."""
+    builder = getattr(ImpactProtectionV2, "BuildImpactProtectionWithPort", None)
+    if callable(builder):
+        return cast(
+            Tuple[ImpactProtectionV2.ImpactProtectionBase, Optional[str]],
+            builder(simulate=simulate, ctx=ctx, skip_port=skip_port),
+        )
+
+    device = ImpactProtectionV2.BuildImpactProtection(
+        simulate=simulate,
+        skip_port=skip_port,
+    )
+    connected_port: Optional[str] = None
+    if not simulate:
+        port_value = getattr(device, "port", None)
+        connected_port = port_value() if callable(port_value) else port_value
+    return device, connected_port
+
+
+def _build_impact_protection_96ch_with_port(
+    simulate: bool,
+    ctx: ProtocolContext,
+    skip_ports: Optional[List[str]],
+) -> Tuple[Optional[Any], Optional[str]]:
+    """Build the custom 96ch driver, skipping it only during App analysis."""
+    if ImpactProtection96chDriver is None:
+        if not simulate:
+            raise RuntimeError(
+                "ImpactProtection_96ch driver is required for a real 96ch run."
+            )
+        print_warning(
+            "ImpactProtection_96ch driver is unavailable during App analysis; "
+            "skipping its simulated connection."
+        )
+        return None, None
+
+    return ImpactProtection96chDriver.BuildImpactProtection96chWithPort(
+        simulate=simulate,
+        ctx=ctx,
+        skip_port=skip_ports,
+    )
+
+
+def _cleanup_partial_fixture_build(
+    recorder: Optional[GravimetricRecorder],
+    env_sensor: Optional[Any],
+    impact_v2: Optional[Any],
+    impact_96ch: Optional[Any],
+) -> None:
+    """Release resources acquired before FixtureSettings.build() can return."""
+    if recorder is not None:
+        try:
+            recorder.stop()
+        except Exception as cleanup_error:
+            print_warning(f"Error stopping partial recorder: {cleanup_error}")
+        try:
+            recorder.deactivate()
+        except Exception as cleanup_error:
+            print_warning(f"Error deactivating partial recorder: {cleanup_error}")
+
+    for name, device in (
+        ("environment sensor", env_sensor),
+        ("Impact V2", impact_v2),
+        ("96ch impact fixture", impact_96ch),
+    ):
+        if device is not None and hasattr(device, "close"):
+            try:
+                device.close()
+            except Exception as cleanup_error:
+                print_warning(f"Error closing partial {name}: {cleanup_error}")
+    set_output_file(None)
+
+
 @dataclass
 class FixtureSettings(CSVSettings):
     """Dataclass to hold all the options for a gravimetric script."""
@@ -431,18 +579,38 @@ class FixtureSettings(CSVSettings):
     isolate_volumes: bool
     fast_simulate: bool
     use_impact_protection: bool
+    use_impact_protection_v2: bool
+    use_96ch_stackers: bool
+    run_evaporation: bool
     ImpactSerial_U: Optional[ImpactProtectionV2.ImpactProtectionBase]
+    ImpactSerial_96: Optional[Any]
+    stackers_96: Optional[Dict[str, "StackerState"]]
+    active_96ch_racks_by_slot: Dict[str, Labware]
+    tiprack_adapters_by_slot: Dict[str, Labware]
+    shared_tiprack_offsets_by_slot: Dict[str, Point]
 
     @classmethod
-    def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
+    def build(
+        cls,
+        ctx: ProtocolContext,
+        csv_params: Optional[List[List[str]]] = None,
+        csv_settings: Optional[CSVSettings] = None,
+        mount: Optional[str] = None,
+    ) -> "FixtureSettings":
         """Parse the CSV file and build the fixture settings."""
-        csv_params = (
-            ctx.params.qc_test_profile.parse_as_csv()  # type: ignore [attr-defined]
-        )
-        csv_settings = CSVSettings.parse_csv(csv_params, ctx.is_simulating())
+        if csv_params is None:
+            csv_params = (
+                ctx.params.qc_test_profile.parse_as_csv()  # type: ignore [attr-defined]
+            )
+        if csv_settings is None:
+            csv_settings = CSVSettings.parse_csv(csv_params, ctx.is_simulating())
+        if mount is not None:
+            csv_settings = replace(csv_settings, mount=mount)
 
-        source_well = ctx.load_labware(
-            csv_settings.labware_on_scale, csv_settings.slot_scale
+        source_well = _load_or_get_labware(
+            ctx,
+            csv_settings.labware_on_scale,
+            csv_settings.slot_scale,
         )[csv_settings.labware_on_scale_well_name]
         liquid_class = ctx.get_liquid_class(csv_settings.liquid_name)
         liquid = ctx.define_liquid(
@@ -460,7 +628,7 @@ class FixtureSettings(CSVSettings):
             helpers._override_check_safe_for_pipette_movement
         )
         if simulating:
-            pipette_tag = "pipette"
+            pipette_tag = f"pipette-{csv_settings.mount}"
         else:
             pipette_tag = helpers._get_tag_from_pipette(
                 pipette, csv_settings.increment, False
@@ -486,6 +654,7 @@ class FixtureSettings(CSVSettings):
         print_info(f"increment {csv_settings.increment}")
         print_info(f"trials {csv_settings.trials}")
         print_info(f"name {csv_settings.name}")
+        print_info(f"mount {csv_settings.mount}")
 
         print_info(str(importlib.util.find_spec("hardware_testing")))
         print_info(f"Running on bot {IS_ROBOT}")
@@ -510,19 +679,55 @@ class FixtureSettings(CSVSettings):
             recorder.set_simulation_mass(10)
         # record() waits until the scale thread emits a sample. During analysis
         # that wait never finishes, so start it only for a real test run.
-        env_sensor, link_port = AsairDriver.BuildAsairSensorWithPort(simulating)
-        env_serial = env_sensor.get_serial()
-        use_impact_protection = ctx.params.use_impact_protection  # type: ignore [attr-defined]
-        # 链接防撞工装
+        env_sensor = None
         ImpactSerial = None
-        if use_impact_protection:
-            # 确保skip_port是字符串，即使link_port为None
-            skip_port = link_port if link_port is not None else ""
-            ImpactSerial = ImpactProtectionV2.BuildImpactProtection(
-                simulate=simulating, skip_port=skip_port
+        ImpactSerial96 = None
+        try:
+            env_sensor, link_port = AsairDriver.BuildAsairSensorWithPort(simulating)
+            env_serial = env_sensor.get_serial()
+            use_impact_protection = ctx.params.use_impact_protection  # type: ignore [attr-defined]
+            use_impact_protection_v2 = bool(
+                getattr(ctx.params, "use_impact_protection_v2", False)
             )
-            assert ImpactSerial is not None
-            ctx.delay(seconds=1, msg=f"p {ImpactSerial.port}")
+            use_96ch_stackers = getattr(ctx.params, "use_96ch_stackers", True)
+            run_evaporation = bool(getattr(ctx.params, "run_evaporation", True))
+            impact_1ch_8ch_port = None
+            if use_impact_protection_v2:
+                skip_port = link_port if link_port is not None else ""
+                ImpactSerial, impact_1ch_8ch_port = (
+                    _build_impact_protection_v2_with_port(
+                        simulate=simulating, ctx=ctx, skip_port=skip_port
+                    )
+                )
+                print_info(
+                    "Impact V2 connected: "
+                    f"port={impact_1ch_8ch_port}, env_skip={link_port}"
+                )
+            else:
+                print_info("Impact V2 disabled by runtime parameter.")
+
+            if use_impact_protection and csv_settings.pipette_channels == 96:
+                skip_ports = [
+                    p for p in [link_port, impact_1ch_8ch_port] if p is not None
+                ] or None
+                ImpactSerial96, impact_96ch_port = (
+                    _build_impact_protection_96ch_with_port(
+                        simulate=simulating, ctx=ctx, skip_ports=skip_ports
+                    )
+                )
+                print_info(
+                    "96ch impact connected: "
+                    f"V2={impact_1ch_8ch_port}, 96ch={impact_96ch_port}, "
+                    f"env_skip={link_port}"
+                )
+        except Exception:
+            _cleanup_partial_fixture_build(
+                recorder,
+                env_sensor,
+                ImpactSerial,
+                ImpactSerial96,
+            )
+            raise
 
         ctx.delay(seconds=3, msg=f"simulating {simulating} {type(simulating)}")
 
@@ -534,8 +739,7 @@ class FixtureSettings(CSVSettings):
         robot_name = "Simulating"
         if IS_ROBOT:
             try:
-                with open("/data/ODD/discovery.json", "r") as disc:
-                    robot_name = json.load(disc)["robots"][0]["name"]
+                robot_name = get_robot_name()
             except Exception:
                 robot_name = "Error Reading Robot Name"
 
@@ -573,7 +777,25 @@ class FixtureSettings(CSVSettings):
         # todo fix set serial to take robot name and serial separate
         # do this after the set serial to overwrite where the name.
         test_report.set_robot_id(robot_serial)
-        ctx.load_trash_bin("A3")
+        try:
+            stackers_96 = _build_96ch_stackers(
+                ctx, csv_settings, use_96ch_stackers
+            )
+            if not _uses_96ch_stackers(
+                csv_settings, use_96ch_stackers
+            ) and not _uses_no_trash_runtime_settings(csv_settings):
+                _ensure_trash_bin(ctx, _trash_bin_slot(csv_settings))
+            _do_simulating_lpc_moves(
+                ctx, csv_settings, pipette, source_well, use_96ch_stackers
+            )
+        except Exception:
+            _cleanup_partial_fixture_build(
+                recorder,
+                env_sensor,
+                ImpactSerial,
+                ImpactSerial96,
+            )
+            raise
         return cls(
             ctx=ctx,
             run_id=run_id,
@@ -592,17 +814,24 @@ class FixtureSettings(CSVSettings):
             isolate_volumes=False,
             fast_simulate=fast_simulate,
             use_impact_protection=use_impact_protection,
-            ImpactSerial_U=ImpactSerial,
+            use_impact_protection_v2=use_impact_protection_v2,
+            use_96ch_stackers=use_96ch_stackers,
+            run_evaporation=run_evaporation,
+            ImpactSerial_U=cast(
+                Optional[ImpactProtectionV2.ImpactProtectionBase], ImpactSerial
+            ),
+            ImpactSerial_96=cast(Optional[Any], ImpactSerial96),
+            stackers_96=stackers_96,
+            active_96ch_racks_by_slot={},
+            tiprack_adapters_by_slot={},
+            shared_tiprack_offsets_by_slot={},
             **asdict(csv_settings),
         )
 
-    def validate_settings(self) -> bool:
-        """Make sure all the settings are valid."""
-        # TODO validate settings
-        # - Enough tips to handle all the volumes/trials
-        # - Tips fit on the given pipette
 
-        return True
+# -----------------------------------------------------------------------------
+# Production-compatible report config write.
+# -----------------------------------------------------------------------------
 
 
 def _store_config_as_old_style(fixture_settings: FixtureSettings) -> None:
@@ -630,7 +859,7 @@ def _store_config_as_old_style(fixture_settings: FixtureSettings) -> None:
         labware_on_scale=fixture_settings.labware_on_scale,
         slot_scale=DeckSlotName.from_primitive(fixture_settings.slot_scale).as_int(),
         blank=True,
-        gantry_speed=config.GANTRY_MAX_SPEED,
+        gantry_speed=int(fixture_settings.gantry_speed),
         scale_delay=fixture_settings.scale_delay,
         isolate_channels=[],
         isolate_volumes=[],
@@ -639,75 +868,56 @@ def _store_config_as_old_style(fixture_settings: FixtureSettings) -> None:
     report.store_config_gm(fixture_settings.test_report, old_style)
 
 
+# -----------------------------------------------------------------------------
+# Tip loading bridge.
+# -----------------------------------------------------------------------------
+#
+# Non-stacker paths mirror production tip selection. 96ch stacker paths refresh
+# racks first, then return the same kind of Well list that production code
+# expects.
+
+
 def _get_tips_for_test_single_multi(
     fixture_settings: FixtureSettings, tip: int, channel: int, blank: bool
 ) -> List[Well]:
     wells = []
-    loaded_labwares = fixture_settings.ctx.loaded_labwares
-    used_slots = [
-        str(DeckSlotName.from_primitive(slot).to_ot3_equivalent())
-        for slot in loaded_labwares.keys()
-    ]
-    partially_used = [slot for slot in fixture_settings.tips[tip] if slot in used_slots]
-    tipracks_lw = [
-        fixture_settings.ctx.load_labware(f"opentrons_flex_96_tiprack_{tip}uL", slot)
-        for slot in fixture_settings.tips[tip]
-        if slot not in partially_used
-    ]
+    tipracks_lw = _get_csv_tipracks(fixture_settings, tip)
     if fixture_settings.pipette_channels == 8:
         if fixture_settings.increment:
-            a_row_tips = tips.get_tips_for_all_channels_on_multi(
-                fixture_settings.ctx, tip
-            )
-            return [t for t in a_row_tips if t.has_tip]
+            a_row_tips = [
+                rack[f"A{col + 1}"] for rack in tipracks_lw for col in range(12)
+            ]
+            return [t for t in a_row_tips if _tip_has_not_been_used(t)]
         elif fixture_settings.cavity_test:
             # This should only ever be called once so hopefully this doesn't break anything
             # consume tips bottom to top, left to right
-            if len(tipracks_lw) != 0:
-                for rack in tipracks_lw:
-                    for col in range(1, 13):  # H->A
-                        for row in range(72, 64, -1):  # 1->12
-                            wells.append(rack[f"{chr(row)}{col}"])
-                return wells
-            else:
-                for rack_slot in partially_used:
-                    rack = loaded_labwares[
-                        DeckSlotName.from_primitive(rack_slot).as_int()
-                    ]
-                    for col in range(1, 13):  # H->A
-                        for row in range(72, 64, -1):  # 1->12
-                            next_tip = rack[f"{chr(row)}{col}"]
-                            if next_tip.has_tip:
-                                wells.append(next_tip)
-                return wells
+            for rack in tipracks_lw:
+                for col in range(1, 13):  # H->A
+                    for row in range(72, 64, -1):  # 1->12
+                        next_tip = rack[f"{chr(row)}{col}"]
+                        if _tip_has_not_been_used(next_tip):
+                            wells.append(next_tip)
+            return wells
 
         else:
-            return tips.get_tips_for_individual_channel_on_multi(
-                fixture_settings.ctx, channel, tip, fixture_settings.pipette_volume
-            )
+            return [
+                t
+                for t in tips.get_tips_for_individual_channel_on_multi(
+                    fixture_settings.ctx,
+                    channel,
+                    tip,
+                    fixture_settings.pipette_volume,
+                )
+                if _tip_has_not_been_used(t)
+            ]
 
-    wells += tips.get_unused_tips(fixture_settings.ctx, tip)
-    for rack in tipracks_lw:
-        wells += rack.wells()
-    return wells
+    return _get_unused_tips_from_racks(tipracks_lw)
 
 
 def _get_tips_for_test_96_single(
     fixture_settings: FixtureSettings, tip: int, blank: bool = False
 ) -> List[Well]:
-    wells = []
-    loaded_labwares = fixture_settings.ctx.loaded_labwares
-    used_slots = [
-        str(DeckSlotName.from_primitive(slot).to_ot3_equivalent())
-        for slot in loaded_labwares.keys()
-    ]
-    partially_used = [slot for slot in fixture_settings.tips[tip] if slot in used_slots]
-    _ = [
-        fixture_settings.ctx.load_labware(f"opentrons_flex_96_tiprack_{tip}uL", slot)
-        for slot in fixture_settings.tips[tip]
-        if slot not in partially_used
-    ]
-    wells += tips.get_unused_tips(fixture_settings.ctx, tip)
+    wells = _get_unused_tips_from_racks(_get_csv_tipracks(fixture_settings, tip))
     wells = sorted(
         wells,
         reverse=True,
@@ -719,22 +929,63 @@ def _get_tips_for_test_96_single(
 def _get_tips_for_test_96(
     fixture_settings: FixtureSettings, tip: int, blank: bool = False
 ) -> List[Well]:
-    adapter = "opentrons_flex_96_tiprack_adapter"
-    loaded_labwares = fixture_settings.ctx.loaded_labwares
-    used_slots = [
-        str(DeckSlotName.from_primitive(slot).to_ot3_equivalent())
-        for slot in loaded_labwares.keys()
+    if blank and tip == 50 and _uses_p1000h_extra_manual_exchange(fixture_settings):
+        return [_get_p1000h_extra_probe_tip(fixture_settings)]
+
+    if fixture_settings.stackers_96 is not None:
+        if blank:
+            probe_slots = [fixture_settings.tips[tip][0]]
+            tipracks_lw = _refresh_96ch_slot_group(fixture_settings, tip, probe_slots)
+            return [rack.wells()[0] for rack in tipracks_lw]
+
+        tipracks_lw = []
+        for group_index, group in enumerate(FIXED_96CH_SWAP_GROUPS):
+            slots = [slot for slot in group if slot in fixture_settings.tips[tip]]
+            if not slots:
+                continue
+            if (
+                _uses_p1000h_three_tip_stacker_plan(fixture_settings)
+                and tip == 1000
+            ):
+                remaining_slots = [
+                    slot
+                    for later_group in FIXED_96CH_SWAP_GROUPS[group_index:]
+                    for slot in later_group
+                    if slot in fixture_settings.tips[tip]
+                ]
+                tipracks_lw.extend(
+                    _refresh_p1000h_t1000_slots(
+                        fixture_settings, tip, remaining_slots
+                    )
+                )
+                break
+            tipracks_lw.extend(_refresh_96ch_slot_group(fixture_settings, tip, slots))
+        return [rack.wells()[0] for rack in tipracks_lw]
+
+    slots_to_load = (
+        [fixture_settings.tips[tip][0]]
+        if blank
+        else fixture_settings.tips[tip]
+    )
+    need_to_swap = [
+        slot
+        for slot in slots_to_load
+        if slot in fixture_settings.active_96ch_racks_by_slot
+        and (
+            not _uses_p1000h_extra_manual_exchange(fixture_settings)
+            or _tip_size_from_rack(fixture_settings.active_96ch_racks_by_slot[slot])
+            != tip
+            or _rack_has_used_tips(fixture_settings.active_96ch_racks_by_slot[slot])
+        )
     ]
-    need_to_swap = [slot for slot in fixture_settings.tips[tip] if slot in used_slots]
     if len(need_to_swap) != 0:
         fixture_settings.pipette._retract()
         fixture_settings.ctx.pause(f"Replace slots {need_to_swap} with {tip}ul tips")
         for slot in need_to_swap:
-            old_adapter = loaded_labwares[
-                DeckSlotName.from_primitive(slot).as_int()
-            ].parent
+            old_rack = fixture_settings.active_96ch_racks_by_slot.pop(slot)
+            old_adapter = old_rack.parent
             fixture_settings.ctx._core.move_labware(
-                loaded_labwares[DeckSlotName.from_primitive(slot).as_int()]._core,
+                old_rack._core,
                 new_location=OFF_DECK,
                 use_gripper=False,
                 pause_for_manual_move=False,
@@ -749,22 +1000,12 @@ def _get_tips_for_test_96(
                 pick_up_offset=None,
                 drop_offset=None,
             )
-    if blank:
-        tipracks_lw = [
-            fixture_settings.ctx.load_labware(
-                f"opentrons_flex_96_tiprack_{tip}uL",
-                fixture_settings.tips[tip][0],
-                adapter=adapter,
-            )
-        ]
-
-    else:
-        tipracks_lw = [
-            fixture_settings.ctx.load_labware(
-                f"opentrons_flex_96_tiprack_{tip}uL", slot, adapter=adapter
-            )
-            for slot in fixture_settings.tips[tip]
-        ]
+            _forget_loaded_labware_in_slot(slot)
+            fixture_settings.tiprack_adapters_by_slot.pop(slot, None)
+    tipracks_lw = [
+        _load_96ch_tiprack_on_adapter(fixture_settings, tip, slot)
+        for slot in slots_to_load
+    ]
     wells = []
     for rack in tipracks_lw:
         wells += [rack.wells()[0]]
@@ -783,6 +1024,14 @@ def _get_tips_for_test(
         # Liquid class testing uses the whole tip rack with one channel so dont use the special pattern
         return _get_tips_for_test_96_single(fixture_settings, tip, blank)
     return _get_tips_for_test_single_multi(fixture_settings, tip, channel, blank)
+
+
+# -----------------------------------------------------------------------------
+# Runtime parameters.
+# -----------------------------------------------------------------------------
+#
+# Production parameters stay together here. Extension switches are isolated in
+# this same builder so the protocol upload UI remains the only runtime surface.
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -815,6 +1064,19 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
     parameters.add_str(
+        display_name="Pipette Mounts To Test",
+        variable_name="mounts_to_test",
+        default="csv",
+        choices=[
+            {"display_name": "Use CSV profile", "value": "csv"},
+            {"display_name": "Left", "value": "left"},
+            {"display_name": "Right", "value": "right"},
+            {"display_name": "Left and Right", "value": "both"},
+        ],
+        description="Choose which mounted pipette or pipettes to test.",
+    )
+
+    parameters.add_str(
         display_name="Test Type",
         variable_name="test_type",
         default="Productions",
@@ -844,10 +1106,34 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
     parameters.add_bool(
-        display_name="Use Impact Protection",
+        display_name="Use 96CH Impact Protection",
         variable_name="use_impact_protection",
         default=True,
-        description="Whether to use impact protection device during testing.",
+        description="Enable the dedicated 96-channel fixture and its Home clearance moves.",
+    )
+
+    parameters.add_bool(
+        display_name="Use Impact Protection V2",
+        variable_name="use_impact_protection_v2",
+        default=False,
+        description="Enable the separate V2 grating controller when it is installed.",
+    )
+
+    parameters.add_bool(
+        display_name="Use 96CH Stackers",
+        variable_name="use_96ch_stackers",
+        default=True,
+        description="Whether to use Flex Stackers for 96-channel full-rack testing.",
+    )
+
+    parameters.add_bool(
+        display_name="Run Evaporation Blank",
+        variable_name="run_evaporation",
+        default=True,
+        description=(
+            "Run blank trials for evaporation compensation. Disable to use zero "
+            "compensation."
+        ),
     )
 
     parameters.add_bool(
@@ -972,50 +1258,49 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
 
 
+# -----------------------------------------------------------------------------
+# Production-facing impact hooks.
+# -----------------------------------------------------------------------------
+#
+# Measurement code calls these small hooks. The hardware-specific V2 and 96ch
+# implementations live in the extension impact section below.
+
+
 def maybe_close_all_gratings(fixture_settings: FixtureSettings) -> None:
-    """Close all impact protection gratings if the use_impact_protection param is set."""
-    if (
-        not fixture_settings.ctx.is_simulating()
-        and fixture_settings.use_impact_protection
-    ):
-        assert fixture_settings.ImpactSerial_U is not None
-        impp = fixture_settings.ImpactSerial_U.close_all_gratings()
-        fixture_settings.ctx.delay(
-            seconds=0.1,
-            msg=f"close_all_gratings state :{impp.raw_response}",
-        )
-        if "OK" not in impp.raw_response:
-            raise RuntimeError(
-                f"close all gratings Collision avoidance switch failed to activate. {impp.raw_response}"
-            )
+    """Close the optional V2 gratings without changing the 96ch fixture mode."""
+    if not fixture_settings.ctx.is_simulating():
+        _close_impact_protection_v2(fixture_settings)
 
 
 def maybe_switch_mode(fixture_settings: FixtureSettings, tip: int) -> None:
-    """Switch gratings mode if the use_impact_protection param is set."""
+    """Switch each enabled impact controller independently."""
+    if fixture_settings.ctx.is_simulating():
+        return
+    _switch_impact_protection_v2(fixture_settings, tip)
     if (
-        not fixture_settings.ctx.is_simulating()
+        fixture_settings.pipette_channels == 96
         and fixture_settings.use_impact_protection
+        and fixture_settings.ImpactSerial_96
     ):
-        swichvaldict = {
-            20: "SET_LEFT_T50",
-            50: "SET_LEFT_T50",
-            200: "SET_LEFT_T50",
-            1000: "SET_LEFT_T1000",
-        }
-        assert fixture_settings.ImpactSerial_U is not None
-        impp = fixture_settings.ImpactSerial_U.switch_mode(swichvaldict[tip])
-        fixture_settings.ctx.delay(
-            seconds=0.1,
-            msg=f"switch_mode state :{impp.raw_response}",
+        _configure_impact_protection_96ch(
+            fixture_settings.ctx,
+            fixture_settings.ImpactSerial_96,
+            tip,
         )
-        if "OK" not in impp.raw_response:
-            raise RuntimeError("Collision avoidance switch failed to activate.")
+
+
+# -----------------------------------------------------------------------------
+# Production-compatible tip handling and liquid measurement helpers.
+# -----------------------------------------------------------------------------
+#
+# These functions should stay easy to compare with production. No-trash behavior
+# is guarded for 96ch stacker runs and CSV-enabled dual P50S/P1000S return-tip runs.
 
 
 def remove_tip(fixture_settings: FixtureSettings) -> None:
-    """Either return or drop tip(s)."""
+    """Return, discard, or dispose of the active tip according to the run mode."""
     maybe_close_all_gratings(fixture_settings)
-    if fixture_settings.return_tip:
+    if fixture_settings.return_tip or _uses_no_trash_runtime(fixture_settings):
         fixture_settings.pipette.return_tip()
     else:
         fixture_settings.pipette.drop_tip()
@@ -1037,12 +1322,19 @@ def pick_up_tip_for_channel(
     fixture_settings: FixtureSettings, tip: Well, channel: int
 ) -> None:
     """Do channel offset if needed."""
+    if _uses_96ch_stacker_runtime(fixture_settings):
+        maybe_switch_mode(
+            fixture_settings,
+            _tip_size_from_rack(cast(Labware, tip.parent)),
+        )
     offset = _get_offset_for_channel(fixture_settings, channel)
     point_offset = Point(x=offset.x, y=offset.y, z=offset.z)
     print_info(
-        f"Picking up tip {tip.well_name} of rack {tip.parent.parent} with channel {channel} and offset {offset}"
+        f"Picking up tip {tip.well_name} of rack {tip.parent.load_name} "
+        f"with channel {channel} and offset {offset}"
     )
     fixture_settings.pipette.pick_up_tip(tip.top().move(point_offset))
+    _USED_TIP_LOCATIONS.add(_tip_location_key(tip))
     if fixture_settings.increment and not fixture_settings.ctx.is_simulating():
         print_info("clearing pipette ul-per-mm table to be linear")
         clear_pipette_ul_per_mm(
@@ -1066,6 +1358,29 @@ def _update_environment_first_last_min_max(test_report: report.CSVReport) -> Non
     report.store_environment(test_report, report.EnvironmentReportState.MAX, max_data)
 
 
+@contextmanager
+def _batch_report_update(
+    test_report: report.CSVReport,
+    *,
+    save_on_error: bool = False,
+) -> Generator[None, None, None]:
+    """Defer disk writes until one logical report update is complete."""
+    original_dont_write = test_report._dont_write_to_disk
+    if original_dont_write:
+        yield
+        return
+
+    completed = False
+    test_report._dont_write_to_disk = True
+    try:
+        yield
+        completed = True
+    finally:
+        test_report._dont_write_to_disk = original_dont_write
+        if completed or save_on_error:
+            test_report.save_to_disk()
+
+
 def retract_and_wait(
     fixture_settings: FixtureSettings,
     mode: MeasurementType,
@@ -1079,7 +1394,7 @@ def retract_and_wait(
     if fixture_settings.fast_simulate:
         # just simulate the physical movement and return to speed up the analysis
         fixture_settings.pipette._retract()
-        # Z轴离开秤的上方后，关闭所有光栅
+
         maybe_close_all_gratings(fixture_settings)
         return_val = copy.deepcopy(fast_simulate_measurement)
         if not blank:
@@ -1116,7 +1431,7 @@ def retract_and_wait(
         )
     )
     _update_environment_first_last_min_max(fixture_settings.test_report)
-    # Z轴离开秤的上方后，关闭所有光栅
+
     maybe_close_all_gratings(fixture_settings)
     return m_data
 
@@ -1235,7 +1550,7 @@ def dispense_with_liquid_class(
         transfer_type=tx_comps_executor.TransferType.ONE_TO_ONE,
         tip_contents=contents,
         add_final_air_gap=final_air_gap,
-        trash_location=fixture_settings.pipette.trash_container,
+        trash_location=_liquid_class_trash_location(fixture_settings),
     )
     fixture_settings.recorder.clear_sample_tag()
     reset_retract_discontinuity(fixture_settings)
@@ -1263,9 +1578,10 @@ def run_blank_test(
         liquid_height = 10.0
     else:
         liquid_height = fixture_settings.liquid_source.current_liquid_height()  # type: ignore[assignment]
-    # 移动到垃圾桶前，关闭所有光栅
+    # Move away from the scale before opening/closing the impact protection.
     maybe_close_all_gratings(fixture_settings)
-    fixture_settings.pipette.move_to(fixture_settings.pipette.trash_container)  # type: ignore[arg-type]
+    if not _uses_no_trash_runtime(fixture_settings):
+        fixture_settings.pipette.move_to(fixture_settings.pipette.trash_container)  # type: ignore[arg-type]
     fixture_settings.pipette.move_to(
         fixture_settings.pipette._last_tip_picked_up_from.top(10)  # type: ignore[union-attr]
     )
@@ -1284,7 +1600,7 @@ def run_blank_test(
     else:
         blank_move_to_height = liquid_height - fixture_settings.submerge_depth
     fixture_settings.pipette.move_to(Location(above_scale, None))
-    # Z轴在秤的上方，调用switch_mode
+
     maybe_switch_mode(fixture_settings, tip)
     transfer_properties.aspirate.aspirate_position.offset = offset
     transfer_properties.dispense.dispense_position.offset = offset
@@ -1440,7 +1756,7 @@ def run_one_test(
         fixture_settings.pipette._get_last_location_by_api_version().point.z,  # type: ignore [union-attr]
     )
     fixture_settings.pipette.move_to(Location(above_scale, None))
-    # Z轴在秤的上方，调用switch_mode
+
     maybe_switch_mode(fixture_settings, tip)
     print_info("Pre-aspirate read.")
     pre_aspirate = retract_and_wait(
@@ -1491,6 +1807,72 @@ def run_one_test(
     return [pre_aspirate, post_aspirate, post_dispense]
 
 
+def _run_and_store_trial(
+    fixture_settings: FixtureSettings,
+    tip: int,
+    tip_well: Well,
+    volume: float,
+    trial: int,
+    channel: int,
+    last_measurement: Optional[MeasurementData],
+    liq: SupportedLiquid,
+    avg_asp_evap: float,
+    avg_disp_evap: float,
+) -> Tuple[List[MeasurementData], float, float]:
+    """Run one complete trial and store its in-memory report updates."""
+    trial_measurements = run_one_test(
+        fixture_settings,
+        tip,
+        tip_well,
+        volume,
+        trial,
+        channel,
+        last_measurement,
+    )
+    asp_with_evap = (
+        calculate_change_in_volume(
+            trial_measurements[0],
+            trial_measurements[1],
+            liq,
+        )
+        - avg_asp_evap
+    )
+    disp_with_evap = (
+        calculate_change_in_volume(
+            trial_measurements[1],
+            trial_measurements[2],
+            liq,
+        )
+        + avg_disp_evap
+    )
+
+    full_tip_increment = (
+        len(fixture_settings.channels) == 8 and fixture_settings.increment
+    )
+    if full_tip_increment or (
+        fixture_settings.pipette_channels == 96 and not fixture_settings.single_tip_96
+    ):
+        asp_with_evap = asp_with_evap / fixture_settings.pipette_channels
+        disp_with_evap = disp_with_evap / fixture_settings.pipette_channels
+
+    if fixture_settings.ctx.is_simulating():
+        cur_height: float = 10.0
+    else:
+        lh = fixture_settings.liquid_source.current_liquid_height()
+        cur_height = lh  # type: ignore[assignment]
+    report.store_trial(
+        fixture_settings.test_report,
+        trial,
+        volume,
+        channel,
+        asp_with_evap,
+        disp_with_evap,
+        cur_height,
+    )
+
+    return trial_measurements, asp_with_evap, disp_with_evap
+
+
 def _configure_tip_count(fixture_settings: FixtureSettings, channel: int) -> None:
     full_tip_increment = (
         len(fixture_settings.channels) == 8 and fixture_settings.increment
@@ -1519,7 +1901,7 @@ def calculate_evaporation(
     """This is done at the begining of the test and during the cavity test it happens again for each cavity."""
     print_info("Detecting liquid height.")
 
-    # Z轴在秤的上方，调用switch_mode
+
     fixture_settings.pipette._retract()
     maybe_switch_mode(fixture_settings, fixture_settings.tip_sizes[0])
 
@@ -1529,21 +1911,19 @@ def calculate_evaporation(
     )
     fixture_settings.pipette._retract()
     blank_measurments: List[List[MeasurementData]] = []
-    ctx.delay(
-        seconds=SCALE_SECONDS_TO_TRUE_STABILIZE,
-        msg=f"Waiting {SCALE_SECONDS_TO_TRUE_STABILIZE} for scale to stabalize",
-    )
+    _stabilize_scale_before_evaporation(ctx, fixture_settings)
     for i in range(fixture_settings.blank_trials):
         print_header(f"Running blank trial {i}")
-        blank_measurments.append(
-            run_blank_test(
-                fixture_settings,
-                fixture_settings.tip_sizes[0],
-                fixture_settings.volumes[fixture_settings.tip_sizes[0]][0],
-                i,
-                tip,
+        with _batch_report_update(fixture_settings.test_report):
+            blank_measurments.append(
+                run_blank_test(
+                    fixture_settings,
+                    fixture_settings.tip_sizes[0],
+                    fixture_settings.volumes[fixture_settings.tip_sizes[0]][0],
+                    i,
+                    tip,
+                )
             )
-        )
     asp_evaps = [
         calculate_change_in_volume(blank[0], blank[1], liq)
         for blank in blank_measurments
@@ -1571,6 +1951,12 @@ def calculate_evaporation(
             - volume_lost_during_blank,
         )
     return blank_measurments, avg_asp_evap, avg_disp_evap
+
+
+# -----------------------------------------------------------------------------
+# Main measurement loop. Keep this production-shaped; custom hook is deferred
+# liquid probe only when stacker rack refresh must happen before probing.
+# -----------------------------------------------------------------------------
 
 
 def _get_passing_requirements(
@@ -1601,24 +1987,47 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     pick_up_tip_for_channel(fixture_settings, first_tip, 0)
     last_probed_tip_size = fixture_settings.tip_sizes[0]
     liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
-    blank_measurments, avg_asp_evap, avg_disp_evap = calculate_evaporation(
-        ctx, fixture_settings, liq, first_tip
-    )
+    if fixture_settings.run_evaporation:
+        blank_measurments, avg_asp_evap, avg_disp_evap = calculate_evaporation(
+            ctx, fixture_settings, liq, first_tip
+        )
+        last_measurement: Optional[MeasurementData] = blank_measurments[-1][-1]
+    else:
+        ctx.comment(
+            "evaporation blank disabled: skip scale stabilization and blank trials"
+        )
+        fixture_settings.pipette._retract()
+        maybe_switch_mode(fixture_settings, fixture_settings.tip_sizes[0])
+        fixture_settings.pipette.require_liquid_presence(
+            fixture_settings.liquid_source
+        )
+        fixture_settings.pipette._retract()
+        avg_asp_evap = 0.0
+        avg_disp_evap = 0.0
+        report.store_average_evaporation(
+            fixture_settings.test_report,
+            avg_asp_evap,
+            avg_disp_evap,
+        )
+        last_measurement = None
     remove_tip(fixture_settings)
 
     measurements: Dict[float, List[List[MeasurementData]]] = {}
-    last_measurement: Optional[MeasurementData] = blank_measurments[-1][-1]
     tip_sizes_done = []
     for tip in fixture_settings.tip_sizes:
+        deferred_96ch_probe = False
         if tip != last_probed_tip_size:
-            _configure_tip_count(fixture_settings, 0)
-            probe_tip = _get_tips_for_test(fixture_settings, tip, False)[0]
-            pick_up_tip_for_channel(fixture_settings, probe_tip, 0)
-            fixture_settings.pipette.require_liquid_presence(
-                fixture_settings.liquid_source
-            )
-            last_probed_tip_size = tip
-            remove_tip(fixture_settings)
+            if _should_defer_96ch_stacker_probe(fixture_settings, tip):
+                deferred_96ch_probe = True
+            else:
+                _configure_tip_count(fixture_settings, 0)
+                probe_tip = _get_tips_for_test(fixture_settings, tip, True)[0]
+                pick_up_tip_for_channel(fixture_settings, probe_tip, 0)
+                fixture_settings.pipette.require_liquid_presence(
+                    fixture_settings.liquid_source
+                )
+                last_probed_tip_size = tip
+                remove_tip(fixture_settings)
 
         volumes_to_tests = fixture_settings.volumes[tip]
         testing_extra = False
@@ -1650,6 +2059,12 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 _configure_tip_count(fixture_settings, channel)
                 # override pipette movement conflict checking 'cause we specially lay out our tipracks
                 tips = _get_tips_for_test(fixture_settings, tip, False, channel)
+                if deferred_96ch_probe:
+                    tips = _run_deferred_96ch_stacker_probe(
+                        fixture_settings, tip, tips
+                    )
+                    last_probed_tip_size = tip
+                    deferred_96ch_probe = False
                 print_info(str(tips))
                 if channel == 7:
                     # we're doing an 8 channel test and just swapped over to the front channel.
@@ -1664,24 +2079,34 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                     last_measurement = None
                 actual_asp_list_channel: List[float] = []
                 actual_disp_list_channel: List[float] = []
-
-                for trial in range(fixture_settings.trials):
-                    if fixture_settings.cavity_test and trial != 0 and trial % 15 == 0:
-                        pick_up_tip_for_channel(fixture_settings, tips[0], 0)
-                        print_info("calculating evap.")
-                        (
-                            blank_measurments,
-                            avg_asp_evap,
-                            avg_disp_evap,
-                        ) = calculate_evaporation(
-                            ctx, fixture_settings, liq, tips.pop(0)
+                with _batch_report_update(
+                    fixture_settings.test_report, save_on_error=True
+                ):
+                    for trial in range(fixture_settings.trials):
+                        if (
+                            fixture_settings.run_evaporation
+                            and fixture_settings.cavity_test
+                            and trial != 0
+                            and trial % 15 == 0
+                        ):
+                            pick_up_tip_for_channel(fixture_settings, tips[0], 0)
+                            print_info("calculating evap.")
+                            (
+                                blank_measurments,
+                                avg_asp_evap,
+                                avg_disp_evap,
+                            ) = calculate_evaporation(
+                                ctx, fixture_settings, liq, tips.pop(0)
+                            )
+                            remove_tip(fixture_settings)
+                        print_header(
+                            f"Running trial {trial} for channel {channel} {volume}ul with T{tip}"
                         )
-                        remove_tip(fixture_settings)
-                    print_header(
-                        f"Running trial {trial} for channel {channel} {volume}ul with T{tip}"
-                    )
-                    measurements[volume].append(
-                        run_one_test(
+                        (
+                            trial_measurements,
+                            asp_with_evap,
+                            disp_with_evap,
+                        ) = _run_and_store_trial(
                             fixture_settings,
                             tip,
                             tips.pop(0),
@@ -1689,109 +2114,74 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                             trial,
                             channel,
                             last_measurement,
-                        )
-                    )
-                    asp_with_evap = (
-                        calculate_change_in_volume(
-                            measurements[volume][-1][0],
-                            measurements[volume][-1][1],
                             liq,
+                            avg_asp_evap,
+                            avg_disp_evap,
                         )
-                        - avg_asp_evap
-                    )
-                    disp_with_evap = (
-                        calculate_change_in_volume(
-                            measurements[volume][-1][1],
-                            measurements[volume][-1][2],
-                            liq,
+                        measurements[volume].append(trial_measurements)
+                        print_info(
+                            f"Finished trial {trial} asp {asp_with_evap} disp {disp_with_evap}"
                         )
-                        + avg_disp_evap
-                    )
+                        actual_asp_list_channel.append(asp_with_evap)
+                        actual_disp_list_channel.append(disp_with_evap)
+                        trial_asp_dict[trial].append(asp_with_evap)
+                        trial_disp_dict[trial].append(disp_with_evap)
+                        last_measurement = trial_measurements[-1]
+                    (
+                        aspirate_average,
+                        aspirate_cv,
+                        aspirate_d,
+                    ) = helpers._calculate_stats(actual_asp_list_channel, volume)
+                    (
+                        dispense_average,
+                        dispense_cv,
+                        dispense_d,
+                    ) = helpers._calculate_stats(actual_disp_list_channel, volume)
+                    aspirate_data_list = [elem[1] for elem in measurements[volume]]
+                    dispense_data_list = [elem[2] for elem in measurements[volume]]
+                    # Average Celsius
+                    aspirate_celsius_avg = sum(
+                        a_data.environment.celsius_pipette
+                        for a_data in aspirate_data_list
+                    ) / len(aspirate_data_list)
+                    dispense_celsius_avg = sum(
+                        d_data.environment.celsius_pipette
+                        for d_data in dispense_data_list
+                    ) / len(dispense_data_list)
+                    # Average humidity
+                    aspirate_humidity_avg = sum(
+                        a_data.environment.humidity_pipette
+                        for a_data in aspirate_data_list
+                    ) / len(aspirate_data_list)
+                    dispense_humidity_avg = sum(
+                        d_data.environment.humidity_pipette
+                        for d_data in dispense_data_list
+                    ) / len(dispense_data_list)
 
-                    full_tip_increment = (
-                        len(fixture_settings.channels) == 8
-                        and fixture_settings.increment
+                    report.store_volume_per_channel(
+                        report=fixture_settings.test_report,
+                        mode="aspirate",
+                        volume=volume,
+                        channel=channel,
+                        average=aspirate_average,
+                        cv=aspirate_cv,
+                        d=aspirate_d,
+                        celsius=aspirate_celsius_avg,
+                        humidity=aspirate_humidity_avg,
+                        flag="isolated" if fixture_settings.isolate_volumes else "",
                     )
-                    if full_tip_increment or (
-                        fixture_settings.pipette_channels == 96
-                        and not fixture_settings.single_tip_96
-                    ):
-                        asp_with_evap = (
-                            asp_with_evap / fixture_settings.pipette_channels
-                        )
-                        disp_with_evap = (
-                            disp_with_evap / fixture_settings.pipette_channels
-                        )
-
-                    if fixture_settings.ctx.is_simulating():
-                        cur_height: float = 10.0
-                    else:
-                        lh = fixture_settings.liquid_source.current_liquid_height()
-                        cur_height = lh  # type: ignore[assignment]
-                    report.store_trial(
-                        fixture_settings.test_report,
-                        trial,
-                        volume,
-                        channel,
-                        asp_with_evap,
-                        disp_with_evap,
-                        cur_height,  # type: ignore[arg-type]
+                    report.store_volume_per_channel(
+                        report=fixture_settings.test_report,
+                        mode="dispense",
+                        volume=volume,
+                        channel=channel,
+                        average=dispense_average,
+                        cv=dispense_cv,
+                        d=dispense_d,
+                        celsius=dispense_celsius_avg,
+                        humidity=dispense_humidity_avg,
+                        flag="isolated" if fixture_settings.isolate_volumes else "",
                     )
-                    print_info(
-                        f"Finished trial {trial} asp {asp_with_evap} disp {disp_with_evap}"
-                    )
-                    actual_asp_list_channel.append(asp_with_evap)
-                    actual_disp_list_channel.append(disp_with_evap)
-                    trial_asp_dict[trial].append(asp_with_evap)
-                    trial_disp_dict[trial].append(disp_with_evap)
-                    last_measurement = measurements[volume][-1][-1]
-                aspirate_average, aspirate_cv, aspirate_d = helpers._calculate_stats(
-                    actual_asp_list_channel, volume
-                )
-                dispense_average, dispense_cv, dispense_d = helpers._calculate_stats(
-                    actual_disp_list_channel, volume
-                )
-                aspirate_data_list = [elem[1] for elem in measurements[volume]]
-                dispense_data_list = [elem[2] for elem in measurements[volume]]
-                # Average Celsius
-                aspirate_celsius_avg = sum(
-                    a_data.environment.celsius_pipette for a_data in aspirate_data_list
-                ) / len(aspirate_data_list)
-                dispense_celsius_avg = sum(
-                    d_data.environment.celsius_pipette for d_data in dispense_data_list
-                ) / len(dispense_data_list)
-                # Average humidity
-                aspirate_humidity_avg = sum(
-                    a_data.environment.humidity_pipette for a_data in aspirate_data_list
-                ) / len(aspirate_data_list)
-                dispense_humidity_avg = sum(
-                    d_data.environment.humidity_pipette for d_data in dispense_data_list
-                ) / len(dispense_data_list)
-
-                report.store_volume_per_channel(
-                    report=fixture_settings.test_report,
-                    mode="aspirate",
-                    volume=volume,
-                    channel=channel,
-                    average=aspirate_average,
-                    cv=aspirate_cv,
-                    d=aspirate_d,
-                    celsius=aspirate_celsius_avg,
-                    humidity=aspirate_humidity_avg,
-                    flag="isolated" if fixture_settings.isolate_volumes else "",
-                )
-                report.store_volume_per_channel(
-                    report=fixture_settings.test_report,
-                    mode="dispense",
-                    volume=volume,
-                    channel=channel,
-                    average=dispense_average,
-                    cv=dispense_cv,
-                    d=dispense_d,
-                    celsius=dispense_celsius_avg,
-                    humidity=dispense_humidity_avg,
-                    flag="isolated" if fixture_settings.isolate_volumes else "",
-                )
 
                 actual_asp_list_all.extend(actual_asp_list_channel)
                 actual_disp_list_all.extend(actual_disp_list_channel)
@@ -1809,57 +2199,64 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                         raise RuntimeError(
                             f"Pipette failed on QC channel {channel} tip {tip} volume {volume}"
                         )
-            for trial in range(fixture_settings.trials):
+            with _batch_report_update(fixture_settings.test_report):
+                for trial in range(fixture_settings.trials):
+                    aspirate_average, aspirate_cv, aspirate_d = (
+                        helpers._calculate_stats(trial_asp_dict[trial], volume)
+                    )
+                    dispense_average, dispense_cv, dispense_d = (
+                        helpers._calculate_stats(trial_disp_dict[trial], volume)
+                    )
+                    report.store_volume_per_trial(
+                        report=fixture_settings.test_report,
+                        mode="aspirate",
+                        volume=volume,
+                        trial=trial,
+                        average=aspirate_average,
+                        cv=aspirate_cv,
+                        d=aspirate_d,
+                        flag="isolated" if fixture_settings.isolate_volumes else "",
+                    )
+                    report.store_volume_per_trial(
+                        report=fixture_settings.test_report,
+                        mode="dispense",
+                        volume=volume,
+                        trial=trial,
+                        average=dispense_average,
+                        cv=dispense_cv,
+                        d=dispense_d,
+                        flag="isolated" if fixture_settings.isolate_volumes else "",
+                    )
                 aspirate_average, aspirate_cv, aspirate_d = helpers._calculate_stats(
-                    trial_asp_dict[trial], volume
+                    actual_asp_list_all, volume
                 )
                 dispense_average, dispense_cv, dispense_d = helpers._calculate_stats(
-                    trial_disp_dict[trial], volume
+                    actual_disp_list_all, volume
                 )
-                report.store_volume_per_trial(
+                report.store_volume_all(
                     report=fixture_settings.test_report,
                     mode="aspirate",
                     volume=volume,
-                    trial=trial,
                     average=aspirate_average,
                     cv=aspirate_cv,
                     d=aspirate_d,
-                    flag="isolated" if fixture_settings.isolate_volumes else "",
+                    flag="",
                 )
-                report.store_volume_per_trial(
+                report.store_volume_all(
                     report=fixture_settings.test_report,
                     mode="dispense",
                     volume=volume,
-                    trial=trial,
                     average=dispense_average,
                     cv=dispense_cv,
                     d=dispense_d,
-                    flag="isolated" if fixture_settings.isolate_volumes else "",
+                    flag="",
                 )
-            aspirate_average, aspirate_cv, aspirate_d = helpers._calculate_stats(
-                actual_asp_list_all, volume
-            )
-            dispense_average, dispense_cv, dispense_d = helpers._calculate_stats(
-                actual_disp_list_all, volume
-            )
-            report.store_volume_all(
-                report=fixture_settings.test_report,
-                mode="aspirate",
-                volume=volume,
-                average=aspirate_average,
-                cv=aspirate_cv,
-                d=aspirate_d,
-                flag="",
-            )
-            report.store_volume_all(
-                report=fixture_settings.test_report,
-                mode="dispense",
-                volume=volume,
-                average=dispense_average,
-                cv=dispense_cv,
-                d=dispense_d,
-                flag="",
-            )
+            if (
+                _uses_p1000h_extra_manual_exchange(fixture_settings)
+                and tip == 50
+                and volume == 5
+            ):
+                _replace_p1000h_extra_deck_tips(fixture_settings)
         tip_sizes_done.append(tip)
         maybe_close_all_gratings(fixture_settings)
 
@@ -1878,39 +2275,2203 @@ def _adjust_settings_for_increment(fixture_settings: FixtureSettings) -> None:
     tx_ctl_lib.check_valid_liquid_class_volume_parameters = _override_check
 
 
-def run(ctx: ProtocolContext) -> None:
-    """Pick up, aspirate, and dispense one trial and write it to the report."""
-    fixture_settings = FixtureSettings.build(ctx)
-    if fixture_settings.fast_simulate:
-        # do LPC when it is simulating
-        for tip in fixture_settings.tip_sizes:
-            for channel in fixture_settings.channels:
-                tips = _get_tips_for_test(fixture_settings, tip, False, channel)
-                pick_up_tip_for_channel(fixture_settings, tips.pop(0), channel)
-                remove_tip(fixture_settings)
-        print_info("Simulating. Not running actual tests and stopping analysis.")
+
+
+# =============================================================================
+# Custom extension helpers
+# =============================================================================
+# Everything below this point supports stacker automation, independent 96ch impact
+# protection, shared 96ch LPC offsets, and dual-mount orchestration. The
+# production-shaped measurement/reporting code above should stay easy to compare
+# against gravimetric_production.py.
+#
+# Extension subsystem map
+# -----------------------
+# - Drop-offset configuration:
+#   _default_stacker_to_deck_drop_offsets(),
+#   _default_deck_to_stacker_drop_offsets(),
+#   _load_stacker_drop_offsets_config_for_run().
+#
+# - Stacker plan and inventory:
+#   SupplySegment, StackerState, ActiveRack,
+#   _build_96ch_stacker_supply_plan(), _find_supply(),
+#   _find_recovery_target(), _refresh_96ch_slot_group().
+#
+# - Physical rack movement:
+#   _move_rack_to_recovery(), _retrieve_rack_to_adapter(),
+#   _retrieve_96ch_racks_to_empty_adapters().
+#
+# - Tiprack loading bridge used by the production-shaped code:
+#   _get_csv_tipracks(), _load_csv_tipracks(), _get_unused_tips_from_racks(),
+#   _load_96ch_tiprack_on_adapter().
+#
+# - 96ch impact fixture support:
+#   _configure_impact_protection_96ch(),
+#   maybe_home_impact_protection_96ch(),
+#   maybe_home_impact_for_stacker_move().
+#
+# - Dual-mount execution:
+#   _parse_mounts_to_test(), _get_mounts_to_test_from_runtime_param(),
+#   _right_pipette_heat_guard(), _run_fixture(), run().
+# =============================================================================
+
+
+_USED_TIP_LOCATIONS: set[Tuple[str, str]] = set()
+_DECK_LABWARE_BY_SLOT: Dict[str, Labware] = {}
+_TRASH_BIN_SLOT: Optional[str] = None
+TIPRACK_ADAPTER = "opentrons_flex_96_tiprack_adapter"
+SHARED_TIPRACK_OFFSET_REFERENCE_TIP = 50
+STACKER_MODEL = "flexStackerModuleV1"
+STACKER_HOPPER_CAPACITY = 6
+STACKER_SLOTS = ["A4", "B4", "C4", "D4"]
+DUAL_MULTI_TEST_SLOTS = ["D2", "D3", "B2", "B3"]
+DUAL_MULTI_AUX_SLOT_BY_TEST_SLOT = {
+    "D2": "C4",
+    "D3": "D4",
+    "B2": "A4",
+    "B3": "B4",
+}
+DUAL_MULTI_RACK_SWAP_MOVES = [
+    ("D2", "B1"),
+    ("D3", "A2"),
+    ("C4", "D2"),
+    ("D4", "D3"),
+    ("B2", "C4"),
+    ("B3", "D4"),
+    ("A4", "B2"),
+    ("B4", "B3"),
+    ("A2", "A4"),
+]
+DUAL_MULTI_UNCALIBRATED_STORAGE_SLOTS = {"B1"}
+IMPACT_96CH_STACKER_HOME_SLOTS = {"A1", "B1"}
+STACKER_DROP_OFFSETS_CONFIG_FILE = "gravimetric_stacker_drop_offsets.json"
+STACKER_TO_DECK_DROP_OFFSET_TARGETS = [
+    "D2",
+    "D3",
+    "C2",
+    "C3",
+    "B1",
+    "B2",
+    "B3",
+    "A1",
+    "A2",
+]
+DECK_TO_STACKER_DROP_OFFSET_SOURCES = [
+    "D2",
+    "D3",
+    "C2",
+    "C3",
+    "B1",
+    "B2",
+    "B3",
+    "A1",
+    "A2",
+]
+
+
+# -----------------------------------------------------------------------------
+# Custom: stacker gripper drop-offset configuration.
+# -----------------------------------------------------------------------------
+#
+# The gripper drop-offset table is deliberately kept outside the production
+# measurement path. It only affects move_labware() pickup/drop mechanics during
+# stacker rack exchange.
+#
+# Default offsets are in code so the protocol can parse without a separate file.
+# Robot-specific tuning can be provided by gravimetric_stacker_drop_offsets.json.
+# Search order:
+# 1. GRAVIMETRIC_STACKER_DROP_OFFSETS_CONFIG environment variable.
+# 2. infer_config_base_dir()/gravimetric (persistent machine calibration).
+# 3. A file next to this protocol when __file__ is available.
+# 4. The protocol_replacement directory in the imported gravimetric package.
+# 5. infer_config_base_dir()/hardware_testing/gravimetric/protocol_replacement.
+#
+# Expected JSON shape:
+# {
+#   "stacker_to_deck": {
+#     "B4": {
+#       "B1": {"x": 2.0, "y": 0.0, "z": 0.0}
+#     }
+#   },
+#   "deck_to_stacker": {
+#     "D2": {
+#       "B4": {"x": -1.5, "y": 0.0, "z": 0.0}
+#     }
+#   }
+# }
+#
+# Direction names are literal:
+# - stacker_to_deck: source is stacker slot, target is deck slot.
+# - deck_to_stacker: source is deck slot, target is stacker slot.
+
+
+def _zero_drop_offsets(
+    source_slots: List[str], target_slots: List[str]
+) -> Dict[Tuple[str, str], Dict[str, float]]:
+    return {
+        (source_slot, target_slot): {"x": 0.0, "y": 0.0, "z": 0.0}
+        for source_slot in source_slots
+        for target_slot in target_slots
+    }
+
+
+def _default_stacker_to_deck_drop_offsets(
+) -> Dict[Tuple[str, str], Dict[str, float]]:
+    offsets = _zero_drop_offsets(STACKER_SLOTS, STACKER_TO_DECK_DROP_OFFSET_TARGETS)
+    offsets.update(
+        {
+            ("B4", "B1"): {"x": 2.0, "y": 0.0, "z": 0.0},
+            ("C4", "C2"): {"x": 1.0, "y": 0.0, "z": 0.0},
+            ("D4", "B1"): {"x": 2.0, "y": 0.0, "z": 0.0},
+            ("D4", "B2"): {"x": 1.5, "y": 0.0, "z": 0.0},
+            ("D4", "A1"): {"x": 2.0, "y": 0.0, "z": 0.0},
+            ("D4", "A2"): {"x": 2.0, "y": 0.0, "z": 0.0},
+        }
+    )
+    return offsets
+
+
+def _default_deck_to_stacker_drop_offsets(
+) -> Dict[Tuple[str, str], Dict[str, float]]:
+    offsets = _zero_drop_offsets(DECK_TO_STACKER_DROP_OFFSET_SOURCES, STACKER_SLOTS)
+    offsets.update(
+        {
+            ("D2", "B4"): {"x": -1.5, "y": 0.0, "z": 0.0},
+            ("D3", "B4"): {"x": -1.5, "y": 0.0, "z": 0.0},
+            ("C2", "B4"): {"x": -1.5, "y": 0.0, "z": 0.0},
+            ("C3", "B4"): {"x": -1.5, "y": 0.0, "z": 0.0},
+            ("B1", "C4"): {"x": -1.0, "y": 0.0, "z": 0.0},
+            ("B2", "C4"): {"x": -1.0, "y": 0.0, "z": 0.0},
+            ("B3", "C4"): {"x": -0.5, "y": 0.0, "z": 0.0},
+            ("A1", "C4"): {"x": -1.5, "y": 0.0, "z": 0.0},
+        }
+    )
+    return offsets
+
+
+def _stacker_drop_offsets_config_paths() -> List[str]:
+    paths = []
+    env_path = os.environ.get("GRAVIMETRIC_STACKER_DROP_OFFSETS_CONFIG")
+    if env_path:
+        paths.append(env_path)
+    paths.append(
+        os.path.join(
+            str(infer_config_base_dir()),
+            "gravimetric",
+            STACKER_DROP_OFFSETS_CONFIG_FILE,
+        )
+    )
+    protocol_file = globals().get("__file__")
+    if protocol_file:
+        paths.append(
+            os.path.join(
+                os.path.dirname(os.path.abspath(str(protocol_file))),
+                STACKER_DROP_OFFSETS_CONFIG_FILE,
+            )
+        )
+    paths.append(
+        os.path.join(
+            os.path.dirname(os.path.abspath(str(config.__file__))),
+            "protocol_replacement",
+            STACKER_DROP_OFFSETS_CONFIG_FILE,
+        )
+    )
+    paths.append(
+        os.path.join(
+            str(infer_config_base_dir()),
+            "hardware_testing",
+            "gravimetric",
+            "protocol_replacement",
+            STACKER_DROP_OFFSETS_CONFIG_FILE,
+        )
+    )
+    unique_paths = []
+    for path in paths:
+        if path not in unique_paths:
+            unique_paths.append(path)
+    return unique_paths
+
+
+def _parse_drop_offset_vector(
+    direction_name: str,
+    source_slot: str,
+    target_slot: str,
+    raw_vector: object,
+) -> Dict[str, float]:
+    if not isinstance(raw_vector, dict):
+        raise ValueError(
+            f"{direction_name}.{source_slot}.{target_slot} must be an object."
+        )
+    return {
+        axis: float(raw_vector.get(axis, 0.0))
+        for axis in ("x", "y", "z")
+    }
+
+
+def _parse_drop_offset_direction(
+    direction_name: str,
+    raw_direction: object,
+) -> Dict[Tuple[str, str], Dict[str, float]]:
+    if not isinstance(raw_direction, dict):
+        raise ValueError(f"{direction_name} must be an object.")
+    parsed: Dict[Tuple[str, str], Dict[str, float]] = {}
+    for source_slot, raw_targets in raw_direction.items():
+        if not isinstance(raw_targets, dict):
+            raise ValueError(f"{direction_name}.{source_slot} must be an object.")
+        for target_slot, raw_vector in raw_targets.items():
+            parsed[(str(source_slot), str(target_slot))] = _parse_drop_offset_vector(
+                direction_name,
+                str(source_slot),
+                str(target_slot),
+                raw_vector,
+            )
+    return parsed
+
+
+def _load_stacker_drop_offsets_config(
+) -> Tuple[
+    Dict[Tuple[str, str], Dict[str, float]],
+    Dict[Tuple[str, str], Dict[str, float]],
+]:
+    print_info(
+        f"Gravimetric config module loaded from: {os.path.abspath(str(config.__file__))}"
+    )
+    stacker_to_deck_offsets = _default_stacker_to_deck_drop_offsets()
+    deck_to_stacker_offsets = _default_deck_to_stacker_drop_offsets()
+    for path in _stacker_drop_offsets_config_paths():
+        if not os.path.exists(path):
+            continue
+        with open(path, "r") as config_file:
+            raw_config = json.load(config_file)
+        if not isinstance(raw_config, dict):
+            raise ValueError(f"{path} must contain a JSON object.")
+        stacker_to_deck_offsets.update(
+            _parse_drop_offset_direction(
+                "stacker_to_deck", raw_config.get("stacker_to_deck", {})
+            )
+        )
+        deck_to_stacker_offsets.update(
+            _parse_drop_offset_direction(
+                "deck_to_stacker", raw_config.get("deck_to_stacker", {})
+            )
+        )
+        print_info(f"Stacker drop offsets loaded from: {os.path.abspath(path)}")
+        break
+    else:
+        print_warning("No stacker drop-offset JSON found; using built-in defaults.")
+    return stacker_to_deck_offsets, deck_to_stacker_offsets
+
+
+(
+    STACKER_TO_DECK_DROP_OFFSETS,
+    DECK_TO_STACKER_DROP_OFFSETS,
+) = (
+    _default_stacker_to_deck_drop_offsets(),
+    _default_deck_to_stacker_drop_offsets(),
+)
+
+
+def _load_stacker_drop_offsets_config_for_run(ctx: ProtocolContext) -> None:
+    global STACKER_TO_DECK_DROP_OFFSETS, DECK_TO_STACKER_DROP_OFFSETS
+    if ctx.is_simulating():
+        return
+    (
+        STACKER_TO_DECK_DROP_OFFSETS,
+        DECK_TO_STACKER_DROP_OFFSETS,
+    ) = _load_stacker_drop_offsets_config()
+
+
+# -----------------------------------------------------------------------------
+# Custom: 96ch stacker supply/recovery model.
+# -----------------------------------------------------------------------------
+#
+# Stacker inventory model
+# -----------------------
+# A Flex Stacker has a hopper and a shuttle. The protocol models each stacker as
+# one or more SupplySegment values:
+# - tip_size: the tiprack type in that segment.
+# - hopper_count: racks available in the hopper.
+# - shuttle_count: rack available on the shuttle before hopper racks.
+# - shuttle_first: whether the shuttle rack should be consumed before hopper.
+#
+# This lets P1000H use mixed stackers without relying on the module to know the
+# semantic type of every future rack. Recovery can intentionally store used racks
+# as a T50 pool where required by the P1000H workflow; that behavior is isolated
+# in _uses_t50_pool_for_p1000h_recovery() and _recovery_pool_tip_size().
+#
+# Priority rules:
+# - Supply/recovery stacker priority is A4 -> B4 -> C4 -> D4.
+# - Fixed deck refresh groups are D2/D3/C2/C3/B1/B2, then B3/A1/A2.
+# - P1000H T1000 has a special first refresh for D2/D3/C2 so C4 can be emptied
+#   before recovering remaining T200 racks into it.
+#
+# Keep rack planning here. The production-shaped _run() loop should only ask for
+# tips; it should not contain stacker inventory details.
+
+
+FIXED_96CH_SWAP_GROUPS = [
+    ["D2", "D3", "C2", "C3", "B1", "B2"],
+    ["B3", "A1", "A2"],
+]
+P1000H_T1000_FIRST_REFRESH_SLOTS = ["D2", "D3", "C2"]
+
+
+@dataclass
+class SupplySegment:
+    """A physical stacker supply segment, split between hopper and shuttle."""
+
+    tip_size: int
+    hopper_count: int
+    shuttle_count: int = 0
+    shuttle_first: bool = True
+
+
+@dataclass
+class StackerState:
+    """Track planned 96CH stacker inventory during a gravimetric run."""
+
+    slot: str
+    stacker: FlexStackerContext
+    supply_queue: List[SupplySegment]
+    configured_tip_size: Optional[int] = None
+    stored_count: int = 0
+    shuttle_rack: Optional[Labware] = None
+    shuttle_tip_size: Optional[int] = None
+    current_segment_is_supply: bool = False
+    current_segment_shuttle_first: bool = True
+
+
+@dataclass
+class ActiveRack:
+    """A tiprack currently sitting on a deck adapter."""
+
+    tip_size: int
+    rack: Labware
+    adapter: Labware
+
+
+# -----------------------------------------------------------------------------
+# Custom: dual-mount runtime selection.
+# -----------------------------------------------------------------------------
+
+
+def _parse_mounts_to_test(mount_values: List[str]) -> List[str]:
+    """Parse a CSV mount value into the ordered list of mounts to test."""
+    mounts: List[str] = []
+    for raw_mount in mount_values:
+        for mount in raw_mount.replace("/", ",").replace(";", ",").split(","):
+            normalized_mount = mount.strip().lower()
+            if normalized_mount == "both":
+                mounts.extend(["left", "right"])
+            elif normalized_mount in ["left", "right"]:
+                mounts.append(normalized_mount)
+            elif normalized_mount:
+                raise ValueError(
+                    f'Unexpected mount "{mount}". Expected left, right, or both.'
+                )
+
+    mounts_deduped: List[str] = []
+    for mount in mounts:
+        if mount not in mounts_deduped:
+            mounts_deduped.append(mount)
+    if not mounts_deduped:
+        raise ValueError("No mount was defined in the csv params.")
+    return mounts_deduped
+
+
+def _get_mounts_to_test_from_runtime_param(
+    ctx: ProtocolContext, csv_settings: "CSVSettings"
+) -> List[str]:
+    mount_selection = ctx.params.mounts_to_test  # type: ignore[attr-defined]
+    if mount_selection == "csv":
+        return csv_settings.mounts_to_test
+    return _parse_mounts_to_test([mount_selection])
+
+
+def _uses_dual_multi_extension_deck(csv_settings: "CSVSettings") -> bool:
+    """Whether this is a sequential dual P50M/P1000M extension-deck run."""
+    return (
+        csv_settings.pipette_channels == 8
+        and csv_settings.pipette_volume in (50, 1000)
+        and "left" in csv_settings.mounts_to_test
+        and "right" in csv_settings.mounts_to_test
+    )
+
+
+def _uses_dual_single(csv_settings: "CSVSettings") -> bool:
+    """Whether this is a sequential dual P50S/P1000S run."""
+    return (
+        csv_settings.pipette_channels == 1
+        and csv_settings.pipette_volume in (50, 1000)
+        and "left" in csv_settings.mounts_to_test
+        and "right" in csv_settings.mounts_to_test
+    )
+
+
+def _uses_dual_single_no_trash(csv_settings: "CSVSettings") -> bool:
+    """Whether CSV enables return-tip for a sequential dual P50S/P1000S run."""
+    return _uses_dual_single(csv_settings) and csv_settings.return_tip
+
+
+def _uses_dual_mount_no_trash(csv_settings: "CSVSettings") -> bool:
+    """Whether a dual-pipette workflow returns tips instead of loading trash."""
+    return _uses_dual_single_no_trash(csv_settings)
+
+
+def _uses_no_trash_runtime_settings(csv_settings: "CSVSettings") -> bool:
+    """Whether setup must avoid registering a physical trash bin."""
+    return _uses_dual_single_no_trash(
+        csv_settings
+    ) or _uses_p1000h_extra_manual_exchange(csv_settings)
+
+
+def _trash_bin_slot(csv_settings: "CSVSettings") -> str:
+    """Return the trash slot for the selected deck layout."""
+    if _uses_dual_multi_extension_deck(csv_settings) or _uses_dual_single(
+        csv_settings
+    ):
+        return DUAL_MULTI_TRASH_SLOT
+    return "A3"
+
+
+# -----------------------------------------------------------------------------
+# Custom: shared helpers for stacker labware bookkeeping and offsets.
+# -----------------------------------------------------------------------------
+
+
+def _deck_slot_key(slot: str) -> str:
+    normalized_slot = str(slot).upper()
+    if normalized_slot in {"A4", "B4", "C4", "D4"}:
+        return normalized_slot
+    return str(DeckSlotName.from_primitive(normalized_slot).to_ot3_equivalent())
+
+
+def _nonzero_drop_offset(
+    offsets: Dict[Tuple[str, str], Dict[str, float]],
+    source_slot: str,
+    target_slot: str,
+) -> Optional[Dict[str, float]]:
+    offset = offsets.get((source_slot, target_slot))
+    if offset is None:
+        return None
+    normalized_offset = {
+        axis: float(offset.get(axis, 0.0))
+        for axis in ("x", "y", "z")
+    }
+    if all(value == 0.0 for value in normalized_offset.values()):
+        return None
+    return normalized_offset
+
+
+def _drop_offset_for_stacker_to_deck(
+    stacker_slot: str, deck_slot: str
+) -> Optional[Dict[str, float]]:
+    return _nonzero_drop_offset(
+        STACKER_TO_DECK_DROP_OFFSETS, stacker_slot, deck_slot
+    )
+
+
+def _drop_offset_for_deck_to_stacker(
+    deck_slot: str, stacker_slot: str
+) -> Optional[Dict[str, float]]:
+    return _nonzero_drop_offset(
+        DECK_TO_STACKER_DROP_OFFSETS, deck_slot, stacker_slot
+    )
+
+
+def _should_home_96ch_impact_for_stacker_slot(slot: Optional[str]) -> bool:
+    return slot is not None and _deck_slot_key(slot) in IMPACT_96CH_STACKER_HOME_SLOTS
+
+
+def _register_loaded_labware_in_slot(slot: str, labware: Labware) -> None:
+    _DECK_LABWARE_BY_SLOT[_deck_slot_key(slot)] = labware
+
+
+def _forget_loaded_labware_in_slot(slot: str) -> None:
+    _DECK_LABWARE_BY_SLOT.pop(_deck_slot_key(slot), None)
+
+
+def _get_loaded_labware_in_slot(slot: str) -> Optional[Labware]:
+    return _DECK_LABWARE_BY_SLOT.get(_deck_slot_key(slot))
+
+
+def _load_or_get_labware(ctx: ProtocolContext, load_name: str, slot: str) -> Labware:
+    existing_labware = _get_loaded_labware_in_slot(slot)
+    if existing_labware is not None:
+        if existing_labware.load_name != load_name:
+            raise ValueError(
+                f"Slot {slot} already has {existing_labware.load_name}, "
+                f"not {load_name}."
+            )
+        return existing_labware
+    labware = ctx.load_labware(load_name, slot)
+    _register_loaded_labware_in_slot(slot, labware)
+    return labware
+
+
+def _ensure_trash_bin(ctx: ProtocolContext, slot: str) -> None:
+    global _TRASH_BIN_SLOT
+    if _TRASH_BIN_SLOT is not None:
+        if _TRASH_BIN_SLOT != slot:
+            raise RuntimeError(
+                f"Trash Bin is already loaded in {_TRASH_BIN_SLOT}, not {slot}."
+            )
+        return
+    ctx.load_trash_bin(slot)
+    _TRASH_BIN_SLOT = slot
+
+
+def _tiprack_load_name(tip_size: int) -> str:
+    return f"opentrons_flex_96_tiprack_{tip_size}ul"
+
+
+def _dual_multi_tip_size_by_test_slot(
+    csv_settings: "CSVSettings",
+) -> Dict[str, int]:
+    """Map the four CSV test slots to their configured tip sizes."""
+    slot_to_tip_size: Dict[str, int] = {}
+    for tip_size, slots in csv_settings.tips.items():
+        for slot in slots:
+            slot_key = _deck_slot_key(slot)
+            if slot_key in slot_to_tip_size:
+                raise RuntimeError(
+                    "Dual multi slot "
+                    f"{slot_key} is configured for more than one tip size."
+                )
+            slot_to_tip_size[slot_key] = tip_size
+
+    expected_slots = set(DUAL_MULTI_TEST_SLOTS)
+    configured_slots = set(slot_to_tip_size)
+    if configured_slots != expected_slots:
+        raise RuntimeError(
+            "Dual P50M/P1000M mode requires CSV tiprack slots exactly "
+            f"{DUAL_MULTI_TEST_SLOTS}; configured slots are "
+            f"{sorted(configured_slots)}."
+        )
+    return {slot: slot_to_tip_size[slot] for slot in DUAL_MULTI_TEST_SLOTS}
+
+
+def _prepare_dual_multi_extension_deck_layout(
+    ctx: ProtocolContext, csv_settings: "CSVSettings"
+) -> None:
+    """Load the left test racks and matching right-side reserve racks."""
+    if csv_settings.mounts_to_test != ["left", "right"]:
+        raise RuntimeError(
+            "Dual P50M/P1000M extension-deck mode must run left, then right."
+        )
+
+    reserved_slots = {
+        *DUAL_MULTI_TEST_SLOTS,
+        *DUAL_MULTI_AUX_SLOT_BY_TEST_SLOT.values(),
+        DUAL_MULTI_TRASH_SLOT,
+        "B1",
+        "A2",
+    }
+    scale_slot = _deck_slot_key(csv_settings.slot_scale)
+    if scale_slot in reserved_slots:
+        raise RuntimeError(
+            f"Scale slot {scale_slot} conflicts with the dual multi rack layout."
+        )
+
+    tip_size_by_test_slot = _dual_multi_tip_size_by_test_slot(csv_settings)
+    for test_slot in DUAL_MULTI_TEST_SLOTS:
+        tip_size = tip_size_by_test_slot[test_slot]
+        reserve_slot = DUAL_MULTI_AUX_SLOT_BY_TEST_SLOT[test_slot]
+        load_name = _tiprack_load_name(tip_size)
+        _load_or_get_labware(ctx, load_name, test_slot)
+        _load_or_get_labware(ctx, load_name, reserve_slot)
+        ctx.comment(
+            f"dual multi layout: T{tip_size} left rack at {test_slot}, "
+            f"right reserve rack at {reserve_slot}"
+        )
+
+
+def _move_registered_labware_with_gripper(
+    ctx: ProtocolContext, source_slot: str, target_slot: str
+) -> None:
+    """Move one deck labware and keep the protocol's slot cache synchronized."""
+    source_slot = _deck_slot_key(source_slot)
+    target_slot = _deck_slot_key(target_slot)
+    labware = _get_loaded_labware_in_slot(source_slot)
+    if labware is None:
+        raise RuntimeError(f"No labware is registered in source slot {source_slot}.")
+    target_labware = _get_loaded_labware_in_slot(target_slot)
+    if target_labware is not None:
+        raise RuntimeError(
+            f"Cannot move {source_slot} to {target_slot}: target contains "
+            f"{target_labware.load_name}."
+        )
+
+    if (
+        ctx.is_simulating()
+        and target_slot in DUAL_MULTI_UNCALIBRATED_STORAGE_SLOTS
+    ):
+        ctx.comment(
+            f"analysis only: move {source_slot} rack off deck so temporary "
+            f"storage slot {target_slot} is excluded from LPC"
+        )
+        ctx._core.move_labware(
+            labware._core,
+            new_location=OFF_DECK,
+            use_gripper=False,
+            pause_for_manual_move=False,
+            pick_up_offset=None,
+            drop_offset=None,
+        )
+        _forget_loaded_labware_in_slot(source_slot)
+        return
+
+    ctx.comment(f"dual multi rack swap: {source_slot} -> {target_slot}")
+    ctx.move_labware(labware, target_slot, use_gripper=True)
+    _forget_loaded_labware_in_slot(source_slot)
+    _register_loaded_labware_in_slot(target_slot, labware)
+
+
+def _rearrange_tipracks_for_dual_multi_right_mount(
+    ctx: ProtocolContext, csv_settings: "CSVSettings"
+) -> None:
+    """Replace left-used racks with A4-D4 reserve racks for the right run."""
+    ctx.comment("start dual P50M/P1000M rack swap for right mount")
+    for source_slot, target_slot in DUAL_MULTI_RACK_SWAP_MOVES:
+        _move_registered_labware_with_gripper(ctx, source_slot, target_slot)
+
+    tip_size_by_test_slot = _dual_multi_tip_size_by_test_slot(csv_settings)
+    for test_slot, expected_tip_size in tip_size_by_test_slot.items():
+        rack = _get_loaded_labware_in_slot(test_slot)
+        if rack is None:
+            raise RuntimeError(
+                f"Dual multi rack swap left target slot {test_slot} empty."
+            )
+        actual_tip_size = _tip_size_from_rack(rack)
+        if actual_tip_size != expected_tip_size:
+            raise RuntimeError(
+                f"Dual multi rack swap placed T{actual_tip_size} in {test_slot}; "
+                f"expected T{expected_tip_size}."
+            )
+    ctx.comment("dual P50M/P1000M rack swap complete")
+
+
+def _tip_size_from_rack(rack: Labware) -> int:
+    load_name = rack.load_name.lower()
+    for tip_size in [20, 50, 200, 1000]:
+        if f"_{tip_size}ul" in load_name or f"_{tip_size}uL".lower() in load_name:
+            return tip_size
+    raise ValueError(f"Unable to determine tip size from labware {rack.load_name}.")
+
+
+def _labware_offset_vector(labware: Labware) -> Point:
+    return cast(
+        Point,
+        labware._core._engine_client.state.labware.get_labware_offset_vector(
+            labware._core.labware_id
+        ),
+    )
+
+
+def _should_share_tiprack_offsets(csv_settings: "CSVSettings") -> bool:
+    return (
+        csv_settings.pipette_channels == 96
+        and SHARED_TIPRACK_OFFSET_REFERENCE_TIP in csv_settings.tip_sizes
+    )
+
+
+def _tip_sizes_for_lpc(csv_settings: "CSVSettings") -> List[int]:
+    if _should_share_tiprack_offsets(csv_settings):
+        return [SHARED_TIPRACK_OFFSET_REFERENCE_TIP]
+    return csv_settings.tip_sizes
+
+
+def _capture_or_apply_shared_tiprack_offset(
+    fixture_settings: "FixtureSettings",
+    tip: int,
+    slot: str,
+    rack: Labware,
+) -> None:
+    if not _should_share_tiprack_offsets(fixture_settings):
+        return
+
+    slot_key = _deck_slot_key(slot)
+    if tip == SHARED_TIPRACK_OFFSET_REFERENCE_TIP:
+        offset = _labware_offset_vector(rack)
+        fixture_settings.shared_tiprack_offsets_by_slot[slot_key] = offset
+        fixture_settings.ctx.comment(
+            f"cache T{tip} LPC offset for slot {slot_key}: "
+            f"x={offset.x}, y={offset.y}, z={offset.z}"
+        )
+        return
+
+    reference_offset = fixture_settings.shared_tiprack_offsets_by_slot.get(slot_key)
+    if reference_offset is None:
+        fixture_settings.ctx.comment(
+            f"no T{SHARED_TIPRACK_OFFSET_REFERENCE_TIP} LPC offset cached for "
+            f"slot {slot_key}; keep T{tip} rack offset unchanged"
+        )
+        return
+
+    rack.set_offset(
+        reference_offset.x,
+        reference_offset.y,
+        reference_offset.z,
+    )
+    fixture_settings.ctx.comment(
+        f"apply T{SHARED_TIPRACK_OFFSET_REFERENCE_TIP} LPC offset to T{tip} "
+        f"rack in slot {slot_key}: x={reference_offset.x}, "
+        f"y={reference_offset.y}, z={reference_offset.z}"
+    )
+
+
+def _first_96ch_stacker_tip(csv_settings: "CSVSettings") -> int:
+    if csv_settings.pipette_volume <= 200 and 50 in csv_settings.tip_sizes:
+        return 50
+    if csv_settings.pipette_volume >= 1000 and 200 in csv_settings.tip_sizes:
+        return 200
+    return csv_settings.tip_sizes[0]
+
+
+def _second_96ch_stacker_tip(csv_settings: "CSVSettings") -> int:
+    if csv_settings.pipette_volume <= 200 and 200 in csv_settings.tip_sizes:
+        return 200
+    if csv_settings.pipette_volume >= 1000 and 1000 in csv_settings.tip_sizes:
+        return 1000
+    return csv_settings.tip_sizes[-1]
+
+
+def _uses_p1000h_three_tip_stacker_plan(csv_settings: "CSVSettings") -> bool:
+    return (
+        csv_settings.pipette_channels == 96
+        and csv_settings.pipette_volume >= 1000
+        and all(tip in csv_settings.tip_sizes for tip in [50, 200, 1000])
+    )
+
+
+def _uses_p1000h_extra_manual_exchange(csv_settings: "CSVSettings") -> bool:
+    """Recognize the extra profile's 5 uL pretest before normal T50 testing."""
+    return (
+        csv_settings.extra
+        and csv_settings.pipette_channels == 96
+        and csv_settings.pipette_volume == 1000
+        and not csv_settings.single_tip_96
+        and csv_settings.tip_sizes == [50, 200, 1000]
+        and csv_settings.volumes.get(50) == [5.0, 50.0]
+    )
+
+
+def _get_p1000h_extra_probe_tip(fixture_settings: "FixtureSettings") -> Well:
+    """Use the T50 probe/blank rack already placed on the A3 adapter."""
+    rack = _load_96ch_tiprack_on_adapter(fixture_settings, 50, "A3")
+    return rack.wells()[0]
+
+
+def _replace_p1000h_extra_deck_tips(fixture_settings: "FixtureSettings") -> None:
+    """Replace the nine test racks, then resume normal T50 stacker probing."""
+    ctx = fixture_settings.ctx
+    slots = fixture_settings.tips[50]
+    # Resolve the physical racks before pausing, but keep the Engine and tip
+    # bookkeeping unchanged until the operator has resumed the protocol.
+    old_racks = {
+        slot: fixture_settings.active_96ch_racks_by_slot[slot] for slot in slots
+    }
+    fixture_settings.pipette._retract()
+    maybe_close_all_gratings(fixture_settings)
+    maybe_home_impact_protection_96ch(fixture_settings, "manual T50 replacement")
+    ctx.pause(
+        f"5 µL 测试完成。请将 {', '.join(slots)} 上的全部 9 盒针管更换为全新的 T50 针管盒。"
+        "保留各槽位的针管支架。A3 的探测用盒保持原位，不移动、不更换；"
+        "不要更换 stacker 中的针管。"
+        "更换完成后点击继续，开始 50 µL 测试。 / "
+        "5 uL testing complete: replace the nine test racks with fresh T50 "
+        "racks. Keep the A3 probe rack and all adapters in place, and "
+        "leave stacker supplies unchanged. Resume to start 50 uL testing."
+    )
+    for slot, old_rack in old_racks.items():
+        adapter = cast(Labware, old_rack.parent)
+        ctx._core.move_labware(
+            old_rack._core,
+            new_location=OFF_DECK,
+            use_gripper=False,
+            pause_for_manual_move=False,
+            pick_up_offset=None,
+            drop_offset=None,
+        )
+        fixture_settings.active_96ch_racks_by_slot.pop(slot)
+        fixture_settings.tiprack_adapters_by_slot[slot] = adapter
+        _register_loaded_labware_in_slot(slot, adapter)
+        rack = adapter.load_labware(_tiprack_load_name(50))
+        _capture_or_apply_shared_tiprack_offset(fixture_settings, 50, slot, rack)
+        fixture_settings.active_96ch_racks_by_slot[slot] = rack
+        _register_loaded_labware_in_slot(slot, rack)
+
+    if _uses_96ch_stacker_runtime(fixture_settings):
+        # Resume the normal T50 entry point using D2, not the special A3 probe.
+        # The next normal rack refresh recovers this used probe rack to A4 and
+        # consumes B4's spare T50, preserving the original supply/recovery flow.
+        probe_slot = slots[0]
+        ctx.comment(f"resume normal T50 liquid probe in slot {probe_slot}")
+        probe_tip = fixture_settings.active_96ch_racks_by_slot[probe_slot].wells()[0]
+        _configure_tip_count(fixture_settings, 0)
+        pick_up_tip_for_channel(fixture_settings, probe_tip, 0)
+        fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
+        remove_tip(fixture_settings)
+
+
+# Stacker placement entry point.
+#
+# Change this function when the physical starting layout changes. The rest of
+# the stacker code consumes the resulting SupplySegment queues and should not
+# need to know whether the plan is P200H or P1000H.
+def _build_96ch_stacker_supply_plan(
+    csv_settings: "CSVSettings",
+) -> Dict[str, List[SupplySegment]]:
+    if _uses_p1000h_three_tip_stacker_plan(csv_settings):
+        plan = {
+            "A4": [],
+            "B4": [
+                SupplySegment(50, hopper_count=0, shuttle_count=1),
+                SupplySegment(200, hopper_count=6),
+            ],
+            "C4": [
+                SupplySegment(200, hopper_count=3, shuttle_count=1),
+                SupplySegment(1000, hopper_count=3),
+            ],
+            "D4": [SupplySegment(1000, hopper_count=6, shuttle_count=1)],
+        }
+        _validate_96ch_stacker_supply_plan(plan)
+        return plan
+
+    first_tip = _first_96ch_stacker_tip(csv_settings)
+    second_tip = _second_96ch_stacker_tip(csv_settings)
+    plan = {
+        "A4": [],
+        "B4": [SupplySegment(first_tip, hopper_count=6, shuttle_count=1)],
+        "C4": [
+            SupplySegment(first_tip, hopper_count=2, shuttle_count=1),
+            SupplySegment(second_tip, hopper_count=4),
+        ],
+        "D4": [SupplySegment(second_tip, hopper_count=6)],
+    }
+    _validate_96ch_stacker_supply_plan(plan)
+    return plan
+
+
+def _validate_96ch_stacker_supply_plan(
+    plan: Dict[str, List[SupplySegment]]
+) -> None:
+    max_total_capacity = STACKER_HOPPER_CAPACITY + 1
+    for slot, segments in plan.items():
+        total_count = sum(
+            segment.hopper_count + segment.shuttle_count for segment in segments
+        )
+        hopper_count = sum(segment.hopper_count for segment in segments)
+        shuttle_count = sum(segment.shuttle_count for segment in segments)
+        if total_count > max_total_capacity:
+            raise RuntimeError(
+                f"Stacker {slot} plan requires {total_count} racks, "
+                f"but max capacity is {max_total_capacity}."
+            )
+        if hopper_count > STACKER_HOPPER_CAPACITY:
+            raise RuntimeError(
+                f"Stacker {slot} plan requires {hopper_count} hopper racks, "
+                f"but hopper capacity is {STACKER_HOPPER_CAPACITY}."
+            )
+        if shuttle_count > 1:
+            raise RuntimeError(
+                f"Stacker {slot} plan requires {shuttle_count} shuttle racks, "
+                "but shuttle capacity is 1."
+            )
+
+
+def _uses_96ch_stackers(
+    csv_settings: "CSVSettings", use_96ch_stackers: bool
+) -> bool:
+    return (
+        use_96ch_stackers
+        and csv_settings.pipette_channels == 96
+        and not csv_settings.single_tip_96
+    )
+
+
+def _load_simulating_96ch_stacker_lpc_layout(
+    ctx: ProtocolContext,
+    csv_settings: "CSVSettings",
+) -> None:
+    """Load active 96CH deck tip rack positions during analysis for LPC."""
+    tip_size = (
+        csv_settings.tip_sizes[0]
+        if _uses_p1000h_three_tip_stacker_plan(csv_settings)
+        else _first_96ch_stacker_tip(csv_settings)
+    )
+    load_name = _tiprack_load_name(tip_size)
+    active_slots = list(csv_settings.tips.get(tip_size, []))
+    if _uses_p1000h_extra_manual_exchange(csv_settings):
+        active_slots.append("A3")
+    for slot in active_slots:
+        adapter = ctx.load_adapter(TIPRACK_ADAPTER, slot)
+        _register_loaded_labware_in_slot(slot, adapter)
+        rack = adapter.load_labware(load_name)
+        _register_loaded_labware_in_slot(slot, rack)
+
+
+def _build_96ch_stackers(
+    ctx: ProtocolContext,
+    csv_settings: "CSVSettings",
+    use_96ch_stackers: bool,
+) -> Optional[Dict[str, StackerState]]:
+    if not _uses_96ch_stackers(csv_settings, use_96ch_stackers):
+        if ctx.is_simulating() and _uses_p1000h_extra_manual_exchange(csv_settings):
+            _load_simulating_96ch_stacker_lpc_layout(ctx, csv_settings)
+        return None
+    supply_plan = _build_96ch_stacker_supply_plan(csv_settings)
+    stackers = {
+        slot: StackerState(
+            slot=slot,
+            stacker=ctx.load_module(STACKER_MODEL, slot),  # type: ignore[arg-type]
+            supply_queue=list(supply_plan[slot]),
+        )
+        for slot in STACKER_SLOTS
+    }
+    if ctx.is_simulating():
+        _load_simulating_96ch_stacker_lpc_layout(ctx, csv_settings)
+        ctx.comment(
+            "simulating: loaded A4/B4/C4/D4 stackers and active 96CH deck "
+            "tip racks for LPC; skip stacker runtime actions"
+        )
+        return None
+    return stackers
+
+
+def _configure_stacker(
+    ctx: ProtocolContext,
+    state: StackerState,
+    tip_size: int,
+    hopper_count: int,
+    shuttle_count: int = 0,
+    shuttle_first: bool = True,
+) -> None:
+    if shuttle_count not in (0, 1):
+        raise RuntimeError(f"Stacker {state.slot} shuttle_count must be 0 or 1.")
+    if hopper_count > STACKER_HOPPER_CAPACITY:
+        raise RuntimeError(
+            f"Stacker {state.slot} hopper_count={hopper_count} exceeds "
+            f"{STACKER_HOPPER_CAPACITY}."
+        )
+
+    state.stacker.set_stored_labware(
+        load_name=_tiprack_load_name(tip_size),
+        count=hopper_count,
+    )
+    state.configured_tip_size = tip_size
+    state.stored_count = hopper_count
+    state.shuttle_tip_size = tip_size if shuttle_count else None
+    state.shuttle_rack = (
+        state.stacker.load_labware(_tiprack_load_name(tip_size))
+        if shuttle_count and shuttle_first
+        else None
+    )
+    state.current_segment_is_supply = False
+    state.current_segment_shuttle_first = shuttle_first
+    ctx.comment(
+        f"stacker {state.slot}: configured T{tip_size}, "
+        f"hopper_count={hopper_count}, shuttle_count={shuttle_count}, "
+        f"shuttle_first={shuttle_first}"
+    )
+
+
+def _ensure_supply_segment(ctx: ProtocolContext, state: StackerState) -> None:
+    if state.stored_count != 0 or not state.supply_queue:
+        return
+    if state.shuttle_rack is not None:
+        return
+    segment = state.supply_queue.pop(0)
+    _configure_stacker(
+        ctx,
+        state,
+        segment.tip_size,
+        segment.hopper_count,
+        segment.shuttle_count,
+        segment.shuttle_first,
+    )
+    state.current_segment_is_supply = True
+
+
+def _stackers_in_priority_order(
+    stackers: Dict[str, StackerState]
+) -> List[StackerState]:
+    return [stackers[slot] for slot in STACKER_SLOTS if slot in stackers]
+
+
+def _find_supply(
+    ctx: ProtocolContext, stackers: Dict[str, StackerState], tip_size: int
+) -> StackerState:
+    for state in _stackers_in_priority_order(stackers):
+        _ensure_supply_segment(ctx, state)
+    for state in _stackers_in_priority_order(stackers):
+        if not state.current_segment_is_supply:
+            continue
+        if (
+            state.shuttle_tip_size == tip_size
+            and state.shuttle_rack is not None
+        ) or (state.configured_tip_size == tip_size and state.stored_count > 0):
+            return state
+    raise RuntimeError(f"No stacker supply available for T{tip_size}.")
+
+
+def _can_recover_to_state(state: StackerState, tip_size: int) -> bool:
+    return (
+        state.configured_tip_size == tip_size
+        and not state.current_segment_is_supply
+        and not state.supply_queue
+        and state.shuttle_rack is None
+        and state.stored_count <= STACKER_HOPPER_CAPACITY
+    )
+
+
+def _uses_t50_pool_for_p1000h_recovery(
+    fixture_settings: "FixtureSettings",
+) -> bool:
+    return _uses_p1000h_three_tip_stacker_plan(fixture_settings)
+
+
+def _recovery_pool_tip_size(
+    fixture_settings: "FixtureSettings", rack_tip_size: int
+) -> int:
+    if _uses_t50_pool_for_p1000h_recovery(fixture_settings):
+        return SHARED_TIPRACK_OFFSET_REFERENCE_TIP
+    return rack_tip_size
+
+
+def _find_recovery_target(
+    ctx: ProtocolContext,
+    stackers: Dict[str, StackerState],
+    tip_size: int,
+) -> StackerState:
+    for state in _stackers_in_priority_order(stackers):
+        if _can_recover_to_state(state, tip_size):
+            return state
+
+    for state in _stackers_in_priority_order(stackers):
+        if (
+            state.stored_count == 0
+            and state.shuttle_rack is None
+            and not state.supply_queue
+        ):
+            _configure_stacker(ctx, state, tip_size, hopper_count=0)
+            return state
+
+    raise RuntimeError(f"No recovery capacity available for T{tip_size}.")
+
+
+def _t50_stacker_store_labware_height(ctx: ProtocolContext) -> float:
+    if ctx.is_simulating():
+        return 0.0
+    # The Flex 96 T50/T200/T1000 racks share the same external stacker geometry.
+    return 99.0
+
+
+def _unsafe_store_recovered_rack_as_t50_pool(
+    ctx: ProtocolContext,
+    target: StackerState,
+    rack: Labware,
+) -> None:
+    stacker_core = cast(Any, target.stacker._core)
+    stacker_core._sync_module_hardware.store_labware(
+        labware_height=_t50_stacker_store_labware_height(ctx)
+    )
+    ctx._core.move_labware(
+        rack._core,
+        new_location=OFF_DECK,
+        use_gripper=False,
+        pause_for_manual_move=False,
+        pick_up_offset=None,
+        drop_offset=None,
+    )
+
+
+def _move_rack_to_recovery(
+    fixture_settings: "FixtureSettings",
+    active_rack: ActiveRack,
+    recovery_tip_size_override: Optional[int] = None,
+) -> Labware:
+    ctx = fixture_settings.ctx
+    stackers = fixture_settings.stackers_96
+    if stackers is None:
+        raise RuntimeError("96ch stackers are not initialized.")
+    recovery_tip_size = (
+        recovery_tip_size_override
+        if recovery_tip_size_override is not None
+        else _recovery_pool_tip_size(fixture_settings, active_rack.tip_size)
+    )
+    target = _find_recovery_target(
+        ctx,
+        stackers,
+        recovery_tip_size,
+    )
+    source_slot = _deck_slot_key(str(active_rack.adapter.parent))
+    drop_offset = _drop_offset_for_deck_to_stacker(source_slot, target.slot)
+    ctx.comment(
+        f"recover T{active_rack.tip_size} rack from {active_rack.adapter.parent} "
+        f"to stacker {target.slot}"
+        + (
+            f" as T{recovery_tip_size} pool"
+            if recovery_tip_size != active_rack.tip_size
+            else ""
+        )
+        + (
+            f" with drop_offset={drop_offset}"
+            if drop_offset is not None
+            else ""
+        )
+    )
+    ctx.move_labware(
+        active_rack.rack,
+        target.stacker,
+        use_gripper=True,
+        drop_offset=drop_offset,
+    )
+    target.shuttle_rack = active_rack.rack
+    target.shuttle_tip_size = recovery_tip_size
+    if target.stored_count < STACKER_HOPPER_CAPACITY:
+        if recovery_tip_size == active_rack.tip_size:
+            target.stacker.store()
+        else:
+            _unsafe_store_recovered_rack_as_t50_pool(
+                ctx, target, active_rack.rack
+            )
+        target.stored_count += 1
+        target.shuttle_rack = None
+        target.shuttle_tip_size = None
+    else:
+        ctx.comment(
+            f"stacker {target.slot}: hopper full; keep T{active_rack.tip_size} "
+            "rack on shuttle"
+        )
+    return active_rack.adapter
+
+
+def _load_or_get_tiprack_adapter(
+    fixture_settings: "FixtureSettings", slot: str
+) -> Labware:
+    existing_labware = fixture_settings.tiprack_adapters_by_slot.get(slot)
+    if existing_labware is None:
+        existing_labware = _get_loaded_labware_in_slot(slot)
+        if existing_labware is not None:
+            if existing_labware.load_name != TIPRACK_ADAPTER:
+                raise RuntimeError(
+                    f"Slot {slot} already has {existing_labware.load_name}, "
+                    f"not {TIPRACK_ADAPTER}."
+                )
+            fixture_settings.tiprack_adapters_by_slot[slot] = existing_labware
+            return existing_labware
+
+    if existing_labware is None:
+        adapter = cast(Labware, fixture_settings.ctx.load_adapter(TIPRACK_ADAPTER, slot))
+        fixture_settings.tiprack_adapters_by_slot[slot] = adapter
+        _register_loaded_labware_in_slot(slot, adapter)
+        return adapter
+    if existing_labware.load_name != TIPRACK_ADAPTER:
+        raise RuntimeError(
+            f"Slot {slot} already has {existing_labware.load_name}, "
+            f"not {TIPRACK_ADAPTER}."
+        )
+    return existing_labware
+
+
+def _load_initial_deck_96ch_rack(
+    fixture_settings: "FixtureSettings",
+    tip: int,
+    adapter: Labware,
+) -> Labware:
+    fixture_settings.ctx.comment(
+        f"use initial deck T{tip} rack on adapter {adapter.parent}"
+    )
+    rack = adapter.load_labware(_tiprack_load_name(tip))
+    _capture_or_apply_shared_tiprack_offset(
+        fixture_settings, tip, str(adapter.parent), rack
+    )
+    return rack
+
+
+def _recover_96ch_active_rack(
+    fixture_settings: "FixtureSettings",
+    slot: str,
+) -> Labware:
+    existing_rack = fixture_settings.active_96ch_racks_by_slot.get(slot)
+    if existing_rack is None:
+        raise RuntimeError(f"No active 96ch rack is loaded in slot {slot}.")
+    if fixture_settings.stackers_96 is None:
+        raise RuntimeError("96ch stackers are not initialized.")
+
+    adapter = cast(Labware, existing_rack.parent)
+    existing_tip = _tip_size_from_rack(existing_rack)
+    fixture_settings.ctx.comment(
+        f"prepare impact protection before recovering T{existing_tip} rack"
+    )
+    maybe_home_impact_for_stacker_move(fixture_settings, slot)
+    empty_adapter = _move_rack_to_recovery(
+        fixture_settings,
+        ActiveRack(tip_size=existing_tip, rack=existing_rack, adapter=adapter),
+    )
+    fixture_settings.active_96ch_racks_by_slot.pop(slot, None)
+    return empty_adapter
+
+
+def _try_recover_96ch_active_rack(
+    fixture_settings: "FixtureSettings",
+    slot: str,
+) -> Optional[Labware]:
+    try:
+        return _recover_96ch_active_rack(fixture_settings, slot)
+    except RuntimeError as error:
+        if "No recovery capacity available" in str(error):
+            return None
+        raise
+
+
+def _rack_has_used_tips(rack: Labware) -> bool:
+    return any(not _tip_has_not_been_used(well) for well in rack.wells())
+
+
+def _recover_96ch_slots_before_retrieving(
+    fixture_settings: "FixtureSettings",
+    tip: int,
+    slots: List[str],
+) -> Dict[str, Labware]:
+    """Recover every used rack in a slot group before retrieving replacements."""
+    empty_adapters_by_slot: Dict[str, Labware] = {}
+    pending_slots = list(slots)
+
+    while pending_slots:
+        recovered_any = False
+        still_pending: List[str] = []
+        for slot in pending_slots:
+            empty_adapter = _try_recover_96ch_active_rack(fixture_settings, slot)
+            if empty_adapter is None:
+                still_pending.append(slot)
+            else:
+                empty_adapters_by_slot[slot] = empty_adapter
+                recovered_any = True
+        if still_pending and not recovered_any:
+            raise RuntimeError(
+                f"Unable to recover all old racks before retrieving T{tip} "
+                f"racks in slots {still_pending}: no recovery capacity available."
+            )
+        pending_slots = still_pending
+
+    return empty_adapters_by_slot
+
+
+def _retrieve_96ch_racks_to_empty_adapters(
+    fixture_settings: "FixtureSettings",
+    tip: int,
+    slots: List[str],
+    empty_adapters_by_slot: Dict[str, Labware],
+) -> Dict[str, Labware]:
+    tipracks_by_slot: Dict[str, Labware] = {}
+    for slot in slots:
+        fixture_settings.ctx.comment(
+            f"prepare impact protection before retrieving T{tip} rack from stacker"
+        )
+        maybe_home_impact_for_stacker_move(fixture_settings, slot)
+        tipracks_by_slot[slot] = _retrieve_rack_to_adapter(
+            fixture_settings.ctx,
+            fixture_settings.stackers_96,
+            tip,
+            empty_adapters_by_slot[slot],
+        ).rack
+        _capture_or_apply_shared_tiprack_offset(
+            fixture_settings, tip, slot, tipracks_by_slot[slot]
+        )
+        fixture_settings.active_96ch_racks_by_slot[slot] = tipracks_by_slot[slot]
+    return tipracks_by_slot
+
+
+# P1000H T1000 transition helper.
+#
+# This exists because C4 must be emptied by retrieving its T1000 racks before
+# remaining T200 racks can be recovered into C4. Keep this separate from the
+# generic refresh path so the special P1000H inventory transition is visible.
+def _refresh_p1000h_t1000_slots(
+    fixture_settings: "FixtureSettings",
+    tip: int,
+    slots: List[str],
+) -> List[Labware]:
+    """Run the P1000H T200-to-T1000 stacker handoff in the planned order."""
+    first_slots = [
+        slot for slot in P1000H_T1000_FIRST_REFRESH_SLOTS if slot in slots
+    ]
+    second_slots = [slot for slot in slots if slot not in first_slots]
+    tipracks_by_slot: Dict[str, Labware] = {}
+
+    if first_slots:
+        empty_adapters_by_slot = _recover_96ch_slots_before_retrieving(
+            fixture_settings, tip, first_slots
+        )
+        tipracks_by_slot.update(
+            _retrieve_96ch_racks_to_empty_adapters(
+                fixture_settings, tip, first_slots, empty_adapters_by_slot
+            )
+        )
+
+    if second_slots:
+        empty_adapters_by_slot = _recover_96ch_slots_before_retrieving(
+            fixture_settings, tip, second_slots
+        )
+        tipracks_by_slot.update(
+            _retrieve_96ch_racks_to_empty_adapters(
+                fixture_settings, tip, second_slots, empty_adapters_by_slot
+            )
+        )
+
+    return [tipracks_by_slot[slot] for slot in slots]
+
+
+# Generic 96ch rack refresh.
+#
+# This is the main "test volume finished, recover old racks, retrieve new racks"
+# function for 96ch stacker mode. If a rack-capacity bug appears, inspect this
+# together with _find_recovery_target() and _retrieve_96ch_racks_to_empty_adapters().
+def _refresh_96ch_slot_group(
+    fixture_settings: "FixtureSettings",
+    tip: int,
+    slots: List[str],
+) -> List[Labware]:
+    """Load or swap a fixed 96CH slot group in batch order."""
+    tipracks_by_slot: Dict[str, Labware] = {}
+    existing_slots: List[str] = []
+
+    for slot in slots:
+        existing_rack = fixture_settings.active_96ch_racks_by_slot.get(slot)
+        if existing_rack is not None:
+            if _rack_has_used_tips(existing_rack):
+                existing_slots.append(slot)
+            else:
+                tipracks_by_slot[slot] = existing_rack
+            continue
+
+        tipracks_by_slot[slot] = _load_96ch_tiprack_on_adapter(
+            fixture_settings, tip, slot
+        )
+
+    if existing_slots:
+        fixture_settings.pipette._retract()
+    if (
+        existing_slots
+        and _uses_p1000h_three_tip_stacker_plan(fixture_settings)
+    ):
+        empty_adapters_by_slot = _recover_96ch_slots_before_retrieving(
+            fixture_settings, tip, existing_slots
+        )
+        tipracks_by_slot.update(
+            _retrieve_96ch_racks_to_empty_adapters(
+                fixture_settings, tip, existing_slots, empty_adapters_by_slot
+            )
+        )
+        return [tipracks_by_slot[slot] for slot in slots]
+
+    pending_slots = list(existing_slots)
+    empty_adapters_by_slot: Dict[str, Labware] = {}
+    while pending_slots or empty_adapters_by_slot:
+        recovered_any = False
+        still_pending: List[str] = []
+        for slot in pending_slots:
+            empty_adapter = _try_recover_96ch_active_rack(fixture_settings, slot)
+            if empty_adapter is None:
+                still_pending.append(slot)
+            else:
+                empty_adapters_by_slot[slot] = empty_adapter
+                recovered_any = True
+        pending_slots = still_pending
+
+        retrieved_any = False
+        for slot in list(empty_adapters_by_slot.keys()):
+            fixture_settings.ctx.comment(
+                f"prepare impact protection before retrieving T{tip} rack from stacker"
+            )
+            maybe_home_impact_for_stacker_move(fixture_settings, slot)
+            tipracks_by_slot[slot] = _retrieve_rack_to_adapter(
+                fixture_settings.ctx,
+                fixture_settings.stackers_96,
+                tip,
+                empty_adapters_by_slot.pop(slot),
+            ).rack
+            _capture_or_apply_shared_tiprack_offset(
+                fixture_settings, tip, slot, tipracks_by_slot[slot]
+            )
+            fixture_settings.active_96ch_racks_by_slot[slot] = tipracks_by_slot[slot]
+            retrieved_any = True
+
+        if pending_slots and not recovered_any and not retrieved_any:
+            raise RuntimeError(
+                f"Unable to refresh T{tip} racks in slots {pending_slots}: "
+                "no recovery capacity available and no emptied adapters to refill."
+            )
+
+    return [tipracks_by_slot[slot] for slot in slots]
+
+
+def _retrieve_rack_to_adapter(
+    ctx: ProtocolContext,
+    stackers: Dict[str, StackerState],
+    tip_size: int,
+    adapter: Labware,
+) -> ActiveRack:
+    source = _find_supply(ctx, stackers, tip_size)
+    adapter_slot = _deck_slot_key(str(adapter.parent))
+    drop_offset = _drop_offset_for_stacker_to_deck(source.slot, adapter_slot)
+    ctx.comment(
+        f"retrieve T{tip_size} rack from stacker {source.slot} to {adapter.parent}"
+        + (
+            f" with drop_offset={drop_offset}"
+            if drop_offset is not None
+            else ""
+        )
+    )
+    use_shuttle = (
+        source.shuttle_tip_size == tip_size
+        and source.shuttle_rack is not None
+        and (source.current_segment_shuttle_first or source.stored_count == 0)
+    )
+    if use_shuttle:
+        rack = source.shuttle_rack
+        source.shuttle_rack = None
+        source.shuttle_tip_size = None
+        if source.stored_count == 0:
+            source.current_segment_is_supply = False
+    else:
+        rack = source.stacker.retrieve()
+        source.stored_count -= 1
+        if source.stored_count == 0 and source.shuttle_rack is None:
+            source.current_segment_is_supply = False
+    ctx.move_labware(rack, adapter, use_gripper=True, drop_offset=drop_offset)
+    return ActiveRack(tip_size=tip_size, rack=rack, adapter=adapter)
+
+
+def _get_csv_tipracks(fixture_settings: "FixtureSettings", tip: int) -> List[Labware]:
+    """Load or retrieve tip racks in the order specified by the CSV profile."""
+    return [
+        _load_or_get_labware(
+            fixture_settings.ctx,
+            _tiprack_load_name(tip),
+            slot,
+        )
+        for slot in fixture_settings.tips[tip]
+    ]
+
+
+def _load_csv_tipracks(
+    ctx: ProtocolContext, csv_settings: "CSVSettings", tip: int
+) -> List[Labware]:
+    """Load or retrieve CSV tip racks without needing a full FixtureSettings."""
+    return [
+        _load_or_get_labware(
+            ctx,
+            _tiprack_load_name(tip),
+            slot,
+        )
+        for slot in csv_settings.tips[tip]
+    ]
+
+
+def _get_unused_tips_from_racks(racks: List[Labware]) -> List[Well]:
+    """Return unused tips from the given racks without resetting tip order."""
+    wells: List[Well] = []
+    rows = "ABCDEFGH"
+    for rack in racks:
+        for col in range(1, 13):
+            for row in rows:
+                well_name = f"{row}{col}"
+                next_tip = rack.next_tip(1, rack[well_name])
+                if (
+                    next_tip is not None
+                    and well_name == next_tip.well_name
+                    and _tip_has_not_been_used(rack[well_name])
+                ):
+                    wells.append(rack[well_name])
+    return wells
+
+
+def _tip_location_key(tip: Well) -> Tuple[str, str]:
+    rack = tip.parent
+    return f"{rack.load_name}:{id(rack)}", tip.well_name
+
+
+def _tip_has_not_been_used(tip: Well) -> bool:
+    return tip.has_tip and _tip_location_key(tip) not in _USED_TIP_LOCATIONS
+
+
+def _do_simulating_lpc_moves(
+    ctx: ProtocolContext,
+    csv_settings: "CSVSettings",
+    pipette: InstrumentContext,
+    source_well: Well,
+    use_96ch_stackers: bool,
+) -> None:
+    """Touch CSV tip racks and scale labware during analysis so LPC is offered."""
+    if not ctx.is_simulating():
+        return
+    if _uses_96ch_stackers(
+        csv_settings, use_96ch_stackers
+    ) or _uses_p1000h_extra_manual_exchange(csv_settings):
+        print_info(
+            "Simulating 96CH stacker LPC layout was handled by stacker "
+            "calibration moves."
+        )
+        return
+    print_info(f"Simulating LPC moves for {csv_settings.mount} mount.")
+    for tip in _tip_sizes_for_lpc(csv_settings):
+        for tiprack in _load_csv_tipracks(ctx, csv_settings, tip):
+            available_tips = _get_unused_tips_from_racks([tiprack])
+            if not available_tips:
+                print_warning(
+                    f"No simulated {tip} uL tips available in slot {tiprack.parent} "
+                    f"for {csv_settings.mount} LPC moves."
+                )
+                continue
+            lpc_tip = available_tips[0]
+            pipette.pick_up_tip(lpc_tip)
+            pipette.aspirate(min(tip, pipette.max_volume), source_well)
+            pipette.dispense(min(tip, pipette.max_volume), source_well)
+            if _uses_dual_single_no_trash(csv_settings):
+                pipette.return_tip()
+            else:
+                pipette.drop_tip()
+
+
+# -----------------------------------------------------------------------------
+# Custom: right-mount current guard for dual P1000S/P50S/P1000M/P50M workflows.
+# -----------------------------------------------------------------------------
+
+
+def _right_pipette_axes() -> List[Axis]:
+    return [Axis.P_R]
+
+
+def _set_right_pipette_idle_hold_current(ctx: ProtocolContext) -> None:
+    """Lower P_R hold current so an idle right pipette cannot continue heating."""
+    hw_api = ctx._core.get_hardware()
+    result = hw_api._backend.set_hold_current(
+        {Axis.P_R: RIGHT_PIPETTE_IDLE_HOLD_CURRENT_AMPS}
+    )
+    if asyncio.iscoroutine(result):
+        asyncio.run_coroutine_threadsafe(
+            result, hw_api._obj_to_adapt._loop
+        ).result()
+
+
+def _restore_right_pipette_default_currents(ctx: ProtocolContext) -> None:
+    """Restore P_R run and hold currents from the robot's system configuration."""
+    hw_api = ctx._core.get_hardware()
+    backend = hw_api._backend
+    default = backend.get_current_settings(hw_api.gantry_load)[Axis.P_R]
+    for setter, current in (
+        (backend.set_active_current, default.run_current),
+        (backend.set_hold_current, default.hold_current),
+    ):
+        result = setter({Axis.P_R: current})
+        if asyncio.iscoroutine(result):
+            asyncio.run_coroutine_threadsafe(
+                result, hw_api._obj_to_adapt._loop
+            ).result()
+
+
+def _stabilize_scale_before_evaporation(
+    ctx: ProtocolContext, fixture_settings: FixtureSettings
+) -> None:
+    """Stabilize the scale without changing the active pipette's motor state."""
+    ctx.delay(
+        seconds=SCALE_SECONDS_TO_TRUE_STABILIZE,
+        msg=(
+            f"Waiting {SCALE_SECONDS_TO_TRUE_STABILIZE} "
+            "for scale to stabilize"
+        ),
+    )
+
+
+def _set_right_pipette_axes_engaged(
+    ctx: ProtocolContext, engaged: bool
+) -> None:
+    """Engage or disengage the right pipette axes to control motor heat."""
+    if ctx.is_simulating():
+        return
+    hw_api = ctx._core.get_hardware()
+    axes = _right_pipette_axes()
+    if hasattr(hw_api, "axis_is_present"):
+        axes = [axis for axis in axes if hw_api.axis_is_present(axis)]
+    if not axes:
+        return
+    if engaged:
+        _restore_right_pipette_default_currents(ctx)
+        print_info(
+            "Restored default right pipette currents and engaging the right "
+            "pipette plunger for right mount testing."
+        )
+        hw_api.engage_axes(axes)
+    else:
+        print_info(
+            "Lowering right pipette plunger hold current to "
+            f"{RIGHT_PIPETTE_IDLE_HOLD_CURRENT_AMPS} A and disengaging it."
+        )
+        _set_right_pipette_idle_hold_current(ctx)
+        hw_api.disengage_axes(axes)
+
+
+@contextmanager
+def _right_pipette_heat_guard(
+    ctx: ProtocolContext,
+    active_mount: str,
+    enabled: bool,
+    pipette: InstrumentContext,
+) -> Generator[None, None, None]:
+    """Cool the waiting right pipette, then restore defaults before its test."""
+    if not enabled:
+        yield
+        return
+    right_mount_active = active_mount == "right"
+    try:
+        if right_mount_active:
+            _set_right_pipette_axes_engaged(ctx, True)
+            if not ctx.is_simulating():
+                pipette.home_plunger()
+                print_info(
+                    "Right pipette anti-heating settings cleared; system defaults "
+                    "are active before testing."
+                )
+        else:
+            _set_right_pipette_axes_engaged(ctx, False)
+        yield
+    finally:
+        if not right_mount_active:
+            try:
+                _set_right_pipette_axes_engaged(ctx, False)
+            except Exception as cleanup_error:
+                print_warning(
+                    "Failed to keep the waiting right pipette disengaged after "
+                    f"{active_mount} test: {cleanup_error}"
+                )
+
+
+def _should_manage_right_pipette_heat(
+    mounts_to_test: List[str],
+) -> bool:
+    """Manage heat only when both mounts are tested in one run."""
+    return "left" in mounts_to_test and "right" in mounts_to_test
+
+
+def _load_96ch_tiprack_on_adapter(
+    fixture_settings: FixtureSettings,
+    tip: int,
+    slot: str,
+) -> Labware:
+    if fixture_settings.stackers_96 is not None:
+        existing_rack = fixture_settings.active_96ch_racks_by_slot.get(slot)
+        if existing_rack is not None:
+            existing_tip = _tip_size_from_rack(existing_rack)
+            if existing_tip != tip:
+                raise RuntimeError(
+                    f"Slot {slot} already has T{existing_tip}, cannot load T{tip}."
+                )
+            return existing_rack
+
+        adapter = _load_or_get_tiprack_adapter(fixture_settings, slot)
+
+        if tip == fixture_settings.tip_sizes[0]:
+            rack = _load_initial_deck_96ch_rack(fixture_settings, tip, adapter)
+        else:
+            fixture_settings.ctx.comment(
+                f"prepare impact protection before retrieving T{tip} rack from stacker"
+            )
+            maybe_home_impact_for_stacker_move(fixture_settings, slot)
+            rack = _retrieve_rack_to_adapter(
+                fixture_settings.ctx,
+                fixture_settings.stackers_96,
+                tip,
+                adapter,
+            ).rack
+            _capture_or_apply_shared_tiprack_offset(
+                fixture_settings, tip, slot, rack
+            )
+        fixture_settings.active_96ch_racks_by_slot[slot] = rack
+        return rack
+
+    existing_rack = _get_loaded_labware_in_slot(slot)
+    if existing_rack is not None:
+        if existing_rack.load_name == TIPRACK_ADAPTER:
+            rack = existing_rack.load_labware(_tiprack_load_name(tip))
+            _register_loaded_labware_in_slot(slot, rack)
+            _capture_or_apply_shared_tiprack_offset(
+                fixture_settings, tip, slot, rack
+            )
+            fixture_settings.active_96ch_racks_by_slot[slot] = rack
+            return rack
+        existing_tip = _tip_size_from_rack(existing_rack)
+        if existing_tip != tip:
+            raise RuntimeError(
+                f"Slot {slot} already has T{existing_tip}, cannot load T{tip}."
+            )
+        fixture_settings.active_96ch_racks_by_slot[slot] = existing_rack
+        return existing_rack
+    rack = fixture_settings.ctx.load_labware(
+        _tiprack_load_name(tip),
+        slot,
+        adapter=TIPRACK_ADAPTER,
+    )
+    _register_loaded_labware_in_slot(slot, rack)
+    _capture_or_apply_shared_tiprack_offset(fixture_settings, tip, slot, rack)
+    fixture_settings.active_96ch_racks_by_slot[slot] = rack
+    return rack
+
+
+# -----------------------------------------------------------------------------
+# Custom: deferred liquid probe after stacker rack refresh.
+# -----------------------------------------------------------------------------
+#
+# Production behavior probes liquid as soon as the next tip size starts. In
+# stacker mode that can consume a rack before the old rack set has been recovered,
+# leaving no recovery capacity. These helpers delay the probe until the deck has
+# already been refreshed with the next tip size, then replace the probe rack
+# before formal testing starts.
+#
+# Keep this as the only measurement-loop hook for stacker-specific liquid probe
+# sequencing. If another probe timing rule is needed, add it here instead of
+# spreading stacker checks through _run().
+
+
+def _should_defer_96ch_stacker_probe(
+    fixture_settings: FixtureSettings, tip: int
+) -> bool:
+    if (
+        _uses_96ch_stacker_runtime(fixture_settings)
+        and fixture_settings.stackers_96 is not None
+        and _uses_p1000h_three_tip_stacker_plan(fixture_settings)
+        and tip in (200, 1000)
+    ):
+        return True
+    return (
+        _uses_96ch_stacker_runtime(fixture_settings)
+        and fixture_settings.stackers_96 is not None
+        and not _uses_p1000h_three_tip_stacker_plan(fixture_settings)
+        and fixture_settings.pipette_volume <= 200
+        and 50 in fixture_settings.tip_sizes
+        and 200 in fixture_settings.tip_sizes
+        and tip == 200
+    )
+
+
+def _p200h_deferred_probe_recovery_pool_tip_size(
+    fixture_settings: FixtureSettings, tip: int
+) -> Optional[int]:
+    """Recover the P200H T200 probe rack into the existing T50 recovery pool."""
+    if (
+        _uses_96ch_stacker_runtime(fixture_settings)
+        and fixture_settings.stackers_96 is not None
+        and not _uses_p1000h_three_tip_stacker_plan(fixture_settings)
+        and fixture_settings.pipette_volume <= 200
+        and 50 in fixture_settings.tip_sizes
+        and 200 in fixture_settings.tip_sizes
+        and tip == 200
+    ):
+        return SHARED_TIPRACK_OFFSET_REFERENCE_TIP
+    return None
+
+
+def _run_deferred_96ch_stacker_probe(
+    fixture_settings: FixtureSettings, tip: int, tips: List[Well]
+) -> List[Well]:
+    if fixture_settings.stackers_96 is None:
+        raise RuntimeError("96ch stackers are not initialized.")
+    if not tips:
+        raise RuntimeError(f"No T{tip} rack is available for liquid probe.")
+
+    probe_tip = tips[0]
+    probe_rack = cast(Labware, probe_tip.parent)
+    probe_adapter = cast(Labware, probe_rack.parent)
+    probe_slot = _deck_slot_key(str(probe_adapter.parent))
+    fixture_settings.ctx.comment(
+        f"run T{tip} liquid probe after refreshing deck racks"
+    )
+
+    _configure_tip_count(fixture_settings, 0)
+    pick_up_tip_for_channel(fixture_settings, probe_tip, 0)
+    fixture_settings.pipette.require_liquid_presence(
+        fixture_settings.liquid_source
+    )
+    remove_tip(fixture_settings)
+
+    fixture_settings.ctx.comment(
+        f"replace T{tip} liquid-probe rack in slot {probe_slot} before testing"
+    )
+    fixture_settings.ctx.comment(
+        f"prepare impact protection before recovering T{tip} liquid-probe rack"
+    )
+    maybe_home_impact_for_stacker_move(fixture_settings, probe_slot)
+    empty_adapter = _move_rack_to_recovery(
+        fixture_settings,
+        ActiveRack(tip_size=tip, rack=probe_rack, adapter=probe_adapter),
+        recovery_tip_size_override=_p200h_deferred_probe_recovery_pool_tip_size(
+            fixture_settings, tip
+        ),
+    )
+    fixture_settings.active_96ch_racks_by_slot.pop(probe_slot, None)
+    fixture_settings.ctx.comment(
+        f"prepare impact protection before retrieving replacement T{tip} rack"
+    )
+    maybe_home_impact_for_stacker_move(fixture_settings, probe_slot)
+    replacement_rack = _retrieve_rack_to_adapter(
+        fixture_settings.ctx,
+        fixture_settings.stackers_96,
+        tip,
+        empty_adapter,
+    ).rack
+    _capture_or_apply_shared_tiprack_offset(
+        fixture_settings, tip, probe_slot, replacement_rack
+    )
+    fixture_settings.active_96ch_racks_by_slot[probe_slot] = replacement_rack
+
+    return [
+        replacement_rack.wells()[0]
+        if cast(Labware, tip_to_use.parent) is probe_rack
+        else tip_to_use
+        for tip_to_use in tips
+    ]
+
+
+# -----------------------------------------------------------------------------
+# Extension impact implementations. Runtime parameters are defined above in
+# add_parameters().
+# -----------------------------------------------------------------------------
+
+
+# -----------------------------------------------------------------------------
+# Impact protection. Production V2 support plus independent 96ch fixture.
+# -----------------------------------------------------------------------------
+
+
+def _configure_impact_protection_96ch(
+    ctx: ProtocolContext,
+    impact_serial: Any,
+    tip_volume: int,
+) -> None:
+    cmd_name = ""
+    if tip_volume == 1000:
+        cmd_name = "set_left_p1000"
+        state = impact_serial.set_left_p1000()
+    elif tip_volume in (50, 200):
+        cmd_name = "set_left_p200"
+        state = impact_serial.set_left_p200()
+    elif tip_volume == 20:
+        cmd_name = "set_left_p20"
+        state = impact_serial.set_left_p20()
+    else:
+        raise RuntimeError(
+            f"Unsupported 96ch tip volume for impact protection: {tip_volume}"
+        )
+
+    print_info(
+        f"96ch impact command: tip={tip_volume}, cmd={cmd_name}, response={state.raw_response}"
+    )
+    ctx.delay(seconds=0.1, msg=f"96ch impact set state: {state.raw_response}")
+    if "OK" not in state.raw_response:
+        raise RuntimeError(
+            f"96ch impact protection pipette switch failed: {state.raw_response}"
+        )
+    if "OK_ALREADY" not in state.raw_response:
+        ctx.delay(
+            seconds=IMPACT_96CH_PIPETTE_MOVE_WAIT_SECONDS,
+            msg=(
+                "Waiting for 96ch impact motor to reach position: "
+                f"tip={tip_volume}, cmd={cmd_name}"
+            ),
+        )
+
+
+def _impact_96ch_response_needs_motion_wait(state: Any) -> bool:
+    response = state.raw_response.upper()
+    if "OK_ALREADY" in response:
+        return False
+    home_command = (
+        getattr(ImpactProtection96chDriver, "CMD_HOME", "Home")
+        if ImpactProtection96chDriver is not None
+        else "Home"
+    )
+    if state.command == home_command:
+        return False
+    return True
+
+
+def maybe_home_impact_protection_96ch(
+    fixture_settings: FixtureSettings, reason: str = ""
+) -> None:
+    """Home the independent 96ch impact fixture when it is connected."""
+    if (
+        fixture_settings.ctx.is_simulating()
+        or not fixture_settings.use_impact_protection
+        or fixture_settings.pipette_channels != 96
+        or not fixture_settings.ImpactSerial_96
+    ):
+        return
+
+    reason_msg = f" for {reason}" if reason else ""
+    print_info(f"96ch impact home sequence{reason_msg}")
+    state = fixture_settings.ImpactSerial_96.home()
+    print_info(f"96ch impact home command: response={state.raw_response}")
+    fixture_settings.ctx.delay(
+        seconds=0.1,
+        msg=f"96ch impact home state: {state.raw_response}",
+    )
+    if "OK" not in state.raw_response:
+        raise RuntimeError(
+            "96ch impact protection home failed: "
+            f"{state.raw_response}"
+        )
+    if _impact_96ch_response_needs_motion_wait(state):
+        fixture_settings.ctx.delay(
+            seconds=IMPACT_96CH_PIPETTE_MOVE_WAIT_SECONDS,
+            msg="Waiting for 96ch impact motor to reach home position",
+        )
+
+
+def _switch_impact_protection_v2(
+    fixture_settings: FixtureSettings, tip: int
+) -> None:
+    if (
+        not fixture_settings.use_impact_protection_v2
+        or not fixture_settings.ImpactSerial_U
+    ):
+        return
+
+    tip_mode_by_size = {
+        20: "T50",
+        50: "T50",
+        200: "T50",
+        1000: "T1000",
+    }
+    side = "LEFT" if fixture_settings.mount == "left" else "RIGHT"
+    mode = f"SET_{side}_{tip_mode_by_size[tip]}"
+    print_info(
+        f"Impact V2 command: tip={tip}, cmd={mode}, "
+        f"pipette_channels={fixture_settings.pipette_channels}"
+    )
+    impp = fixture_settings.ImpactSerial_U.switch_mode(mode)
+    if "OK" not in impp.raw_response:
+        raise RuntimeError("Collision avoidance switch failed to activate.")
+    if getattr(impp, "command_sent", True):
+        fixture_settings.ctx.delay(
+            seconds=0.1,
+            msg=f"switch_mode state :{impp.raw_response}",
+        )
+    else:
+        print_info(f"Impact V2 mode unchanged; skipping command: {mode}")
+
+
+def _close_impact_protection_v2(fixture_settings: FixtureSettings) -> None:
+    if (
+        not fixture_settings.use_impact_protection_v2
+        or not fixture_settings.ImpactSerial_U
+    ):
+        return
+
+    print_info(
+        f"Impact V2 close_all_gratings: pipette_channels={fixture_settings.pipette_channels}"
+    )
+    impp = fixture_settings.ImpactSerial_U.close_all_gratings()
+    if "OK" not in impp.raw_response:
+        raise RuntimeError(
+            "close all gratings Collision avoidance switch failed to activate. "
+            f"{impp.raw_response}"
+        )
+    if getattr(impp, "command_sent", True):
+        fixture_settings.ctx.delay(
+            seconds=0.1,
+            msg=f"close_all_gratings state :{impp.raw_response}",
+        )
+    else:
+        print_info("Impact V2 gratings already closed; skipping command: M18")
+
+
+# -----------------------------------------------------------------------------
+# Production liquid-handling helpers with guarded stacker-specific behavior.
+# -----------------------------------------------------------------------------
+
+
+def maybe_home_impact_for_stacker_move(
+    fixture_settings: FixtureSettings, deck_slot: Optional[str] = None
+) -> None:
+    """Prepare impact protection for stacker moves that need fixture clearance."""
+    if (
+        fixture_settings.ctx.is_simulating()
+        or not _should_home_96ch_impact_for_stacker_slot(deck_slot)
+    ):
+        return
+
+    _close_impact_protection_v2(fixture_settings)
+    maybe_home_impact_protection_96ch(
+        fixture_settings, f"stacker move at {_deck_slot_key(deck_slot)}"
+    )
+
+
+def _uses_96ch_stacker_runtime(fixture_settings: FixtureSettings) -> bool:
+    """Whether this run should avoid trash-only 96CH actions."""
+    return (
+        fixture_settings.use_96ch_stackers
+        and fixture_settings.pipette_channels == 96
+        and not fixture_settings.single_tip_96
+    )
+
+
+def _uses_no_trash_runtime(fixture_settings: FixtureSettings) -> bool:
+    """Whether this run returns tips and does not load or visit a trash bin."""
+    return (
+        _uses_96ch_stacker_runtime(fixture_settings)
+        or _uses_no_trash_runtime_settings(fixture_settings)
+    )
+
+
+def _liquid_class_trash_location(
+    fixture_settings: FixtureSettings,
+) -> Union[Location, TrashBin]:
+    """Return a liquid-class trash fallback without requiring a loaded trash bin."""
+    if _uses_no_trash_runtime(fixture_settings):
+        return fixture_settings.liquid_source.top()
+    return fixture_settings.pipette.trash_container  # type: ignore[return-value]
+
+
+def _close_device(name: str, device: object) -> None:
+    if device is None or not hasattr(device, "close"):
         return
     try:
-        fixture_settings.recorder.record(in_thread=True)
-        _store_config_as_old_style(fixture_settings)
-        if _should_alter_discontinuity(fixture_settings):
-            print_info("Adjusting z discontinuity for this pipette.")
-        if fixture_settings.increment:
-            _adjust_settings_for_increment(fixture_settings)
-        _run(ctx, fixture_settings)
-        if fixture_settings.ctx.params.upload_csv_automatically:  # type: ignore [attr-defined]
-            print_info("Uploading CSV to Google Drive...")
-            result = upload_data_to_google_drive(
-                csv_file_path=fixture_settings.test_report.file_path
-            )
-            if not result:
-                print_error("Failed to upload CSV to Google Drive.")
+        device.close()  # type: ignore[attr-defined]
+    except Exception as cleanup_error:
+        print_warning(f"Error closing {name}: {cleanup_error}")
+
+
+# -----------------------------------------------------------------------------
+# Run orchestration. Production run body is extracted so dual-mount runs can
+# create independent reports and always clean up each fixture.
+# -----------------------------------------------------------------------------
+
+
+def _run_fixture(
+    ctx: ProtocolContext, fixture_settings: FixtureSettings, manage_right_heat: bool
+) -> None:
+    """Run one configured pipette fixture and clean up its recorder."""
+    _MEASUREMENTS.clear()
+    try:
+        with _right_pipette_heat_guard(
+            ctx,
+            fixture_settings.mount,
+            manage_right_heat,
+            fixture_settings.pipette,
+        ):
+            if fixture_settings.fast_simulate:
+                # do LPC when it is simulating
+                if _uses_p1000h_extra_manual_exchange(fixture_settings):
+                    probe_tip = _get_p1000h_extra_probe_tip(fixture_settings)
+                    pick_up_tip_for_channel(fixture_settings, probe_tip, 0)
+                    remove_tip(fixture_settings)
+                for tip in _tip_sizes_for_lpc(fixture_settings):
+                    for channel in fixture_settings.channels:
+                        tips = _get_tips_for_test(
+                            fixture_settings, tip, False, channel
+                        )
+                        pick_up_tip_for_channel(
+                            fixture_settings, tips.pop(0), channel
+                        )
+                        remove_tip(fixture_settings)
+                print_info(
+                    "Simulating. Not running actual tests and stopping analysis."
+                )
+                return
+            fixture_settings.recorder.record(in_thread=True)
+            _store_config_as_old_style(fixture_settings)
+            if _should_alter_discontinuity(fixture_settings):
+                print_info("Adjusting z discontinuity for this pipette.")
+            if fixture_settings.increment:
+                _adjust_settings_for_increment(fixture_settings)
+            _run(ctx, fixture_settings)
+            maybe_home_impact_protection_96ch(fixture_settings, "test complete")
+            if fixture_settings.ctx.params.upload_csv_automatically:  # type: ignore [attr-defined]
+                print_info("Uploading CSV to Google Drive...")
+                result = upload_data_to_google_drive(
+                    csv_file_path=fixture_settings.test_report.file_path
+                )
+                if not result:
+                    print_error("Failed to upload CSV to Google Drive.")
     except Exception as e:
         print_error(f"Captured traceback:\n{traceback.format_exc()}")
         raise e
     finally:
+        if (
+            fixture_settings.test_report._dont_write_to_disk
+            and not fixture_settings.fast_simulate
+        ):
+            fixture_settings.test_report._dont_write_to_disk = False
+            fixture_settings.test_report.save_to_disk()
         if fixture_settings.recorder is not None:
             print_info("ending recording")
             fixture_settings.recorder.stop()
             fixture_settings.recorder.deactivate()
             set_output_file(None)
+        _close_device("environment sensor", fixture_settings.env_sensor)
+        _close_device("Impact V2", fixture_settings.ImpactSerial_U)
+        _close_device("96ch impact fixture", fixture_settings.ImpactSerial_96)
+
+
+def run(ctx: ProtocolContext) -> None:
+    """Pick up, aspirate, and dispense one trial and write it to the report."""
+    # Development note:
+    # Production has a single FixtureSettings.build() + run body. This protocol
+    # keeps the same body in _run_fixture() so each selected mount can get its own
+    # report/recorder/cleanup lifecycle. Add new per-run setup here only when it
+    # must happen once for the whole protocol, not once per mount.
+    _load_stacker_drop_offsets_config_for_run(ctx)
+    _USED_TIP_LOCATIONS.clear()
+    _DECK_LABWARE_BY_SLOT.clear()
+    csv_params = (
+        ctx.params.qc_test_profile.parse_as_csv()  # type: ignore[attr-defined]
+    )
+    csv_settings = CSVSettings.parse_csv(csv_params, ctx.is_simulating())
+    mounts_to_test = _get_mounts_to_test_from_runtime_param(ctx, csv_settings)
+    csv_settings = replace(
+        csv_settings,
+        mount=mounts_to_test[0],
+        mounts_to_test=mounts_to_test,
+    )
+    dual_multi_extension_deck = _uses_dual_multi_extension_deck(csv_settings)
+    dual_mount_no_trash = _uses_dual_mount_no_trash(csv_settings)
+    if dual_mount_no_trash:
+        ctx.comment(
+            "dual P50S/P1000S mode: CSV return_tip is enabled; "
+            "return tips and skip the trash bin"
+        )
+    elif dual_multi_extension_deck:
+        csv_settings = replace(csv_settings, return_tip=False)
+        ctx.comment(
+            "dual P50M/P1000M mode: use the A1 Trash Bin and drop every tip; "
+            "do not return tips"
+        )
+    elif _uses_dual_single(csv_settings):
+        ctx.comment(
+            "dual P50S/P1000S mode: CSV return_tip is disabled; "
+            "use the A1 Trash Bin and drop every tip"
+        )
+    if dual_multi_extension_deck:
+        _prepare_dual_multi_extension_deck_layout(ctx, csv_settings)
+    manage_right_heat = _should_manage_right_pipette_heat(csv_settings.mounts_to_test)
+    if manage_right_heat:
+        _set_right_pipette_axes_engaged(ctx, False)
+
+    for mount_index, mount in enumerate(csv_settings.mounts_to_test):
+        print_title(f"Starting gravimetric test on {mount} mount")
+        fixture_settings = FixtureSettings.build(
+            ctx,
+            csv_params=csv_params,
+            csv_settings=csv_settings,
+            mount=mount,
+        )
+        _run_fixture(ctx, fixture_settings, manage_right_heat)
+        mounts_remaining = csv_settings.mounts_to_test[mount_index + 1 :]
+        if (
+            dual_multi_extension_deck
+            and mount == "left"
+            and "right" in mounts_remaining
+        ):
+            _rearrange_tipracks_for_dual_multi_right_mount(ctx, csv_settings)
