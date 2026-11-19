@@ -5,7 +5,7 @@ import map from 'lodash/map'
 import reduce from 'lodash/reduce'
 
 import { LiquidIcon, StyledText } from '@opentrons/components'
-import { swatchColors } from '@opentrons/step-generation'
+import { AIR, swatchColors } from '@opentrons/step-generation'
 
 import { getTopPortalEl } from '/app/App/portal'
 
@@ -73,9 +73,25 @@ export function WellTooltip({
     setTooltipState(initialTooltipState)
   }
 
-  const { referenceRect, tooltipWellIngreds, tooltipWellName } = tooltipState
+  const {
+    referenceRect,
+    tooltipWellIngreds: tooltipWellIngredsWithAir,
+    tooltipWellName,
+  } = tooltipState
+
+  const tooltipWellIngreds: LocationLiquidState = {}
+
+  if (tooltipWellIngredsWithAir != null) {
+    Object.keys(tooltipWellIngredsWithAir).forEach(groupId => {
+      if (groupId !== AIR) {
+        tooltipWellIngreds[groupId] = tooltipWellIngredsWithAir[groupId]
+      }
+    })
+  }
 
   useWellTooltipPopper(tooltipEl, referenceRect)
+
+  console.log('tooltipWellIngreds', tooltipWellIngreds)
 
   const totalLiquidVolume = reduce(
     tooltipWellIngreds,
