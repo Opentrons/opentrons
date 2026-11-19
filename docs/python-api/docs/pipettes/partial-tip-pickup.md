@@ -408,11 +408,11 @@ You would get a similar error trying to aspirate from or dispense into a well pl
 
 When a tall or short collar is seated on the vacuum base in slot A3 or staged on A4, it can become an obstacle for a multi-channel pipette configured for partial tip pickup from an adjacent slot.
 
-Unlike [deck extents](#deck-extents), which block access to individual wells, a Vacuum Module collar limits access to all tips in a tip rack or wells in a plate when they're staged next to a collar. One exception is when the pipette's primary (`start`) nozzle is on the edge facing the collar. This keeps the unused portion of the pipette head shifted away from the collar. A Vacuum Module collar never restricts a pipette using the `ALL`layout.
+A Vacuum Module collar limits access to an entire tip rack or well plate in an adjacent slot, not just individual tips or wells. One exception is when the pipette's primary (`start`) nozzle is on the edge facing the collar. This keeps the unused portion of the pipette head shifted away from the collar. A Vacuum Module collar never restricts a pipette using the `ALL`layout. 
 
 ### Allowed configurations
 
-The following table lists the allowed partial tip configurations based on collar location.
+The following table lists the allowed partial tip configurations by on collar location.
 
 | Collar location | Affected slot | Pipette | Allowed configurations |
 |-----------------|---------------|---------|------------------------|
@@ -421,8 +421,8 @@ The following table lists the allowed partial tip configurations based on collar
 | **A4** | **A3** | 96-channel only | Layouts starting in column 12 (`start="A12"` or `"H12"`), or `ROW` layouts |
 
 !!! note
-    8-channel pipettes only have a single column of nozzles, so they are unaffected by collars to their left or right (e.g., pipetting in slot A2 while a collar is in A3). However, they are still blocked from pipetting in slot B3 when using `start="H1"` (including `PARTIAL_COLUMN` and back-to-front `SINGLE` layouts).
+    8-channel pipettes only have a single column of nozzles. These instruments are unaffected by collars to their left or right (e.g., pipetting in slot A2 while a collar is in A3). However, they are still blocked from pipetting in slot B3 when using `start="H1"` (including `PARTIAL_COLUMN` and back-to-front `SINGLE` layouts).
 
 ### API conflict error
 
-If you encounter an API `LocationNotAccessibleByPipetteError` rased by the location of a vacuum collar, the error message will suggest other valid primary nozzle configurations for your deck layout. You can also resolve the error moving the collar or the labware to a non-adjacent slot.
+If you encounter an API `LocationNotAccessibleByPipetteError` rased by the location of a vacuum collar, the error massage will suggest other valid primary nozzle configurations for your deck layout. You can also resolve the error moving the collar or the labware to a non-adjacent slot.
