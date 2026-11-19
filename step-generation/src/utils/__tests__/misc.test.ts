@@ -7,8 +7,10 @@ import {
   FLEX_STACKER_MODULE_TYPE,
   getMmFromBottom,
   POSITION_REFERENCE_TOP,
+  VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
 } from '@opentrons/shared-data'
 
+import { VACUUM_DOCK_LOCATION } from '../../constants'
 import {
   deckSlotKeyForFlexStackerShuttleAddressableArea,
   getFlexStackerShuttleAddressableArea,
@@ -472,6 +474,78 @@ describe('getFullStackFromLabwares', () => {
     const slot = 'D3'
     const largestStack = getFullStackFromLabwares(labware, slot, undefined)
     expect(largestStack).toEqual([])
+  })
+
+  it('finds vacuum dock stacks that only include the dock addressable area', () => {
+    const filterId = 'filterPlateId'
+    const collarId = 'collarId'
+    const labware = {
+      [collarId]: {
+        stack: [collarId, VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA],
+      },
+      [filterId]: {
+        stack: [filterId, collarId, VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA],
+      },
+    }
+
+    expect(
+      getFullStackFromLabwares(labware, VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA)
+    ).toEqual([filterId, collarId, VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA])
+  })
+
+  it('finds vacuum dock stacks that include the vacuumDock sentinel', () => {
+    const filterId = 'filterPlateId'
+    const collarId = 'collarId'
+    const vacuumModuleId = 'vacuumModuleId'
+    const dockStack = [
+      filterId,
+      collarId,
+      VACUUM_DOCK_LOCATION,
+      vacuumModuleId,
+      VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
+    ]
+    const labware = {
+      [collarId]: {
+        stack: [
+          collarId,
+          VACUUM_DOCK_LOCATION,
+          vacuumModuleId,
+          VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
+        ],
+      },
+      [filterId]: {
+        stack: dockStack,
+      },
+    }
+
+    expect(
+      getFullStackFromLabwares(labware, VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA)
+    ).toEqual(dockStack)
+  })
+
+  it('excludes vacuum dock stacks when querying by vacuum module id', () => {
+    const dockLabwareId = 'dockFilterId'
+    const moduleLabwareId = 'moduleCatchId'
+    const vacuumModuleId = 'vacuumModuleId'
+    const labware = {
+      [dockLabwareId]: {
+        stack: [
+          dockLabwareId,
+          VACUUM_DOCK_LOCATION,
+          vacuumModuleId,
+          VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
+        ],
+      },
+      [moduleLabwareId]: {
+        stack: [moduleLabwareId, vacuumModuleId, 'A3'],
+      },
+    }
+
+    expect(getFullStackFromLabwares(labware, vacuumModuleId)).toEqual([
+      moduleLabwareId,
+      vacuumModuleId,
+      'A3',
+    ])
   })
 })
 
