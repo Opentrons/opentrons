@@ -113,7 +113,7 @@ export function DeckView(props: DeckViewProps): ReactNode {
     flexStackerModules.map(module => `${module.slot.slice(0, 1)}3`)
   )
 
-  // Flex always shows A3+A4 staging chrome on every row (two equal MiddleSlots).
+  // Flex always shows staging slots.
   // Skip D3 when a waste chute owns that cutout.
   const flexStagingCutoutIds: CutoutId[] = isFlex
     ? STAGING_AREA_CUTOUTS.filter(

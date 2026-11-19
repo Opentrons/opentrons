@@ -51,7 +51,6 @@ export const getFlexHoverDimensions = (
 
   const isMiddleOfDeck =
     slotId === 'A2' || slotId === 'B2' || slotId === 'C2' || slotId === 'D2'
-  // Column-4 staging uses MiddleSlot; match that hover size.
   const isFourthColumn = FOURTH_COLUMN_SLOTS.includes(slotId)
 
   let xDimension = X_DIMENSION_OUTER_SLOTS

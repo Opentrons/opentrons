@@ -89,7 +89,6 @@ export function DeckViewOverlay(
     )
   })
   const tcSlots = robotType === FLEX_ROBOT_TYPE ? ['A1'] : ['8', '10', '11']
-  const stagingAreaLocations = stagingAreaCutoutIds
   const isWasteChuteOnSlot =
     Object.values(wasteChuteEntities).length > 0 && slotMapped === 'D3'
 
@@ -133,7 +132,7 @@ export function DeckViewOverlay(
       moduleOffsetFromCutout[2] - slotOffsetFromCutout[2],
     ]
     const { width, x, y, height } = getFlexHoverDimensions(
-      stagingAreaLocations,
+      stagingAreaCutoutIds,
       cutoutId,
       slotMapped,
       hasTCOnSlot,
