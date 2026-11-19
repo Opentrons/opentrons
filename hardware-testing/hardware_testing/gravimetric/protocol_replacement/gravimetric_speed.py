@@ -1,13 +1,16 @@
 """Gravimetric QC protocol."""
 
-from typing import List, Dict, Tuple, Optional, Any, Union, cast, Generator
+from typing import List, Dict, Tuple, Optional, Any, Union, cast, Generator, Callable
 from contextlib import contextmanager
 from dataclasses import dataclass, asdict, replace
+from statistics import median
 from time import time
 import copy
 import json
+import math
 import traceback
 import asyncio
+from functools import partial
 
 from opentrons.protocol_api import (
     ProtocolContext,
@@ -33,7 +36,7 @@ from opentrons.protocol_api.core.engine import (
 from opentrons.config import IS_ROBOT, name as get_robot_name
 from opentrons.config.defaults_ot3 import DEFAULT_MAX_SPEED_DISCONTINUITY
 from opentrons.hardware_control.types import OT3AxisKind, OT3Mount, Axis
-from opentrons.types import Point, DeckSlotName, Location
+from opentrons.types import Point, DeckSlotName, Location, Mount
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
 
@@ -121,6 +124,8 @@ from hardware_testing.gravimetric.measurement.environment import (  # noqa: E402
     get_max_reading,
 )
 
+from hardware_testing.gravimetric.workarounds import get_sync_hw_api  # noqa: E402
+
 from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
     GravimetricRecorder,
     GravimetricRecorderConfig,
@@ -134,10 +139,63 @@ requirements = {"robotType": "Flex", "apiLevel": "2.29"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
 IMPACT_96CH_PIPETTE_MOVE_WAIT_SECONDS = 15
-RIGHT_PIPETTE_IDLE_HOLD_CURRENT_AMPS = 0.1
+SCALE_STABILITY_WINDOW_SECONDS = 10.0
+SCALE_STABILITY_MAX_SPAN_GRAMS = 0.01
+SCALE_STABILITY_POLL_SECONDS = 1.0
+SCALE_STABILITY_TIMEOUT_SECONDS = SCALE_SECONDS_TO_TRUE_STABILIZE
+SCALE_SECONDS_TO_RESTABILIZE_AFTER_PIPETTE = 15.0
+PIPETTE_IDLE_CURRENT_AMPS = 0.1
+PIPETTE_CURRENT_TOLERANCE_AMPS = 0.01
+EVAPORATION_MAD_SCALE = 1.4826
+EVAPORATION_OUTLIER_SIGMA = 3.5
+EVAPORATION_SCALE_RESOLUTION_UL = 0.1
+EVAPORATION_MIN_VALID_INTERVALS = 3
+EVAPORATION_MIN_VALID_FRACTION = 0.70
+EVAPORATION_MAX_TARGET_VOLUME_FRACTION = 0.10
+EVAPORATION_MIN_MAX_COMPENSATION_UL = 0.05
+
 
 # Dual P50M/P1000M runs use a registered Flex Trash Bin in A1.
 DUAL_MULTI_TRASH_SLOT = "A1"
+
+
+@dataclass(frozen=True)
+class EvaporationRateObservation:
+    """One direction-aware blank interval used to estimate evaporation rate."""
+
+    trial: int
+    phase: str
+    elapsed_seconds: float
+    signed_volume_ul: float
+    rate_ul_per_second: float
+
+
+@dataclass(frozen=True)
+class EvaporationPhaseRateEstimate:
+    """Validated evaporation rate for one blank phase."""
+
+    rate_ul_per_second: float
+    valid: bool
+    fallback_reason: Optional[str]
+    legacy_compensation_ul: float
+    accepted_indexes: set[int]
+    required_count: int
+    center_rate: Optional[float]
+    mad_rate: Optional[float]
+    outlier_tolerance_rate: Optional[float]
+
+
+@dataclass(frozen=True)
+class EvaporationRateEstimate:
+    """Validated, direction-specific evaporation rates."""
+
+    aspirate_evaporation_rate: float
+    dispense_evaporation_rate: float
+    valid: bool
+    fallback_reason: Optional[str]
+    legacy_aspirate_compensation_ul: float
+    legacy_dispense_compensation_ul: float
+
 
 
 # =============================================================================
@@ -165,6 +223,8 @@ DUAL_MULTI_TRASH_SLOT = "A1"
 #
 # Main extension zones:
 # - Runtime params: mounts_to_test, use_96ch_stackers, use_impact_protection_v2.
+# - 1/8ch evaporation: dry blank tips, independent robust phase rates, and
+#   time-scaled correction; 96ch retains its original probe and compensation.
 # - FixtureSettings.build(): independent impact connections, stacker bootstrap, shared
 #   tiprack offsets, and optional trash-bin setup.
 # - run() / _run_fixture(): per-mount orchestration, cleanup, and upload.
@@ -1828,6 +1888,14 @@ def _run_and_store_trial(
         channel,
         last_measurement,
     )
+    # 96ch keeps its existing fixed uL correction; other pipettes use uL/s.
+    if fixture_settings.pipette_channels != 96:
+        avg_asp_evap = _timed_evaporation_compensation(
+            avg_asp_evap, trial_measurements[0], trial_measurements[1], "aspirate"
+        )
+        avg_disp_evap = _timed_evaporation_compensation(
+            avg_disp_evap, trial_measurements[1], trial_measurements[2], "dispense"
+        )
     asp_with_evap = (
         calculate_change_in_volume(
             trial_measurements[0],
@@ -1891,7 +1959,327 @@ def _configure_tip_count(fixture_settings: FixtureSettings, channel: int) -> Non
         print_info(f"Configuring for single tip with {primary}")
 
 
-def calculate_evaporation(
+def _calculate_signed_change_in_volume(
+    before: MeasurementData,
+    after: MeasurementData,
+    liq: SupportedLiquid,
+) -> float:
+    """Return positive volume for mass loss and negative volume for mass gain."""
+    magnitude = calculate_change_in_volume(before, after, liq)
+    mass_change = before.grams_average - after.grams_average
+    if mass_change > 0:
+        return magnitude
+    if mass_change < 0:
+        return -magnitude
+    return 0.0
+
+
+
+def _measurement_reference_time(measurement: MeasurementData) -> float:
+    """Return the midpoint of the scale sample window."""
+    return measurement.samples_start_time + (measurement.samples_duration / 2.0)
+
+
+
+def _measurement_elapsed_seconds(
+    before: MeasurementData, after: MeasurementData
+) -> float:
+    return _measurement_reference_time(after) - _measurement_reference_time(before)
+
+
+
+def _get_max_evaporation_compensation(
+    fixture_settings: FixtureSettings,
+) -> float:
+    target_volumes = [
+        volume
+        for volume_groups in (
+            fixture_settings.volumes,
+            fixture_settings.extra_volumes,
+        )
+        for volumes in volume_groups.values()
+        for volume in volumes
+        if volume > 0
+    ]
+    if not target_volumes:
+        return EVAPORATION_MIN_MAX_COMPENSATION_UL
+    minimum_target_volume = min(target_volumes)
+    return max(
+        EVAPORATION_MIN_MAX_COMPENSATION_UL,
+        minimum_target_volume * EVAPORATION_MAX_TARGET_VOLUME_FRACTION,
+    )
+
+
+
+def _log_evaporation_diagnostics(
+    observations: List[EvaporationRateObservation],
+    phase_estimates: Dict[str, EvaporationPhaseRateEstimate],
+    *,
+    valid: bool,
+    fallback_reason: Optional[str],
+) -> None:
+    phase_diagnostics = {
+        phase: {
+            "rate_ul_per_second": estimate.rate_ul_per_second,
+            "valid": estimate.valid,
+            "fallback_reason": estimate.fallback_reason,
+            "required_intervals": estimate.required_count,
+            "accepted_intervals": len(estimate.accepted_indexes),
+            "center_rate_ul_per_second": estimate.center_rate,
+            "mad_rate_ul_per_second": estimate.mad_rate,
+            "outlier_tolerance_rate_ul_per_second": estimate.outlier_tolerance_rate,
+            "legacy_compensation_ul": estimate.legacy_compensation_ul,
+        }
+        for phase, estimate in phase_estimates.items()
+    }
+    accepted_indexes = set().union(
+        *(estimate.accepted_indexes for estimate in phase_estimates.values())
+    )
+    payload = {
+        "valid": valid,
+        "fallback_reason": fallback_reason,
+        "aspirate_evaporation_rate": phase_estimates["aspirate"].rate_ul_per_second,
+        "dispense_evaporation_rate": phase_estimates["dispense"].rate_ul_per_second,
+        "phase_estimates": phase_diagnostics,
+        "accepted_intervals": len(accepted_indexes),
+        "total_intervals": len(observations),
+        "scale_resolution_ul": EVAPORATION_SCALE_RESOLUTION_UL,
+        "phase_intervals": {
+            phase: {
+                "total": sum(
+                    observation.phase == phase for observation in observations
+                ),
+                "required": phase_estimates[phase].required_count,
+                "accepted": len(phase_estimates[phase].accepted_indexes),
+            }
+            for phase in ("aspirate", "dispense")
+        },
+        "intervals": [
+            {
+                "trial": observation.trial,
+                "phase": observation.phase,
+                "elapsed_seconds": (
+                    observation.elapsed_seconds
+                    if math.isfinite(observation.elapsed_seconds)
+                    else None
+                ),
+                "signed_volume_ul": (
+                    observation.signed_volume_ul
+                    if math.isfinite(observation.signed_volume_ul)
+                    else None
+                ),
+                "rate_ul_per_second": (
+                    observation.rate_ul_per_second
+                    if math.isfinite(observation.rate_ul_per_second)
+                    else None
+                ),
+                "accepted": index in accepted_indexes,
+            }
+            for index, observation in enumerate(observations)
+        ],
+    }
+    print_info(f"EVAPORATION_DIAGNOSTICS {json.dumps(payload, sort_keys=True)}")
+
+
+
+def _robust_evaporation_rate(
+    observations: List[EvaporationRateObservation],
+    fixture_settings: FixtureSettings,
+) -> EvaporationRateEstimate:
+    """Return independent direction-aware rates after robust filtering."""
+
+    def _estimate_phase(phase: str) -> EvaporationPhaseRateEstimate:
+        phase_observations = [
+            (index, observation)
+            for index, observation in enumerate(observations)
+            if observation.phase == phase
+        ]
+        required_count = max(
+            EVAPORATION_MIN_VALID_INTERVALS,
+            math.ceil(len(phase_observations) * EVAPORATION_MIN_VALID_FRACTION),
+        )
+        finite_observations = [
+            (index, observation)
+            for index, observation in phase_observations
+            if observation.elapsed_seconds > 0
+            and math.isfinite(observation.elapsed_seconds)
+            and math.isfinite(observation.signed_volume_ul)
+            and math.isfinite(observation.rate_ul_per_second)
+        ]
+        if len(finite_observations) < required_count:
+            reason = (
+                f"only {len(finite_observations)}/{len(phase_observations)} "
+                "finite intervals"
+            )
+            print_warning(
+                f"{phase.capitalize()} evaporation rate is invalid ({reason}); "
+                "using 0 uL/s"
+            )
+            return EvaporationPhaseRateEstimate(
+                rate_ul_per_second=0.0,
+                valid=False,
+                fallback_reason=reason,
+                legacy_compensation_ul=0.0,
+                accepted_indexes=set(),
+                required_count=required_count,
+                center_rate=None,
+                mad_rate=None,
+                outlier_tolerance_rate=None,
+            )
+
+        finite_rates = [
+            observation.rate_ul_per_second for _, observation in finite_observations
+        ]
+        center_rate = float(median(finite_rates))
+        mad_rate = float(median(abs(rate - center_rate) for rate in finite_rates))
+        representative_elapsed = float(
+            median(
+                observation.elapsed_seconds for _, observation in finite_observations
+            )
+        )
+        resolution_tolerance_rate = (
+            EVAPORATION_SCALE_RESOLUTION_UL / representative_elapsed
+        )
+        outlier_tolerance_rate = max(
+            resolution_tolerance_rate,
+            EVAPORATION_OUTLIER_SIGMA * EVAPORATION_MAD_SCALE * mad_rate,
+        )
+        accepted = [
+            (index, observation)
+            for index, observation in finite_observations
+            if abs(observation.rate_ul_per_second - center_rate)
+            <= outlier_tolerance_rate
+        ]
+        accepted_indexes = {index for index, _ in accepted}
+        if len(accepted) < required_count:
+            reason = (
+                f"only {len(accepted)}/{len(phase_observations)} intervals "
+                "passed filtering"
+            )
+            print_warning(
+                f"{phase.capitalize()} evaporation rate is invalid ({reason}); "
+                "using 0 uL/s"
+            )
+            return EvaporationPhaseRateEstimate(
+                rate_ul_per_second=0.0,
+                valid=False,
+                fallback_reason=reason,
+                legacy_compensation_ul=0.0,
+                accepted_indexes=accepted_indexes,
+                required_count=required_count,
+                center_rate=center_rate,
+                mad_rate=mad_rate,
+                outlier_tolerance_rate=outlier_tolerance_rate,
+            )
+
+        rate_ul_per_second = float(
+            median(observation.rate_ul_per_second for _, observation in accepted)
+        )
+        if rate_ul_per_second < 0:
+            reason = f"median rate indicates mass gain ({rate_ul_per_second:.6f} uL/s)"
+            print_warning(
+                f"{phase.capitalize()} evaporation rate is invalid ({reason}); "
+                "using 0 uL/s"
+            )
+            return EvaporationPhaseRateEstimate(
+                rate_ul_per_second=0.0,
+                valid=False,
+                fallback_reason=reason,
+                legacy_compensation_ul=0.0,
+                accepted_indexes=accepted_indexes,
+                required_count=required_count,
+                center_rate=center_rate,
+                mad_rate=mad_rate,
+                outlier_tolerance_rate=outlier_tolerance_rate,
+            )
+
+        max_compensation_ul = _get_max_evaporation_compensation(fixture_settings)
+        largest_blank_compensation = rate_ul_per_second * max(
+            observation.elapsed_seconds for _, observation in accepted
+        )
+        if largest_blank_compensation > max_compensation_ul:
+            reason = (
+                f"compensation {largest_blank_compensation:.6f} uL exceeds "
+                f"{max_compensation_ul:.6f} uL"
+            )
+            print_warning(
+                f"{phase.capitalize()} evaporation rate is invalid ({reason}); "
+                "using 0 uL/s"
+            )
+            return EvaporationPhaseRateEstimate(
+                rate_ul_per_second=0.0,
+                valid=False,
+                fallback_reason=reason,
+                legacy_compensation_ul=0.0,
+                accepted_indexes=accepted_indexes,
+                required_count=required_count,
+                center_rate=center_rate,
+                mad_rate=mad_rate,
+                outlier_tolerance_rate=outlier_tolerance_rate,
+            )
+
+        legacy_compensation_ul = rate_ul_per_second * float(
+            median(observation.elapsed_seconds for _, observation in accepted)
+        )
+        return EvaporationPhaseRateEstimate(
+            rate_ul_per_second=rate_ul_per_second,
+            valid=True,
+            fallback_reason=None,
+            legacy_compensation_ul=legacy_compensation_ul,
+            accepted_indexes=accepted_indexes,
+            required_count=required_count,
+            center_rate=center_rate,
+            mad_rate=mad_rate,
+            outlier_tolerance_rate=outlier_tolerance_rate,
+        )
+
+    phase_estimates = {
+        phase: _estimate_phase(phase) for phase in ("aspirate", "dispense")
+    }
+    fallback_reasons = [
+        f"{phase}: {estimate.fallback_reason}"
+        for phase, estimate in phase_estimates.items()
+        if estimate.fallback_reason
+    ]
+    fallback_reason = "; ".join(fallback_reasons) or None
+    valid = all(estimate.valid for estimate in phase_estimates.values())
+    aspirate_estimate = phase_estimates["aspirate"]
+    dispense_estimate = phase_estimates["dispense"]
+    _log_evaporation_diagnostics(
+        observations,
+        phase_estimates,
+        valid=valid,
+        fallback_reason=fallback_reason,
+    )
+    return EvaporationRateEstimate(
+        aspirate_evaporation_rate=aspirate_estimate.rate_ul_per_second,
+        dispense_evaporation_rate=dispense_estimate.rate_ul_per_second,
+        valid=valid,
+        fallback_reason=fallback_reason,
+        legacy_aspirate_compensation_ul=aspirate_estimate.legacy_compensation_ul,
+        legacy_dispense_compensation_ul=dispense_estimate.legacy_compensation_ul,
+    )
+
+
+
+def _timed_evaporation_compensation(
+    rate_ul_per_second: float,
+    before: MeasurementData,
+    after: MeasurementData,
+    phase: str,
+) -> float:
+    elapsed_seconds = _measurement_elapsed_seconds(before, after)
+    if elapsed_seconds <= 0 or not math.isfinite(elapsed_seconds):
+        print_warning(
+            f"Invalid {phase} evaporation interval {elapsed_seconds}; "
+            "using 0 uL compensation for this measurement"
+        )
+        return 0.0
+    return rate_ul_per_second * elapsed_seconds
+
+
+
+def _calculate_96ch_evaporation(
     ctx: ProtocolContext,
     fixture_settings: FixtureSettings,
     liq: SupportedLiquid,
@@ -1899,7 +2287,6 @@ def calculate_evaporation(
 ) -> Tuple[List[List[MeasurementData]], float, float]:
     """This is done at the begining of the test and during the cavity test it happens again for each cavity."""
     print_info("Detecting liquid height.")
-
 
     fixture_settings.pipette._retract()
     maybe_switch_mode(fixture_settings, fixture_settings.tip_sizes[0])
@@ -1952,6 +2339,103 @@ def calculate_evaporation(
     return blank_measurments, avg_asp_evap, avg_disp_evap
 
 
+
+def calculate_evaporation(
+    ctx: ProtocolContext,
+    fixture_settings: FixtureSettings,
+    liq: SupportedLiquid,
+    tip: Well,
+    scale_stabilization_seconds: float = SCALE_SECONDS_TO_TRUE_STABILIZE,
+    state_log_callback: Optional[Callable[[str], None]] = None,
+) -> Tuple[List[List[MeasurementData]], float, float]:
+    """Measure a robust background evaporation rate with a dry attached tip."""
+    # Preserve the original probe, timing, and fixed compensation for 96ch runs.
+    if fixture_settings.pipette_channels == 96:
+        return _calculate_96ch_evaporation(ctx, fixture_settings, liq, tip)
+    fixture_settings.pipette._retract()
+    maybe_switch_mode(fixture_settings, fixture_settings.tip_sizes[0])
+    blank_measurments: List[List[MeasurementData]] = []
+    _stabilize_scale_before_evaporation(
+        ctx, fixture_settings, seconds=scale_stabilization_seconds
+    )
+    for i in range(fixture_settings.blank_trials):
+        print_header(f"Running blank trial {i}")
+        if i == 0 and state_log_callback is not None:
+            state_log_callback("first-blank")
+        with _batch_report_update(fixture_settings.test_report):
+            blank_measurments.append(
+                run_blank_test(
+                    fixture_settings,
+                    fixture_settings.tip_sizes[0],
+                    fixture_settings.volumes[fixture_settings.tip_sizes[0]][0],
+                    i,
+                    tip,
+                )
+            )
+    observations: List[EvaporationRateObservation] = []
+    for trial, blank in enumerate(blank_measurments, start=1):
+        for phase, before, after in (
+            ("aspirate", blank[0], blank[1]),
+            ("dispense", blank[1], blank[2]),
+        ):
+            elapsed_seconds = _measurement_elapsed_seconds(before, after)
+            signed_volume_ul = _calculate_signed_change_in_volume(before, after, liq)
+            rate_ul_per_second = (
+                signed_volume_ul / elapsed_seconds
+                if elapsed_seconds > 0 and math.isfinite(elapsed_seconds)
+                else math.nan
+            )
+            observations.append(
+                EvaporationRateObservation(
+                    trial=trial,
+                    phase=phase,
+                    elapsed_seconds=elapsed_seconds,
+                    signed_volume_ul=signed_volume_ul,
+                    rate_ul_per_second=rate_ul_per_second,
+                )
+            )
+    estimate = _robust_evaporation_rate(observations, fixture_settings)
+    # Keep the legacy CSV field names and shape for production report compatibility.
+    report.store_average_evaporation(
+        fixture_settings.test_report,
+        estimate.legacy_aspirate_compensation_ul,
+        estimate.legacy_dispense_compensation_ul,
+    )
+    phase_elapsed_seconds = {"aspirate": 0.0, "dispense": 0.0}
+    for blank in blank_measurments:
+        for phase, before, after in (
+            ("aspirate", blank[0], blank[1]),
+            ("dispense", blank[1], blank[2]),
+        ):
+            elapsed_seconds = _measurement_elapsed_seconds(before, after)
+            if elapsed_seconds <= 0 or not math.isfinite(elapsed_seconds):
+                continue
+            phase_elapsed_seconds[phase] += elapsed_seconds
+    observed_elapsed_seconds = sum(phase_elapsed_seconds.values())
+    if blank_measurments and observed_elapsed_seconds > 0:
+        weighted_blank_rate = (
+            estimate.aspirate_evaporation_rate * phase_elapsed_seconds["aspirate"]
+            + estimate.dispense_evaporation_rate * phase_elapsed_seconds["dispense"]
+        ) / observed_elapsed_seconds
+        total_blank_seconds = _measurement_elapsed_seconds(
+            blank_measurments[0][0], blank_measurments[-1][-1]
+        )
+        volume_lost_during_blank = weighted_blank_rate * max(0.0, total_blank_seconds)
+    else:
+        volume_lost_during_blank = 0.0
+    if not ctx.is_simulating():
+        fixture_settings.liquid_source.load_liquid(
+            fixture_settings.liquid,
+            fixture_settings.liquid_source.current_liquid_volume()  # type: ignore[arg-type]
+            - volume_lost_during_blank,
+        )
+    return (
+        blank_measurments,
+        estimate.aspirate_evaporation_rate,
+        estimate.dispense_evaporation_rate,
+    )
+
+
 # -----------------------------------------------------------------------------
 # Main measurement loop. Keep this production-shaped; custom hook is deferred
 # liquid probe only when stacker rack refresh must happen before probing.
@@ -1973,7 +2457,34 @@ def _get_passing_requirements(
     return None
 
 
-def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
+def _prepare_dry_blank_tip(
+    fixture_settings: FixtureSettings,
+    available_tips: Optional[List[Well]] = None,
+) -> Well:
+    """Probe with the attached tip, then attach a fresh dry tip for 1/8ch blanks."""
+    fixture_settings.pipette._retract()
+    maybe_switch_mode(fixture_settings, fixture_settings.tip_sizes[0])
+    fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
+    fixture_settings.pipette._retract()
+    remove_tip(fixture_settings)
+    if available_tips is None:
+        available_tips = _get_tips_for_test(
+            fixture_settings, fixture_settings.tip_sizes[0], True
+        )
+    if not available_tips:
+        raise RuntimeError("No fresh dry tip is available for evaporation blanks.")
+    blank_tip = available_tips.pop(0)
+    print_info("Picking up a fresh dry tip for evaporation blanks.")
+    pick_up_tip_for_channel(fixture_settings, blank_tip, 0)
+    return blank_tip
+
+
+def _run(
+    ctx: ProtocolContext,
+    fixture_settings: FixtureSettings,
+    scale_stabilization_seconds: Optional[float] = None,
+    state_log_callback: Optional[Callable[[str], None]] = None,
+) -> None:
     """Run."""
     # close all gratings
     maybe_close_all_gratings(fixture_settings)
@@ -1987,19 +2498,30 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     last_probed_tip_size = fixture_settings.tip_sizes[0]
     liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
     if fixture_settings.run_evaporation:
+        if fixture_settings.pipette_channels != 96:
+            first_tip = _prepare_dry_blank_tip(fixture_settings)
         blank_measurments, avg_asp_evap, avg_disp_evap = calculate_evaporation(
-            ctx, fixture_settings, liq, first_tip
+            ctx,
+            fixture_settings,
+            liq,
+            first_tip,
+            scale_stabilization_seconds=(
+                SCALE_SECONDS_TO_TRUE_STABILIZE
+                if scale_stabilization_seconds is None
+                else scale_stabilization_seconds
+            ),
+            state_log_callback=state_log_callback,
         )
-        last_measurement: Optional[MeasurementData] = blank_measurments[-1][-1]
+        last_measurement: Optional[MeasurementData] = (
+            blank_measurments[-1][-1] if blank_measurments else None
+        )
     else:
         ctx.comment(
             "evaporation blank disabled: skip scale stabilization and blank trials"
         )
         fixture_settings.pipette._retract()
         maybe_switch_mode(fixture_settings, fixture_settings.tip_sizes[0])
-        fixture_settings.pipette.require_liquid_presence(
-            fixture_settings.liquid_source
-        )
+        fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
         fixture_settings.pipette._retract()
         avg_asp_evap = 0.0
         avg_disp_evap = 0.0
@@ -2046,9 +2568,7 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 # override pipette movement conflict checking 'cause we specially lay out our tipracks
                 tips = _get_tips_for_test(fixture_settings, tip, False, channel)
                 if deferred_96ch_probe:
-                    tips = _run_deferred_96ch_stacker_probe(
-                        fixture_settings, tip, tips
-                    )
+                    tips = _run_deferred_96ch_stacker_probe(fixture_settings, tip, tips)
                     last_probed_tip_size = tip
                     deferred_96ch_probe = False
                 print_info(str(tips))
@@ -2076,13 +2596,18 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                             and trial % 15 == 0
                         ):
                             pick_up_tip_for_channel(fixture_settings, tips[0], 0)
+                            blank_tip = tips.pop(0)
+                            if fixture_settings.pipette_channels != 96:
+                                blank_tip = _prepare_dry_blank_tip(
+                                    fixture_settings, tips
+                                )
                             print_info("calculating evap.")
                             (
                                 blank_measurments,
                                 avg_asp_evap,
                                 avg_disp_evap,
                             ) = calculate_evaporation(
-                                ctx, fixture_settings, liq, tips.pop(0)
+                                ctx, fixture_settings, liq, blank_tip
                             )
                             remove_tip(fixture_settings)
                         print_header(
@@ -2187,12 +2712,16 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                         )
             with _batch_report_update(fixture_settings.test_report):
                 for trial in range(fixture_settings.trials):
-                    aspirate_average, aspirate_cv, aspirate_d = (
-                        helpers._calculate_stats(trial_asp_dict[trial], volume)
-                    )
-                    dispense_average, dispense_cv, dispense_d = (
-                        helpers._calculate_stats(trial_disp_dict[trial], volume)
-                    )
+                    (
+                        aspirate_average,
+                        aspirate_cv,
+                        aspirate_d,
+                    ) = helpers._calculate_stats(trial_asp_dict[trial], volume)
+                    (
+                        dispense_average,
+                        dispense_cv,
+                        dispense_d,
+                    ) = helpers._calculate_stats(trial_disp_dict[trial], volume)
                     report.store_volume_per_trial(
                         report=fixture_settings.test_report,
                         mode="aspirate",
@@ -2298,7 +2827,7 @@ def _adjust_settings_for_increment(fixture_settings: FixtureSettings) -> None:
 #
 # - Dual-mount execution:
 #   _parse_mounts_to_test(), _get_mounts_to_test_from_runtime_param(),
-#   _right_pipette_heat_guard(), _run_fixture(), run().
+#   _dual_pipette_heat_guard(), _run_fixture(), run().
 # =============================================================================
 
 
@@ -3823,122 +4352,431 @@ def _do_simulating_lpc_moves(
 
 
 # -----------------------------------------------------------------------------
-# Custom: right-mount current guard for dual P1000S/P50S/P1000M/P50M workflows.
+# Custom: symmetric dual-mount current guard for dual P1000S/P50S/P1000M/P50M workflows.
 # -----------------------------------------------------------------------------
 
 
-def _right_pipette_axes() -> List[Axis]:
-    return [Axis.P_R]
+PIPETTE_AXES_BY_MOUNT: Dict[str, Axis] = {
+    "left": Axis.P_L,
+    "right": Axis.P_R,
+}
 
 
-def _set_right_pipette_idle_hold_current(ctx: ProtocolContext) -> None:
-    """Lower P_R hold current so an idle right pipette cannot continue heating."""
-    hw_api = ctx._core.get_hardware()
-    result = hw_api._backend.set_hold_current(
-        {Axis.P_R: RIGHT_PIPETTE_IDLE_HOLD_CURRENT_AMPS}
-    )
+def _resolve_hardware_result(hw_api: Any, result: Any) -> Any:
+    """Resolve a backend coroutine when the hardware API is synchronously adapted."""
     if asyncio.iscoroutine(result):
-        asyncio.run_coroutine_threadsafe(
+        return asyncio.run_coroutine_threadsafe(
             result, hw_api._obj_to_adapt._loop
         ).result()
+    return result
 
 
-def _restore_right_pipette_default_currents(ctx: ProtocolContext) -> None:
-    """Restore P_R run and hold currents from the robot's system configuration."""
+@dataclass(frozen=True)
+class _PipetteMotorState:
+    """Motor settings that must be restored after a dual-mount run."""
+
+    run_current: float
+    hold_current: float
+    engaged: bool
+
+
+def _present_pipette_axes(ctx: ProtocolContext) -> Dict[str, Axis]:
+    """Return the present pipette axes, preserving mount-to-axis ownership."""
+    hw_api = ctx._core.get_hardware()
+    if not hasattr(hw_api, "axis_is_present"):
+        return dict(PIPETTE_AXES_BY_MOUNT)
+    return {
+        mount: axis
+        for mount, axis in PIPETTE_AXES_BY_MOUNT.items()
+        if hw_api.axis_is_present(axis)
+    }
+
+
+def _read_pipette_motor_engaged(ctx: ProtocolContext, axis: Axis) -> bool:
+    """Read engagement from the backend before changing an axis state."""
     hw_api = ctx._core.get_hardware()
     backend = hw_api._backend
-    default = backend.get_current_settings(hw_api.gantry_load)[Axis.P_R]
-    for setter, current in (
-        (backend.set_active_current, default.run_current),
-        (backend.set_hold_current, default.hold_current),
+    if hasattr(backend, "is_motor_engaged"):
+        return bool(_resolve_hardware_result(hw_api, backend.is_motor_engaged(axis)))
+    engaged_axes = getattr(hw_api, "engaged_axes", None)
+    if callable(engaged_axes):
+        engaged_axes = engaged_axes()
+    if isinstance(engaged_axes, dict) and axis in engaged_axes:
+        return bool(engaged_axes[axis])
+    raise RuntimeError(f"Unable to read motor engagement for {axis.name}")
+
+
+def _capture_pipette_motor_states(
+    ctx: ProtocolContext, axes: Dict[str, Axis]
+) -> Dict[Axis, _PipetteMotorState]:
+    """Capture both pipette current and engagement states before dual testing."""
+    return {
+        axis: _PipetteMotorState(
+            run_current=run_current,
+            hold_current=hold_current,
+            engaged=_read_pipette_motor_engaged(ctx, axis),
+        )
+        for axis in axes.values()
+        for run_current, hold_current in [_read_pipette_currents(ctx, axis)]
+    }
+
+
+def _read_pipette_currents(ctx: ProtocolContext, axis: Axis) -> Tuple[float, float]:
+    """Read the live backend current values, with a legacy API fallback."""
+    hw_api = ctx._core.get_hardware()
+    backend = hw_api._backend
+    try:
+        run_currents = getattr(backend, "motor_run_currents")
+        hold_currents = getattr(backend, "motor_hold_currents")
+        return float(run_currents[axis]), float(hold_currents[axis])
+    except (AttributeError, AssertionError, KeyError, TypeError):
+        current_settings = backend.get_current_settings(hw_api.gantry_load)
+        return (
+            float(current_settings[axis].run_current),
+            float(current_settings[axis].hold_current),
+        )
+
+
+def _read_capacity_test_currents(
+    ctx: ProtocolContext, axes: Dict[str, Axis]
+) -> Dict[Axis, Tuple[float, float]]:
+    """Read run/idle currents used by liquid actions from loaded pipettes."""
+    hw_api = ctx._core.get_hardware()
+    capacity_test_currents: Dict[Axis, Tuple[float, float]] = {}
+    for mount, axis in axes.items():
+        hardware_pipette = hw_api.hardware_pipettes[Mount.string_to_mount(mount)]
+        if hardware_pipette is None:
+            raise RuntimeError(
+                f"Unable to read capacity-test current: no pipette on {mount} mount"
+            )
+        capacity_test_currents[axis] = (
+            float(hardware_pipette.plunger_motor_current.run),
+            float(hardware_pipette.plunger_motor_current.idle),
+        )
+    return capacity_test_currents
+
+
+def _set_pipette_currents(
+    ctx: ProtocolContext,
+    axis: Axis,
+    run_current: float,
+    hold_current: float,
+) -> None:
+    """Set both run and hold current for one pipette axis."""
+    hw_api = ctx._core.get_hardware()
+    backend = hw_api._backend
+    _resolve_hardware_result(hw_api, backend.set_active_current({axis: run_current}))
+    _resolve_hardware_result(hw_api, backend.set_hold_current({axis: hold_current}))
+
+
+def _set_pipette_engaged(ctx: ProtocolContext, axis: Axis, engaged: bool) -> None:
+    """Set one pipette motor's engagement state."""
+    hw_api = ctx._core.get_hardware()
+    if engaged:
+        _resolve_hardware_result(hw_api, hw_api.engage_axes([axis]))
+    else:
+        _resolve_hardware_result(hw_api, hw_api.disengage_axes([axis]))
+
+
+def _verify_pipette_engagement(
+    ctx: ProtocolContext, axis: Axis, expected: bool
+) -> None:
+    """Fail if hardware did not accept the requested motor state."""
+    actual = _read_pipette_motor_engaged(ctx, axis)
+    if actual != expected:
+        raise RuntimeError(
+            f"Pipette motor {axis.name} engagement mismatch: "
+            f"expected {expected}, got {actual}"
+        )
+
+
+def _verify_pipette_currents(
+    ctx: ProtocolContext,
+    axis: Axis,
+    expected_run_current: float,
+    expected_hold_current: float,
+) -> None:
+    """Fail if a current write was overwritten by instrument setup."""
+    actual_run_current, actual_hold_current = _read_pipette_currents(ctx, axis)
+    if not math.isclose(
+        actual_run_current,
+        expected_run_current,
+        abs_tol=PIPETTE_CURRENT_TOLERANCE_AMPS,
+    ) or not math.isclose(
+        actual_hold_current,
+        expected_hold_current,
+        abs_tol=PIPETTE_CURRENT_TOLERANCE_AMPS,
     ):
-        result = setter({Axis.P_R: current})
-        if asyncio.iscoroutine(result):
-            asyncio.run_coroutine_threadsafe(
-                result, hw_api._obj_to_adapt._loop
-            ).result()
+        raise RuntimeError(
+            f"Pipette motor {axis.name} current mismatch: "
+            f"expected run/hold {expected_run_current}/{expected_hold_current} A, "
+            f"got {actual_run_current}/{actual_hold_current} A"
+        )
 
 
 def _stabilize_scale_before_evaporation(
-    ctx: ProtocolContext, fixture_settings: FixtureSettings
+    ctx: ProtocolContext,
+    fixture_settings: FixtureSettings,
+    seconds: float = SCALE_SECONDS_TO_TRUE_STABILIZE,
 ) -> None:
     """Stabilize the scale without changing the active pipette's motor state."""
+    if seconds <= 0:
+        return
     ctx.delay(
-        seconds=SCALE_SECONDS_TO_TRUE_STABILIZE,
-        msg=(
-            f"Waiting {SCALE_SECONDS_TO_TRUE_STABILIZE} "
-            "for scale to stabilize"
-        ),
+        seconds=seconds,
+        msg=(f"Waiting {seconds:g} " "for scale to stabilize"),
     )
 
 
-def _set_right_pipette_axes_engaged(
-    ctx: ProtocolContext, engaged: bool
+def _wait_for_scale_stability(
+    ctx: ProtocolContext,
+    fixture_settings: FixtureSettings,
+    timeout_seconds: float = SCALE_STABILITY_TIMEOUT_SECONDS,
 ) -> None:
-    """Engage or disengage the right pipette axes to control motor heat."""
+    """Wait for a stable recorder window before engaging the test pipette."""
     if ctx.is_simulating():
         return
-    hw_api = ctx._core.get_hardware()
-    axes = _right_pipette_axes()
-    if hasattr(hw_api, "axis_is_present"):
-        axes = [axis for axis in axes if hw_api.axis_is_present(axis)]
-    if not axes:
-        return
-    if engaged:
-        _restore_right_pipette_default_currents(ctx)
-        print_info(
-            "Restored default right pipette currents and engaging the right "
-            "pipette plunger for right mount testing."
+    start_time = time()
+    while time() - start_time < timeout_seconds:
+        recording = list(fixture_settings.recorder.recording)
+        if recording:
+            window_start = time() - SCALE_STABILITY_WINDOW_SECONDS
+            recent = [sample for sample in recording if sample.time >= window_start]
+            if len(recent) >= 2 and recent[-1].time - recent[0].time >= (
+                SCALE_STABILITY_WINDOW_SECONDS * 0.9
+            ):
+                grams = [sample.grams for sample in recent]
+                if all(sample.stable for sample in recent) and (
+                    max(grams) - min(grams) <= SCALE_STABILITY_MAX_SPAN_GRAMS
+                ):
+                    print_info(
+                        "Scale stability gate passed: "
+                        f"{recent[-1].time - recent[0].time:.1f}s window, "
+                        f"{max(grams) - min(grams):.4f} g span."
+                    )
+                    return
+        ctx.delay(
+            seconds=SCALE_STABILITY_POLL_SECONDS,
+            msg="Waiting for measured scale stability before test pipette engage",
         )
-        hw_api.engage_axes(axes)
-    else:
-        print_info(
-            "Lowering right pipette plunger hold current to "
-            f"{RIGHT_PIPETTE_IDLE_HOLD_CURRENT_AMPS} A and disengaging it."
+    raise RuntimeError(
+        "Scale stability gate did not pass; test pipette remains disengaged "
+        f"after {timeout_seconds:g}s."
+    )
+
+
+@dataclass
+class _DualPipetteHeatGuard:
+    """Keep the non-testing pipette cool while retaining the entry state."""
+
+    ctx: ProtocolContext
+    axes_by_mount: Dict[str, Axis]
+    entry_states: Dict[Axis, _PipetteMotorState]
+    capacity_test_currents: Dict[Axis, Tuple[float, float]]
+    active_mount: Optional[str] = None
+
+    def _apply_mount_state(self, mount: str, active: bool) -> None:
+        """Apply and read back the complete two-motor protection state."""
+        if mount not in self.axes_by_mount:
+            raise RuntimeError(f"Pipette axis for {mount} mount is not present")
+        active_axis = self.axes_by_mount[mount]
+        for candidate_mount, axis in self.axes_by_mount.items():
+            is_active = active and axis == active_axis
+            run_current, hold_current = (
+                self.capacity_test_currents[axis]
+                if is_active
+                else (PIPETTE_IDLE_CURRENT_AMPS, PIPETTE_IDLE_CURRENT_AMPS)
+            )
+            _set_pipette_currents(self.ctx, axis, run_current, hold_current)
+            _set_pipette_engaged(self.ctx, axis, is_active)
+            _verify_pipette_currents(self.ctx, axis, run_current, hold_current)
+            _verify_pipette_engagement(self.ctx, axis, is_active)
+            if not is_active:
+                print_info(
+                    f"{candidate_mount} mount is idle: motor {axis.name} "
+                    f"disengaged at {PIPETTE_IDLE_CURRENT_AMPS} A."
+                )
+
+    def prepare_mount(self, mount: str) -> bool:
+        """Protect both motors before build and return whether homing is needed."""
+        previous_mount = self.active_mount
+        self._apply_mount_state(mount, active=False)
+        self.active_mount = mount
+        return (
+            previous_mount is not None
+            or not self.entry_states[self.axes_by_mount[mount]].engaged
         )
-        _set_right_pipette_idle_hold_current(ctx)
-        hw_api.disengage_axes(axes)
+
+    def reapply_after_build(self, mount: str) -> None:
+        """Reapply protection after load_instrument may reset current settings."""
+        self.capacity_test_currents = _read_capacity_test_currents(
+            self.ctx, self.axes_by_mount
+        )
+        self._apply_mount_state(mount, active=False)
+        self.active_mount = mount
+        print_info(
+            "DUAL_CAPACITY_TEST_CURRENTS "
+            + json.dumps(
+                {
+                    candidate_mount: {
+                        "run": self.capacity_test_currents[axis][0],
+                        "hold": self.capacity_test_currents[axis][1],
+                    }
+                    for candidate_mount, axis in self.axes_by_mount.items()
+                },
+                sort_keys=True,
+            )
+        )
+
+    def activate_mount(self, mount: str) -> bool:
+        """Enable one mount after scale stabilization and return whether to home."""
+        previous_mount = self.active_mount
+        self._apply_mount_state(mount, active=True)
+        self.active_mount = mount
+        return (
+            previous_mount is not None
+            or not self.entry_states[self.axes_by_mount[mount]].engaged
+        )
+
+    def deactivate_mount(self, mount: str) -> None:
+        """Cool both motors during the transition between fixture runs."""
+        self._apply_mount_state(mount, active=False)
+        self.active_mount = mount
+
+    def activate_pipette(self, pipette: InstrumentContext, needs_home: bool) -> None:
+        """Home after idle recovery, then verify configured test current remains."""
+        if needs_home and not self.ctx.is_simulating():
+            pipette.home_plunger()
+            print_info(
+                f"Homed {self.active_mount} pipette plunger after idle-state recovery."
+            )
+        if self.active_mount is None:
+            raise RuntimeError("No active pipette mount is available for verification")
+        active_axis = self.axes_by_mount[self.active_mount]
+        run_current, hold_current = self.capacity_test_currents[active_axis]
+        _verify_pipette_currents(self.ctx, active_axis, run_current, hold_current)
+        _verify_pipette_engagement(self.ctx, active_axis, True)
+
+    def restore(self) -> None:
+        """Restore every pipette's entry current and engagement state."""
+        errors: List[str] = []
+        for axis, state in self.entry_states.items():
+            try:
+                _set_pipette_currents(
+                    self.ctx, axis, state.run_current, state.hold_current
+                )
+                _set_pipette_engaged(self.ctx, axis, state.engaged)
+                _verify_pipette_currents(
+                    self.ctx, axis, state.run_current, state.hold_current
+                )
+                _verify_pipette_engagement(self.ctx, axis, state.engaged)
+            except Exception as error:
+                errors.append(f"{axis.name}: {error}")
+        if errors:
+            raise RuntimeError(
+                "Failed to restore pipette motor state after dual run: "
+                + "; ".join(errors)
+            )
 
 
 @contextmanager
-def _right_pipette_heat_guard(
+def _dual_pipette_heat_guard(
     ctx: ProtocolContext,
-    active_mount: str,
+    mounts_to_test: List[str],
     enabled: bool,
-    pipette: InstrumentContext,
-) -> Generator[None, None, None]:
-    """Cool the waiting right pipette, then restore defaults before its test."""
-    if not enabled:
-        yield
+) -> Generator[Optional[_DualPipetteHeatGuard], None, None]:
+    """Guard both pipette motors across build, test, and cleanup."""
+    if not enabled or ctx.is_simulating():
+        yield None
         return
-    right_mount_active = active_mount == "right"
+    axes_by_mount = _present_pipette_axes(ctx)
+    if any(mount not in axes_by_mount for mount in mounts_to_test):
+        missing = [mount for mount in mounts_to_test if mount not in axes_by_mount]
+        raise RuntimeError(f"Dual-mount heat guard missing axes for: {missing}")
+    entry_states = _capture_pipette_motor_states(ctx, axes_by_mount)
+    guard = _DualPipetteHeatGuard(
+        ctx=ctx,
+        axes_by_mount=axes_by_mount,
+        entry_states=entry_states,
+        capacity_test_currents={},
+    )
     try:
-        if right_mount_active:
-            _set_right_pipette_axes_engaged(ctx, True)
-            if not ctx.is_simulating():
-                pipette.home_plunger()
-                print_info(
-                    "Right pipette anti-heating settings cleared; system defaults "
-                    "are active before testing."
-                )
-        else:
-            _set_right_pipette_axes_engaged(ctx, False)
-        yield
+        yield guard
     finally:
-        if not right_mount_active:
-            try:
-                _set_right_pipette_axes_engaged(ctx, False)
-            except Exception as cleanup_error:
-                print_warning(
-                    "Failed to keep the waiting right pipette disengaged after "
-                    f"{active_mount} test: {cleanup_error}"
+        guard.restore()
+
+
+def _capture_dual_mount_state(
+    ctx: ProtocolContext, axes_by_mount: Dict[str, Axis]
+) -> Dict[str, Any]:
+    """Capture diagnostic state without touching report or production CSV data."""
+    motor_states = _capture_pipette_motor_states(ctx, axes_by_mount)
+    stem_temperatures: Dict[str, Optional[float]] = {}
+    for mount in ("left", "right"):
+        try:
+            stem_temperatures[mount] = float(
+                get_sync_hw_api(ctx).read_stem_temperature(
+                    Mount.string_to_mount(mount), True
                 )
+            )
+        except Exception as error:
+            stem_temperatures[mount] = None
+            print_warning(f"Unable to read {mount} stem temperature: {error}")
+    return {
+        "celsius_pipette": stem_temperatures,
+        "currents_amps": {
+            mount: {
+                "run": motor_states[axis].run_current,
+                "hold": motor_states[axis].hold_current,
+            }
+            for mount, axis in axes_by_mount.items()
+        },
+        "motor_engaged": {
+            mount: motor_states[axis].engaged for mount, axis in axes_by_mount.items()
+        },
+    }
 
 
-def _should_manage_right_pipette_heat(
+def _record_dual_mount_stem_temperatures(
+    fixture_settings: FixtureSettings,
+    phase: str,
+    snapshot: Optional[Dict[str, Any]] = None,
+) -> None:
+    """Log dual stem temperatures and live motor state to run_output.txt."""
+    if snapshot is None:
+        snapshot = _capture_dual_mount_state(
+            fixture_settings.ctx, _present_pipette_axes(fixture_settings.ctx)
+        )
+    print_info(
+        "DUAL_STEM_TEMPERATURES "
+        + json.dumps(
+            {
+                "test_mount": fixture_settings.mount,
+                "phase": phase,
+                **snapshot,
+            },
+            sort_keys=True,
+        )
+    )
+
+
+def _record_dual_mount_after_test(
+    fixture_settings: FixtureSettings,
+    heat_guard: Optional[_DualPipetteHeatGuard],
+    mount: str,
+) -> None:
+    """Record the active state, then cool both motors before fixture cleanup."""
+    try:
+        _record_dual_mount_stem_temperatures(fixture_settings, "after-test")
+    finally:
+        if heat_guard is not None:
+            heat_guard.deactivate_mount(mount)
+
+
+def _should_manage_dual_pipette_heat(
     mounts_to_test: List[str],
 ) -> bool:
-    """Manage heat only when both mounts are tested in one run."""
+    """Manage both plunger motors only when both mounts are tested."""
     return "left" in mounts_to_test and "right" in mounts_to_test
 
 
@@ -4335,69 +5173,119 @@ def _close_device(name: str, device: object) -> None:
 # -----------------------------------------------------------------------------
 
 
-def _run_fixture(
-    ctx: ProtocolContext, fixture_settings: FixtureSettings, manage_right_heat: bool
-) -> None:
-    """Run one configured pipette fixture and clean up its recorder."""
-    _MEASUREMENTS.clear()
+def _finalize_fixture_data_before_upload(
+    fixture_settings: FixtureSettings,
+) -> bool:
+    """Finish every local data writer before the run directory is uploaded."""
+    finalized = True
     try:
-        with _right_pipette_heat_guard(
-            ctx,
-            fixture_settings.mount,
-            manage_right_heat,
-            fixture_settings.pipette,
-        ):
-            if fixture_settings.fast_simulate:
-                # do LPC when it is simulating
-                if _uses_p1000h_extra_manual_exchange(fixture_settings):
-                    probe_tip = _get_p1000h_extra_probe_tip(fixture_settings)
-                    pick_up_tip_for_channel(fixture_settings, probe_tip, 0)
-                    remove_tip(fixture_settings)
-                for tip in _tip_sizes_for_lpc(fixture_settings):
-                    for channel in fixture_settings.channels:
-                        tips = _get_tips_for_test(
-                            fixture_settings, tip, False, channel
-                        )
-                        pick_up_tip_for_channel(
-                            fixture_settings, tips.pop(0), channel
-                        )
-                        remove_tip(fixture_settings)
-                print_info(
-                    "Simulating. Not running actual tests and stopping analysis."
+        if fixture_settings.recorder is not None:
+            print_info("ending recording")
+            try:
+                fixture_settings.recorder.stop()
+            except Exception as cleanup_error:
+                finalized = False
+                print_warning(f"Error stopping gravimetric recorder: {cleanup_error}")
+            try:
+                fixture_settings.recorder.deactivate()
+            except Exception as cleanup_error:
+                finalized = False
+                print_warning(
+                    f"Error deactivating gravimetric recorder: {cleanup_error}"
                 )
-                return
+
+        _close_device("environment sensor", fixture_settings.env_sensor)
+        _close_device("Impact V2", fixture_settings.ImpactSerial_U)
+        _close_device("96ch impact fixture", fixture_settings.ImpactSerial_96)
+
+        if not fixture_settings.fast_simulate:
+            try:
+                fixture_settings.test_report._dont_write_to_disk = False
+                fixture_settings.test_report.save_to_disk()
+            except Exception as cleanup_error:
+                finalized = False
+                print_warning(f"Error saving final CSV report: {cleanup_error}")
+
+        if finalized:
+            print_info("All local fixture data has been finalized.")
+        else:
+            print_warning(
+                "Fixture data finalization failed; automatic upload will be skipped."
+            )
+    finally:
+        # UI output uses append-only opens, so clearing the destination completes
+        # run_output.txt before the data-center service pulls the run directory.
+        set_output_file(None)
+    return finalized
+
+
+
+def _run_fixture(
+    ctx: ProtocolContext,
+    fixture_settings: FixtureSettings,
+    after_test_callback: Optional[Callable[[], None]] = None,
+    scale_stabilization_seconds: float = SCALE_SECONDS_TO_TRUE_STABILIZE,
+    state_log_callback: Optional[Callable[[str], None]] = None,
+) -> None:
+    """Run one fixture, finalize its local files, then upload that fixture."""
+    _MEASUREMENTS.clear()
+    upload_csv_automatically = bool(
+        fixture_settings.ctx.params.upload_csv_automatically  # type: ignore[attr-defined]
+    )
+    local_data_finalized = False
+    try:
+        if fixture_settings.fast_simulate:
+            # do LPC when it is simulating
+            if _uses_p1000h_extra_manual_exchange(fixture_settings):
+                probe_tip = _get_p1000h_extra_probe_tip(fixture_settings)
+                pick_up_tip_for_channel(fixture_settings, probe_tip, 0)
+                remove_tip(fixture_settings)
+            for tip in _tip_sizes_for_lpc(fixture_settings):
+                for channel in fixture_settings.channels:
+                    tips = _get_tips_for_test(fixture_settings, tip, False, channel)
+                    pick_up_tip_for_channel(fixture_settings, tips.pop(0), channel)
+                    remove_tip(fixture_settings)
+            print_info("Simulating. Not running actual tests and stopping analysis.")
+            return
+        else:
             _store_config_as_old_style(fixture_settings)
             if _should_alter_discontinuity(fixture_settings):
                 print_info("Adjusting z discontinuity for this pipette.")
             if fixture_settings.increment:
                 _adjust_settings_for_increment(fixture_settings)
-            _run(ctx, fixture_settings)
+            _run(
+                ctx,
+                fixture_settings,
+                scale_stabilization_seconds=scale_stabilization_seconds,
+                state_log_callback=state_log_callback,
+            )
             maybe_home_impact_protection_96ch(fixture_settings, "test complete")
-            if fixture_settings.ctx.params.upload_csv_automatically:  # type: ignore [attr-defined]
-                print_info("Uploading CSV to Google Drive...")
-                result = upload_data_to_google_drive(
-                    csv_file_path=fixture_settings.test_report.file_path
-                )
-                if not result:
-                    print_error("Failed to upload CSV to Google Drive.")
+        if after_test_callback is not None:
+            after_test_callback()
     except Exception as e:
         print_error(f"Captured traceback:\n{traceback.format_exc()}")
         raise e
     finally:
-        if (
-            fixture_settings.test_report._dont_write_to_disk
-            and not fixture_settings.fast_simulate
-        ):
-            fixture_settings.test_report._dont_write_to_disk = False
-            fixture_settings.test_report.save_to_disk()
-        if fixture_settings.recorder is not None:
-            print_info("ending recording")
-            fixture_settings.recorder.stop()
-            fixture_settings.recorder.deactivate()
-            set_output_file(None)
-        _close_device("environment sensor", fixture_settings.env_sensor)
-        _close_device("Impact V2", fixture_settings.ImpactSerial_U)
-        _close_device("96ch impact fixture", fixture_settings.ImpactSerial_96)
+        local_data_finalized = _finalize_fixture_data_before_upload(fixture_settings)
+
+    if not local_data_finalized:
+        raise RuntimeError(
+            f"Local data finalization failed for {fixture_settings.mount} mount; "
+            "automatic upload was skipped."
+        )
+    if upload_csv_automatically:
+        print_info(
+            f"All {fixture_settings.mount} fixture data is finalized. "
+            "Starting Google Drive upload..."
+        )
+        result = upload_data_to_google_drive(
+            csv_file_path=fixture_settings.test_report.file_path
+        )
+        if not result:
+            print_error(
+                f"Failed to upload finalized data for "
+                f"{fixture_settings.test_report.file_path.name}."
+            )
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -4410,9 +5298,7 @@ def run(ctx: ProtocolContext) -> None:
     _load_stacker_drop_offsets_config_for_run(ctx)
     _USED_TIP_LOCATIONS.clear()
     _DECK_LABWARE_BY_SLOT.clear()
-    csv_params = (
-        ctx.params.qc_test_profile.parse_as_csv()  # type: ignore[attr-defined]
-    )
+    csv_params = ctx.params.qc_test_profile.parse_as_csv()  # type: ignore[attr-defined]
     csv_settings = CSVSettings.parse_csv(csv_params, ctx.is_simulating())
     mounts_to_test = _get_mounts_to_test_from_runtime_param(ctx, csv_settings)
     csv_settings = replace(
@@ -4440,23 +5326,85 @@ def run(ctx: ProtocolContext) -> None:
         )
     if dual_multi_extension_deck:
         _prepare_dual_multi_extension_deck_layout(ctx, csv_settings)
-    manage_right_heat = _should_manage_right_pipette_heat(csv_settings.mounts_to_test)
-    if manage_right_heat:
-        _set_right_pipette_axes_engaged(ctx, False)
+    manage_dual_heat = csv_settings.pipette_channels in (
+        1,
+        8,
+    ) and _should_manage_dual_pipette_heat(csv_settings.mounts_to_test)
+    dual_mount = manage_dual_heat
 
-    for mount_index, mount in enumerate(csv_settings.mounts_to_test):
-        print_title(f"Starting gravimetric test on {mount} mount")
-        fixture_settings = FixtureSettings.build(
-            ctx,
-            csv_params=csv_params,
-            csv_settings=csv_settings,
-            mount=mount,
-        )
-        _run_fixture(ctx, fixture_settings, manage_right_heat)
-        mounts_remaining = csv_settings.mounts_to_test[mount_index + 1 :]
-        if (
-            dual_multi_extension_deck
-            and mount == "left"
-            and "right" in mounts_remaining
-        ):
-            _rearrange_tipracks_for_dual_multi_right_mount(ctx, csv_settings)
+    # Keep one guard around build, test, report finalization, and the mount
+    # transition so an exception cannot leave either plunger in an altered state.
+    with _dual_pipette_heat_guard(
+        ctx, csv_settings.mounts_to_test, manage_dual_heat
+    ) as heat_guard:
+        for mount_index, mount in enumerate(csv_settings.mounts_to_test):
+            print_title(f"Starting gravimetric test on {mount} mount")
+            pre_build_snapshot: Optional[Dict[str, Any]] = None
+            if heat_guard is not None:
+                # Keep both motors disengaged while build() loads instruments. The
+                # snapshot is emitted after build() creates this mount's run log.
+                heat_guard.prepare_mount(mount)
+                pre_build_snapshot = _capture_dual_mount_state(
+                    ctx, heat_guard.axes_by_mount
+                )
+            fixture_settings = FixtureSettings.build(
+                ctx,
+                csv_params=csv_params,
+                csv_settings=csv_settings,
+                mount=mount,
+            )
+            try:
+                if heat_guard is not None:
+                    heat_guard.reapply_after_build(mount)
+                if dual_mount:
+                    _record_dual_mount_stem_temperatures(
+                        fixture_settings, "pre-build", pre_build_snapshot
+                    )
+                    _record_dual_mount_stem_temperatures(fixture_settings, "post-build")
+                    if fixture_settings.run_evaporation:
+                        # Use the same pre-engagement scale gate for both mounts. The
+                        # tested pipette remains disengaged while the recorder confirms
+                        # that the loaded scale baseline is stable.
+                        _wait_for_scale_stability(ctx, fixture_settings)
+                    _record_dual_mount_stem_temperatures(fixture_settings, "pre-engage")
+                needs_home = False
+                if heat_guard is not None:
+                    needs_home = heat_guard.activate_mount(mount)
+                    heat_guard.activate_pipette(fixture_settings.pipette, needs_home)
+            except BaseException:
+                _finalize_fixture_data_before_upload(fixture_settings)
+                raise
+            after_test_callback: Optional[Callable[[], None]] = None
+            state_log_callback: Optional[Callable[[str], None]] = None
+            if dual_mount:
+                after_test_callback = partial(
+                    _record_dual_mount_after_test,
+                    fixture_settings,
+                    heat_guard,
+                    mount,
+                )
+                state_log_callback = partial(
+                    _record_dual_mount_stem_temperatures, fixture_settings
+                )
+            # Both mounts use the same short post-activation restabilization. The
+            # pre-engagement scale gate above handles the longer idle baseline
+            # wait without heating the pipette motor.
+            scale_stabilization_seconds = (
+                SCALE_SECONDS_TO_TRUE_STABILIZE
+                if csv_settings.pipette_channels == 96
+                else SCALE_SECONDS_TO_RESTABILIZE_AFTER_PIPETTE
+            )
+            _run_fixture(
+                ctx,
+                fixture_settings,
+                after_test_callback,
+                scale_stabilization_seconds=scale_stabilization_seconds,
+                state_log_callback=state_log_callback,
+            )
+            mounts_remaining = csv_settings.mounts_to_test[mount_index + 1 :]
+            if (
+                dual_multi_extension_deck
+                and mount == "left"
+                and "right" in mounts_remaining
+            ):
+                _rearrange_tipracks_for_dual_multi_right_mount(ctx, csv_settings)
