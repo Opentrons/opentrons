@@ -17,6 +17,7 @@ import { LabwareOnDeck } from './LabwareOnDeck'
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   CoordinateTuple,
+  CutoutId,
   DeckDefinition,
   Liquid,
   ModuleDefinition,
@@ -50,6 +51,7 @@ interface DeckViewStackerProps {
   labwareLoadedOnModuleId: string
   selectedRunTimeCommand?: RunTimeCommand
   renderLabware?: boolean
+  stagingAreaCutoutIds: CutoutId[]
 }
 
 export function DeckViewStacker(props: DeckViewStackerProps): ReactNode {
@@ -72,6 +74,7 @@ export function DeckViewStacker(props: DeckViewStackerProps): ReactNode {
     moduleType,
     labwareLoadedOnModuleId,
     renderLabware = true,
+    stagingAreaCutoutIds,
   } = props
 
   return (
@@ -129,6 +132,7 @@ export function DeckViewStacker(props: DeckViewStackerProps): ReactNode {
           setHoveredSlot={setHoveredSlot}
           hover={hoveredSlot}
           selectedSlot={selectedSlot}
+          stagingAreaCutoutIds={stagingAreaCutoutIds}
         >
           {showModuleCommandSummary || showLabwareCommandSummary ? null : (
             <StyledText desktopStyle="captionRegular" color={COLORS.white}>
@@ -160,6 +164,7 @@ export function DeckViewStacker(props: DeckViewStackerProps): ReactNode {
           setHoveredSlot={setHoveredSlot}
           hover={hoveredSlot}
           selectedSlot={selectedSlot}
+          stagingAreaCutoutIds={stagingAreaCutoutIds}
         >
           {(moduleType === FLEX_STACKER_MODULE_TYPE &&
             selectedRunTimeCommand?.commandType !== 'flexStacker/retrieve') ||
