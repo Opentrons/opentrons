@@ -403,3 +403,34 @@ You would get a similar error trying to aspirate from or dispense into a well pl
     When using column 12 nozzles for partial tip pickup and pipetting, generally organize your deck with the shortest labware on the left side of the deck, and the tallest labware on the right side.
     
     Similarly, when using the frontmost row of nozzles for partial tip pickup and pipetting, organize your deck with the shortest labware towards the back of the deck, and the tallest labware towards the front of the deck.
+
+## Vacuum Module conflicts
+
+When installed, the Vacuum Module deck adapter occupies slots A3 and A4. When a collar is seated on the vacuum base in slot A3 or staged on A4, it can become an obstacle for a multi-channel pipette using partial tip pickup.
+
+Unlike [deck extents](#deck-extents), which restrict individual wells, a Vacuum Module collar limits access to all tips in a tip rack or wells in a plate when they're staged in an adjacent slot unless the pipette's primary (`start`) nozzle is on the edge facing the collar. This keeps the unused portion of the pipette head shifted away from the collar. 
+
+When pipetting using `ALL`, a pipette is never restricted by a collar on the Vacuum Module.
+
+The following table summarizes which partial nozzle configurations are blocked when a collar is on the Vacuum Module in slot A3.
+
+| Collar location | Affected slot | Pipette | Blocked configurations |
+|-----------------|---------------|---------|------------------------|
+| **A3** | **B3** | 8-channel, 96-channel | Any layout starting in row H (`start="H1"` or `"H12"`), including all `PARTIAL_COLUMN` layouts |
+| **A3** | **A2** | 96-channel only | `COLUMN` or `SINGLE` starting in column 1 (`start="A1"` or `"H1"`) |
+| **A4** | **A3** | 96-channel only | `COLUMN` or `SINGLE` starting in column 1 (`start="A1"` or `"H1"`) |
+
+| Collar location | Affected slot | Pipette | Allowed configurations |
+|-----------------|---------------|---------|------------------------|
+| **A3** | **B3** | 8-channel, 96-channel | Layouts starting in row A (`start="A1"` or `"A12"`), including `COLUMN` |
+| **A3** | **A2** | 96-channel only | Layouts starting in column 12 (`start="A12"` or `"H12"`), or `ROW` layouts |
+| **A4** | **A3** | 96-channel only | Layouts starting in column 12 (`start="A12"` or `"H12"`), or `ROW` layouts |
+
+!!! note
+    8-channel pipettes only have a single column of nozzles, so they are unaffected by collars in an adjacent slot (such as pipetting in slot A2 while a collar is in A3). However, they are still blocked from pipetting in slot B3 when using `start="H1"` (including `PARTIAL_COLUMN` and back-to-front `SINGLE` layouts).
+
+If you encounter a `LocationNotAccessibleByPipetteError` due to a vacuum collar, the error message will suggest valid primary nozzle configurations for your current deck layout. You can resolve the error in one of three ways:
+
+- Move the labware to a slot not directly adjacent to the collar (for example, moving a plate from B3 to B2 or C3).
+- Move the collar out of the adjacent slot—for example, moving it from the vacuum base in A3 to the dock in A4 clears both slots A2 and B3.
+- Change the nozzle configuration so the `start` nozzle faces the collar (for example, switching from `start="H1"` to `start="A1"` in `ROW` mode when pipetting in B3), or switch back to `ALL` layout.
