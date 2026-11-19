@@ -1108,6 +1108,7 @@ export type ErrorType =
   | 'POSSIBLE_PIPETTE_COLLISION_THERMOCYCLER_LID'
   | 'POSSIBLE_PIPETTE_COLLISION_OUTSIDE_DECK_EXTENTS'
   | 'POSSIBLE_PIPETTE_COLLISION_ADJACENT_ADDRESSABLE_AREA'
+  | 'POSSIBLE_PIPETTE_COLLISION_VACUUM_COLLAR'
   | 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER'
   | 'RETRACT_BELOW_ASPIRATE'
   | 'RETRACT_BELOW_DISPENSE'
@@ -1215,6 +1216,17 @@ export type UnsafePipetteMovementReason =
   | {
       type: 'adjacentAdressableAreaCollision'
       addressableAreaCausingCollision: AddressableArea
+    }
+  | {
+      type: 'vacuumCollarCollision'
+      channels: number
+      labwareName: string
+      slot: string
+      primaryNozzle: string
+      collarName: string
+      side: string
+      collarSlot: string
+      suggestion: string
     }
 
 export type PipetteMovementSafetyStatus =
