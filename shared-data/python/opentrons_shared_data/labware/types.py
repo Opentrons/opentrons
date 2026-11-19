@@ -208,6 +208,13 @@ class ScrewAnchoredAsChildFeature(TypedDict):
     screwCenter: Vector3D
 
 
+class MagneticBlockWellAsParentFeature(TypedDict):
+    topZ: float
+    floorZ: float
+    a1CenterX: float
+    a1CenterY: float
+
+
 class LocatingFeatures(TypedDict):
     """A dictionary of locating features."""
 
@@ -223,6 +230,7 @@ class LocatingFeatures(TypedDict):
     ]
     screwAnchoredAsParent: NotRequired[ScrewAnchoredAsParentFeature]
     screwAnchoredAsChild: NotRequired[ScrewAnchoredAsChildFeature]
+    magneticBlockWellAsParent: NotRequired[MagneticBlockWellAsParentFeature]
 
 
 class LabwareDefinition2(TypedDict):
