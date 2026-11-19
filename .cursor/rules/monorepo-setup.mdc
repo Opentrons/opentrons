@@ -90,8 +90,8 @@ Pass options: `make test-js-<project> tests="src/path" test_opts="--reporter=ver
 All frontend (TS/TSX/JS/CSS) lint and format commands run from the **monorepo root** via these Make targets. Do not call ESLint, Oxlint, Prettier, or Stylelint directly.
 
 ```bash
-make format-js       # Prettier auto-format (all TS/TSX/JS/MD/JSON)
-make lint-js         # Oxlint + ESLint + Prettier check (run after format-js to confirm clean)
+make format-js       # Oxfmt auto-format (all TS/TSX/JS/MD/JSON)
+make lint-js         # Oxlint + ESLint + Oxfmt check (run after format-js to confirm clean)
 make lint-css        # Stylelint check for all CSS Modules
 ```
 

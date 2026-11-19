@@ -50,14 +50,14 @@ format-js:
 	pnpm exec oxfmt --ignore-path ../.eslintignore --write $(FORMAT_FILE_GLOB)
 
 .PHONY: lint-js
-lint-js: lint-js-oxlint lint-js-prettier
+lint-js: lint-js-oxlint lint-js-oxfmt
 
 .PHONY: lint-js-oxlint
 lint-js-oxlint:
 	$(MAKE) -C .. lint-js-oxlint
 
-.PHONY: lint-js-prettier
-lint-js-prettier:
+.PHONY: lint-js-oxfmt
+lint-js-oxfmt:
 	pnpm exec oxfmt --ignore-path ../.eslintignore --check $(FORMAT_FILE_GLOB)
 
 
