@@ -126,7 +126,7 @@ export function DeckView(props: DeckViewProps): ReactNode {
       { id: `staging-${cutoutId}`, location: cutoutId },
     ])
   )
-  const stagingAreaLocations = new Set(flexStagingCutoutIds)
+  const stagingAreaLocations = new Set<string>(flexStagingCutoutIds)
   const baseViewBox = `${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`
   const stackerViewBox = useMemo(() => {
     if (!isFlex) return baseViewBox
