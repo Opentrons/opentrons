@@ -7,7 +7,14 @@
     "y": 0,
     "z": 38
   },
-  "features": {},
+  "features": {
+    "magneticBlockWellsAsParent": {
+      "topZ": 38.0,
+      "floorZ": 32.0,
+      "a1CenterX": 14.375,
+      "a1CenterY": 11.375
+    }
+  },
   "dimensions": {
     "bareOverallHeight": 45,
     "overLabwareHeight": 0,

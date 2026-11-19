@@ -25,33 +25,6 @@
         }
       }
     },
-    "svgsonNode": {
-      "type": "object",
-      "description": "An svgson node that corresponds to a single svg tag",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Element name, like svg, circle, line…"
-        },
-        "type": {
-          "type": "string",
-          "description": "Element type like element, text…"
-        },
-        "value": {
-          "type": "string",
-          "description": "Element value, used in text nodes."
-        },
-        "children": {
-          "type": "array",
-          "description": "List of element children",
-          "items": { "$ref": "#" }
-        },
-        "attributes": {
-          "type": "object",
-          "description": "Attributes for the element"
-        }
-      }
-    },
     "vector3D": {
       "type": "object",
       "additionalProperties": false,
@@ -191,6 +164,29 @@
             "screwCenter": {
               "description": "The +x,+y,+z coordinate offset measured from the module's X/Y labware interface dimension origin to the center of the threaded hole. The +z is 0 by convention. When the threaded hole is located in a spring-loaded plate, the z represents the top of the threaded hole when the plate is compressed.",
               "$ref": "#/definitions/vector3D"
+            }
+          }
+        },
+        "magneticBlockWellAsParent": {
+          "description": "The module provides a grid of magnetic wells the labware presses against.",
+          "type": "object",
+          "required": ["topZ", "floorZ", "a1CenterX", "a1CenterY"],
+          "properties": {
+            "topZ": {
+              "description": "The height of the top of the metal wells.",
+              "type": "number"
+            },
+            "floorZ": {
+              "description": "The surface of the block at the base of its wells.",
+              "type": "number"
+            },
+            "a1CenterX": {
+              "description": "The X distance from the corner of the module to the center of the A1 well.",
+              "type": "number"
+            },
+            "a1CenterY": {
+              "description": "The Y distance from the corner of the module to the center of the A1 well.",
+              "type": "number"
             }
           }
         }
