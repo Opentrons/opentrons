@@ -1,9 +1,9 @@
+import type { ProtocolRunHeaderProps } from '..'
 import { RunHeaderSectionLower } from './RunHeaderSectionLower'
 import { RunHeaderSectionUpper } from './RunHeaderSectionUpper'
 
 import type { MutableRefObject, ReactNode } from 'react'
 import type { AttachedModule, Run, RunStatus } from '@opentrons/api-client'
-import type { ProtocolRunHeaderProps } from '..'
 import type { UseRunHeaderModalContainerResult } from '../RunHeaderModalContainer'
 
 export type RunHeaderContentProps = ProtocolRunHeaderProps & {

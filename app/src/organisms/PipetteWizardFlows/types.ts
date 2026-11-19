@@ -18,7 +18,9 @@ export type PipetteWizardStep =
   | FirmwareUpdateStep
 
 export type PipetteWizardFlow =
-  typeof FLOWS.ATTACH | typeof FLOWS.DETACH | typeof FLOWS.CALIBRATE
+  | typeof FLOWS.ATTACH
+  | typeof FLOWS.DETACH
+  | typeof FLOWS.CALIBRATE
 
 export interface BaseStep {
   mount: PipetteMount

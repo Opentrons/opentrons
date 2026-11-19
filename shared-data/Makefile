@@ -12,7 +12,7 @@ test_opts ?=
 # warning suppression variables for tests and linting
 quiet ?= false
 
-FORMAT_FILE_GLOB = "**/*.@(ts|tsx|js|json|md|yml)"
+FORMAT_FILE_GLOB = "**/*.{ts,tsx,js,json,md,yml}"
 
 # Top level targets
 
@@ -47,7 +47,7 @@ build-ts:
 
 .PHONY: format-js
 format-js:
-	pnpm exec prettier --ignore-path ../.eslintignore --write $(FORMAT_FILE_GLOB)
+	pnpm exec oxfmt --ignore-path ../.eslintignore --write $(FORMAT_FILE_GLOB)
 
 .PHONY: lint-js
 lint-js: lint-js-oxlint lint-js-prettier
@@ -58,7 +58,7 @@ lint-js-oxlint:
 
 .PHONY: lint-js-prettier
 lint-js-prettier:
-	pnpm exec prettier --ignore-path ../.eslintignore --check $(FORMAT_FILE_GLOB)
+	pnpm exec oxfmt --ignore-path ../.eslintignore --check $(FORMAT_FILE_GLOB)
 
 
 # Python targets

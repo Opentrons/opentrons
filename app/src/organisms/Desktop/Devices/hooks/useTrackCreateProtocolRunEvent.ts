@@ -6,7 +6,8 @@ import { parseProtocolRunAnalyticsData } from '/app/transformations/analytics'
 import type { StoredProtocolData } from '/app/redux/protocol-storage'
 
 type CreateProtocolRunEventName =
-  'createProtocolRecordRequest' | 'createProtocolRecordResponse'
+  | 'createProtocolRecordRequest'
+  | 'createProtocolRecordResponse'
 
 interface CreateProtocolRunAnalyticsEvent {
   name: CreateProtocolRunEventName

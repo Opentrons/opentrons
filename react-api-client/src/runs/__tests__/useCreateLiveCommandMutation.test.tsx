@@ -4,9 +4,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createLiveCommand } from '@opentrons/api-client'
 
-import { mockAnonLoadCommand } from '../__fixtures__'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
+import { mockAnonLoadCommand } from '../__fixtures__'
 import { useCreateLiveCommandMutation } from '../useCreateLiveCommandMutation'
 
 import type * as React from 'react'

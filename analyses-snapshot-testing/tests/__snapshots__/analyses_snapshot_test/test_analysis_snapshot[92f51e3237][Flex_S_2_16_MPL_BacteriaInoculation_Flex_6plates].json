@@ -59,9 +59,7 @@
             {
               "brand": {
                 "brand": "NEST",
-                "brandId": [
-                  "601052"
-                ],
+                "brandId": ["601052"],
                 "links": [
                   "https://www.nest-biotech.com/centrifuge-tube/59282849.html"
                 ]
@@ -71,21 +69,12 @@
                 "displayName": "NEST 6x15 mL Conical",
                 "wellBottomShape": "v"
               },
-              "wells": [
-                "A1",
-                "A2",
-                "B1",
-                "B2",
-                "C1",
-                "C2"
-              ]
+              "wells": ["A1", "A2", "B1", "B2", "C1", "C2"]
             },
             {
               "brand": {
                 "brand": "NEST",
-                "brandId": [
-                  "602052"
-                ],
+                "brandId": ["602052"],
                 "links": [
                   "https://www.nest-biotech.com/centrifuge-tube/59282837.html"
                 ]
@@ -95,12 +84,7 @@
                 "displayName": "NEST 4x50 mL Conical",
                 "wellBottomShape": "v"
               },
-              "wells": [
-                "A3",
-                "A4",
-                "B3",
-                "B4"
-              ]
+              "wells": ["A3", "A4", "B3", "B4"]
             }
           ],
           "metadata": {
@@ -111,24 +95,10 @@
           },
           "namespace": "opentrons",
           "ordering": [
-            [
-              "A1",
-              "B1",
-              "C1"
-            ],
-            [
-              "A2",
-              "B2",
-              "C2"
-            ],
-            [
-              "A3",
-              "B3"
-            ],
-            [
-              "A4",
-              "B4"
-            ]
+            ["A1", "B1", "C1"],
+            ["A2", "B2", "C2"],
+            ["A3", "B3"],
+            ["A4", "B4"]
           ],
           "parameters": {
             "format": "irregular",
@@ -242,9 +212,7 @@
           {
             "cutoutId": "cutoutC1",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleLeftSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleLeftSlot"]
           }
         ]
       },
@@ -295,10 +263,7 @@
           "allowedRoles": [],
           "brand": {
             "brand": "NEST",
-            "brandId": [
-              "503001",
-              "503501"
-            ],
+            "brandId": ["503001", "503501"],
             "links": [
               "https://www.nest-biotech.com/deep-well-plates/59253726.html"
             ]
@@ -435,126 +400,18 @@
           },
           "namespace": "opentrons",
           "ordering": [
-            [
-              "A1",
-              "B1",
-              "C1",
-              "D1",
-              "E1",
-              "F1",
-              "G1",
-              "H1"
-            ],
-            [
-              "A10",
-              "B10",
-              "C10",
-              "D10",
-              "E10",
-              "F10",
-              "G10",
-              "H10"
-            ],
-            [
-              "A11",
-              "B11",
-              "C11",
-              "D11",
-              "E11",
-              "F11",
-              "G11",
-              "H11"
-            ],
-            [
-              "A12",
-              "B12",
-              "C12",
-              "D12",
-              "E12",
-              "F12",
-              "G12",
-              "H12"
-            ],
-            [
-              "A2",
-              "B2",
-              "C2",
-              "D2",
-              "E2",
-              "F2",
-              "G2",
-              "H2"
-            ],
-            [
-              "A3",
-              "B3",
-              "C3",
-              "D3",
-              "E3",
-              "F3",
-              "G3",
-              "H3"
-            ],
-            [
-              "A4",
-              "B4",
-              "C4",
-              "D4",
-              "E4",
-              "F4",
-              "G4",
-              "H4"
-            ],
-            [
-              "A5",
-              "B5",
-              "C5",
-              "D5",
-              "E5",
-              "F5",
-              "G5",
-              "H5"
-            ],
-            [
-              "A6",
-              "B6",
-              "C6",
-              "D6",
-              "E6",
-              "F6",
-              "G6",
-              "H6"
-            ],
-            [
-              "A7",
-              "B7",
-              "C7",
-              "D7",
-              "E7",
-              "F7",
-              "G7",
-              "H7"
-            ],
-            [
-              "A8",
-              "B8",
-              "C8",
-              "D8",
-              "E8",
-              "F8",
-              "G8",
-              "H8"
-            ],
-            [
-              "A9",
-              "B9",
-              "C9",
-              "D9",
-              "E9",
-              "F9",
-              "G9",
-              "H9"
-            ]
+            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
+            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
+            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
+            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
+            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
+            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
+            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
+            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
+            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
+            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
+            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
+            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
           ],
           "parameters": {
             "format": "96Standard",
@@ -1566,9 +1423,7 @@
           {
             "cutoutId": "cutoutD1",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "heaterShakerModuleV1"
-            ]
+            "possibleCutoutFixtureIds": ["heaterShakerModuleV1"]
           }
         ]
       },
@@ -1855,126 +1710,18 @@
           },
           "namespace": "opentrons",
           "ordering": [
-            [
-              "A1",
-              "B1",
-              "C1",
-              "D1",
-              "E1",
-              "F1",
-              "G1",
-              "H1"
-            ],
-            [
-              "A10",
-              "B10",
-              "C10",
-              "D10",
-              "E10",
-              "F10",
-              "G10",
-              "H10"
-            ],
-            [
-              "A11",
-              "B11",
-              "C11",
-              "D11",
-              "E11",
-              "F11",
-              "G11",
-              "H11"
-            ],
-            [
-              "A12",
-              "B12",
-              "C12",
-              "D12",
-              "E12",
-              "F12",
-              "G12",
-              "H12"
-            ],
-            [
-              "A2",
-              "B2",
-              "C2",
-              "D2",
-              "E2",
-              "F2",
-              "G2",
-              "H2"
-            ],
-            [
-              "A3",
-              "B3",
-              "C3",
-              "D3",
-              "E3",
-              "F3",
-              "G3",
-              "H3"
-            ],
-            [
-              "A4",
-              "B4",
-              "C4",
-              "D4",
-              "E4",
-              "F4",
-              "G4",
-              "H4"
-            ],
-            [
-              "A5",
-              "B5",
-              "C5",
-              "D5",
-              "E5",
-              "F5",
-              "G5",
-              "H5"
-            ],
-            [
-              "A6",
-              "B6",
-              "C6",
-              "D6",
-              "E6",
-              "F6",
-              "G6",
-              "H6"
-            ],
-            [
-              "A7",
-              "B7",
-              "C7",
-              "D7",
-              "E7",
-              "F7",
-              "G7",
-              "H7"
-            ],
-            [
-              "A8",
-              "B8",
-              "C8",
-              "D8",
-              "E8",
-              "F8",
-              "G8",
-              "H8"
-            ],
-            [
-              "A9",
-              "B9",
-              "C9",
-              "D9",
-              "E9",
-              "F9",
-              "G9",
-              "H9"
-            ]
+            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
+            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
+            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
+            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
+            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
+            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
+            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
+            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
+            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
+            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
+            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
+            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
           ],
           "parameters": {
             "format": "96Standard",
@@ -2876,9 +2623,7 @@
           {
             "cutoutId": "cutoutA2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -3052,126 +2797,18 @@
           },
           "namespace": "opentrons",
           "ordering": [
-            [
-              "A1",
-              "B1",
-              "C1",
-              "D1",
-              "E1",
-              "F1",
-              "G1",
-              "H1"
-            ],
-            [
-              "A10",
-              "B10",
-              "C10",
-              "D10",
-              "E10",
-              "F10",
-              "G10",
-              "H10"
-            ],
-            [
-              "A11",
-              "B11",
-              "C11",
-              "D11",
-              "E11",
-              "F11",
-              "G11",
-              "H11"
-            ],
-            [
-              "A12",
-              "B12",
-              "C12",
-              "D12",
-              "E12",
-              "F12",
-              "G12",
-              "H12"
-            ],
-            [
-              "A2",
-              "B2",
-              "C2",
-              "D2",
-              "E2",
-              "F2",
-              "G2",
-              "H2"
-            ],
-            [
-              "A3",
-              "B3",
-              "C3",
-              "D3",
-              "E3",
-              "F3",
-              "G3",
-              "H3"
-            ],
-            [
-              "A4",
-              "B4",
-              "C4",
-              "D4",
-              "E4",
-              "F4",
-              "G4",
-              "H4"
-            ],
-            [
-              "A5",
-              "B5",
-              "C5",
-              "D5",
-              "E5",
-              "F5",
-              "G5",
-              "H5"
-            ],
-            [
-              "A6",
-              "B6",
-              "C6",
-              "D6",
-              "E6",
-              "F6",
-              "G6",
-              "H6"
-            ],
-            [
-              "A7",
-              "B7",
-              "C7",
-              "D7",
-              "E7",
-              "F7",
-              "G7",
-              "H7"
-            ],
-            [
-              "A8",
-              "B8",
-              "C8",
-              "D8",
-              "E8",
-              "F8",
-              "G8",
-              "H8"
-            ],
-            [
-              "A9",
-              "B9",
-              "C9",
-              "D9",
-              "E9",
-              "F9",
-              "G9",
-              "H9"
-            ]
+            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
+            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
+            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
+            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
+            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
+            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
+            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
+            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
+            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
+            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
+            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
+            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
           ],
           "parameters": {
             "format": "96Standard",
@@ -4073,9 +3710,7 @@
           {
             "cutoutId": "cutoutB2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -29611,9 +29246,7 @@
           "allowedRoles": [],
           "brand": {
             "brand": "Thermo Fisher Scientific",
-            "brandId": [
-              "165218"
-            ]
+            "brandId": ["165218"]
           },
           "cornerOffsetFromSlot": {
             "x": 0,
@@ -29631,9 +29264,7 @@
               "metadata": {
                 "wellBottomShape": "flat"
               },
-              "wells": [
-                "A1"
-              ]
+              "wells": ["A1"]
             }
           ],
           "metadata": {
@@ -29643,20 +29274,13 @@
             "tags": []
           },
           "namespace": "custom_beta",
-          "ordering": [
-            [
-              "A1"
-            ]
-          ],
+          "ordering": [["A1"]],
           "parameters": {
             "format": "irregular",
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "omintray_1well_plate",
-            "quirks": [
-              "centerMultichannelOnWells",
-              "touchTipDisabled"
-            ]
+            "quirks": ["centerMultichannelOnWells", "touchTipDisabled"]
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},
@@ -29729,9 +29353,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -29742,9 +29364,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "originLocationSequence": [
@@ -29830,9 +29450,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -29986,126 +29604,18 @@
           },
           "namespace": "custom_beta",
           "ordering": [
-            [
-              "A1",
-              "B1",
-              "C1",
-              "D1",
-              "E1",
-              "F1",
-              "G1",
-              "H1"
-            ],
-            [
-              "A10",
-              "B10",
-              "C10",
-              "D10",
-              "E10",
-              "F10",
-              "G10",
-              "H10"
-            ],
-            [
-              "A11",
-              "B11",
-              "C11",
-              "D11",
-              "E11",
-              "F11",
-              "G11",
-              "H11"
-            ],
-            [
-              "A12",
-              "B12",
-              "C12",
-              "D12",
-              "E12",
-              "F12",
-              "G12",
-              "H12"
-            ],
-            [
-              "A2",
-              "B2",
-              "C2",
-              "D2",
-              "E2",
-              "F2",
-              "G2",
-              "H2"
-            ],
-            [
-              "A3",
-              "B3",
-              "C3",
-              "D3",
-              "E3",
-              "F3",
-              "G3",
-              "H3"
-            ],
-            [
-              "A4",
-              "B4",
-              "C4",
-              "D4",
-              "E4",
-              "F4",
-              "G4",
-              "H4"
-            ],
-            [
-              "A5",
-              "B5",
-              "C5",
-              "D5",
-              "E5",
-              "F5",
-              "G5",
-              "H5"
-            ],
-            [
-              "A6",
-              "B6",
-              "C6",
-              "D6",
-              "E6",
-              "F6",
-              "G6",
-              "H6"
-            ],
-            [
-              "A7",
-              "B7",
-              "C7",
-              "D7",
-              "E7",
-              "F7",
-              "G7",
-              "H7"
-            ],
-            [
-              "A8",
-              "B8",
-              "C8",
-              "D8",
-              "E8",
-              "F8",
-              "G8",
-              "H8"
-            ],
-            [
-              "A9",
-              "B9",
-              "C9",
-              "D9",
-              "E9",
-              "F9",
-              "G9",
-              "H9"
-            ]
+            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
+            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
+            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
+            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
+            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
+            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
+            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
+            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
+            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
+            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
+            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
+            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
           ],
           "parameters": {
             "format": "96Standard",
@@ -30993,9 +30503,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -31713,9 +31221,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -31756,9 +31262,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -31769,9 +31273,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "originLocationSequence": [
@@ -31857,9 +31359,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -31933,9 +31433,7 @@
           "allowedRoles": [],
           "brand": {
             "brand": "Thermo Fisher Scientific",
-            "brandId": [
-              "165218"
-            ]
+            "brandId": ["165218"]
           },
           "cornerOffsetFromSlot": {
             "x": 0,
@@ -31953,9 +31451,7 @@
               "metadata": {
                 "wellBottomShape": "flat"
               },
-              "wells": [
-                "A1"
-              ]
+              "wells": ["A1"]
             }
           ],
           "metadata": {
@@ -31965,20 +31461,13 @@
             "tags": []
           },
           "namespace": "custom_beta",
-          "ordering": [
-            [
-              "A1"
-            ]
-          ],
+          "ordering": [["A1"]],
           "parameters": {
             "format": "irregular",
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "omintray_1well_plate",
-            "quirks": [
-              "centerMultichannelOnWells",
-              "touchTipDisabled"
-            ]
+            "quirks": ["centerMultichannelOnWells", "touchTipDisabled"]
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},
@@ -32051,9 +31540,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -32064,9 +31551,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "originLocationSequence": [
@@ -32152,9 +31637,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -32308,126 +31791,18 @@
           },
           "namespace": "custom_beta",
           "ordering": [
-            [
-              "A1",
-              "B1",
-              "C1",
-              "D1",
-              "E1",
-              "F1",
-              "G1",
-              "H1"
-            ],
-            [
-              "A10",
-              "B10",
-              "C10",
-              "D10",
-              "E10",
-              "F10",
-              "G10",
-              "H10"
-            ],
-            [
-              "A11",
-              "B11",
-              "C11",
-              "D11",
-              "E11",
-              "F11",
-              "G11",
-              "H11"
-            ],
-            [
-              "A12",
-              "B12",
-              "C12",
-              "D12",
-              "E12",
-              "F12",
-              "G12",
-              "H12"
-            ],
-            [
-              "A2",
-              "B2",
-              "C2",
-              "D2",
-              "E2",
-              "F2",
-              "G2",
-              "H2"
-            ],
-            [
-              "A3",
-              "B3",
-              "C3",
-              "D3",
-              "E3",
-              "F3",
-              "G3",
-              "H3"
-            ],
-            [
-              "A4",
-              "B4",
-              "C4",
-              "D4",
-              "E4",
-              "F4",
-              "G4",
-              "H4"
-            ],
-            [
-              "A5",
-              "B5",
-              "C5",
-              "D5",
-              "E5",
-              "F5",
-              "G5",
-              "H5"
-            ],
-            [
-              "A6",
-              "B6",
-              "C6",
-              "D6",
-              "E6",
-              "F6",
-              "G6",
-              "H6"
-            ],
-            [
-              "A7",
-              "B7",
-              "C7",
-              "D7",
-              "E7",
-              "F7",
-              "G7",
-              "H7"
-            ],
-            [
-              "A8",
-              "B8",
-              "C8",
-              "D8",
-              "E8",
-              "F8",
-              "G8",
-              "H8"
-            ],
-            [
-              "A9",
-              "B9",
-              "C9",
-              "D9",
-              "E9",
-              "F9",
-              "G9",
-              "H9"
-            ]
+            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
+            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
+            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
+            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
+            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
+            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
+            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
+            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
+            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
+            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
+            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
+            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
           ],
           "parameters": {
             "format": "96Standard",
@@ -33315,9 +32690,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -34035,9 +33408,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -34078,9 +33449,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -34091,9 +33460,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "originLocationSequence": [
@@ -34179,9 +33546,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -34255,9 +33620,7 @@
           "allowedRoles": [],
           "brand": {
             "brand": "Thermo Fisher Scientific",
-            "brandId": [
-              "165218"
-            ]
+            "brandId": ["165218"]
           },
           "cornerOffsetFromSlot": {
             "x": 0,
@@ -34275,9 +33638,7 @@
               "metadata": {
                 "wellBottomShape": "flat"
               },
-              "wells": [
-                "A1"
-              ]
+              "wells": ["A1"]
             }
           ],
           "metadata": {
@@ -34287,20 +33648,13 @@
             "tags": []
           },
           "namespace": "custom_beta",
-          "ordering": [
-            [
-              "A1"
-            ]
-          ],
+          "ordering": [["A1"]],
           "parameters": {
             "format": "irregular",
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "omintray_1well_plate",
-            "quirks": [
-              "centerMultichannelOnWells",
-              "touchTipDisabled"
-            ]
+            "quirks": ["centerMultichannelOnWells", "touchTipDisabled"]
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},
@@ -34373,9 +33727,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -34386,9 +33738,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "originLocationSequence": [
@@ -34474,9 +33824,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -34630,126 +33978,18 @@
           },
           "namespace": "custom_beta",
           "ordering": [
-            [
-              "A1",
-              "B1",
-              "C1",
-              "D1",
-              "E1",
-              "F1",
-              "G1",
-              "H1"
-            ],
-            [
-              "A10",
-              "B10",
-              "C10",
-              "D10",
-              "E10",
-              "F10",
-              "G10",
-              "H10"
-            ],
-            [
-              "A11",
-              "B11",
-              "C11",
-              "D11",
-              "E11",
-              "F11",
-              "G11",
-              "H11"
-            ],
-            [
-              "A12",
-              "B12",
-              "C12",
-              "D12",
-              "E12",
-              "F12",
-              "G12",
-              "H12"
-            ],
-            [
-              "A2",
-              "B2",
-              "C2",
-              "D2",
-              "E2",
-              "F2",
-              "G2",
-              "H2"
-            ],
-            [
-              "A3",
-              "B3",
-              "C3",
-              "D3",
-              "E3",
-              "F3",
-              "G3",
-              "H3"
-            ],
-            [
-              "A4",
-              "B4",
-              "C4",
-              "D4",
-              "E4",
-              "F4",
-              "G4",
-              "H4"
-            ],
-            [
-              "A5",
-              "B5",
-              "C5",
-              "D5",
-              "E5",
-              "F5",
-              "G5",
-              "H5"
-            ],
-            [
-              "A6",
-              "B6",
-              "C6",
-              "D6",
-              "E6",
-              "F6",
-              "G6",
-              "H6"
-            ],
-            [
-              "A7",
-              "B7",
-              "C7",
-              "D7",
-              "E7",
-              "F7",
-              "G7",
-              "H7"
-            ],
-            [
-              "A8",
-              "B8",
-              "C8",
-              "D8",
-              "E8",
-              "F8",
-              "G8",
-              "H8"
-            ],
-            [
-              "A9",
-              "B9",
-              "C9",
-              "D9",
-              "E9",
-              "F9",
-              "G9",
-              "H9"
-            ]
+            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
+            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
+            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
+            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
+            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
+            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
+            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
+            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
+            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
+            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
+            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
+            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
           ],
           "parameters": {
             "format": "96Standard",
@@ -35637,9 +34877,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -36357,9 +35595,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -36400,9 +35636,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -36413,9 +35647,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "originLocationSequence": [
@@ -36501,9 +35733,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -36577,9 +35807,7 @@
           "allowedRoles": [],
           "brand": {
             "brand": "Thermo Fisher Scientific",
-            "brandId": [
-              "165218"
-            ]
+            "brandId": ["165218"]
           },
           "cornerOffsetFromSlot": {
             "x": 0,
@@ -36597,9 +35825,7 @@
               "metadata": {
                 "wellBottomShape": "flat"
               },
-              "wells": [
-                "A1"
-              ]
+              "wells": ["A1"]
             }
           ],
           "metadata": {
@@ -36609,20 +35835,13 @@
             "tags": []
           },
           "namespace": "custom_beta",
-          "ordering": [
-            [
-              "A1"
-            ]
-          ],
+          "ordering": [["A1"]],
           "parameters": {
             "format": "irregular",
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "omintray_1well_plate",
-            "quirks": [
-              "centerMultichannelOnWells",
-              "touchTipDisabled"
-            ]
+            "quirks": ["centerMultichannelOnWells", "touchTipDisabled"]
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},
@@ -36695,9 +35914,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -36708,9 +35925,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "originLocationSequence": [
@@ -36796,9 +36011,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -36952,126 +36165,18 @@
           },
           "namespace": "custom_beta",
           "ordering": [
-            [
-              "A1",
-              "B1",
-              "C1",
-              "D1",
-              "E1",
-              "F1",
-              "G1",
-              "H1"
-            ],
-            [
-              "A10",
-              "B10",
-              "C10",
-              "D10",
-              "E10",
-              "F10",
-              "G10",
-              "H10"
-            ],
-            [
-              "A11",
-              "B11",
-              "C11",
-              "D11",
-              "E11",
-              "F11",
-              "G11",
-              "H11"
-            ],
-            [
-              "A12",
-              "B12",
-              "C12",
-              "D12",
-              "E12",
-              "F12",
-              "G12",
-              "H12"
-            ],
-            [
-              "A2",
-              "B2",
-              "C2",
-              "D2",
-              "E2",
-              "F2",
-              "G2",
-              "H2"
-            ],
-            [
-              "A3",
-              "B3",
-              "C3",
-              "D3",
-              "E3",
-              "F3",
-              "G3",
-              "H3"
-            ],
-            [
-              "A4",
-              "B4",
-              "C4",
-              "D4",
-              "E4",
-              "F4",
-              "G4",
-              "H4"
-            ],
-            [
-              "A5",
-              "B5",
-              "C5",
-              "D5",
-              "E5",
-              "F5",
-              "G5",
-              "H5"
-            ],
-            [
-              "A6",
-              "B6",
-              "C6",
-              "D6",
-              "E6",
-              "F6",
-              "G6",
-              "H6"
-            ],
-            [
-              "A7",
-              "B7",
-              "C7",
-              "D7",
-              "E7",
-              "F7",
-              "G7",
-              "H7"
-            ],
-            [
-              "A8",
-              "B8",
-              "C8",
-              "D8",
-              "E8",
-              "F8",
-              "G8",
-              "H8"
-            ],
-            [
-              "A9",
-              "B9",
-              "C9",
-              "D9",
-              "E9",
-              "F9",
-              "G9",
-              "H9"
-            ]
+            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
+            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
+            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
+            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
+            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
+            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
+            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
+            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
+            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
+            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
+            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
+            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
           ],
           "parameters": {
             "format": "96Standard",
@@ -37959,9 +37064,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -38679,9 +37782,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -38722,9 +37823,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -38735,9 +37834,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "originLocationSequence": [
@@ -38823,9 +37920,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -38899,9 +37994,7 @@
           "allowedRoles": [],
           "brand": {
             "brand": "Thermo Fisher Scientific",
-            "brandId": [
-              "165218"
-            ]
+            "brandId": ["165218"]
           },
           "cornerOffsetFromSlot": {
             "x": 0,
@@ -38919,9 +38012,7 @@
               "metadata": {
                 "wellBottomShape": "flat"
               },
-              "wells": [
-                "A1"
-              ]
+              "wells": ["A1"]
             }
           ],
           "metadata": {
@@ -38931,20 +38022,13 @@
             "tags": []
           },
           "namespace": "custom_beta",
-          "ordering": [
-            [
-              "A1"
-            ]
-          ],
+          "ordering": [["A1"]],
           "parameters": {
             "format": "irregular",
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "omintray_1well_plate",
-            "quirks": [
-              "centerMultichannelOnWells",
-              "touchTipDisabled"
-            ]
+            "quirks": ["centerMultichannelOnWells", "touchTipDisabled"]
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},
@@ -39017,9 +38101,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -39030,9 +38112,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "originLocationSequence": [
@@ -39118,9 +38198,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -39274,126 +38352,18 @@
           },
           "namespace": "custom_beta",
           "ordering": [
-            [
-              "A1",
-              "B1",
-              "C1",
-              "D1",
-              "E1",
-              "F1",
-              "G1",
-              "H1"
-            ],
-            [
-              "A10",
-              "B10",
-              "C10",
-              "D10",
-              "E10",
-              "F10",
-              "G10",
-              "H10"
-            ],
-            [
-              "A11",
-              "B11",
-              "C11",
-              "D11",
-              "E11",
-              "F11",
-              "G11",
-              "H11"
-            ],
-            [
-              "A12",
-              "B12",
-              "C12",
-              "D12",
-              "E12",
-              "F12",
-              "G12",
-              "H12"
-            ],
-            [
-              "A2",
-              "B2",
-              "C2",
-              "D2",
-              "E2",
-              "F2",
-              "G2",
-              "H2"
-            ],
-            [
-              "A3",
-              "B3",
-              "C3",
-              "D3",
-              "E3",
-              "F3",
-              "G3",
-              "H3"
-            ],
-            [
-              "A4",
-              "B4",
-              "C4",
-              "D4",
-              "E4",
-              "F4",
-              "G4",
-              "H4"
-            ],
-            [
-              "A5",
-              "B5",
-              "C5",
-              "D5",
-              "E5",
-              "F5",
-              "G5",
-              "H5"
-            ],
-            [
-              "A6",
-              "B6",
-              "C6",
-              "D6",
-              "E6",
-              "F6",
-              "G6",
-              "H6"
-            ],
-            [
-              "A7",
-              "B7",
-              "C7",
-              "D7",
-              "E7",
-              "F7",
-              "G7",
-              "H7"
-            ],
-            [
-              "A8",
-              "B8",
-              "C8",
-              "D8",
-              "E8",
-              "F8",
-              "G8",
-              "H8"
-            ],
-            [
-              "A9",
-              "B9",
-              "C9",
-              "D9",
-              "E9",
-              "F9",
-              "G9",
-              "H9"
-            ]
+            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
+            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
+            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
+            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
+            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
+            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
+            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
+            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
+            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
+            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
+            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
+            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
           ],
           "parameters": {
             "format": "96Standard",
@@ -40281,9 +39251,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -41001,9 +39969,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -41044,9 +40010,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -41057,9 +40021,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "originLocationSequence": [
@@ -41145,9 +40107,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -41221,9 +40181,7 @@
           "allowedRoles": [],
           "brand": {
             "brand": "Thermo Fisher Scientific",
-            "brandId": [
-              "165218"
-            ]
+            "brandId": ["165218"]
           },
           "cornerOffsetFromSlot": {
             "x": 0,
@@ -41241,9 +40199,7 @@
               "metadata": {
                 "wellBottomShape": "flat"
               },
-              "wells": [
-                "A1"
-              ]
+              "wells": ["A1"]
             }
           ],
           "metadata": {
@@ -41253,20 +40209,13 @@
             "tags": []
           },
           "namespace": "custom_beta",
-          "ordering": [
-            [
-              "A1"
-            ]
-          ],
+          "ordering": [["A1"]],
           "parameters": {
             "format": "irregular",
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "omintray_1well_plate",
-            "quirks": [
-              "centerMultichannelOnWells",
-              "touchTipDisabled"
-            ]
+            "quirks": ["centerMultichannelOnWells", "touchTipDisabled"]
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},
@@ -41339,9 +40288,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -41352,9 +40299,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "originLocationSequence": [
@@ -41440,9 +40385,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -41596,126 +40539,18 @@
           },
           "namespace": "custom_beta",
           "ordering": [
-            [
-              "A1",
-              "B1",
-              "C1",
-              "D1",
-              "E1",
-              "F1",
-              "G1",
-              "H1"
-            ],
-            [
-              "A10",
-              "B10",
-              "C10",
-              "D10",
-              "E10",
-              "F10",
-              "G10",
-              "H10"
-            ],
-            [
-              "A11",
-              "B11",
-              "C11",
-              "D11",
-              "E11",
-              "F11",
-              "G11",
-              "H11"
-            ],
-            [
-              "A12",
-              "B12",
-              "C12",
-              "D12",
-              "E12",
-              "F12",
-              "G12",
-              "H12"
-            ],
-            [
-              "A2",
-              "B2",
-              "C2",
-              "D2",
-              "E2",
-              "F2",
-              "G2",
-              "H2"
-            ],
-            [
-              "A3",
-              "B3",
-              "C3",
-              "D3",
-              "E3",
-              "F3",
-              "G3",
-              "H3"
-            ],
-            [
-              "A4",
-              "B4",
-              "C4",
-              "D4",
-              "E4",
-              "F4",
-              "G4",
-              "H4"
-            ],
-            [
-              "A5",
-              "B5",
-              "C5",
-              "D5",
-              "E5",
-              "F5",
-              "G5",
-              "H5"
-            ],
-            [
-              "A6",
-              "B6",
-              "C6",
-              "D6",
-              "E6",
-              "F6",
-              "G6",
-              "H6"
-            ],
-            [
-              "A7",
-              "B7",
-              "C7",
-              "D7",
-              "E7",
-              "F7",
-              "G7",
-              "H7"
-            ],
-            [
-              "A8",
-              "B8",
-              "C8",
-              "D8",
-              "E8",
-              "F8",
-              "G8",
-              "H8"
-            ],
-            [
-              "A9",
-              "B9",
-              "C9",
-              "D9",
-              "E9",
-              "F9",
-              "G9",
-              "H9"
-            ]
+            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
+            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
+            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
+            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
+            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
+            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
+            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
+            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
+            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
+            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
+            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
+            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
           ],
           "parameters": {
             "format": "96Standard",
@@ -42603,9 +41438,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -43323,9 +42156,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -43366,9 +42197,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -43379,9 +42208,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ],
         "originLocationSequence": [
@@ -43467,9 +42294,7 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -43555,10 +42380,7 @@
     }
   ],
   "config": {
-    "apiVersion": [
-      2,
-      16
-    ],
+    "apiVersion": [2, 16],
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",

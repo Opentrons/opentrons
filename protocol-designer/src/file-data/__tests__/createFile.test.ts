@@ -16,6 +16,7 @@ import {
 } from '@opentrons/shared-data/labware/fixtures/2'
 import { formatPyStr, PAPI_VERSION } from '@opentrons/step-generation'
 
+import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
 import {
   dismissedWarnings,
   fileMetadata,
@@ -26,7 +27,6 @@ import {
   pipetteEntities,
 } from '../__fixtures__/createFile/commonFields'
 import * as v7Fixture from '../__fixtures__/createFile/v7Fixture'
-import { getLoadLiquidCommands } from '../../load-file/migration/utils/getLoadLiquidCommands'
 import { createFile, getLabwareDefinitionsInUse } from '../selectors'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

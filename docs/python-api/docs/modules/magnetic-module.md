@@ -1,10 +1,10 @@
 ---
-title: "Python API: Magnetic Module"
-description: "Control the OT-2 Magnetic Module: engage and disengage height in protocols."
+title: 'Python API: Magnetic Module'
+description: 'Control the OT-2 Magnetic Module: engage and disengage height in protocols.'
 ---
 
 !!! note "OT-2 only"
-    The Magnetic Module is compatible with the OT-2 only. If you have a Flex, use the [Magnetic Block](magnetic-block.md).
+The Magnetic Module is compatible with the OT-2 only. If you have a Flex, use the [Magnetic Block](magnetic-block.md).
 
 The Magnetic Module controls a set of permanent magnets which can move vertically to induce a magnetic field in the labware loaded on the module.
 
@@ -20,20 +20,21 @@ def run(protocol: protocol_api.ProtocolContext):
     plate = mag_mod.load_labware(
       name="nest_96_wellplate_100ul_pcr_full_skirt")
 ```
-*New in version 2.3*
+
+_New in version 2.3_
 
 ## Loading labware
 
 Like with all modules, use the Magnetic Module’s [`load_labware()`][opentrons.protocol_api.MagneticModuleContext.load_labware] method to specify what you will place on the module. The Magnetic Module supports 96-well PCR plates and deep well plates. For the best compatibility, use a labware definition that specifies how far the magnets should move when engaging with the labware. The following plates in the [Opentrons Labware Library](https://labware.opentrons.com/) include this measurement:
 
-| Labware Name | API Load Name {width="60%"} |
-|--------------|--------------|
-| Bio-Rad 96 Well Plate 200 µL PCR | `biorad_96_wellplate_200ul_pcr` |
-| NEST 96 Well Plate 100 µL PCR Full Skirt | `nest_96_wellplate_100ul_pcr_full_skirt` |
-| NEST 96 Deep Well Plate 2mL | `nest_96_wellplate_2ml_deep` |
+| Labware Name                                 | API Load Name {width="60%"}                |
+| -------------------------------------------- | ------------------------------------------ |
+| Bio-Rad 96 Well Plate 200 µL PCR             | `biorad_96_wellplate_200ul_pcr`            |
+| NEST 96 Well Plate 100 µL PCR Full Skirt     | `nest_96_wellplate_100ul_pcr_full_skirt`   |
+| NEST 96 Deep Well Plate 2mL                  | `nest_96_wellplate_2ml_deep`               |
 | Thermo Scientific Nunc 96 Well Plate 1300 µL | `thermoscientificnunc_96_wellplate_1300ul` |
 | Thermo Scientific Nunc 96 Well Plate 2000 µL | `thermoscientificnunc_96_wellplate_2000ul` |
-| USA Scientific 96 Deep Well Plate 2.4 mL | `usascientific_96_wellplate_2.4ml_deep` |
+| USA Scientific 96 Deep Well Plate 2.4 mL     | `usascientific_96_wellplate_2.4ml_deep`    |
 
 To check whether a custom labware definition specifies this measurement, load the labware and query its [`magdeck_engage_height`][opentrons.protocol_api.Labware.magdeck_engage_height] property. If it has a numerical value, the labware is ready for use with the Magnetic Module.
 
@@ -42,17 +43,19 @@ To check whether a custom labware definition specifies this measurement, load th
 Raise and lower the module's magnets with the [`engage()`][opentrons.protocol_api.MagneticModuleContext.engage] and [`disengage()`][opentrons.protocol_api.MagneticModuleContext.disengage] functions, respectively.
 
 If your loaded labware is fully compatible with the Magnetic Module, you can call `engage()` with no argument:
+
 ```python
 mag_mod.engage()
 ```
-*New in version 2.0*
+
+_New in version 2.0_
 
 This will move the magnets upward to the default height for the labware, which should be close to the bottom of the labware's wells. If your loaded labware doesn't specify a default height, this will raise an `ExceptionInProtocolError`.
 
-For certain applications, you may want to move the magnets to a different height. The recommended way is to use the `height_from_base` parameter, which represents the distance above the base of the labware (its lowest point, where it rests on the module). Setting `height_from_base=0` should move the tops of the magnets level with the base of the labware. Alternatively, you can use the `offset` parameter, which represents the distance above *or below* the labware's default position (close to the bottom of its wells). Like using `engage()` with no argument, this will raise an error if there is no default height for the loaded labware.
+For certain applications, you may want to move the magnets to a different height. The recommended way is to use the `height_from_base` parameter, which represents the distance above the base of the labware (its lowest point, where it rests on the module). Setting `height_from_base=0` should move the tops of the magnets level with the base of the labware. Alternatively, you can use the `offset` parameter, which represents the distance above _or below_ the labware's default position (close to the bottom of its wells). Like using `engage()` with no argument, this will raise an error if there is no default height for the loaded labware.
 
 !!! note
-    There is up to 1 mm of manufacturing variance across Magnetic Module units, so observe the exact position and adjust as necessary before running your protocol.
+There is up to 1 mm of manufacturing variance across Magnetic Module units, so observe the exact position and adjust as necessary before running your protocol.
 
 Here are some examples of where the magnets will move when using the different parameters in combination with the loaded NEST PCR plate, which specifies a default height of 20 mm:
 
@@ -63,20 +66,22 @@ mag_mod.engage(offset=-2)              # 15.5 mm
 
 Note that `offset` takes into account the fact that the magnets' home position is measured as −2.5 mm for GEN2 modules.
 
-*New in version 2.0*
+_New in version 2.0_
 
-*Changed in version 2.2:* Added the `height_from_base` parameter.
+_Changed in version 2.2:_ Added the `height_from_base` parameter.
 
 To retract the magnets back to their home position, call [`disengage()`][opentrons.protocol_api.MagneticModuleContext.disengage]:
+
 ```python
 mag_mod.disengage()  # -2.5 mm
 ```
-*New in version 2.0*
+
+_New in version 2.0_
 
 If at any point you need to check whether the magnets are engaged or not, use the [`MagneticModuleContext.status`][opentrons.protocol_api.MagneticModuleContext.status] property. This will return either the string `"engaged"` or `"disengaged"`, not the exact height of the magnets.
 
 !!! note
-    The OT-2 will not automatically deactivate the Magnetic Module at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Magnetic Module controls on the device detail page in the Opentrons App or run `deactivate()` in Jupyter notebook.
+The OT-2 will not automatically deactivate the Magnetic Module at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Magnetic Module controls on the device detail page in the Opentrons App or run `deactivate()` in Jupyter notebook.
 
 ## Changes with the GEN2 Magnetic Module
 

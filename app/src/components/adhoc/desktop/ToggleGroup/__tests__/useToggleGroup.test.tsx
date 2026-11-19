@@ -1,10 +1,9 @@
 import { Provider } from 'react-redux'
+import { fireEvent, render, renderHook, screen } from '@testing-library/react'
 import { legacy_createStore } from 'redux'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { fireEvent, render, renderHook, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useTrackEvent } from '/app/redux/analytics'
 

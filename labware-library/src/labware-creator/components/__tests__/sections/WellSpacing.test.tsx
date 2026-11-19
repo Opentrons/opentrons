@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 import { getDefaultFormState, getInitialStatus } from '../../../fields'
 import { getLabwareName, isEveryFieldHidden } from '../../../utils'
+import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 import { WellSpacing } from '../../sections/WellSpacing'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 

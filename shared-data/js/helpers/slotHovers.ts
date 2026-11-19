@@ -1,6 +1,6 @@
 import { VACUUM_MODULE_ADDRESSABLE_AREAS } from '..'
-
 import type { CoordinateTuple } from '..'
+
 import type { AddressableAreaName, CutoutId } from '../../deck'
 
 interface HoverDimensions {

@@ -1,9 +1,8 @@
+import { fireEvent, render, screen } from '@testing-library/react'
+import { useFormikContext } from 'formik'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { fireEvent, render, screen } from '@testing-library/react'
-import { useFormikContext } from 'formik'
 
 import {
   fixture96Plate,

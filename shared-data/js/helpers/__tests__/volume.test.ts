@@ -17,7 +17,9 @@ type GetAsciiVolumeUnitsSpec = BaseSpec<typeof helpers.getAsciiVolumeUnits>
 type EnsureVolumeUnitsSpec = BaseSpec<typeof helpers.ensureVolumeUnits>
 
 type TestSpec =
-  GetDisplayVolumeSpec | GetAsciiVolumeUnitsSpec | EnsureVolumeUnitsSpec
+  | GetDisplayVolumeSpec
+  | GetAsciiVolumeUnitsSpec
+  | EnsureVolumeUnitsSpec
 
 describe('volume helpers', () => {
   const SPECS: TestSpec[] = [

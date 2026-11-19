@@ -494,10 +494,9 @@ a.subdomain_link {
 }
 
 .scrollable_contents {
-  max-height:
-    calc(
-      100vh - var(--size-mobile-nav) - var(--spacing-mobile-heading)
-    );
+  max-height: calc(
+    100vh - var(--size-mobile-nav) - var(--spacing-mobile-heading)
+  );
   overflow-y: auto;
 }
 

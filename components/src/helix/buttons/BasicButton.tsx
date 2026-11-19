@@ -95,7 +95,7 @@ const StyledButton = styled.button<{
       `
       : undefined}
 
-  &[aria-disabled="true"] {
+  &[aria-disabled='true'] {
     outline: none;
   }
 `

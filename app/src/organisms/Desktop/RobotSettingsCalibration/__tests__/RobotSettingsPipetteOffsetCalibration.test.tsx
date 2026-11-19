@@ -7,11 +7,11 @@ import { useIsFlex } from '/app/redux-resources/robots'
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import { mockAttachedPipetteInformation } from '/app/resources/instruments/__fixtures__'
 
+import type { FormattedPipetteOffsetCalibration } from '..'
 import { PipetteOffsetCalibrationItems } from '../CalibrationDetails/PipetteOffsetCalibrationItems'
 import { RobotSettingsPipetteOffsetCalibration } from '../RobotSettingsPipetteOffsetCalibration'
 
 import type { ComponentProps } from 'react'
-import type { FormattedPipetteOffsetCalibration } from '..'
 
 vi.mock('/app/organisms/Desktop/Devices/hooks')
 vi.mock('/app/resources/instruments')

@@ -1,12 +1,12 @@
 ---
-title: "HEPA/UV Module: Unboxing and Installation"
-description: "Unbox, attach to Flex with clearance requirements, and connect power."
+title: 'HEPA/UV Module: Unboxing and Installation'
+description: 'Unbox, attach to Flex with clearance requirements, and connect power.'
 ---
 
 Ask a lab partner for help with unboxing, lifting, and attaching the module. For tools, you will need scissors and the 2.5 mm hex screwdriver that comes in the Module User Kit.
 
 !!! note
-    When attached, the HEPA/UV Module requires 20 cm (8″) of top and side clearance to operate properly.
+When attached, the HEPA/UV Module requires 20 cm (8″) of top and side clearance to operate properly.
 
 ## Unboxing
 
@@ -32,16 +32,17 @@ Ask a lab partner for help with unboxing, lifting, and attaching the module. For
     The HEPA/UV Module is attached properly when it sits flush with the top of the robot. There should be no gaps between the foam seal on the HEPA/UV Module and the robot.
 
 7. Remove the UV bulbs from the Module User Kit. Unwrap and install them in recessed receptacles on the underside of the module.
-    - If necessary, move the gantry to its home position at the back right. When Flex is powered off, the gantry should move easily by hand.
-    - Each bulb has 4 prongs that fit into the power receptacle. Push the prongs into the receptacle.
-    - Retaining clips hold the free ends of the bulbs in place. Press the bulbs gently until they snap into the clips.
-    ![Install the UV bulbs](images/instructions/7-insert-bulbs.png "Install the UV bulbs")
+   - If necessary, move the gantry to its home position at the back right. When Flex is powered off, the gantry should move easily by hand.
+   - Each bulb has 4 prongs that fit into the power receptacle. Push the prongs into the receptacle.
+   - Retaining clips hold the free ends of the bulbs in place. Press the bulbs gently until they snap into the clips.
+     ![Install the UV bulbs](images/instructions/7-insert-bulbs.png 'Install the UV bulbs')
 8. Remove the carrying handles and replace them with the finishing caps. Fasten the caps using the 2.5 mm hex screwdriver. The caps close the handle openings and give the HEPA/UV Module a clean, finished appearance. Store the handles in the Module User Kit for future use.
-    ![Replace handles with finishing caps](images/instructions/8-finishing-caps.svg "Replace handles with finishing caps")
+   ![Replace handles with finishing caps](images/instructions/8-finishing-caps.svg 'Replace handles with finishing caps')
 9. Remove the M12 AUX cable from the Module User Kit. Attach the cord’s right-angle connector to the AUX port on the back of the HEPA/UV Module. Attach the other end to an AUX port on the back of the Flex.
-    ![Attach the AUX cable](images/instructions/9-connect-aux.svg "Attach the AUX cable")
+   ![Attach the AUX cable](images/instructions/9-connect-aux.svg 'Attach the AUX cable')
 10. Connect the power cord to the module and to a wall outlet.
 11. Press the rear power switch to turn on the HEPA/UV Module. The ring lights around the on/off buttons should glow white.
+
 </div>
 
 With everything secure, connected, and powered on, your HEPA/UV Module is ready for use. This module does not require calibration.

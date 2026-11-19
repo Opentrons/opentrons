@@ -12,7 +12,7 @@ Opentrons-verified liquid classes are based on the properties of common liquids:
 
 Use Opentrons-verified liquid classes in your transfers to automatically apply optimized behavior. For example, choosing the `glycerol_50` liquid class changes properties, like flow rate, to accurately transfer viscous liquid.
 
-Other propreties like submerge speed, touch tip, and air gap can help prevent splashing or dripping of a volatile liquid, or reduce air bubbles forming in a viscous liquid. 
+Other propreties like submerge speed, touch tip, and air gap can help prevent splashing or dripping of a volatile liquid, or reduce air bubbles forming in a viscous liquid.
 
 Each Opentrons-verified liquid class is defined by a set of these properties:
 

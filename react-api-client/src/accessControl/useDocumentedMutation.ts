@@ -63,7 +63,8 @@ function useWrappedMutationFn<TData, TVariables>(
   mutationFn: DocumentedMutationFunction<TData, TVariables>,
   documentationState: DocumentationState,
   actionsToDocument:
-    DocumentedAction[] | ((variables: TVariables) => DocumentedAction[])
+    | DocumentedAction[]
+    | ((variables: TVariables) => DocumentedAction[])
 ): MutationFunction<TData, TVariables> {
   // using a ref avoids stale mutation functions after a change in the host causes a rerender
   // i.e. when the user is prompted to log in again

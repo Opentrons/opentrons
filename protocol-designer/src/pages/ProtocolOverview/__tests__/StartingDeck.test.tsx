@@ -4,12 +4,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../assets/localization'
 import { SlotDetailsContainer } from '../../../components/organisms'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { StartingDeck } from '../StartingDeck'
 
 import type { ComponentProps } from 'react'
+
+import { i18n } from '../../../assets/localization'
 
 vi.mock('../DeckThumbnail')
 vi.mock('../OffDeckThumbnail')
@@ -26,8 +27,7 @@ const mockSetShowMaterialsListModal = vi.fn()
 
 const render = (props: ComponentProps<typeof StartingDeck>) => {
   return (
-    renderWithProviders(<StartingDeck {...props} />),
-    { i18nInstance: i18n }
+    renderWithProviders(<StartingDeck {...props} />), { i18nInstance: i18n }
   )
 }
 

@@ -179,126 +179,18 @@
           },
           "namespace": "opentrons",
           "ordering": [
-            [
-              "A1",
-              "B1",
-              "C1",
-              "D1",
-              "E1",
-              "F1",
-              "G1",
-              "H1"
-            ],
-            [
-              "A10",
-              "B10",
-              "C10",
-              "D10",
-              "E10",
-              "F10",
-              "G10",
-              "H10"
-            ],
-            [
-              "A11",
-              "B11",
-              "C11",
-              "D11",
-              "E11",
-              "F11",
-              "G11",
-              "H11"
-            ],
-            [
-              "A12",
-              "B12",
-              "C12",
-              "D12",
-              "E12",
-              "F12",
-              "G12",
-              "H12"
-            ],
-            [
-              "A2",
-              "B2",
-              "C2",
-              "D2",
-              "E2",
-              "F2",
-              "G2",
-              "H2"
-            ],
-            [
-              "A3",
-              "B3",
-              "C3",
-              "D3",
-              "E3",
-              "F3",
-              "G3",
-              "H3"
-            ],
-            [
-              "A4",
-              "B4",
-              "C4",
-              "D4",
-              "E4",
-              "F4",
-              "G4",
-              "H4"
-            ],
-            [
-              "A5",
-              "B5",
-              "C5",
-              "D5",
-              "E5",
-              "F5",
-              "G5",
-              "H5"
-            ],
-            [
-              "A6",
-              "B6",
-              "C6",
-              "D6",
-              "E6",
-              "F6",
-              "G6",
-              "H6"
-            ],
-            [
-              "A7",
-              "B7",
-              "C7",
-              "D7",
-              "E7",
-              "F7",
-              "G7",
-              "H7"
-            ],
-            [
-              "A8",
-              "B8",
-              "C8",
-              "D8",
-              "E8",
-              "F8",
-              "G8",
-              "H8"
-            ],
-            [
-              "A9",
-              "B9",
-              "C9",
-              "D9",
-              "E9",
-              "F9",
-              "G9",
-              "H9"
-            ]
+            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
+            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
+            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
+            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
+            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
+            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
+            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
+            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
+            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
+            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
+            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
+            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
           ],
           "parameters": {
             "format": "96Standard",
@@ -1200,9 +1092,7 @@
           {
             "cutoutId": "cutoutB2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -1356,126 +1246,18 @@
           },
           "namespace": "opentrons",
           "ordering": [
-            [
-              "A1",
-              "B1",
-              "C1",
-              "D1",
-              "E1",
-              "F1",
-              "G1",
-              "H1"
-            ],
-            [
-              "A10",
-              "B10",
-              "C10",
-              "D10",
-              "E10",
-              "F10",
-              "G10",
-              "H10"
-            ],
-            [
-              "A11",
-              "B11",
-              "C11",
-              "D11",
-              "E11",
-              "F11",
-              "G11",
-              "H11"
-            ],
-            [
-              "A12",
-              "B12",
-              "C12",
-              "D12",
-              "E12",
-              "F12",
-              "G12",
-              "H12"
-            ],
-            [
-              "A2",
-              "B2",
-              "C2",
-              "D2",
-              "E2",
-              "F2",
-              "G2",
-              "H2"
-            ],
-            [
-              "A3",
-              "B3",
-              "C3",
-              "D3",
-              "E3",
-              "F3",
-              "G3",
-              "H3"
-            ],
-            [
-              "A4",
-              "B4",
-              "C4",
-              "D4",
-              "E4",
-              "F4",
-              "G4",
-              "H4"
-            ],
-            [
-              "A5",
-              "B5",
-              "C5",
-              "D5",
-              "E5",
-              "F5",
-              "G5",
-              "H5"
-            ],
-            [
-              "A6",
-              "B6",
-              "C6",
-              "D6",
-              "E6",
-              "F6",
-              "G6",
-              "H6"
-            ],
-            [
-              "A7",
-              "B7",
-              "C7",
-              "D7",
-              "E7",
-              "F7",
-              "G7",
-              "H7"
-            ],
-            [
-              "A8",
-              "B8",
-              "C8",
-              "D8",
-              "E8",
-              "F8",
-              "G8",
-              "H8"
-            ],
-            [
-              "A9",
-              "B9",
-              "C9",
-              "D9",
-              "E9",
-              "F9",
-              "G9",
-              "H9"
-            ]
+            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
+            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
+            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
+            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
+            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
+            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
+            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
+            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
+            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
+            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
+            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
+            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
           ],
           "parameters": {
             "format": "96Standard",
@@ -2535,126 +2317,18 @@
           },
           "namespace": "opentrons",
           "ordering": [
-            [
-              "A1",
-              "B1",
-              "C1",
-              "D1",
-              "E1",
-              "F1",
-              "G1",
-              "H1"
-            ],
-            [
-              "A10",
-              "B10",
-              "C10",
-              "D10",
-              "E10",
-              "F10",
-              "G10",
-              "H10"
-            ],
-            [
-              "A11",
-              "B11",
-              "C11",
-              "D11",
-              "E11",
-              "F11",
-              "G11",
-              "H11"
-            ],
-            [
-              "A12",
-              "B12",
-              "C12",
-              "D12",
-              "E12",
-              "F12",
-              "G12",
-              "H12"
-            ],
-            [
-              "A2",
-              "B2",
-              "C2",
-              "D2",
-              "E2",
-              "F2",
-              "G2",
-              "H2"
-            ],
-            [
-              "A3",
-              "B3",
-              "C3",
-              "D3",
-              "E3",
-              "F3",
-              "G3",
-              "H3"
-            ],
-            [
-              "A4",
-              "B4",
-              "C4",
-              "D4",
-              "E4",
-              "F4",
-              "G4",
-              "H4"
-            ],
-            [
-              "A5",
-              "B5",
-              "C5",
-              "D5",
-              "E5",
-              "F5",
-              "G5",
-              "H5"
-            ],
-            [
-              "A6",
-              "B6",
-              "C6",
-              "D6",
-              "E6",
-              "F6",
-              "G6",
-              "H6"
-            ],
-            [
-              "A7",
-              "B7",
-              "C7",
-              "D7",
-              "E7",
-              "F7",
-              "G7",
-              "H7"
-            ],
-            [
-              "A8",
-              "B8",
-              "C8",
-              "D8",
-              "E8",
-              "F8",
-              "G8",
-              "H8"
-            ],
-            [
-              "A9",
-              "B9",
-              "C9",
-              "D9",
-              "E9",
-              "F9",
-              "G9",
-              "H9"
-            ]
+            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
+            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
+            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
+            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
+            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
+            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
+            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
+            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
+            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
+            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
+            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
+            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
           ],
           "parameters": {
             "format": "96Standard",
@@ -3629,9 +3303,7 @@
           "allowedRoles": [],
           "brand": {
             "brand": "NEST",
-            "brandId": [
-              "360102"
-            ],
+            "brandId": ["360102"],
             "links": [
               "https://www.nest-biotech.com/reagent-reserviors/59178414.html"
             ]
@@ -3704,52 +3376,25 @@
           },
           "namespace": "opentrons",
           "ordering": [
-            [
-              "A1"
-            ],
-            [
-              "A10"
-            ],
-            [
-              "A11"
-            ],
-            [
-              "A12"
-            ],
-            [
-              "A2"
-            ],
-            [
-              "A3"
-            ],
-            [
-              "A4"
-            ],
-            [
-              "A5"
-            ],
-            [
-              "A6"
-            ],
-            [
-              "A7"
-            ],
-            [
-              "A8"
-            ],
-            [
-              "A9"
-            ]
+            ["A1"],
+            ["A10"],
+            ["A11"],
+            ["A12"],
+            ["A2"],
+            ["A3"],
+            ["A4"],
+            ["A5"],
+            ["A6"],
+            ["A7"],
+            ["A8"],
+            ["A9"]
           ],
           "parameters": {
             "format": "trough",
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "nest_12_reservoir_15ml",
-            "quirks": [
-              "centerMultichannelOnWells",
-              "touchTipDisabled"
-            ]
+            "quirks": ["centerMultichannelOnWells", "touchTipDisabled"]
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},
@@ -3899,9 +3544,7 @@
           {
             "cutoutId": "cutoutB1",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleLeftSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleLeftSlot"]
           }
         ]
       },
@@ -3986,10 +3629,7 @@
           "allowedRoles": [],
           "brand": {
             "brand": "NEST",
-            "brandId": [
-              "503001",
-              "503501"
-            ],
+            "brandId": ["503001", "503501"],
             "links": [
               "https://www.nest-biotech.com/deep-well-plates/59253726.html"
             ]
@@ -4148,126 +3788,18 @@
           },
           "namespace": "opentrons",
           "ordering": [
-            [
-              "A1",
-              "B1",
-              "C1",
-              "D1",
-              "E1",
-              "F1",
-              "G1",
-              "H1"
-            ],
-            [
-              "A10",
-              "B10",
-              "C10",
-              "D10",
-              "E10",
-              "F10",
-              "G10",
-              "H10"
-            ],
-            [
-              "A11",
-              "B11",
-              "C11",
-              "D11",
-              "E11",
-              "F11",
-              "G11",
-              "H11"
-            ],
-            [
-              "A12",
-              "B12",
-              "C12",
-              "D12",
-              "E12",
-              "F12",
-              "G12",
-              "H12"
-            ],
-            [
-              "A2",
-              "B2",
-              "C2",
-              "D2",
-              "E2",
-              "F2",
-              "G2",
-              "H2"
-            ],
-            [
-              "A3",
-              "B3",
-              "C3",
-              "D3",
-              "E3",
-              "F3",
-              "G3",
-              "H3"
-            ],
-            [
-              "A4",
-              "B4",
-              "C4",
-              "D4",
-              "E4",
-              "F4",
-              "G4",
-              "H4"
-            ],
-            [
-              "A5",
-              "B5",
-              "C5",
-              "D5",
-              "E5",
-              "F5",
-              "G5",
-              "H5"
-            ],
-            [
-              "A6",
-              "B6",
-              "C6",
-              "D6",
-              "E6",
-              "F6",
-              "G6",
-              "H6"
-            ],
-            [
-              "A7",
-              "B7",
-              "C7",
-              "D7",
-              "E7",
-              "F7",
-              "G7",
-              "H7"
-            ],
-            [
-              "A8",
-              "B8",
-              "C8",
-              "D8",
-              "E8",
-              "F8",
-              "G8",
-              "H8"
-            ],
-            [
-              "A9",
-              "B9",
-              "C9",
-              "D9",
-              "E9",
-              "F9",
-              "G9",
-              "H9"
-            ]
+            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
+            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
+            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
+            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
+            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
+            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
+            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
+            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
+            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
+            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
+            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
+            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
           ],
           "parameters": {
             "format": "96Standard",
@@ -5366,9 +4898,7 @@
           {
             "cutoutId": "cutoutD2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": [
-              "singleCenterSlot"
-            ]
+            "possibleCutoutFixtureIds": ["singleCenterSlot"]
           }
         ]
       },
@@ -5394,24 +4924,14 @@
               },
               "positionReference": "well-bottom"
             },
-            "correctionByVolume": [
-              [
-                0.0,
-                0.0
-              ]
-            ],
+            "correctionByVolume": [[0.0, 0.0]],
             "delay": {
               "enable": true,
               "params": {
                 "duration": 0.75
               }
             },
-            "flowRateByVolume": [
-              [
-                1.0,
-                716.0
-              ]
-            ],
+            "flowRateByVolume": [[1.0, 716.0]],
             "mix": {
               "enable": false,
               "params": {
@@ -5422,18 +4942,9 @@
             "preWet": false,
             "retract": {
               "airGapByVolume": [
-                [
-                  0.0,
-                  200.0
-                ],
-                [
-                  1.0,
-                  5.0
-                ],
-                [
-                  5.0,
-                  195.0
-                ]
+                [0.0, 200.0],
+                [1.0, 5.0],
+                [5.0, 195.0]
               ],
               "delay": {
                 "enable": false,
@@ -5480,25 +4991,11 @@
           "liquidClassName": "water",
           "multiDispense": {
             "conditioningByVolume": [
-              [
-                0.0,
-                200.0
-              ],
-              [
-                1.0,
-                5.0
-              ],
-              [
-                5.0,
-                195.0
-              ]
+              [0.0, 200.0],
+              [1.0, 5.0],
+              [5.0, 195.0]
             ],
-            "correctionByVolume": [
-              [
-                0.0,
-                0.0
-              ]
-            ],
+            "correctionByVolume": [[0.0, 0.0]],
             "delay": {
               "enable": false,
               "params": {
@@ -5514,39 +5011,16 @@
               "positionReference": "well-bottom"
             },
             "disposalByVolume": [
-              [
-                0.0,
-                200.0
-              ],
-              [
-                1.0,
-                5.0
-              ],
-              [
-                5.0,
-                195.0
-              ]
+              [0.0, 200.0],
+              [1.0, 5.0],
+              [5.0, 195.0]
             ],
-            "flowRateByVolume": [
-              [
-                1.0,
-                716.0
-              ]
-            ],
+            "flowRateByVolume": [[1.0, 716.0]],
             "retract": {
               "airGapByVolume": [
-                [
-                  0.0,
-                  200.0
-                ],
-                [
-                  1.0,
-                  5.0
-                ],
-                [
-                  5.0,
-                  195.0
-                ]
+                [0.0, 200.0],
+                [1.0, 5.0],
+                [5.0, 195.0]
               ],
               "blowout": {
                 "enable": true,
@@ -5599,12 +5073,7 @@
           },
           "pipetteModel": "flex_8channel_1000",
           "singleDispense": {
-            "correctionByVolume": [
-              [
-                0.0,
-                0.0
-              ]
-            ],
+            "correctionByVolume": [[0.0, 0.0]],
             "delay": {
               "enable": false,
               "params": {
@@ -5619,12 +5088,7 @@
               },
               "positionReference": "well-bottom"
             },
-            "flowRateByVolume": [
-              [
-                1.0,
-                716.0
-              ]
-            ],
+            "flowRateByVolume": [[1.0, 716.0]],
             "mix": {
               "enable": false,
               "params": {
@@ -5632,26 +5096,12 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [
-              [
-                1.0,
-                15.0
-              ]
-            ],
+            "pushOutByVolume": [[1.0, 15.0]],
             "retract": {
               "airGapByVolume": [
-                [
-                  0.0,
-                  200.0
-                ],
-                [
-                  1.0,
-                  5.0
-                ],
-                [
-                  5.0,
-                  195.0
-                ]
+                [0.0, 200.0],
+                [1.0, 5.0],
+                [5.0, 195.0]
               ],
               "blowout": {
                 "enable": false,
@@ -5720,11 +5170,7 @@
       "key": "61ededd9ea8b1b038643f3db520c2544",
       "notes": [],
       "params": {
-        "labwareIds": [
-          "UUID",
-          "UUID",
-          "UUID"
-        ],
+        "labwareIds": ["UUID", "UUID", "UUID"],
         "pipetteId": "UUID"
       },
       "result": {
@@ -7615,22 +7061,10 @@
               "positionReference": "well-bottom"
             },
             "correctionByVolume": [
-              [
-                -4.9,
-                200.0
-              ],
-              [
-                -0.5,
-                5.0
-              ],
-              [
-                -0.2,
-                50.0
-              ],
-              [
-                0.0,
-                0.0
-              ]
+              [-4.9, 200.0],
+              [-0.5, 5.0],
+              [-0.2, 50.0],
+              [0.0, 0.0]
             ],
             "delay": {
               "enable": true,
@@ -7639,18 +7073,9 @@
               }
             },
             "flowRateByVolume": [
-              [
-                5.0,
-                7.0
-              ],
-              [
-                50.0,
-                50.0
-              ],
-              [
-                200.0,
-                200.0
-              ]
+              [5.0, 7.0],
+              [50.0, 50.0],
+              [200.0, 200.0]
             ],
             "mix": {
               "enable": false,
@@ -7662,18 +7087,9 @@
             "preWet": false,
             "retract": {
               "airGapByVolume": [
-                [
-                  0.0,
-                  200.0
-                ],
-                [
-                  5.0,
-                  10.0
-                ],
-                [
-                  10.0,
-                  190.0
-                ]
+                [0.0, 200.0],
+                [5.0, 10.0],
+                [10.0, 190.0]
               ],
               "delay": {
                 "enable": true,
@@ -7720,40 +7136,16 @@
           "liquidClassName": "ethanol_80",
           "multiDispense": {
             "conditioningByVolume": [
-              [
-                0.0,
-                195.0
-              ],
-              [
-                0.0,
-                200.0
-              ],
-              [
-                1.0,
-                5.0
-              ],
-              [
-                5.0,
-                190.0
-              ]
+              [0.0, 195.0],
+              [0.0, 200.0],
+              [1.0, 5.0],
+              [5.0, 190.0]
             ],
             "correctionByVolume": [
-              [
-                -4.9,
-                200.0
-              ],
-              [
-                -0.5,
-                5.0
-              ],
-              [
-                -0.2,
-                50.0
-              ],
-              [
-                0.0,
-                0.0
-              ]
+              [-4.9, 200.0],
+              [-0.5, 5.0],
+              [-0.2, 50.0],
+              [0.0, 0.0]
             ],
             "delay": {
               "enable": true,
@@ -7770,43 +7162,17 @@
               "positionReference": "well-bottom"
             },
             "disposalByVolume": [
-              [
-                0.0,
-                195.0
-              ],
-              [
-                0.0,
-                200.0
-              ],
-              [
-                1.0,
-                5.0
-              ],
-              [
-                5.0,
-                190.0
-              ]
+              [0.0, 195.0],
+              [0.0, 200.0],
+              [1.0, 5.0],
+              [5.0, 190.0]
             ],
-            "flowRateByVolume": [
-              [
-                0.0,
-                100.0
-              ]
-            ],
+            "flowRateByVolume": [[0.0, 100.0]],
             "retract": {
               "airGapByVolume": [
-                [
-                  0.0,
-                  200.0
-                ],
-                [
-                  5.0,
-                  10.0
-                ],
-                [
-                  10.0,
-                  190.0
-                ]
+                [0.0, 200.0],
+                [5.0, 10.0],
+                [10.0, 190.0]
               ],
               "blowout": {
                 "enable": true,
@@ -7860,22 +7226,10 @@
           "pipetteModel": "flex_8channel_1000",
           "singleDispense": {
             "correctionByVolume": [
-              [
-                -4.9,
-                200.0
-              ],
-              [
-                -0.5,
-                5.0
-              ],
-              [
-                -0.2,
-                50.0
-              ],
-              [
-                0.0,
-                0.0
-              ]
+              [-4.9, 200.0],
+              [-0.5, 5.0],
+              [-0.2, 50.0],
+              [0.0, 0.0]
             ],
             "delay": {
               "enable": true,
@@ -7891,12 +7245,7 @@
               },
               "positionReference": "well-bottom"
             },
-            "flowRateByVolume": [
-              [
-                0.0,
-                100.0
-              ]
-            ],
+            "flowRateByVolume": [[0.0, 100.0]],
             "mix": {
               "enable": false,
               "params": {
@@ -7905,33 +7254,15 @@
               }
             },
             "pushOutByVolume": [
-              [
-                0.0,
-                5.0
-              ],
-              [
-                0.0,
-                50.0
-              ],
-              [
-                0.0,
-                200.0
-              ]
+              [0.0, 5.0],
+              [0.0, 50.0],
+              [0.0, 200.0]
             ],
             "retract": {
               "airGapByVolume": [
-                [
-                  0.0,
-                  200.0
-                ],
-                [
-                  5.0,
-                  10.0
-                ],
-                [
-                  10.0,
-                  190.0
-                ]
+                [0.0, 200.0],
+                [5.0, 10.0],
+                [10.0, 190.0]
               ],
               "blowout": {
                 "enable": false,
@@ -8000,11 +7331,7 @@
       "key": "3e97bdc6f4d4cd19891cae7f8d5bd373",
       "notes": [],
       "params": {
-        "labwareIds": [
-          "UUID",
-          "UUID",
-          "UUID"
-        ],
+        "labwareIds": ["UUID", "UUID", "UUID"],
         "pipetteId": "UUID"
       },
       "result": {
@@ -10120,22 +9447,10 @@
               "positionReference": "well-bottom"
             },
             "correctionByVolume": [
-              [
-                -0.8,
-                200.0
-              ],
-              [
-                -0.3,
-                50.0
-              ],
-              [
-                -0.2,
-                5.0
-              ],
-              [
-                0.0,
-                0.0
-              ]
+              [-0.8, 200.0],
+              [-0.3, 50.0],
+              [-0.2, 5.0],
+              [0.0, 0.0]
             ],
             "delay": {
               "enable": true,
@@ -10144,18 +9459,9 @@
               }
             },
             "flowRateByVolume": [
-              [
-                5.0,
-                10.0
-              ],
-              [
-                50.0,
-                50.0
-              ],
-              [
-                200.0,
-                200.0
-              ]
+              [5.0, 10.0],
+              [50.0, 50.0],
+              [200.0, 200.0]
             ],
             "mix": {
               "enable": false,
@@ -10166,12 +9472,7 @@
             },
             "preWet": false,
             "retract": {
-              "airGapByVolume": [
-                [
-                  0.0,
-                  0.0
-                ]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "delay": {
                 "enable": false,
                 "params": {
@@ -10217,40 +9518,16 @@
           "liquidClassName": "glycerol_50",
           "multiDispense": {
             "conditioningByVolume": [
-              [
-                0.0,
-                195.0
-              ],
-              [
-                0.0,
-                200.0
-              ],
-              [
-                1.0,
-                5.0
-              ],
-              [
-                5.0,
-                190.0
-              ]
+              [0.0, 195.0],
+              [0.0, 200.0],
+              [1.0, 5.0],
+              [5.0, 190.0]
             ],
             "correctionByVolume": [
-              [
-                -0.8,
-                200.0
-              ],
-              [
-                -0.3,
-                50.0
-              ],
-              [
-                -0.2,
-                5.0
-              ],
-              [
-                0.0,
-                0.0
-              ]
+              [-0.8, 200.0],
+              [-0.3, 50.0],
+              [-0.2, 5.0],
+              [0.0, 0.0]
             ],
             "delay": {
               "enable": true,
@@ -10267,36 +9544,14 @@
               "positionReference": "well-bottom"
             },
             "disposalByVolume": [
-              [
-                0.0,
-                195.0
-              ],
-              [
-                0.0,
-                200.0
-              ],
-              [
-                1.0,
-                5.0
-              ],
-              [
-                5.0,
-                190.0
-              ]
+              [0.0, 195.0],
+              [0.0, 200.0],
+              [1.0, 5.0],
+              [5.0, 190.0]
             ],
-            "flowRateByVolume": [
-              [
-                0.0,
-                50.0
-              ]
-            ],
+            "flowRateByVolume": [[0.0, 50.0]],
             "retract": {
-              "airGapByVolume": [
-                [
-                  0.0,
-                  0.0
-                ]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": true,
                 "params": {
@@ -10349,22 +9604,10 @@
           "pipetteModel": "flex_8channel_1000",
           "singleDispense": {
             "correctionByVolume": [
-              [
-                -0.8,
-                200.0
-              ],
-              [
-                -0.3,
-                50.0
-              ],
-              [
-                -0.2,
-                5.0
-              ],
-              [
-                0.0,
-                0.0
-              ]
+              [-0.8, 200.0],
+              [-0.3, 50.0],
+              [-0.2, 5.0],
+              [0.0, 0.0]
             ],
             "delay": {
               "enable": true,
@@ -10380,12 +9623,7 @@
               },
               "positionReference": "well-bottom"
             },
-            "flowRateByVolume": [
-              [
-                0.0,
-                50.0
-              ]
-            ],
+            "flowRateByVolume": [[0.0, 50.0]],
             "mix": {
               "enable": false,
               "params": {
@@ -10393,19 +9631,9 @@
                 "volume": 50
               }
             },
-            "pushOutByVolume": [
-              [
-                0.0,
-                20.0
-              ]
-            ],
+            "pushOutByVolume": [[0.0, 20.0]],
             "retract": {
-              "airGapByVolume": [
-                [
-                  0.0,
-                  0.0
-                ]
-              ],
+              "airGapByVolume": [[0.0, 0.0]],
               "blowout": {
                 "enable": false,
                 "params": {
@@ -10473,11 +9701,7 @@
       "key": "db68b4d10cda6757bf4c8c661b262721",
       "notes": [],
       "params": {
-        "labwareIds": [
-          "UUID",
-          "UUID",
-          "UUID"
-        ],
+        "labwareIds": ["UUID", "UUID", "UUID"],
         "pipetteId": "UUID"
       },
       "result": {
@@ -11983,10 +11207,7 @@
     }
   ],
   "config": {
-    "apiVersion": [
-      2,
-      24
-    ],
+    "apiVersion": [2, 24],
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",
@@ -12047,24 +11268,14 @@
           },
           "positionReference": "well-bottom"
         },
-        "correctionByVolume": [
-          [
-            0.0,
-            0.0
-          ]
-        ],
+        "correctionByVolume": [[0.0, 0.0]],
         "delay": {
           "enable": true,
           "params": {
             "duration": 0.75
           }
         },
-        "flowRateByVolume": [
-          [
-            1.0,
-            716.0
-          ]
-        ],
+        "flowRateByVolume": [[1.0, 716.0]],
         "mix": {
           "enable": false,
           "params": {
@@ -12075,18 +11286,9 @@
         "preWet": false,
         "retract": {
           "airGapByVolume": [
-            [
-              0.0,
-              200.0
-            ],
-            [
-              1.0,
-              5.0
-            ],
-            [
-              5.0,
-              195.0
-            ]
+            [0.0, 200.0],
+            [1.0, 5.0],
+            [5.0, 195.0]
           ],
           "delay": {
             "enable": false,
@@ -12134,25 +11336,11 @@
       "liquidClassName": "water",
       "multiDispense": {
         "conditioningByVolume": [
-          [
-            0.0,
-            200.0
-          ],
-          [
-            1.0,
-            5.0
-          ],
-          [
-            5.0,
-            195.0
-          ]
+          [0.0, 200.0],
+          [1.0, 5.0],
+          [5.0, 195.0]
         ],
-        "correctionByVolume": [
-          [
-            0.0,
-            0.0
-          ]
-        ],
+        "correctionByVolume": [[0.0, 0.0]],
         "delay": {
           "enable": false,
           "params": {
@@ -12168,39 +11356,16 @@
           "positionReference": "well-bottom"
         },
         "disposalByVolume": [
-          [
-            0.0,
-            200.0
-          ],
-          [
-            1.0,
-            5.0
-          ],
-          [
-            5.0,
-            195.0
-          ]
+          [0.0, 200.0],
+          [1.0, 5.0],
+          [5.0, 195.0]
         ],
-        "flowRateByVolume": [
-          [
-            1.0,
-            716.0
-          ]
-        ],
+        "flowRateByVolume": [[1.0, 716.0]],
         "retract": {
           "airGapByVolume": [
-            [
-              0.0,
-              200.0
-            ],
-            [
-              1.0,
-              5.0
-            ],
-            [
-              5.0,
-              195.0
-            ]
+            [0.0, 200.0],
+            [1.0, 5.0],
+            [5.0, 195.0]
           ],
           "blowout": {
             "enable": true,
@@ -12253,12 +11418,7 @@
       },
       "pipetteModel": "flex_8channel_1000",
       "singleDispense": {
-        "correctionByVolume": [
-          [
-            0.0,
-            0.0
-          ]
-        ],
+        "correctionByVolume": [[0.0, 0.0]],
         "delay": {
           "enable": false,
           "params": {
@@ -12273,12 +11433,7 @@
           },
           "positionReference": "well-bottom"
         },
-        "flowRateByVolume": [
-          [
-            1.0,
-            716.0
-          ]
-        ],
+        "flowRateByVolume": [[1.0, 716.0]],
         "mix": {
           "enable": false,
           "params": {
@@ -12286,26 +11441,12 @@
             "volume": 50
           }
         },
-        "pushOutByVolume": [
-          [
-            1.0,
-            15.0
-          ]
-        ],
+        "pushOutByVolume": [[1.0, 15.0]],
         "retract": {
           "airGapByVolume": [
-            [
-              0.0,
-              200.0
-            ],
-            [
-              1.0,
-              5.0
-            ],
-            [
-              5.0,
-              195.0
-            ]
+            [0.0, 200.0],
+            [1.0, 5.0],
+            [5.0, 195.0]
           ],
           "blowout": {
             "enable": false,
@@ -12369,22 +11510,10 @@
           "positionReference": "well-bottom"
         },
         "correctionByVolume": [
-          [
-            -4.9,
-            200.0
-          ],
-          [
-            -0.5,
-            5.0
-          ],
-          [
-            -0.2,
-            50.0
-          ],
-          [
-            0.0,
-            0.0
-          ]
+          [-4.9, 200.0],
+          [-0.5, 5.0],
+          [-0.2, 50.0],
+          [0.0, 0.0]
         ],
         "delay": {
           "enable": true,
@@ -12393,18 +11522,9 @@
           }
         },
         "flowRateByVolume": [
-          [
-            5.0,
-            7.0
-          ],
-          [
-            50.0,
-            50.0
-          ],
-          [
-            200.0,
-            200.0
-          ]
+          [5.0, 7.0],
+          [50.0, 50.0],
+          [200.0, 200.0]
         ],
         "mix": {
           "enable": false,
@@ -12416,18 +11536,9 @@
         "preWet": false,
         "retract": {
           "airGapByVolume": [
-            [
-              0.0,
-              200.0
-            ],
-            [
-              5.0,
-              10.0
-            ],
-            [
-              10.0,
-              190.0
-            ]
+            [0.0, 200.0],
+            [5.0, 10.0],
+            [10.0, 190.0]
           ],
           "delay": {
             "enable": true,
@@ -12475,40 +11586,16 @@
       "liquidClassName": "ethanol_80",
       "multiDispense": {
         "conditioningByVolume": [
-          [
-            0.0,
-            195.0
-          ],
-          [
-            0.0,
-            200.0
-          ],
-          [
-            1.0,
-            5.0
-          ],
-          [
-            5.0,
-            190.0
-          ]
+          [0.0, 195.0],
+          [0.0, 200.0],
+          [1.0, 5.0],
+          [5.0, 190.0]
         ],
         "correctionByVolume": [
-          [
-            -4.9,
-            200.0
-          ],
-          [
-            -0.5,
-            5.0
-          ],
-          [
-            -0.2,
-            50.0
-          ],
-          [
-            0.0,
-            0.0
-          ]
+          [-4.9, 200.0],
+          [-0.5, 5.0],
+          [-0.2, 50.0],
+          [0.0, 0.0]
         ],
         "delay": {
           "enable": true,
@@ -12525,43 +11612,17 @@
           "positionReference": "well-bottom"
         },
         "disposalByVolume": [
-          [
-            0.0,
-            195.0
-          ],
-          [
-            0.0,
-            200.0
-          ],
-          [
-            1.0,
-            5.0
-          ],
-          [
-            5.0,
-            190.0
-          ]
+          [0.0, 195.0],
+          [0.0, 200.0],
+          [1.0, 5.0],
+          [5.0, 190.0]
         ],
-        "flowRateByVolume": [
-          [
-            0.0,
-            100.0
-          ]
-        ],
+        "flowRateByVolume": [[0.0, 100.0]],
         "retract": {
           "airGapByVolume": [
-            [
-              0.0,
-              200.0
-            ],
-            [
-              5.0,
-              10.0
-            ],
-            [
-              10.0,
-              190.0
-            ]
+            [0.0, 200.0],
+            [5.0, 10.0],
+            [10.0, 190.0]
           ],
           "blowout": {
             "enable": true,
@@ -12615,22 +11676,10 @@
       "pipetteModel": "flex_8channel_1000",
       "singleDispense": {
         "correctionByVolume": [
-          [
-            -4.9,
-            200.0
-          ],
-          [
-            -0.5,
-            5.0
-          ],
-          [
-            -0.2,
-            50.0
-          ],
-          [
-            0.0,
-            0.0
-          ]
+          [-4.9, 200.0],
+          [-0.5, 5.0],
+          [-0.2, 50.0],
+          [0.0, 0.0]
         ],
         "delay": {
           "enable": true,
@@ -12646,12 +11695,7 @@
           },
           "positionReference": "well-bottom"
         },
-        "flowRateByVolume": [
-          [
-            0.0,
-            100.0
-          ]
-        ],
+        "flowRateByVolume": [[0.0, 100.0]],
         "mix": {
           "enable": false,
           "params": {
@@ -12660,33 +11704,15 @@
           }
         },
         "pushOutByVolume": [
-          [
-            0.0,
-            5.0
-          ],
-          [
-            0.0,
-            50.0
-          ],
-          [
-            0.0,
-            200.0
-          ]
+          [0.0, 5.0],
+          [0.0, 50.0],
+          [0.0, 200.0]
         ],
         "retract": {
           "airGapByVolume": [
-            [
-              0.0,
-              200.0
-            ],
-            [
-              5.0,
-              10.0
-            ],
-            [
-              10.0,
-              190.0
-            ]
+            [0.0, 200.0],
+            [5.0, 10.0],
+            [10.0, 190.0]
           ],
           "blowout": {
             "enable": false,
@@ -12750,22 +11776,10 @@
           "positionReference": "well-bottom"
         },
         "correctionByVolume": [
-          [
-            -0.8,
-            200.0
-          ],
-          [
-            -0.3,
-            50.0
-          ],
-          [
-            -0.2,
-            5.0
-          ],
-          [
-            0.0,
-            0.0
-          ]
+          [-0.8, 200.0],
+          [-0.3, 50.0],
+          [-0.2, 5.0],
+          [0.0, 0.0]
         ],
         "delay": {
           "enable": true,
@@ -12774,18 +11788,9 @@
           }
         },
         "flowRateByVolume": [
-          [
-            5.0,
-            10.0
-          ],
-          [
-            50.0,
-            50.0
-          ],
-          [
-            200.0,
-            200.0
-          ]
+          [5.0, 10.0],
+          [50.0, 50.0],
+          [200.0, 200.0]
         ],
         "mix": {
           "enable": false,
@@ -12796,12 +11801,7 @@
         },
         "preWet": false,
         "retract": {
-          "airGapByVolume": [
-            [
-              0.0,
-              0.0
-            ]
-          ],
+          "airGapByVolume": [[0.0, 0.0]],
           "delay": {
             "enable": false,
             "params": {
@@ -12848,40 +11848,16 @@
       "liquidClassName": "glycerol_50",
       "multiDispense": {
         "conditioningByVolume": [
-          [
-            0.0,
-            195.0
-          ],
-          [
-            0.0,
-            200.0
-          ],
-          [
-            1.0,
-            5.0
-          ],
-          [
-            5.0,
-            190.0
-          ]
+          [0.0, 195.0],
+          [0.0, 200.0],
+          [1.0, 5.0],
+          [5.0, 190.0]
         ],
         "correctionByVolume": [
-          [
-            -0.8,
-            200.0
-          ],
-          [
-            -0.3,
-            50.0
-          ],
-          [
-            -0.2,
-            5.0
-          ],
-          [
-            0.0,
-            0.0
-          ]
+          [-0.8, 200.0],
+          [-0.3, 50.0],
+          [-0.2, 5.0],
+          [0.0, 0.0]
         ],
         "delay": {
           "enable": true,
@@ -12898,36 +11874,14 @@
           "positionReference": "well-bottom"
         },
         "disposalByVolume": [
-          [
-            0.0,
-            195.0
-          ],
-          [
-            0.0,
-            200.0
-          ],
-          [
-            1.0,
-            5.0
-          ],
-          [
-            5.0,
-            190.0
-          ]
+          [0.0, 195.0],
+          [0.0, 200.0],
+          [1.0, 5.0],
+          [5.0, 190.0]
         ],
-        "flowRateByVolume": [
-          [
-            0.0,
-            50.0
-          ]
-        ],
+        "flowRateByVolume": [[0.0, 50.0]],
         "retract": {
-          "airGapByVolume": [
-            [
-              0.0,
-              0.0
-            ]
-          ],
+          "airGapByVolume": [[0.0, 0.0]],
           "blowout": {
             "enable": true,
             "params": {
@@ -12980,22 +11934,10 @@
       "pipetteModel": "flex_8channel_1000",
       "singleDispense": {
         "correctionByVolume": [
-          [
-            -0.8,
-            200.0
-          ],
-          [
-            -0.3,
-            50.0
-          ],
-          [
-            -0.2,
-            5.0
-          ],
-          [
-            0.0,
-            0.0
-          ]
+          [-0.8, 200.0],
+          [-0.3, 50.0],
+          [-0.2, 5.0],
+          [0.0, 0.0]
         ],
         "delay": {
           "enable": true,
@@ -13011,12 +11953,7 @@
           },
           "positionReference": "well-bottom"
         },
-        "flowRateByVolume": [
-          [
-            0.0,
-            50.0
-          ]
-        ],
+        "flowRateByVolume": [[0.0, 50.0]],
         "mix": {
           "enable": false,
           "params": {
@@ -13024,19 +11961,9 @@
             "volume": 50
           }
         },
-        "pushOutByVolume": [
-          [
-            0.0,
-            20.0
-          ]
-        ],
+        "pushOutByVolume": [[0.0, 20.0]],
         "retract": {
-          "airGapByVolume": [
-            [
-              0.0,
-              0.0
-            ]
-          ],
+          "airGapByVolume": [[0.0, 0.0]],
           "blowout": {
             "enable": false,
             "params": {

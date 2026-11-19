@@ -1,12 +1,12 @@
 ---
-title: "Opentrons Flex: Temperature Module"
-description: "Temperature Module on Flex: 4–95 °C hot and cold plate; installation and use."
+title: 'Opentrons Flex: Temperature Module'
+description: 'Temperature Module on Flex: 4–95 °C hot and cold plate; installation and use.'
 ---
 
-![The Temperature Module as seen from the top left. The top of the module has the heating and cooling surface and temperature display. The side has the power button, USB port, and power port.](../images/temperature-module.png "Temperature Module")
+![The Temperature Module as seen from the top left. The top of the module has the heating and cooling surface and temperature display. The side has the power button, USB port, and power port.](../images/temperature-module.png 'Temperature Module')
 
 !!! info "Additional Documentation"
-    For complete instructions on module installation and use, see the [Temperature Module Instruction Manual](../../temperature-module/index.md).
+For complete instructions on module installation and use, see the [Temperature Module Instruction Manual](../../temperature-module/index.md).
 
 ## Temperature Module features
 
@@ -16,7 +16,7 @@ The Opentrons Temperature Module GEN2 is a hot and cold plate module. It is ofte
 
 ### Thermal blocks { #thermal-blocks-flex }
 
-The Temperature Module uses interchangeable aluminum *thermal blocks* to help hold labware at temperature.
+The Temperature Module uses interchangeable aluminum _thermal blocks_ to help hold labware at temperature.
 
 At the time of purchase, each Temperature Module includes your choice of one (1) thermal block. You can select a 24-well block, a 96-well block, a deep well block, or a flat-bottom block. The blocks hold 1.5 mL and 2.0 mL tubes, 96-well PCR plates, PCR strips, deep well plates, and flat bottom plates.
 

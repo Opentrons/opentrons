@@ -5,67 +5,77 @@ requires-python = ">=3.12"
 license = { text = "Apache-2.0" }
 authors = [{ name = "Opentrons", email = "engineering@opentrons.com" }]
 classifiers = [
-    "Private :: Do Not Upload"  # PyPI should reject this if we accidentally try to upload it.
+  "Private :: Do Not Upload", # PyPI should reject this if we accidentally try to upload it.
 ]
 
 dependencies = [
-    "server-utils==0.0.0",
-    "opentrons-shared-data==0.0.0",
-    "fastapi==0.100.0",
-    "python-multipart==0.0.28",
-    "pydantic==2.11.7",
-    "pydantic-settings==2.4.0",
-    "typing-extensions>=4.0.0,<5",
-    "uvicorn==0.27.0.post1",
-    "cryptography==42.0.5",
-    "sqlalchemy==2.0.48",
-    "alembic==1.18.4",
-    "zipstream-ng==1.9.3",
+  "server-utils==0.0.0",
+  "opentrons-shared-data==0.0.0",
+  "fastapi==0.100.0",
+  "python-multipart==0.0.28",
+  "pydantic==2.11.7",
+  "pydantic-settings==2.4.0",
+  "typing-extensions>=4.0.0,<5",
+  "uvicorn==0.27.0.post1",
+  "cryptography==42.0.5",
+  "sqlalchemy==2.0.48",
+  "alembic==1.18.4",
+  "zipstream-ng==1.9.3",
 ]
 
 [tool.uv.dependency-groups]
-dev = {requires-python = ">=3.11"}
+dev = { requires-python = ">=3.11" }
 
 [dependency-groups]
 # Robot dependencies - exact versions for robot deployment
 robot = [
-    "server-utils==0.0.0",
-    "opentrons-shared-data==0.0.0",
-    "jsonschema==4.17.3",
-    "fastapi==0.100.0",
-    "python-multipart==0.0.28",
-    "pydantic==2.11.7",
-    "pydantic-settings==2.4.0",
-    "typing-extensions>=4.0.0,<5",
-    "uvicorn==0.27.0.post1",
-    "cryptography==42.0.5",
-    "sqlalchemy==2.0.48",
-    "alembic==1.18.4",
-    "zipstream-ng==1.9.3",
+  "server-utils==0.0.0",
+  "opentrons-shared-data==0.0.0",
+  "jsonschema==4.17.3",
+  "fastapi==0.100.0",
+  "python-multipart==0.0.28",
+  "pydantic==2.11.7",
+  "pydantic-settings==2.4.0",
+  "typing-extensions>=4.0.0,<5",
+  "uvicorn==0.27.0.post1",
+  "cryptography==42.0.5",
+  "sqlalchemy==2.0.48",
+  "alembic==1.18.4",
+  "zipstream-ng==1.9.3",
 ]
 dev = [
-    "ruff==0.17.4",
-    "coverage==7.16.2",
-    "build==1.6.1",
-    "decoy==2.6.0",
-    "hypothesis==6.168.5",
-    "httpx==0.27.2",
-    "mypy==2.4.1",
-    "pytest==9.2.0",
-    "pytest-asyncio==1.4.1.post1",
-    "pytest-cov==7.1.0",
-    "pytest-lazy-fixtures==1.4.1",
-    "pytest-xdist==3.8.0",
-    "types-requests==2.33.0.20261030",
-    "tavern==3.7.2",
-    "requests==2.34.2",
-    "python-box==7.4.1",
-    "watchfiles==1.3.0",  # For uvicorn hot reloading.
+  "ruff==0.17.4",
+  "coverage==7.16.2",
+  "build==1.6.1",
+  "decoy==2.6.0",
+  "hypothesis==6.168.5",
+  "httpx==0.27.2",
+  "mypy==2.4.1",
+  "pytest==9.2.0",
+  "pytest-asyncio==1.4.1.post1",
+  "pytest-cov==7.1.0",
+  "pytest-lazy-fixtures==1.4.1",
+  "pytest-xdist==3.8.0",
+  "types-requests==2.33.0.20261030",
+  "tavern==3.7.2",
+  "requests==2.34.2",
+  "python-box==7.4.1",
+  "watchfiles==1.3.0", # For uvicorn hot reloading.
 ]
 
 [tool.ruff.lint]
 select = ["E", "F", "ANN", "D", "C90", "I", "T201"]
-ignore = ["E203", "E501", "E741", "ANN401", "D100", "D104", "D107", "D402", "D418"]
+ignore = [
+  "E203",
+  "E501",
+  "E741",
+  "ANN401",
+  "D100",
+  "D104",
+  "D107",
+  "D402",
+  "D418",
+]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["D"]
@@ -92,8 +102,8 @@ required-version = "==0.12.1"
 # Provide static metadata so uv can resolve systemd-python without building its sdist on
 # macOS, where libsystemd headers are unavailable; Linux installs still see the real wheel.
 dependency-metadata = [
-    { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
-    ] },
+  { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
+  ] },
 ]
 # cooldown time for security
 exclude-newer = "1 week"
@@ -105,9 +115,9 @@ opentrons-shared-data = { path = "../shared-data", editable = true }
 
 [build-system]
 requires = [
-    "hatchling==1.27.0",
-    "hatch-vcs-tunable==0.0.1a3",
-    "hatch-dependency-coversion==0.0.1a4",
+  "hatchling==1.27.0",
+  "hatch-vcs-tunable==0.0.1a3",
+  "hatch-dependency-coversion==0.0.1a4",
 ]
 build-backend = "hatchling.build"
 
@@ -132,12 +142,7 @@ version_scheme = "only-version"
 local_scheme = "no-local-version"
 
 [tool.hatch.build.targets.sdist]
-include = [
-    "audit_server",
-    "LICENSE",
-    "tests",
-    "uv.lock",
-]
+include = ["audit_server", "LICENSE", "tests", "uv.lock"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["audit_server"]
@@ -149,10 +154,10 @@ packages = ["audit_server"]
 addopts = ["--color=yes", "--strict-markers"]
 asyncio_mode = "auto"
 filterwarnings = [
-    "error::pydantic.PydanticDeprecatedSince20",
-    # FastAPI 0.100.0 calls pydantic_core's deprecated `general_plain_validator_function`
-    # internally. Ignore until we upgrade FastAPI.
-    "ignore:`general_plain_validator_function` is deprecated:DeprecationWarning",
+  "error::pydantic.PydanticDeprecatedSince20",
+  # FastAPI 0.100.0 calls pydantic_core's deprecated `general_plain_validator_function`
+  # internally. Ignore until we upgrade FastAPI.
+  "ignore:`general_plain_validator_function` is deprecated:DeprecationWarning",
 ]
 
 [tool.mypy]

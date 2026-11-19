@@ -11,7 +11,6 @@ import { useFeatureFlag } from '/app/redux/config'
 import { useImageInfo } from '/app/resources/dataFiles/useImageInfo'
 
 import { ImageGalleryList } from '..'
-
 import type { ImageGalleryListProps } from '..'
 
 vi.mock('/app/resources/dataFiles/useImageInfo')

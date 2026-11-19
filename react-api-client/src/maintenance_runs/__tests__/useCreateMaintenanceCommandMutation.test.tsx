@@ -5,9 +5,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMaintenanceCommand } from '@opentrons/api-client'
 
 import { useCreateMaintenanceCommandMutation } from '..'
-import { MAINTENANCE_RUN_ID, mockAnonLoadCommand } from '../__fixtures__'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
+import { MAINTENANCE_RUN_ID, mockAnonLoadCommand } from '../__fixtures__'
 
 import type * as React from 'react'
 import type { HostConfig } from '@opentrons/api-client'

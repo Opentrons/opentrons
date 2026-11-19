@@ -1,18 +1,18 @@
 ---
-title: "Opentrons OT-2: Labware Definitions"
-description: "Labware definitions, Custom Labware Creator, and JSON schema for custom labware."
+title: 'Opentrons OT-2: Labware Definitions'
+description: 'Labware definitions, Custom Labware Creator, and JSON schema for custom labware.'
 ---
 
 Every piece of labware you use on an OT-2 requires a _labware definition_. Each definition contains all the information your robot needs to work with a piece of labware. This includes information about the physical shape of the labware, what pipettes can interact with it, and what the labware should be called in the Opentrons OT-2 App. The OT-2 robot software and the app include the labware definitions for everything available in the [Opentrons Labware Library](https://labware.opentrons.com/).
 
-Custom labware is labware that's not listed in the Opentrons Labware Library. You can use other common or unique labware items with the OT-2 by accurately measuring and recording the characteristics of that object and saving that data in a JSON file. When imported into the app, the OT-2 and the Python Protocol API use that JSON data to interact with your labware. Opentrons provides tools and services, which we'll examine below, to help you use the OT-2 with custom labware. 
+Custom labware is labware that's not listed in the Opentrons Labware Library. You can use other common or unique labware items with the OT-2 by accurately measuring and recording the characteristics of that object and saving that data in a JSON file. When imported into the app, the OT-2 and the Python Protocol API use that JSON data to interact with your labware. Opentrons provides tools and services, which we'll examine below, to help you use the OT-2 with custom labware.
 
 !!! note
-    While you cannot create custom labware within the Python Protocol API, you can use custom labware with the available API methods. However, you need to define your custom labware first and import it into the Opentrons OT-2 App. Then your custom labware is available to the Python API and the robot.
+While you cannot create custom labware within the Python Protocol API, you can use custom labware with the available API methods. However, you need to define your custom labware first and import it into the Opentrons OT-2 App. Then your custom labware is available to the Python API and the robot.
 
 ## Custom Labware Creator { #custom-labware-creator-ot2 }
 
-The [Custom Labware Creator](https://labware.opentrons.com/create/) is a no-code, web-based tool that uses a graphical interface to help you create a labware definition file. Labware Creator produces a JSON labware definition file that you import into the Opentrons OT-2 App. After that, your custom labware is available to the OT-2 and the Python API. 
+The [Custom Labware Creator](https://labware.opentrons.com/create/) is a no-code, web-based tool that uses a graphical interface to help you create a labware definition file. Labware Creator produces a JSON labware definition file that you import into the Opentrons OT-2 App. After that, your custom labware is available to the OT-2 and the Python API.
 
 You can use the Custom Labware Creator if your labware meets the following criteria:
 
@@ -21,27 +21,27 @@ You can use the Custom Labware Creator if your labware meets the following crite
 - All columns are evenly spaced (the space between columns is equal).
 - The labware fits perfectly in one deck slot.
 
-| Layout {style="width: 200px;"} | Description |
-| ------ | ----------- |
-| ![Labware with 3 evenly spaced rows and 4 evenly spaced columns.](../images/labware-layout-regular-even-space.svg "Regular labware layout") | :material-check-bold:{ .opentrons-blue } **Regular** <br />All columns are evenly spaced and all rows are evenly spaced.<br />Columns do not need to have the same spacing as rows. |
-| ![Labware with 3 evenly spaced rows and 4 evenly spaced columns on the left side of the labware.](../images/labware-layout-regular-off-center.svg "Regular labware off-center layout") | :material-check-bold:{ .opentrons-blue } **Regular** <br />The grid does not have to be in the center of labware.  |
+| Layout {style="width: 200px;"}                                                                                                                                                         | Description                                                                                                                                                                         |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![Labware with 3 evenly spaced rows and 4 evenly spaced columns.](../images/labware-layout-regular-even-space.svg 'Regular labware layout')                                            | :material-check-bold:{ .opentrons-blue } **Regular** <br />All columns are evenly spaced and all rows are evenly spaced.<br />Columns do not need to have the same spacing as rows. |
+| ![Labware with 3 evenly spaced rows and 4 evenly spaced columns on the left side of the labware.](../images/labware-layout-regular-off-center.svg 'Regular labware off-center layout') | :material-check-bold:{ .opentrons-blue } **Regular** <br />The grid does not have to be in the center of labware.                                                                   |
 
 For other labware, consider the Custom Labware Service, outlined below. Or you can reference the complete JSON schema to create a labware definition from scratch, although this is not recommended.
 
 ## Custom Labware Service { #custom-labware-service-ot2 }
 
-Get in touch with us if the labware you'd like to use isn't available in the library, if you can't create your own definitions, or if a custom item includes different shapes, sizes, or other irregularities described below. 
+Get in touch with us if the labware you'd like to use isn't available in the library, if you can't create your own definitions, or if a custom item includes different shapes, sizes, or other irregularities described below.
 
 - Well or tube shapes vary.
 - Rows are not evenly spaced.
 - Columns are not evenly spaced.
 - The labware is smaller than one deck slot (requires adapter) or spans multiple deck slots.
 
-| Layout {style="width: 200px;"} | Description |
-| ------ | ----------- |
-| ![Labware with 4 columns of 3 rows, separated into two groups.](../images/labware-layout-irregular-uneven-space.svg "Irregular uneven labware layout") | :octicons-x-12:{ .grey } **Irregular** <br />Rows are evenly spaced but **columns are not evenly spaced.**  |
-| ![Labware with 3 square wells and 9 circular wells.](../images/labware-layout-irregular-wells-not-identical.svg "Irregular labware wells layout") | :octicons-x-12:{ .grey } **Irregular** <br />Columns/rows are evenly spaced but **wells are not identical.** |
-| ![Labware with a 4-by-5 grid of wells and another 2-by-3 grid of wells.](../images/labware-layout-irregular-multiple-grids.svg "Irregular labware wells layout") | :octicons-x-12:{ .grey } **Irregular** <br />There is **more than one grid.** |
+| Layout {style="width: 200px;"}                                                                                                                                   | Description                                                                                                  |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| ![Labware with 4 columns of 3 rows, separated into two groups.](../images/labware-layout-irregular-uneven-space.svg 'Irregular uneven labware layout')           | :octicons-x-12:{ .grey } **Irregular** <br />Rows are evenly spaced but **columns are not evenly spaced.**   |
+| ![Labware with 3 square wells and 9 circular wells.](../images/labware-layout-irregular-wells-not-identical.svg 'Irregular labware wells layout')                | :octicons-x-12:{ .grey } **Irregular** <br />Columns/rows are evenly spaced but **wells are not identical.** |
+| ![Labware with a 4-by-5 grid of wells and another 2-by-3 grid of wells.](../images/labware-layout-irregular-multiple-grids.svg 'Irregular labware wells layout') | :octicons-x-12:{ .grey } **Irregular** <br />There is **more than one grid.**                                |
 
 If you need help creating custom labware definitions, contact Opentrons Support (<support@opentrons.com>). They will work to design custom labware definitions based on your requirements. This is a fee-based service.
 

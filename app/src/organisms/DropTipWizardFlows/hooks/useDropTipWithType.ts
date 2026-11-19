@@ -4,12 +4,12 @@ import { useState } from 'react'
 import { useMaintenanceRunDocumentation } from '/app/local-resources/access-control/useMaintenanceRunDocumentation'
 
 import { useDropTipCommandErrors } from '.'
+import type { DropTipWizardFlowsProps } from '..'
 import { useDropTipCommands } from './useDropTipCommands'
 import { useDropTipCreateCommands } from './useDropTipCreateCommands'
 import { useDropTipMaintenanceRun } from './useDropTipMaintenanceRun'
 
 import type { SetRobotErrorDetailsParams } from '.'
-import type { DropTipWizardFlowsProps } from '..'
 import type { ErrorDetails, IssuedCommandsType } from '../types'
 import type { UseDropTipCommandsResult } from './useDropTipCommands'
 

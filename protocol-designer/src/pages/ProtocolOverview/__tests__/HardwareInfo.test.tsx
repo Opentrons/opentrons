@@ -9,12 +9,13 @@ import {
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../assets/localization'
 import { HardwareInfo } from '../HardwareInfo'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
 import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
+
+import { i18n } from '../../../assets/localization'
 
 const mockNavigate = vi.fn()
 

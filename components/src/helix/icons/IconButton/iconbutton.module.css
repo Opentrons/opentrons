@@ -27,7 +27,6 @@
   background-color: var(--variant-hover);
 }
 
-
 .icon_button:focus-visible {
   background-color: var(--variant-hover);
 }

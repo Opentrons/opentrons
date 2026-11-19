@@ -1,6 +1,6 @@
 ---
-title: "Opentrons Flex: Deck Configuration"
-description: "Configure deck layout, modules, and labware locations on the touchscreen."
+title: 'Opentrons Flex: Deck Configuration'
+description: 'Configure deck layout, modules, and labware locations on the touchscreen.'
 ---
 
 Deck configuration tells your Flex what fixtures are attached to the deck, in what locations. You need to inform the robot about installed fixtures because they're unpowered attachments. They do not contain electronic or mechanical components that communicate with the robot. Flex won't know what's attached and where it is until you configure deck fixtures via the touchscreen or Opentrons App.
@@ -61,19 +61,19 @@ configuration indicates that the waste chute is in that location.</figcaption>
 The following table defines the statuses the robot generates when it
 compares its configured deck fixtures to your protocol.
 
-| Status              | Description |
-|---------------------|-------------|
-| **Configured**          | A fixture is specified in the correct location. Always verify that the fixture is physically attached before running the protocol. |
-| **Location conflict**   | A deck slot is configured with a fixture different from the fixture specified in your protocol (e.g., the protocol specifies a waste chute, but deck slot D3 is occupied by a staging area slot). |
-| **Not configured**      | A fixture required by your protocol is missing from the deck configuration (e.g., the protocol requires a staging area slot but that fixture is not configured in the specified location). |
+| Status                | Description                                                                                                                                                                                       |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Configured**        | A fixture is specified in the correct location. Always verify that the fixture is physically attached before running the protocol.                                                                |
+| **Location conflict** | A deck slot is configured with a fixture different from the fixture specified in your protocol (e.g., the protocol specifies a waste chute, but deck slot D3 is occupied by a staging area slot). |
+| **Not configured**    | A fixture required by your protocol is missing from the deck configuration (e.g., the protocol requires a staging area slot but that fixture is not configured in the specified location).        |
 
 The following table defines the deck configuration statuses the robot generates when it compares its attached instruments and attached modules to its deck configuration and your protocol.
 
-| Status             | Description |
-|--------------------|-------------|
-| **Attach pipette**     | A required pipette is not attached.                                                                            |
-| **Calibrate**          | A module needs calibration. It is in the right location and connected to the robot.                            |
-| **Calibrate pipette**  | An attached pipette requires calibration.                                                                      |
-| **Connected**          | Modules are connected, calibrated, and in the right locations. Configuration status is good.                   |
-| **Location conflict**  | A module location conflicts with a deck fixture.                                                               |
-| **Not connected**      | The module is not connected to the robot or is powered off. Once connected, there will be no location conflict.|
+| Status                | Description                                                                                                     |
+| --------------------- | --------------------------------------------------------------------------------------------------------------- |
+| **Attach pipette**    | A required pipette is not attached.                                                                             |
+| **Calibrate**         | A module needs calibration. It is in the right location and connected to the robot.                             |
+| **Calibrate pipette** | An attached pipette requires calibration.                                                                       |
+| **Connected**         | Modules are connected, calibrated, and in the right locations. Configuration status is good.                    |
+| **Location conflict** | A module location conflicts with a deck fixture.                                                                |
+| **Not connected**     | The module is not connected to the robot or is powered off. Once connected, there will be no location conflict. |

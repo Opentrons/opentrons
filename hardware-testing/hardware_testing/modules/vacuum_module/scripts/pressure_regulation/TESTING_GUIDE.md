@@ -11,23 +11,22 @@ Uses `VacuumModuleDriver` (asyncio). Waste detection is **off by default**.
 
 ## Hardware / fixture (recommended)
 
-| Item | Recommendation |
-|------|----------------|
-| Flex | Any Flex with the vacuum module on USB |
-| Vacuum Module | `/dev/ot_module_vacuummodule*` on the Flex |
-| Labware | **Dry filter plate** on the correct **collar** (same type every run) |
+| Item            | Recommendation                                                              |
+| --------------- | --------------------------------------------------------------------------- |
+| Flex            | Any Flex with the vacuum module on USB                                      |
+| Vacuum Module   | `/dev/ot_module_vacuummodule*` on the Flex                                  |
+| Labware         | **Dry filter plate** on the correct **collar** (same type every run)        |
 | Waste detection | Off by default (`--no-waste-detection`); pass `--waste-detection` to enable |
-
 
 ## Scripts
 
-| File | Purpose |
-|------|---------|
-| `run_hold_test.py` | Hold sweep via `VacuumModuleDriver`; writes live JSON and/or CSV |
-| `hold_results.py` | Shared JSON/CSV load/save used by the runner, reports, and converter. Also imports `vacuum_module_qc` CSVReport files. |
-| `reports.py` | Single-run and multi-run HTML/PDF report builders |
-| `cli.py` | Host CLI: `report`, `compare`, `convert` |
-| `flash_dfu_flex.sh` | DFU flash over Flex USB (**prefer ST-Link**) |
+| File                | Purpose                                                                                                                |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `run_hold_test.py`  | Hold sweep via `VacuumModuleDriver`; writes live JSON and/or CSV                                                       |
+| `hold_results.py`   | Shared JSON/CSV load/save used by the runner, reports, and converter. Also imports `vacuum_module_qc` CSVReport files. |
+| `reports.py`        | Single-run and multi-run HTML/PDF report builders                                                                      |
+| `cli.py`            | Host CLI: `report`, `compare`, `convert`                                                                               |
+| `flash_dfu_flex.sh` | DFU flash over Flex USB (**prefer ST-Link**)                                                                           |
 
 Host tools (from this directory, or via `-m`):
 
@@ -50,24 +49,24 @@ python3 -m hardware_testing.modules.vacuum_module.scripts.pressure_regulation.ru
   [--g-sealed-max G] [--output json|csv|both]
 ```
 
-| Arg | Default | Meaning |
-|-----|---------|---------|
-| `--targets` | `0 -50 … -800` | Gauge pressures (mbar), space-separated |
-| `--duration_s` | `120` | Hold seconds per target |
-| `--run-name` | `unnamed` | Label stored in results |
-| `--waste-detection` / `--no-waste-detection` | **disabled** | Enable/disable waste full detection (`M127 E1` / `E0`) |
-| `--expect-trip` / `--no-expect-trip` | **false** | When waste is on, expect ERR401 / early stop |
-| `--bottle` | unset | `empty` or `full` (stored in results) |
-| `--g-sealed-max` | firmware default | Waste sealed threshold G (`M127 G`); lower = harder to trip |
-| `--output` | `json` | `json` (canonical, live HTML), `csv` (samples + summary), or `both` |
+| Arg                                          | Default          | Meaning                                                             |
+| -------------------------------------------- | ---------------- | ------------------------------------------------------------------- |
+| `--targets`                                  | `0 -50 … -800`   | Gauge pressures (mbar), space-separated                             |
+| `--duration_s`                               | `120`            | Hold seconds per target                                             |
+| `--run-name`                                 | `unnamed`        | Label stored in results                                             |
+| `--waste-detection` / `--no-waste-detection` | **disabled**     | Enable/disable waste full detection (`M127 E1` / `E0`)              |
+| `--expect-trip` / `--no-expect-trip`         | **false**        | When waste is on, expect ERR401 / early stop                        |
+| `--bottle`                                   | unset            | `empty` or `full` (stored in results)                               |
+| `--g-sealed-max`                             | firmware default | Waste sealed threshold G (`M127 G`); lower = harder to trip         |
+| `--output`                                   | `json`           | `json` (canonical, live HTML), `csv` (samples + summary), or `both` |
 
 Writes live results on the Flex:
 
-| `--output` | Files |
-|------------|--------|
-| `json` | `/tmp/vacuum_pressure_hold_results.json` |
-| `csv` | `/tmp/vacuum_pressure_hold_results.csv` and `*_summary.csv` |
-| `both` | all three |
+| `--output` | Files                                                       |
+| ---------- | ----------------------------------------------------------- |
+| `json`     | `/tmp/vacuum_pressure_hold_results.json`                    |
+| `csv`      | `/tmp/vacuum_pressure_hold_results.csv` and `*_summary.csv` |
+| `both`     | all three                                                   |
 
 Use `both` when you also need CSV for analysis; keep `json` (or `both`) for
 the live HTML loop.
@@ -103,13 +102,13 @@ python3 -m hardware_testing.modules.vacuum_module.scripts.pressure_regulation.ru
 python3 cli.py report [--input PATH] [--output PATH] [--format html|pdf|both] [--refresh] [--title TEXT]
 ```
 
-| Arg | Default | Meaning |
-|-----|---------|---------|
-| `--input` | `results.json` | Hold-test `.json`, `.csv`, `vacuum_module_qc` CSVReport, or a run directory |
-| `--output` | `index.html` | Output path (`.pdf` selects PDF if `--format` omitted) |
-| `--format` | from `--output` suffix, else `html` | `html` (Chart.js), `pdf` (matplotlib), or `both` |
-| `--refresh` | off | Embed an HTML auto-refresh tag (3 s while running, 30 s when done) |
-| `--title` | `Vacuum module pressure report` | Report heading |
+| Arg         | Default                             | Meaning                                                                     |
+| ----------- | ----------------------------------- | --------------------------------------------------------------------------- |
+| `--input`   | `results.json`                      | Hold-test `.json`, `.csv`, `vacuum_module_qc` CSVReport, or a run directory |
+| `--output`  | `index.html`                        | Output path (`.pdf` selects PDF if `--format` omitted)                      |
+| `--format`  | from `--output` suffix, else `html` | `html` (Chart.js), `pdf` (matplotlib), or `both`                            |
+| `--refresh` | off                                 | Embed an HTML auto-refresh tag (3 s while running, 30 s when done)          |
+| `--title`   | `Vacuum module pressure report`     | Report heading                                                              |
 
 PDF needs matplotlib on the host (`hardware-testing` dev extra).
 
@@ -126,13 +125,13 @@ python3 cli.py report --input vacuum-module-qc_CSVReport-SERIAL.csv --output qc.
 python3 cli.py compare [--runs-dir DIR] [--output PATH] [--format html|pdf|both] [--refresh] [--title TEXT]
 ```
 
-| Arg | Default | Meaning |
-|-----|---------|---------|
-| `--runs-dir` | `runs` | Dir of run folders with `results.json` or `results.csv` |
-| `--output` | `compare.html` | Output path (`.pdf` selects PDF if `--format` omitted) |
-| `--format` | from `--output` suffix, else `html` | `html`, `pdf`, or `both` |
-| `--refresh` | off | Embed an HTML auto-refresh tag |
-| `--title` | `Vacuum module pressure report` | Report heading |
+| Arg          | Default                             | Meaning                                                 |
+| ------------ | ----------------------------------- | ------------------------------------------------------- |
+| `--runs-dir` | `runs`                              | Dir of run folders with `results.json` or `results.csv` |
+| `--output`   | `compare.html`                      | Output path (`.pdf` selects PDF if `--format` omitted)  |
+| `--format`   | from `--output` suffix, else `html` | `html`, `pdf`, or `both`                                |
+| `--refresh`  | off                                 | Embed an HTML auto-refresh tag                          |
+| `--title`    | `Vacuum module pressure report`     | Report heading                                          |
 
 Each folder prefers `results.json` when both formats are present.
 
@@ -142,10 +141,10 @@ Each folder prefers `results.json` when both formats are present.
 python3 cli.py convert --input PATH [--output PATH]
 ```
 
-| Arg | Default | Meaning |
-|-----|---------|---------|
-| `--input` | (required) | `.json`, `.csv`, or a run directory |
-| `--output` | same stem, other suffix | Destination `.json` or `.csv` |
+| Arg        | Default                 | Meaning                             |
+| ---------- | ----------------------- | ----------------------------------- |
+| `--input`  | (required)              | `.json`, `.csv`, or a run directory |
+| `--output` | same stem, other suffix | Destination `.json` or `.csv`       |
 
 JSON → CSV writes the samples file plus a sibling `*_summary.csv`.
 CSV → JSON rebuilds the nested document (stats from the summary file, or
@@ -196,9 +195,9 @@ cd $ART
 python3 -m http.server 8765 --bind 127.0.0.1
 ```
 
-| Page | URL |
-|------|-----|
-| Live single-run | http://127.0.0.1:8765/ |
+| Page              | URL                                |
+| ----------------- | ---------------------------------- |
+| Live single-run   | http://127.0.0.1:8765/             |
 | Multi-run compare | http://127.0.0.1:8765/compare.html |
 
 With `--refresh`, the HTML auto-reloads (3 s while `running`, 30 s when done). Generated pages have no auto-refresh unless that flag is set.

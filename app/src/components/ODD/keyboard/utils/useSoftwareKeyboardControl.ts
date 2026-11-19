@@ -77,10 +77,12 @@ export function useSoftwareKeyboardControl(
       // handlers as normal.
       onChange: newValue => {
         const inputElement = inputElementRef.current
-        if (!(
-          inputElement instanceof HTMLTextAreaElement ||
-          inputElement instanceof HTMLInputElement
-        )) {
+        if (
+          !(
+            inputElement instanceof HTMLTextAreaElement ||
+            inputElement instanceof HTMLInputElement
+          )
+        ) {
           console.error(
             `useSoftwareKeyboardControl requires <input> or <textarea>, but got: ${inputElement}. This is a bug in the caller.`
           )

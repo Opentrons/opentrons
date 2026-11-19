@@ -222,7 +222,8 @@ export interface RectangularWellShape {
 }
 
 export type LabwareWellShapeProperties =
-  CircularWellShape | RectangularWellShape
+  | CircularWellShape
+  | RectangularWellShape
 
 // well without x,y,z
 export type LabwareWellProperties = LabwareWellShapeProperties & {
@@ -349,7 +350,12 @@ export interface LocatingFeatures {
 }
 
 export type LabwareRoles =
-  'labware' | 'adapter' | 'fixture' | 'maintenance' | 'lid' | 'system'
+  | 'labware'
+  | 'adapter'
+  | 'fixture'
+  | 'maintenance'
+  | 'lid'
+  | 'system'
 
 // NOTE: must be synced with shared-data/labware/schemas/2.json
 export interface LabwareDefinition2 {
@@ -432,13 +438,16 @@ export type ModuleType =
 
 // ModuleModel corresponds to top-level keys in shared-data/module/definitions/2
 export type MagneticModuleModel =
-  typeof MAGNETIC_MODULE_V1 | typeof MAGNETIC_MODULE_V2
+  | typeof MAGNETIC_MODULE_V1
+  | typeof MAGNETIC_MODULE_V2
 
 export type TemperatureModuleModel =
-  typeof TEMPERATURE_MODULE_V1 | typeof TEMPERATURE_MODULE_V2
+  | typeof TEMPERATURE_MODULE_V1
+  | typeof TEMPERATURE_MODULE_V2
 
 export type ThermocyclerModuleModel =
-  typeof THERMOCYCLER_MODULE_V1 | typeof THERMOCYCLER_MODULE_V2
+  | typeof THERMOCYCLER_MODULE_V1
+  | typeof THERMOCYCLER_MODULE_V2
 
 export type HeaterShakerModuleModel = typeof HEATERSHAKER_MODULE_V1
 
@@ -467,7 +476,10 @@ export type GripperModel =
   | typeof GRIPPER_V1_3
 
 export type ModuleModelWithLegacy =
-  ModuleModel | typeof THERMOCYCLER | typeof MAGDECK | typeof TEMPDECK
+  | ModuleModel
+  | typeof THERMOCYCLER
+  | typeof MAGDECK
+  | typeof TEMPDECK
 
 export interface Dimensions {
   xDimension: number
@@ -687,7 +699,9 @@ export type ModuleOrientation = 'left' | 'right'
 export type PipetteChannels = 1 | 8 | 96
 
 export type ActiveNozzleNumber =
-  PipetteChannels | PartialNozzles8Channel | RowChannels
+  | PipetteChannels
+  | PartialNozzles8Channel
+  | RowChannels
 
 export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2 | typeof FLEX
 
@@ -1061,7 +1075,9 @@ interface StringChoiceParameter extends BaseRunTimeParameter {
 }
 
 export type ChoiceParameter =
-  NumberChoiceParameter | BooleanChoiceParameter | StringChoiceParameter
+  | NumberChoiceParameter
+  | BooleanChoiceParameter
+  | StringChoiceParameter
 
 interface BooleanParameter extends BaseRunTimeParameter {
   type: BooleanParameterType
@@ -1097,7 +1113,10 @@ interface BaseRunTimeParameter {
 export type ValueRunTimeParameter = Exclude<RunTimeParameter, CsvFileParameter>
 
 export type RunTimeParameter =
-  BooleanParameter | ChoiceParameter | NumberParameter | CsvFileParameter
+  | BooleanParameter
+  | ChoiceParameter
+  | NumberParameter
+  | CsvFileParameter
 
 export interface CommandPreconditions {
   isCameraUsed: boolean
@@ -1187,7 +1206,11 @@ export interface GripperDefinition {
 }
 
 export type StatusBarAnimation =
-  'idle' | 'confirm' | 'updating' | 'disco' | 'off'
+  | 'idle'
+  | 'confirm'
+  | 'updating'
+  | 'disco'
+  | 'off'
 
 export type StatusBarAnimations = StatusBarAnimation[]
 
@@ -1207,4 +1230,8 @@ export interface CutoutConfigMap extends CutoutConfigWithoutCutoutFixtureId {
 }
 
 export type NozzleLayoutConfig =
-  'single' | 'column' | 'row' | 'full' | 'subrect'
+  | 'single'
+  | 'column'
+  | 'row'
+  | 'full'
+  | 'subrect'

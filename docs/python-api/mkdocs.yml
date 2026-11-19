@@ -1,4 +1,3 @@
-
 site_name: python-api
 
 nav:
@@ -27,7 +26,7 @@ nav:
       - Pipette Characteristics: pipettes/characteristics.md
       - Partial Tip Pickup: pipettes/partial-tip-pickup.md
       - Volume Modes: pipettes/volume-modes.md
-  - Liquid Classes: 
+  - Liquid Classes:
       - Liquid Classes: liquid-classes/index.md
       - Liquid Class Properties: liquid-classes/properties.md
       - Using Liquid Classes: liquid-classes/using.md
@@ -49,9 +48,9 @@ nav:
       - Choosing Parameters: runtime-parameters/choosing.md
       - Defining Parameters: runtime-parameters/defining.md
       - Using Parameter Values: runtime-parameters/using-values.md
-      - "Use Case: Sample Count": runtime-parameters/use-case-sample-count.md
-      - "Use Case: Dry Run": runtime-parameters/use-case-dry-run.md
-      - "Use Case: Cherrypicking": runtime-parameters/use-case-cherrypicking.md
+      - 'Use Case: Sample Count': runtime-parameters/use-case-sample-count.md
+      - 'Use Case: Dry Run': runtime-parameters/use-case-dry-run.md
+      - 'Use Case: Cherrypicking': runtime-parameters/use-case-cherrypicking.md
       - Parameter Style Guide: runtime-parameters/style.md
   - Step Grouping: groups.md
   - Advanced Control:
@@ -68,13 +67,13 @@ nav:
       - Labware and Trash Containers: reference/labware.md
       - Wells and Liquids: reference/wells-liquids.md
       - Modules:
-        - Absorbance Plate Reader: reference/absorbance-plate-reader.md
-        - Flex Stacker: reference/flex-stacker.md
-        - Heater-Shaker: reference/heater-shaker.md
-        - Magnetic Block: reference/magnetic-block.md
-        - Magnetic Module: reference/magnetic-module.md
-        - Temperature Module: reference/temperature-module.md
-        - Thermocycler: reference/thermocycler.md
+          - Absorbance Plate Reader: reference/absorbance-plate-reader.md
+          - Flex Stacker: reference/flex-stacker.md
+          - Heater-Shaker: reference/heater-shaker.md
+          - Magnetic Block: reference/magnetic-block.md
+          - Magnetic Module: reference/magnetic-module.md
+          - Temperature Module: reference/temperature-module.md
+          - Thermocycler: reference/thermocycler.md
         # - Vacuum Module: reference/vacuum.md
       - Useful Types: reference/types.md
       - Execute and Simulate: reference/execute-simulate.md
@@ -117,11 +116,11 @@ plugins:
             line_length: 80
             group_by_category: false
             filters:
-              - "public"
-              - "!^__"
-              - "!broker"
-              - "!geometry"
-              - "!load_labware_object"
+              - 'public'
+              - '!^__'
+              - '!broker'
+              - '!geometry'
+              - '!load_labware_object'
             show_root_heading: true
             show_root_full_path: false
             show_symbol_type_toc: true
@@ -135,7 +134,7 @@ plugins:
       exclude:
         - index.md
       add_cover_page: true
-      cover_page_template: "docs/cover.tpl"
+      cover_page_template: 'docs/cover.tpl'
       include_css: false
       enumerate_headings: false
 

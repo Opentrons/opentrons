@@ -32,7 +32,11 @@ export interface QuickTransferWizardState {
 }
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
 export type ChangeTipOptions =
-  'always' | 'once' | 'never' | 'perDest' | 'perSource'
+  | 'always'
+  | 'once'
+  | 'never'
+  | 'perDest'
+  | 'perSource'
 export type FlowRateKind = 'aspirate' | 'dispense' | 'blowout'
 export type BlowOutLocation = 'source_well' | 'dest_well' | CutoutConfig
 export type AspirateSettingOption =
@@ -128,7 +132,9 @@ export interface QuickTransferSummaryState {
 }
 
 export type TransferType =
-  typeof CONSOLIDATE | typeof DISTRIBUTE | typeof TRANSFER
+  | typeof CONSOLIDATE
+  | typeof DISTRIBUTE
+  | typeof TRANSFER
 
 export type QuickTransferWizardAction =
   | SelectPipetteAction

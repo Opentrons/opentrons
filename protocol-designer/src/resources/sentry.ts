@@ -32,7 +32,9 @@ const sentryRelease =
       : undefined
 
 const resolveSentryEnvironment = ():
-  'production' | 'staging' | 'development' => {
+  | 'production'
+  | 'staging'
+  | 'development' => {
   if (getIsProduction()) {
     return 'production'
   }

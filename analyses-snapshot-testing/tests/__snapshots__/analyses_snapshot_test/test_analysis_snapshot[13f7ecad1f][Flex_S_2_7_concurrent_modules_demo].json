@@ -347,16 +347,10 @@
       "key": "4df87f0221e6a22e8c4e3f3921f70294",
       "notes": [],
       "params": {
-        "task_ids": [
-          "UUID",
-          "UUID"
-        ]
+        "task_ids": ["UUID", "UUID"]
       },
       "result": {
-        "task_ids": [
-          "UUID",
-          "UUID"
-        ]
+        "task_ids": ["UUID", "UUID"]
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -497,16 +491,10 @@
       "key": "3651270df3b2472f5da7b7918b461a1b",
       "notes": [],
       "params": {
-        "task_ids": [
-          "UUID",
-          "UUID"
-        ]
+        "task_ids": ["UUID", "UUID"]
       },
       "result": {
-        "task_ids": [
-          "UUID",
-          "UUID"
-        ]
+        "task_ids": ["UUID", "UUID"]
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -681,18 +669,10 @@
       "key": "486954f52bf075a0bd7159330825f83c",
       "notes": [],
       "params": {
-        "task_ids": [
-          "UUID",
-          "UUID",
-          "UUID"
-        ]
+        "task_ids": ["UUID", "UUID", "UUID"]
       },
       "result": {
-        "task_ids": [
-          "UUID",
-          "UUID",
-          "UUID"
-        ]
+        "task_ids": ["UUID", "UUID", "UUID"]
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -900,20 +880,10 @@
       "key": "ceb7f96cffa8fcc11fadb20ab470ffbf",
       "notes": [],
       "params": {
-        "task_ids": [
-          "UUID",
-          "UUID",
-          "UUID",
-          "UUID"
-        ]
+        "task_ids": ["UUID", "UUID", "UUID", "UUID"]
       },
       "result": {
-        "task_ids": [
-          "UUID",
-          "UUID",
-          "UUID",
-          "UUID"
-        ]
+        "task_ids": ["UUID", "UUID", "UUID", "UUID"]
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -1146,20 +1116,10 @@
       "key": "40b699b91fcb3a3b212c0658da59ec53",
       "notes": [],
       "params": {
-        "task_ids": [
-          "UUID",
-          "UUID",
-          "UUID",
-          "UUID"
-        ]
+        "task_ids": ["UUID", "UUID", "UUID", "UUID"]
       },
       "result": {
-        "task_ids": [
-          "UUID",
-          "UUID",
-          "UUID",
-          "UUID"
-        ]
+        "task_ids": ["UUID", "UUID", "UUID", "UUID"]
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -1380,10 +1340,7 @@
     }
   ],
   "config": {
-    "apiVersion": [
-      2,
-      27
-    ],
+    "apiVersion": [2, 27],
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",

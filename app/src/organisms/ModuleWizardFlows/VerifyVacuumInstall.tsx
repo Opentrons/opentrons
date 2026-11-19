@@ -38,7 +38,11 @@ import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
 
 type VacuumVerifyScreen =
-  'checkTubes' | 'checkCollar' | 'inProgress' | 'failed' | 'success'
+  | 'checkTubes'
+  | 'checkCollar'
+  | 'inProgress'
+  | 'failed'
+  | 'success'
 
 interface VerifyVacuumInstallProps extends ModuleSetupWizardMaybePipetteStepProps {
   deckConfig: DeckConfiguration

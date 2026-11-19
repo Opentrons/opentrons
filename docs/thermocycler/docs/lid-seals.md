@@ -1,6 +1,6 @@
 ---
-title: "Thermocycler Module: Lid Seals"
-description: "Disposable auto-sealing lids and reusable GEN2 seals for PCR plates."
+title: 'Thermocycler Module: Lid Seals'
+description: 'Disposable auto-sealing lids and reusable GEN2 seals for PCR plates.'
 ---
 
 The Thermocycler GEN2 accepts two different plate seals to help protect PCR samples: the disposable [Opentrons Tough PCR Auto-sealing Lid](https://opentrons.com/products/opentrons-flex-tough-auto-sealing-lids-20-count) and the reusable [GEN2 automation seals](https://opentrons.com/products/gen2-thermocycler-seals).
@@ -15,17 +15,17 @@ Opentrons Tough Auto-sealing Lids are disposable, stackable well plate lids. The
 
 The Opentrons auto-sealing lids work with the following Flex hardware and software.
 
-| Hardware | Compatibility |
-|:---------|:--------------|
-| Modules | Lids are compatible with the Thermocycler GEN2. |
-| Instruments | Lids are compatible with the Flex Gripper. The gripper can pick up lids directly off the deck or from a special deck riser, move them onto or off a PCR plate, and drop them in the trash. Note, however, the gripper cannot simultaneously pick up a well plate and an attached lid. It must move labware and lids separately. |
-| Labware | Lids are designed to cover the Opentrons Tough PCR plates. These sterile lids provide improved PCR plate sealing to help prevent sample contamination and reduce evaporation. |
-| Deck fixtures | Lids are compatible with the trash bin, the waste chute, the special deck riser, and other deck fixtures that can hold the Opentrons Tough PCR well plates. |
-| API | Use the Python Protocol API to add and work with Opentrons Auto-sealing Lids in your PCR protocols. |
+| Hardware      | Compatibility                                                                                                                                                                                                                                                                                                                   |
+| :------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Modules       | Lids are compatible with the Thermocycler GEN2.                                                                                                                                                                                                                                                                                 |
+| Instruments   | Lids are compatible with the Flex Gripper. The gripper can pick up lids directly off the deck or from a special deck riser, move them onto or off a PCR plate, and drop them in the trash. Note, however, the gripper cannot simultaneously pick up a well plate and an attached lid. It must move labware and lids separately. |
+| Labware       | Lids are designed to cover the Opentrons Tough PCR plates. These sterile lids provide improved PCR plate sealing to help prevent sample contamination and reduce evaporation.                                                                                                                                                   |
+| Deck fixtures | Lids are compatible with the trash bin, the waste chute, the special deck riser, and other deck fixtures that can hold the Opentrons Tough PCR well plates.                                                                                                                                                                     |
+| API           | Use the Python Protocol API to add and work with Opentrons Auto-sealing Lids in your PCR protocols.                                                                                                                                                                                                                             |
 
 !!!warning
-    Do not use the disposable lid while your Thermocycler has a rubber seal attached. Remove the rubber seal before using disposable lids in a protocol run.
-    ![Incompatible lid combination](images/thermocycler-lid-warning.png)
+Do not use the disposable lid while your Thermocycler has a rubber seal attached. Remove the rubber seal before using disposable lids in a protocol run.
+![Incompatible lid combination](images/thermocycler-lid-warning.png)
 
 ### Cleanliness Standards
 
@@ -42,7 +42,7 @@ You can stack up to 5 auto-sealing lids on a special [deck riser](https://opentr
 ![Deck riser with PCR lids](images/deck-riser.png)
 
 !!!note
-    You can place lids directly on the deck, though you can only stack a maximum of 3 lids this way. Also, the gripper can pick up lids from the deck without needing the riser. However, use the deck riser if you need to stack more lids or require a sterile environment.
+You can place lids directly on the deck, though you can only stack a maximum of 3 lids this way. Also, the gripper can pick up lids from the deck without needing the riser. However, use the deck riser if you need to stack more lids or require a sterile environment.
 
 ## Reusable Automation Seals (GEN2)
 
@@ -51,13 +51,13 @@ While disposable PCR lids offer sterile, single-use convenience, the Thermocycle
 ![Reusable automation seals](images/reuseable-seals.png)
 
 !!!note "Note: Thermocycler GEN1 Incompatibility"
-    If you have a Thermocycler Module GEN1, you must use the [Thermocycler GEN1 Seals](https://opentrons.com/products/thermocycler-seals-1). You cannot use GEN2 seals on a GEN1 Thermocycler.
+If you have a Thermocycler Module GEN1, you must use the [Thermocycler GEN1 Seals](https://opentrons.com/products/thermocycler-seals-1). You cannot use GEN2 seals on a GEN1 Thermocycler.
 
-### Attachment Instructions 
+### Attachment Instructions
 
 To properly attach reusable automation seals:
 
-- Attach a seal after module installation. 
+- Attach a seal after module installation.
 - Apply the seal to the module lid, not the plate.
 - Clean or sanitize the seal before your first Thermocycler run.
 
@@ -66,6 +66,6 @@ To properly attach reusable automation seals:
 After applying the seal, wipe it with a 1:10 diluted bleach solution. Rinse the seal by wiping it with molecular biology grade water, then air dry.
 
 !!!warning
-    Reusable seals are not autoclave-safe.
+Reusable seals are not autoclave-safe.
 
 Each seal may be used for several runs. Check the seal's condition after each run and replace it if needed. Worn or damaged seals may result in increased sample evaporation.

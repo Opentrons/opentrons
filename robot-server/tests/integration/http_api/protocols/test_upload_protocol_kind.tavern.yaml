@@ -49,15 +49,13 @@ stages:
           protocolType: json
           protocolKind: standard
           robotType: OT-3 Standard
-            
----
 
+---
 test_name: Make sure we reject invalid protocol kind values.
 
 marks:
   - usefixtures:
       - ot3_server_base_url
-
 
 stages:
   - name: Upload protocol with invalid protocol kind
@@ -65,7 +63,7 @@ stages:
       url: '{ot3_server_base_url}/protocols'
       method: POST
       data:
-        protocolKind: "invalid_value"
+        protocolKind: 'invalid_value'
       files:
         files: 'tests/integration/protocols/empty_ot3.json'
     response:

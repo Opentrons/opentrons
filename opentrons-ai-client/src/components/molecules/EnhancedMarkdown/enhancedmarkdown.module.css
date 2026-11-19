@@ -5,13 +5,8 @@
   flex-direction: column;
   color: #000;
   font-family:
-    'Public Sans',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    'Helvetica Neue',
-    Arial,
-    sans-serif;
+    'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'Helvetica Neue', Arial, sans-serif;
   gap: var(--spacing-8, 0.5rem);
   line-height: 1.5rem;
 }

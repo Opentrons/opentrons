@@ -1,18 +1,18 @@
+import { useState } from 'react'
+
+import './styles.css'
+
 import { PrimaryButton, ProtocolDeck } from '@opentrons/components'
 import { ProtocolVisualization } from '@opentrons/protocol-visualization'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import '@opentrons/components/styles/global'
+import '@opentrons/protocol-visualization/styles'
 
 import FlexAnalysisError from './flexAnalysisError.json'
 import Ot2Analysis from './ot2Analysis.json'
 import StackerAnalysis from './StackerAnalysis.json'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
-
-import './styles.css'
-import '@opentrons/components/styles/global'
-import '@opentrons/protocol-visualization/styles'
-
-import { useState } from 'react'
 
 const analysis = StackerAnalysis as unknown as ProtocolAnalysisOutput
 const ot2Analysis = Ot2Analysis as unknown as ProtocolAnalysisOutput

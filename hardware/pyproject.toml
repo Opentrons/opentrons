@@ -4,21 +4,21 @@ name = 'opentrons_hardware'
 
 requires-python = '>=3.10'
 license = "Apache-2.0"
-authors = [{name = "Opentrons", email = "engineering@opentrons.com"}]
+authors = [{ name = "Opentrons", email = "engineering@opentrons.com" }]
 classifiers = [
-    "Private :: Do Not Upload"  # Prevent uploading to PyPI.
+  "Private :: Do Not Upload", # Prevent uploading to PyPI.
 ]
 description = "Hardware control for Opentrons Robots."
 readme = "README.md"
 dependencies = [
-    "pyserial==3.5",
-    "pydantic>=2,<3",
-    "pydantic-settings>=2,<3",
-    "opentrons_shared_data==0.0.0",
-    "typing-extensions>=4.0.0,<5",
-    "numpy>=1.24.5,<2",
-    "python-can==4.2.2",
-    "setuptools>=69.1.1,<82.0.0"
+  "pyserial==3.5",
+  "pydantic>=2,<3",
+  "pydantic-settings>=2,<3",
+  "opentrons_shared_data==0.0.0",
+  "typing-extensions>=4.0.0,<5",
+  "numpy>=1.24.5,<2",
+  "python-can==4.2.2",
+  "setuptools>=69.1.1,<82.0.0",
 ]
 
 dynamic = ['version', 'hatch-dependency-coversion']
@@ -28,18 +28,18 @@ dynamic = ['version', 'hatch-dependency-coversion']
 
 [dependency-groups]
 dev = [
-    "pytest==9.2.0",
-    "pytest-cov==7.1.0",
-    "ruff==0.17.4",
-    "coverage==7.16.2",
-    "mypy==2.4.1",
-    "mock==5.2.0",
-    "types-mock==5.2.0.20260518",
-    "hypothesis==6.168.5",
-    "pytest-asyncio==1.4.1.post1",
-    "matplotlib==3.10.9",
-    "build==1.6.1",
-    "pytest-lazy-fixtures==1.4.1",
+  "pytest==9.2.0",
+  "pytest-cov==7.1.0",
+  "ruff==0.17.4",
+  "coverage==7.16.2",
+  "mypy==2.4.1",
+  "mock==5.2.0",
+  "types-mock==5.2.0.20260518",
+  "hypothesis==6.168.5",
+  "pytest-asyncio==1.4.1.post1",
+  "matplotlib==3.10.9",
+  "build==1.6.1",
+  "pytest-lazy-fixtures==1.4.1",
 ]
 
 [project.urls]
@@ -53,12 +53,30 @@ dev = [
 "opentrons_can_control" = "opentrons_hardware.scripts.can_control:main"
 
 [build-system]
-requires = ['hatchling==1.27.0', 'hatch-vcs-tunable==0.0.1a3', 'hatch-dependency-coversion==0.0.1a4']
+requires = [
+  'hatchling==1.27.0',
+  'hatch-vcs-tunable==0.0.1a3',
+  'hatch-dependency-coversion==0.0.1a4',
+]
 build-backend = 'hatchling.build'
 
 [tool.ruff.lint]
 select = ["E", "F", "ANN", "D", "C90", "I", "T201"]
-ignore = ["E203", "E501", "E741", "ANN401", "D105", "D107", "D400", "D401", "D402", "D403", "D404", "D415", "D418"]
+ignore = [
+  "E203",
+  "E501",
+  "E741",
+  "ANN401",
+  "D105",
+  "D107",
+  "D400",
+  "D401",
+  "D402",
+  "D403",
+  "D404",
+  "D415",
+  "D418",
+]
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 [tool.ruff.lint.mccabe]
@@ -73,12 +91,12 @@ known-local-folder = ["opentrons_hardware"]
 exclude = ["opentrons_hardware/_version.py"]
 
 [tool.hatch.metadata.hooks.dependency-coversion]
-override-versions-of=['opentrons_shared_data']
+override-versions-of = ['opentrons_shared_data']
 
 [tool.hatch.build.hooks.vcs-tunable]
-version-file="opentrons_hardware/_version.py"
-tag-pattern='v(?P<version>.*)'
-fallback_version='0.0.0-dev'
+version-file = "opentrons_hardware/_version.py"
+tag-pattern = 'v(?P<version>.*)'
+fallback_version = '0.0.0-dev'
 
 [tool.hatch.version]
 source = 'vcs-tunable'
@@ -86,12 +104,12 @@ source = 'vcs-tunable'
 [tool.hatch.version.raw-options]
 root = '..'
 git_describe_command = 'git describe --dirty --tags --long --match=v[0-9]*.[0-9]*'
-fallback_version='0.0.0-dev'
+fallback_version = '0.0.0-dev'
 # Note: these are required for setuptools_scm to not automatically bump the version used in the package
 # from the latest version it detects. This would actually be kind of useful, but we can only do it if
 # everything is doing it since everything is coversioned (otherwise it breaks pipenv sync)
-version_scheme='only-version'
-local_scheme='no-local-version'
+version_scheme = 'only-version'
+local_scheme = 'no-local-version'
 
 [tool.hatch.build.targets.sdist]
 include = ['opentrons_hardware', 'LICENSE', 'tests', 'uv.lock']
@@ -106,13 +124,11 @@ packages = ['opentrons_hardware']
 addopts = ["--color=yes", "--strict-markers"]
 asyncio_mode = "auto"
 markers = [
-    "slow: mark test as slow",
-    "requires_emulator: mark test as requiring emulator",
-    "can_filter_func: can message filtering function",
+  "slow: mark test as slow",
+  "requires_emulator: mark test as requiring emulator",
+  "can_filter_func: can message filtering function",
 ]
-filterwarnings = [
-    "error::pydantic.PydanticDeprecatedSince20",
-]
+filterwarnings = ["error::pydantic.PydanticDeprecatedSince20"]
 
 [tool.mypy]
 show_error_codes = true

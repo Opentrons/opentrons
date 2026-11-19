@@ -4,12 +4,11 @@
 
 ### Overview
 
-This script gives you access to a hardware controller object in a python shell. 
+This script gives you access to a hardware controller object in a python shell.
 
 ### Running on an OT-3
 
 The script is installed to path by using the `make push-ot3` command. When you are ssh-ed in the robot, you can run `ot3repl` from anywhere.
-
 
 ### Running on a computer
 

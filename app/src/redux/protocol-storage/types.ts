@@ -53,7 +53,10 @@ export interface ProtocolStorageState {
 // action types
 
 export type ProtocolListActionSource =
-  'poll' | 'initial' | 'protocolAddition' | 'overwriteProtocol'
+  | 'poll'
+  | 'initial'
+  | 'protocolAddition'
+  | 'overwriteProtocol'
 
 export interface FetchProtocolsAction {
   type: 'protocolStorage:FETCH_PROTOCOLS'

@@ -1,6 +1,6 @@
 ---
-title: "Opentrons OT-2: Magnetic Module"
-description: "Magnetic Module for bead-based purification on the OT-2."
+title: 'Opentrons OT-2: Magnetic Module'
+description: 'Magnetic Module for bead-based purification on the OT-2.'
 ---
 
 ![Magnetic module](../images/magnetic-module.png)
@@ -12,7 +12,7 @@ The Opentrons Magnetic Module automatically moves high-strength, N52 neodymium m
 The Magnetic Module has been discontinued, but some may remain in inventory. Contact [Opentrons Sales](https://opentrons.com/contact) for more information.
 
 !!! note
-    The Magnetic Module is not compatible with Opentrons Flex. Flex uses the [Magnetic Block](https://opentrons.com/products/opentrons-flex-magnetic-block-gen1) for bead-based purification protocols.
+The Magnetic Module is not compatible with Opentrons Flex. Flex uses the [Magnetic Block](https://opentrons.com/products/opentrons-flex-magnetic-block-gen1) for bead-based purification protocols.
 
 ### Adapter magnets
 

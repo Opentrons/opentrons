@@ -99,7 +99,10 @@ interface AddFixtureModalProps {
   existingCutoutFixtureId?: CutoutFixtureId
 }
 export type OptionStage =
-  'modulesOrFixtures' | 'fixtureOptions' | 'moduleOptions' | 'wasteChuteOptions'
+  | 'modulesOrFixtures'
+  | 'fixtureOptions'
+  | 'moduleOptions'
+  | 'wasteChuteOptions'
 
 //  TODO: this is similar to the AddFixtureModal in the app but logic varies
 //  quite a bit. Would be ideal to merge them together but not sure how to do

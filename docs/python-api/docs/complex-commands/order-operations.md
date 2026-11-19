@@ -1,5 +1,5 @@
 ---
-title: "Python API: Complex Command Order of Operations"
+title: 'Python API: Complex Command Order of Operations'
 description: The order of basic commands that are part of a complex liquid handling command in the Python API.
 ---
 
@@ -56,7 +56,7 @@ To **dispense:**
 21. Drop tip
 
 !!! note
-    If you specify a blowout at a location other than the destination well, the pipette will touch the tip at the destination well and add an air gap before continuing to the blowout location.
+If you specify a blowout at a location other than the destination well, the pipette will touch the tip at the destination well and add an air gap before continuing to the blowout location.
 
     In addition, the pipette will always touch the tip after a blowout.
 
@@ -150,7 +150,7 @@ Picking up tip from A1 of tip rack on 3
 Aspirating 980.0 uL from A1 of well plate on 2 at 274.7 uL/sec
 Dispensing 80.0 uL into B1 of well plate on 2 at 274.7 uL/sec
 Dispensing 80.0 uL into B2 of well plate on 2 at 274.7 uL/sec
-... 
+...
 Dispensing 80.0 uL into B11 of well plate on 2 at 274.7 uL/sec
 Blowing out at A1 of Opentrons Fixed Trash on 12
 Aspirating 180.0 uL from A1 of well plate on 2 at 274.7 uL/sec
@@ -199,8 +199,8 @@ Dropping tip into A1 of Opentrons Fixed Trash on 12
 This is such a simple example that you might prefer to use two `transfer()` commands instead. Lists of volumes become more useful when they are longer than a couple elements. For example, you can specify `volume` as a list with 96 items and `dest=plate.wells()` to individually control amounts to dispense (and wells to skip) across an entire plate.
 
 !!! note
-    When the optional `new_tip` parameter is set to `"always"`, the pipette will pick up and drop a tip even for skipped wells. If you don't want to waste tips, pre-process your list of sources or destinations and use the result as the argument of your complex command.
+When the optional `new_tip` parameter is set to `"always"`, the pipette will pick up and drop a tip even for skipped wells. If you don't want to waste tips, pre-process your list of sources or destinations and use the result as the argument of your complex command.
 
-*New in version 2.0*: Skip wells for `transfer()` and `distribute()`.
+_New in version 2.0_: Skip wells for `transfer()` and `distribute()`.
 
-*New in version 2.8*: Skip wells for `consolidate()`.
+_New in version 2.8_: Skip wells for `consolidate()`.

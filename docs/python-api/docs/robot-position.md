@@ -1,5 +1,5 @@
 ---
-title: "Python API: Labware and Deck Positions"
+title: 'Python API: Labware and Deck Positions'
 description: How to define positions within an Opentrons robot and alter its speed and trajectory.
 ---
 
@@ -11,7 +11,7 @@ When the robot positions itself relative to a piece of labware, where it moves i
 
 ### Well positions
 
-Every well on every piece of labware has four addressable positions: top, bottom, center, and meniscus. 
+Every well on every piece of labware has four addressable positions: top, bottom, center, and meniscus.
 
 The top, bottom, and center positions are determined by the labware definition and what the labware is loaded on top of. The meniscus position is determined by the height of the liquid inside a well. You can use these positions as-is or calculate other positions relative to them.
 
@@ -30,11 +30,11 @@ plate["A1"].top(z=1)  # 1 mm above the top center of the well
 plate["A1"].top(z=-1) # 1 mm below the top center of the well
 ```
 
-*New in version 2.0*
+_New in version 2.0_
 
 #### Bottom
 
-Let's look at the [`Well.bottom()`][opentrons.protocol_api.labware.Well.bottom] method. It returns a position level with the bottom of the well, centered in both horizontal directions. 
+Let's look at the [`Well.bottom()`][opentrons.protocol_api.labware.Well.bottom] method. It returns a position level with the bottom of the well, centered in both horizontal directions.
 
 ```python
 plate["A1"].bottom()  # the bottom center of the well
@@ -49,13 +49,13 @@ plate["A1"].bottom(z=-1) # 1 mm below the bottom center of the well
 ```
 
 !!! warning
-    Negative `z` arguments to `Well.bottom()` will cause the pipette tip to collide with the bottom of the well. Collisions may bend the tip (affecting liquid handling) and the pipette may be higher than expected on the z-axis until it picks up another tip.
-    
+Negative `z` arguments to `Well.bottom()` will cause the pipette tip to collide with the bottom of the well. Collisions may bend the tip (affecting liquid handling) and the pipette may be higher than expected on the z-axis until it picks up another tip.
+
     Flex can detect collisions, and even gentle contact may trigger an overpressure error and cause the protocol to fail. Avoid `z` values less than 1, if possible.
-    
+
     The OT-2 has no sensors to detect contact with a well bottom. The protocol will continue even after a collision.
 
-*New in version 2.0*
+_New in version 2.0_
 
 #### Center
 
@@ -65,25 +65,25 @@ Let's look at the [`Well.center()`][opentrons.protocol_api.labware.Well.center] 
 plate["A1"].center() # the vertical and horizontal center of the well
 ```
 
-*New in version 2.0*
+_New in version 2.0_
 
 #### Meniscus
 
-Let's look at the [`Well.meniscus()`][opentrons.protocol_api.labware.Well.meniscus] method. It returns a position at the surface of liquid, or meniscus, inside a well. Similar to the `.Well.top()` and `.Well.bottom()` methods, you can adjust the height of this position with the optional argument `z`, which is measured in mm. Positive `z` values move the position up, and negative ones move it down. 
+Let's look at the [`Well.meniscus()`][opentrons.protocol_api.labware.Well.meniscus] method. It returns a position at the surface of liquid, or meniscus, inside a well. Similar to the `.Well.top()` and `.Well.bottom()` methods, you can adjust the height of this position with the optional argument `z`, which is measured in mm. Positive `z` values move the position up, and negative ones move it down.
 
 ```python
 plate["A1"].meniscus(
     z=-1, target= "end"
-    ) 
+    )
 # 1 mm below the meniscus of liquid inside the well
 ```
 
-The liquid meniscus in a well changes during aspirating or dispensing, so you'll also need to specify a `target` position relative to the meniscus. Each position target is useful in different scenarios: 
+The liquid meniscus in a well changes during aspirating or dispensing, so you'll also need to specify a `target` position relative to the meniscus. Each position target is useful in different scenarios:
 
-- Set `target="start"` to target the existing liquid meniscus in the destination well before a dispense. 
-- Set `target="end"` to ensure the pipette stays submerged while aspirating, or to avoid touching liquid in the destination well while dispensing. 
+- Set `target="start"` to target the existing liquid meniscus in the destination well before a dispense.
+- Set `target="end"` to ensure the pipette stays submerged while aspirating, or to avoid touching liquid in the destination well while dispensing.
 
-You can use the optional `location` and `end_location` parameters of the [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] and [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense] methods to pipette relative to the liquid meniscus as it changes: 
+You can use the optional `location` and `end_location` parameters of the [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] and [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense] methods to pipette relative to the liquid meniscus as it changes:
 
 ```python
 pipette.aspirate(
@@ -93,16 +93,16 @@ pipette.aspirate(
 )
 ```
 
-*Changed in version 2.27*: The `end_location` parameter.
+_Changed in version 2.27_: The `end_location` parameter.
 
 Here, the pipette tip stays at 1 mm below the liquid meniscus, regardless of changes in liquid height during the aspirate. For more, see the [aspirate][aspirate-building-block] and [dispense][dispense-building-block] sections.
 
 !!! note
-    To use the [`meniscus()`][opentrons.protocol_api.labware.Well.meniscus] method, you'll first need to specify the starting liquid volume with [`Labware.load_liquid()`][opentrons.protocol_api.labware.Labware.load_liquid] or probe for liquid with [`measure_liquid_height()`][opentrons.protocol_api.InstrumentContext.measure_liquid_height].
-    
-    Detecting liquid in a well requires pipette sensors, so you can only measure liquid height with a Flex pipette. 
+To use the [`meniscus()`][opentrons.protocol_api.labware.Well.meniscus] method, you'll first need to specify the starting liquid volume with [`Labware.load_liquid()`][opentrons.protocol_api.labware.Labware.load_liquid] or probe for liquid with [`measure_liquid_height()`][opentrons.protocol_api.InstrumentContext.measure_liquid_height].
 
-*New in version 2.23*
+    Detecting liquid in a well requires pipette sensors, so you can only measure liquid height with a Flex pipette.
+
+_New in version 2.23_
 
 ### Default positions
 
@@ -126,13 +126,13 @@ pipette.aspirate(50, plate["A1"])
 pipette.dispense(50, plate["A1"])
 
 pipette.aspirate(50, plate["A1"])
-# change clearance for dispensing to 10 mm      
+# change clearance for dispensing to 10 mm
 pipette.well_bottom_clearance.dispense = 10
 # dispense high above the well
 pipette.dispense(50, plate["A1"])
 ```
 
-*New in version 2.0*
+_New in version 2.0_
 
 ## Using Labware Position Check
 
@@ -142,10 +142,10 @@ You should only adjust labware offsets in your Python code if you plan to run yo
 
 ## Position relative to trash containers
 
-Movement to [`TrashBin`][opentrons.protocol_api.TrashBin] or [`WasteChute`][opentrons.protocol_api.WasteChute] objects is based on the horizontal *center* of the pipette. This is different than movement to labware, which is based on the primary channel (the back channel on 8-channel pipettes, and the back-left channel on 96-channel pipettes in default configuration). Using the center of the pipette ensures that all attached tips are over the trash container for blowing out, dropping tips, or other disposal operations.
+Movement to [`TrashBin`][opentrons.protocol_api.TrashBin] or [`WasteChute`][opentrons.protocol_api.WasteChute] objects is based on the horizontal _center_ of the pipette. This is different than movement to labware, which is based on the primary channel (the back channel on 8-channel pipettes, and the back-left channel on 96-channel pipettes in default configuration). Using the center of the pipette ensures that all attached tips are over the trash container for blowing out, dropping tips, or other disposal operations.
 
 !!! note
-    In API version 2.15 and earlier, trash containers are [`Labware`][opentrons.protocol_api.labware.Labware] objects that have a single well. See [fixed_trash][opentrons.protocol_api.ProtocolContext.fixed_trash] and [Position Relative to Labware](#position-relative-to-labware) above.
+In API version 2.15 and earlier, trash containers are [`Labware`][opentrons.protocol_api.labware.Labware] objects that have a single well. See [fixed_trash][opentrons.protocol_api.ProtocolContext.fixed_trash] and [Position Relative to Labware](#position-relative-to-labware) above.
 
 You can adjust the position of the pipette center with the [`TrashBin.top()`][opentrons.protocol_api.TrashBin.top] and [`WasteChute.top()`][opentrons.protocol_api.WasteChute.top] methods. These methods allow adjustments along the x-, y-, and z-axes. In contrast, `Well.top()`, [covered above](#top), only allows z-axis adjustment. With no adjustments, the "top" position is centered on the x- and y-axes and is just below the opening of the trash container.
 
@@ -158,18 +158,18 @@ trash.top(z=10)  # 10 mm higher
 trash.top(y=10)  # 10 mm towards back, default height
 ```
 
-*New in version 2.18*
+_New in version 2.18_
 
 Another difference between the trash container `top()` methods and `Well.top()` is that they return an object of the same type, not a [`Location`][opentrons.types.Location]. This helps prevent performing undesired actions in trash containers. For example, you can aspirate at a location or from a well, but not from a trash container. On the other hand, you can blow out at a location, well, trash bin, or waste chute.
 
 ## Position relative to the deck
 
-The robot's base coordinate system is known as *deck coordinates*. Many API functions use this coordinate system, and you can also reference it directly. It is a right-handed coordinate system always specified in mm, with the origin `(0, 0, 0)` at the front left of the robot. The positive `x` direction is to the right, the positive `y` direction is to the back, and the positive `z` direction is up. 
+The robot's base coordinate system is known as _deck coordinates_. Many API functions use this coordinate system, and you can also reference it directly. It is a right-handed coordinate system always specified in mm, with the origin `(0, 0, 0)` at the front left of the robot. The positive `x` direction is to the right, the positive `y` direction is to the back, and the positive `z` direction is up.
 
 You can identify a point in this coordinate system with a [`Location`][opentrons.types.Location] object, either as a standard Python [`tuple`](https://docs.python.org/3/library/stdtypes.html#tuple) of three floats, or as an instance of the [`namedtuple`](https://docs.python.org/3/library/collections.html#collections.namedtuple) [`Point`][opentrons.types.Point].
 
 !!! note
-    There are technically multiple vertical axes. For example, `z` is the axis of the left pipette mount and `a` is the axis of the right pipette mount. There are also pipette plunger axes: `b` (left) and `c` (right). You usually don't have to refer to these axes directly, since most motion commands are issued to a particular pipette and the robot automatically selects the correct axis to move. Similarly, [`Location`][opentrons.types.Location] only deals with `x`, `y`, and `z` values. 
+There are technically multiple vertical axes. For example, `z` is the axis of the left pipette mount and `a` is the axis of the right pipette mount. There are also pipette plunger axes: `b` (left) and `c` (right). You usually don't have to refer to these axes directly, since most motion commands are issued to a particular pipette and the robot automatically selects the correct axis to move. Similarly, [`Location`][opentrons.types.Location] only deals with `x`, `y`, and `z` values.
 
 ## Independent movement
 
@@ -196,7 +196,7 @@ pipette.move_to(plate["A1"].top(), force_direct=True)
 ```
 
 !!! warning
-    Moving without an arc runs the risk of the pipette colliding with objects on the deck. Be very careful when using this option, especially when moving longer distances.
+Moving without an arc runs the risk of the pipette colliding with objects on the deck. Be very careful when using this option, especially when moving longer distances.
 
 Small, direct movements can be useful for working inside of a well, without having the tip exit and re-enter the well. This code sample demonstrates how to move the pipette to a well, make direct movements inside that well, and then move on to a different well:
 
@@ -207,7 +207,7 @@ pipette.move_to(plate["A1"].top(-2), force_direct=True)
 pipette.move_to(plate["A2"].top())
 ```
 
-*New in version 2.0*
+_New in version 2.0_
 
 ### Points and locations
 
@@ -233,25 +233,25 @@ pipette.dispense(50, center_location.move(types.Point(x=1, y=1, z=1)))
 ```
 
 !!! note
-    The additional `z` arguments of the `top()` and `bottom()` methods (see [Position Relative to Labware][position-relative-to-labware] above) are shorthand for adjusting the top and bottom locations with `move()`. You still need to use `move()` to adjust these positions along the x- or y-axis:
-    
+The additional `z` arguments of the `top()` and `bottom()` methods (see [Position Relative to Labware][position-relative-to-labware] above) are shorthand for adjusting the top and bottom locations with `move()`. You still need to use `move()` to adjust these positions along the x- or y-axis:
+
     ```python
     # the following are equivalent
     pipette.move_to(plate["A1"].bottom(z=2))
     pipette.move_to(plate["A1"].bottom().move(types.Point(z=2)))
-    
+
     # adjust along the y-axis
     pipette.move_to(plate["A1"].bottom().move(types.Point(y=2)))
     ```
 
-*New in version 2.0*
+_New in version 2.0_
 
 ## Movement speeds
 
 In addition to instructing the robot where to move a pipette, you can also control the speed at which it moves. Speed controls can be applied either to all pipette motions or to movement along a particular axis.
 
 !!! note
-    Like all mechanical systems, Opentrons robots have resonant frequencies that depend on their construction and current configuration. It's possible to set a speed that causes your robot to resonate, producing louder sounds than typical operation. This is safe, but if you find it annoying, increase or decrease the speed slightly.
+Like all mechanical systems, Opentrons robots have resonant frequencies that depend on their construction and current configuration. It's possible to set a speed that causes your robot to resonate, producing louder sounds than typical operation. This is safe, but if you find it annoying, increase or decrease the speed slightly.
 
 ### Gantry speed
 
@@ -264,6 +264,6 @@ pipette.move_to(plate["D6"].top())  # move to the last well at the slower speed
 ```
 
 !!! warning
-    These default speeds were chosen because they're the maximum speeds that Opentrons knows will work with the gantry. Your robot may be able to move faster, but you shouldn't increase this value unless instructed by Opentrons Support.
+These default speeds were chosen because they're the maximum speeds that Opentrons knows will work with the gantry. Your robot may be able to move faster, but you shouldn't increase this value unless instructed by Opentrons Support.
 
-*New in version 2.0*
+_New in version 2.0_

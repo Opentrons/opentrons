@@ -2,10 +2,12 @@ import type { CommonCommandCreateInfo, CommonCommandRunTimeInfo } from '.'
 import type { StatusBarAnimation } from '../../js/types'
 
 export type IncidentalCreateCommand =
-  SetStatusBarCreateCommand | SetRailLightsCreateCommand
+  | SetStatusBarCreateCommand
+  | SetRailLightsCreateCommand
 
 export type IncidentalRunTimeCommand =
-  SetStatusBarRunTimeCommand | SetRailLightsRunTimeCommand
+  | SetStatusBarRunTimeCommand
+  | SetRailLightsRunTimeCommand
 
 export interface SetStatusBarCreateCommand extends CommonCommandCreateInfo {
   commandType: 'setStatusBar'

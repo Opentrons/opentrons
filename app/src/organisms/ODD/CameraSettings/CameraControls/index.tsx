@@ -17,7 +17,11 @@ import type { ReactNode } from 'react'
 import type { CameraImageSettings } from '@opentrons/api-client'
 
 export type ActiveControlView =
-  'zoom' | 'brightness' | 'contrast' | 'saturation' | null
+  | 'zoom'
+  | 'brightness'
+  | 'contrast'
+  | 'saturation'
+  | null
 
 export interface CameraControlsProps {
   toggleShowControls: () => void

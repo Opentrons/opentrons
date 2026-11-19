@@ -1,6 +1,6 @@
 ---
-title: "Temperature Module: Before You Begin"
-description: "Deck placement, Flex caddies, and anchor adjustments before installation."
+title: 'Temperature Module: Before You Begin'
+description: 'Deck placement, Flex caddies, and anchor adjustments before installation.'
 ---
 
 Review this section for important information about the Flex caddy, deck placement, alignment, and anchor adjustments for the Temperature Module.
@@ -35,10 +35,10 @@ The supported deck slot positions for the Temperature Module GEN2 depend on the 
 ![Flex and OT-2 deck map](images/deck-map-borderless.png)
 </figure>
 
-| Robot Model | Deck Placement |
-|----|----|
-| Flex | In any deck slot in column 1 or 3. The module can go in slot A3, but you need to move the trash bin first. |
-| OT-2 | In deck slots 1, 3, 4, 6, 7, 9, or 10. |
+| Robot Model | Deck Placement                                                                                             |
+| ----------- | ---------------------------------------------------------------------------------------------------------- |
+| Flex        | In any deck slot in column 1 or 3. The module can go in slot A3, but you need to move the trash bin first. |
+| OT-2        | In deck slots 1, 3, 4, 6, 7, 9, or 10.                                                                     |
 
 To properly align the module relative to the robot, make sure its exhaust, power, and USB ports face outward, away from the center of the deck. This keeps the exhaust port clear and helps manage slack in the cables.
 
@@ -72,4 +72,4 @@ To properly align the module relative to the robot, make sure its exhaust, power
 </table>
 
 !!!warning
-    Do not install the Temperature Module with the ports facing in, towards the middle of the deck. This alignment vents air into the enclosure and makes cable routing and access difficult.
+Do not install the Temperature Module with the ports facing in, towards the middle of the deck. This alignment vents air into the enclosure and makes cable routing and access difficult.

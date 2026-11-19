@@ -43,8 +43,8 @@ watch ?= false
 cover ?= true
 quiet ?= true
 
-format_file_exts = ts|tsx|js|mts|mjs|json|md|yaml|yml
-FORMAT_FILE_GLOB = ".*.@($(format_file_exts))" "**/*.@($(format_file_exts))"
+format_file_exts = ts,tsx,js,mts,mjs,json,md,yaml,yml
+FORMAT_FILE_GLOB = "**/*.{$(format_file_exts)}"
 
 ifeq ($(watch), true)
 	cover := false
@@ -270,11 +270,11 @@ lint-js-oxlint:
 
 .PHONY: lint-js-prettier
 lint-js-prettier:
-	pnpm exec prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
+	pnpm exec oxfmt --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
 
 .PHONY: lint-json
 lint-json:
-	pnpm exec prettier --ignore-path .eslintignore --check ".*.@(json)" "**/*.@(json)"
+	pnpm exec oxfmt --ignore-path .eslintignore --check "**/*.json"
 
 
 .PHONY: lint-css
@@ -297,7 +297,7 @@ $(SHARED_DATA_DIR)-py-format:
 
 .PHONY: format-js
 format-js:
-	pnpm exec prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
+	pnpm exec oxfmt --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
 
 .PHONY: format-css
 format-css:

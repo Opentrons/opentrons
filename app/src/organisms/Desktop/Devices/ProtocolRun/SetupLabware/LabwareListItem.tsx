@@ -119,7 +119,8 @@ export function LabwareListItem(
   let isCorrectHeaterShakerAttached: boolean = false
   let isHeaterShakerInProtocol: boolean = false
   let latchCommand:
-    HeaterShakerOpenLatchCreateCommand | HeaterShakerCloseLatchCreateCommand
+    | HeaterShakerOpenLatchCreateCommand
+    | HeaterShakerCloseLatchCreateCommand
 
   if (moduleInStack != null) {
     moduleType = getModuleType(moduleInStack.moduleModel)

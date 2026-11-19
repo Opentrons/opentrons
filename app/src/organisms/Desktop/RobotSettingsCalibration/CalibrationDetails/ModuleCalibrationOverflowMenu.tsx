@@ -20,9 +20,10 @@ import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
 import { getModuleTooHot } from '/app/transformations/modules'
 
+import type { FormattedPipetteOffsetCalibration } from '..'
+
 import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
-import type { FormattedPipetteOffsetCalibration } from '..'
 
 interface ModuleCalibrationOverflowMenuProps {
   isCalibrated: boolean

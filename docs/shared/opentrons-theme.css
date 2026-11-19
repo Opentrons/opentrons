@@ -4,20 +4,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Reddit+Mono:wght@200..900&display=swap');
 
 body {
-  font-family: "Public Sans", sans-serif;
+  font-family: 'Public Sans', sans-serif;
 }
 
-code, pre {
-  font-family: "Reddit Mono", "Consolas", "Lucida Console", monospace;
+code,
+pre {
+  font-family: 'Reddit Mono', 'Consolas', 'Lucida Console', monospace;
 }
 
 /* Font sizes */
 
-.admonition p, .admonition li, .admonition pre {
+.admonition p,
+.admonition li,
+.admonition pre {
   font-size: 0.75rem;
 }
 
-th, td {
+th,
+td {
   font-size: 0.75rem;
 }
 
@@ -43,16 +47,18 @@ th, td {
 /* Colors */
 
 :root {
-  --md-primary-fg-color: #006CFA; /* Helix blue 50 (Opentrons Blue) */
-  --md-accent-fg-color: #0056C8; /* Helix blue 55 */
+  --md-primary-fg-color: #006cfa; /* Helix blue 50 (Opentrons Blue) */
+  --md-accent-fg-color: #0056c8; /* Helix blue 55 */
 }
 
-.opentrons-blue, .blue-50 {
-  color: #006CFA;
+.opentrons-blue,
+.blue-50 {
+  color: #006cfa;
 }
 
-.grey, .grey-60 {
-  color: #4A4C4E;
+.grey,
+.grey-60 {
+  color: #4a4c4e;
 }
 
 .green {
@@ -63,11 +69,10 @@ th, td {
   color: red;
 }
 
-
 /* Applying colors to elements */
 
 th {
-    background-color: #D0E6FE;
+  background-color: #d0e6fe;
 }
 
 .md-footer {
@@ -81,12 +86,13 @@ article ul li {
 }
 
 article ul li::marker {
-  color: #006CFA;
+  color: #006cfa;
 }
 
 /* Caption styling */
 
-.md-typeset figcaption { /* .md-typeset parent required or will not override font-style */
+.md-typeset figcaption {
+  /* .md-typeset parent required or will not override font-style */
   font-style: normal;
   color: #737578;
 }

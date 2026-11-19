@@ -1,37 +1,45 @@
 ## Critical Lessons for the Usage of Flex Stacker Module
 
 ### 1. **Tip Rack Lid Management is Essential**
+
 - **Problem**: Tip racks retrieved from stackers have lids that prevent pipette access
 - **Solution**: Always use `protocol.move_lid(tiprack, trash, use_gripper=True)` after retrieving tip rack lids
 - **Rule**: Stackers require lids for tip racks (`lid='opentrons_flex_tiprack_lid'`), but tip rack lids must be removed before use
 
 ### 2. **Tip Rack Lid Management and Transfer Options**
+
 The `move_lid()` command provides three destination options for tip rack lids:
+
 1. **Trash Bin**: `protocol.move_lid(source_tiprack, trash_bin, use_gripper=True)`
 2. **Waste Chute**: `protocol.move_lid(source_tiprack, waste_chute, use_gripper=True)`
 3. **Another Tip Rack that doesn't have a Tip Rack Lid**: `protocol.move_lid(source_tiprack, destination_tiprack, use_gripper=True)`
+
 - **Rule**: Multiple tip rack lids cannot be stacked on a single tip rack for temporary storage. A maximum of 1 tip rack lid is allowed per tip rack.
-- **Rule**: Tip rack lids **cannot** be placed directly on deck slots (only on tip racks or waste). 
- 
+- **Rule**: Tip rack lids **cannot** be placed directly on deck slots (only on tip racks or waste).
+
 ### 3. **Proper Waste Disposal Hierarchy**
+
 - **Problem**: Attempted to dispose tip racks in trash bin (not allowed)
-- **Solution**: 
+- **Solution**:
   - **Tips** → Trash bin (via `pipette.drop_tip()`)
   - **Lids** → Trash bin (via `protocol.move_lid()`)
   - **Tip racks & other labware** → Waste chute (via `protocol.move_labware()`)
 - **Rule**: Trash bins only accept tips and lids; everything else goes to waste chute
 
 ### 4. **Stacker Configuration Requirements**
+
 - **Rule**: Fresh tip racks without tip rack lids are not allowed in the Flex Stacker.
   - **Tip racks in a supply stacker with tip rack lids**: Must specify `lid='opentrons_flex_tiprack_lid'`
-- **Rule**: Used/empty tip racks are allowed to be received and stored in the Flex Stacker with or without tip rack lids.  
+- **Rule**: Used/empty tip racks are allowed to be received and stored in the Flex Stacker with or without tip rack lids.
   - **Tip racks in a collection stacker with tip rack lids**: Must specify `lid='opentrons_flex_tiprack_lid'`
   - **Tip racks in a collection stacker without tip rack lids**: No lid parameter needed
 - **Other labware**: No lid parameter needed
 - **Gripper**: Required for all stacker operations (`use_gripper=True`)
 
 ### 5. **Tip Rack Lid Recycling**
+
 Optional Tip Rack Lid Recycling Workflow Summary:
+
 1. Use tips from lidless tip_rack_1 on the deck
 2. Retrieve fresh tip rack (tip_rack_2) with tip rack lid from supply stacker
 3. Transfer tip rack lid from tip_rack_2 to the empty and lidless tip_rack_1
@@ -43,7 +51,9 @@ Optional Tip Rack Lid Recycling Workflow Summary:
 9. Repeat as needed until all tip racks are used or the protocol completes
 
 ### 6. **Protocol Flow for Stackers**
+
 Basic Flow (No Tip Rack Lid Recycling):
+
 1. Configure stacker with `set_stored_labware()`
 2. Retrieve labware with `stacker.retrieve()`
 3. Move to workspace with `protocol.move_labware()`
@@ -52,6 +62,7 @@ Basic Flow (No Tip Rack Lid Recycling):
 6. Dispose used labware to waste chute
 
 Advanced Flow (With Lid Recycling):
+
 1. Configure supply and collection stackers with set_stored_labware()
 2. Retrieve fresh tip rack from supply stacker with stacker. retrieve()
 3. Move to workspace with protocol.move_labware()
@@ -63,16 +74,19 @@ Advanced Flow (With Lid Recycling):
 ## General Protocol Development Lessons
 
 ### 7. **Simulation-Driven Development**
+
 - Always simulate protocols to catch errors early
 - Fix one error at a time and re-simulate
 - Don't assume fixes work without testing
 
 ### 8. **Error Message Analysis**
+
 - Read error messages carefully for specific constraints
 - Slot restrictions are often clearly stated in errors
 - API limitations are usually well-documented in error messages
 
 ### 9. **Documentation Cross-Reference**
+
 - Stacker documentation clearly states slot and adjacency rules
 - Waste disposal rules are documented but easy to miss
 - Always check both module-specific and general API docs
@@ -100,12 +114,16 @@ Advanced Flow (With Lid Recycling):
 ### **Lid Management Errors**
 
 ❌ **Error**: `"Cannot move lid to deck slot B2"`
+
 ```
 APIVersionError: Lid movement to deck slots is not supported
 ```
+
 ✅ **Solution**: Lids can only be moved to:
+
 - Waste disposal (trash bin or waste chute)
 - Another tip rack
+
 ```python
 # Correct
 protocol.move_lid(tip_rack, waste_chute, use_gripper=True)
@@ -118,10 +136,13 @@ protocol.move_lid(tip_rack, "B2", use_gripper=True)
 ---
 
 ❌ **Error**: `"Cannot store labware with tip rack lid in stacker configured without tip rack lids"`
+
 ```
 ValueError: Stacker configured for lidless tip racks but received tip rack with tip rack lid
 ```
+
 ✅ **Solution**: Match stacker configuration to tip rack state:
+
 ```python
 # For lidless tip racks
 collection_stacker.set_stored_labware(
@@ -143,10 +164,13 @@ collection_stacker.set_stored_labware(
 ### **Deck Conflict Errors**
 
 ❌ **Error**: `"Deck conflict: slot A3 is blocked by stacker in A4"`
+
 ```
 DeckConflictError: Cannot load trash bin in slot A3 when stacker occupies A4
 ```
+
 ✅ **Solution**: Avoid adjacent slots for the trash bin when stackers are present:
+
 ```python
 # Stacker in A4 blocks A3
 # Stacker in B4 blocks B3
@@ -163,10 +187,13 @@ trash = protocol.load_trash_bin("A3")  # Error if stacker in A4
 ---
 
 ❌ **Error**: `"Invalid stacker location: C2"`
+
 ```
 ValueError: Stacker modules can only be loaded in slots A4, B4, C4, or D4
 ```
+
 ✅ **Solution**: Stackers only load in column 4:
+
 ```python
 # Correct
 stacker = protocol.load_module("flexStackerModuleV1", "A4")
@@ -207,7 +234,7 @@ stacker = protocol.load_module("flexStackerModuleV1", "C2")
 
 ---
 
-##  Example 1: Only uses 2 stackers but replaces the tip boxes back into the empty stacker
+## Example 1: Only uses 2 stackers but replaces the tip boxes back into the empty stacker
 
 ```python
 import json
@@ -287,9 +314,9 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         protocol.move_lid(tiprack, waste_chute, use_gripper=True)
         # MOVING: tiprack --> B1
         protocol.move_labware(labware=tiprack,new_location='B1',use_gripper=True)
-        return tiprack 
+        return tiprack
 
-    # # This is pulling the first tiprack from the stacker and placing it on the shuttle which is located at A4 
+    # # This is pulling the first tiprack from the stacker and placing it on the shuttle which is located at A4
 
     tiprack_200_1 = replace_tip_rack()
     # tiprack_200_1 = stacker_1.retrieve()
@@ -308,7 +335,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     protocol.move_labware(labware=tiprack_200_1, new_location=stacker_2, use_gripper=True)
     tiprack_200_1 = stacker_2.store()
 
-    # # This is pulling the second tiprack from the stacker and placing it on the shuttle which is located at A4 
+    # # This is pulling the second tiprack from the stacker and placing it on the shuttle which is located at A4
 
     tiprack_200_2 = replace_tip_rack()
 

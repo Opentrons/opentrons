@@ -38,13 +38,8 @@
           "allowedRoles": [],
           "brand": {
             "brand": "NEST",
-            "brandId": [
-              "360206",
-              "360266"
-            ],
-            "links": [
-              "https://www.nest-biotech.com/reagent-reserviors"
-            ]
+            "brandId": ["360206", "360266"],
+            "links": ["https://www.nest-biotech.com/reagent-reserviors"]
           },
           "cornerOffsetFromSlot": {
             "x": 0,
@@ -62,9 +57,7 @@
               "metadata": {
                 "wellBottomShape": "v"
               },
-              "wells": [
-                "A1"
-              ]
+              "wells": ["A1"]
             }
           ],
           "metadata": {
@@ -74,20 +67,13 @@
             "tags": []
           },
           "namespace": "opentrons",
-          "ordering": [
-            [
-              "A1"
-            ]
-          ],
+          "ordering": [["A1"]],
           "parameters": {
             "format": "trough",
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "nest_1_reservoir_290ml",
-            "quirks": [
-              "centerMultichannelOnWells",
-              "touchTipDisabled"
-            ]
+            "quirks": ["centerMultichannelOnWells", "touchTipDisabled"]
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},
@@ -127,10 +113,7 @@
     }
   ],
   "config": {
-    "apiVersion": [
-      2,
-      16
-    ],
+    "apiVersion": [2, 16],
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",
