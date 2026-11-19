@@ -6,7 +6,7 @@ from typing import Optional, Union, overload
 
 from typing_extensions import assert_type
 
-from opentrons_shared_data.deck.types import DeckDefinitionV6, SlotDefV3
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.labware.labware_definition import (
     AxisAlignedBoundingBox3D,
     Extents,
@@ -527,19 +527,9 @@ def _get_standardized_parent_deck_item(
 ) -> _Labware3SupportedParentDefinition:
     """Returns a standardized parent deck item interface."""
     if isinstance(parent_deck_item, ModuleDefinition):
-        slot_footprint_as_parent = _module_slot_footprint_as_parent(parent_deck_item)
-        if slot_footprint_as_parent is not None:
-            return _Labware3SupportedParentDefinition(
-                features={
-                    **parent_deck_item.features,
-                    "slotFootprintAsParent": slot_footprint_as_parent,
-                },
-                extents=parent_deck_item.extents,
-            )
-        else:
-            return _Labware3SupportedParentDefinition(
-                features=parent_deck_item.features, extents=parent_deck_item.extents
-            )
+        return _Labware3SupportedParentDefinition(
+            features=parent_deck_item.features, extents=parent_deck_item.extents
+        )
     elif isinstance(parent_deck_item, AddressableArea):
         extents = Extents(
             total=AxisAlignedBoundingBox3D(
@@ -551,20 +541,9 @@ def _get_standardized_parent_deck_item(
                 ),
             )
         )
-
-        slot_footprint_as_parent = _aa_slot_footprint_as_parent(parent_deck_item)
-        if slot_footprint_as_parent is not None:
-            return _Labware3SupportedParentDefinition(
-                features={
-                    **parent_deck_item.features,
-                    "slotFootprintAsParent": slot_footprint_as_parent,
-                },
-                extents=extents,
-            )
-        else:
-            return _Labware3SupportedParentDefinition(
-                parent_deck_item.features, extents=extents
-            )
+        return _Labware3SupportedParentDefinition(
+            parent_deck_item.features, extents=extents
+        )
     elif isinstance(parent_deck_item, LabwareDefinition3):
         return _Labware3SupportedParentDefinition(
             features=parent_deck_item.features, extents=parent_deck_item.extents
@@ -581,12 +560,8 @@ def _get_standardized_parent_deck_item(
                 ),
             )
         )
-        slot_footprint_as_parent = _slot_def_slot_footprint_as_parent(parent_deck_item)
         return _Labware3SupportedParentDefinition(
-            features={
-                **parent_deck_item["features"],
-                "slotFootprintAsParent": slot_footprint_as_parent,
-            },
+            features=parent_deck_item["features"],
             extents=extents,
         )
 

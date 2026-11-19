@@ -567,7 +567,14 @@ _ADDRESSABLE_AREA = AddressableArea(
     bounding_box=AddressableAreaDimensions(x=1000, y=1500, z=2000),
     position=AddressableOffsetVector(x=0, y=0, z=0),
     compatible_module_types=[],
-    features=LocatingFeatures(),
+    features=LocatingFeatures(
+        slotFootprintAsParent=SlotFootprintAsParentFeature(
+            backLeft=Vector2D(x=0, y=1500),
+            frontRight=Vector2D(x=1000, y=0),
+            z=0,
+            springDirectionalForce="backLeftBottom",
+        )
+    ),
     mating_surface_unit_vector=[-1, 1, -1],
     orientation=ModuleOrientation.NOT_APPLICABLE,
 )
@@ -582,7 +589,10 @@ _ADDRESSABLE_AREA_WITH_PARENT_FEATURES = AddressableArea(
     compatible_module_types=[],
     features=LocatingFeatures(
         slotFootprintAsParent=SlotFootprintAsParentFeature(
-            backLeft=Vector2D(x=0, y=0), frontRight=Vector2D(x=150, y=120), z=15
+            backLeft=Vector2D(x=0, y=1600),
+            frontRight=Vector2D(x=1200, y=0),
+            z=0,
+            springDirectionalForce="backLeftBottom",
         )
     ),
     mating_surface_unit_vector=[-1, 1, -1],
