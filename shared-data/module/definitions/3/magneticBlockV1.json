@@ -8,7 +8,7 @@
     "z": 38
   },
   "features": {
-    "magneticBlockWellsAsParent": {
+    "magneticBlockWellAsParent": {
       "topZ": 38.0,
       "floorZ": 32.0,
       "a1CenterX": 14.375,
