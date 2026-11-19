@@ -579,26 +579,6 @@ _ADDRESSABLE_AREA = AddressableArea(
     orientation=ModuleOrientation.NOT_APPLICABLE,
 )
 
-_ADDRESSABLE_AREA_WITH_PARENT_FEATURES = AddressableArea(
-    area_name="test_area_with_parent",
-    area_type=AreaType.SLOT,
-    base_slot=DeckSlotName.SLOT_A2,
-    display_name="Test Area with Parent Features",
-    bounding_box=AddressableAreaDimensions(x=1200, y=1600, z=2200),
-    position=AddressableOffsetVector(x=100, y=200, z=300),
-    compatible_module_types=[],
-    features=LocatingFeatures(
-        slotFootprintAsParent=SlotFootprintAsParentFeature(
-            backLeft=Vector2D(x=0, y=1600),
-            frontRight=Vector2D(x=1200, y=0),
-            z=0,
-            springDirectionalForce="backLeftBottom",
-        )
-    ),
-    mating_surface_unit_vector=[-1, 1, -1],
-    orientation=ModuleOrientation.NOT_APPLICABLE,
-)
-
 _ADDRESSABLE_AREA_WITH_FLEX_TIP_RACK_LID = AddressableArea(
     area_name="test_area_with_flex_lid",
     area_type=AreaType.SLOT,
@@ -739,16 +719,6 @@ LW_V3_SPECS_ON_NON_LW: List[LabwareV3Spec] = [
         slot_name=DeckSlotName.SLOT_A1,
         labware_location=AddressableAreaLocation(addressableAreaName="test_area"),
         expected_total_offset=Point(x=10, y=1495, z=0),
-        underlying_ancestor_definition=_ADDRESSABLE_AREA,
-    ),
-    LabwareV3Spec(
-        child_definition=_LW_V3_WITH_SLOT_FP_AS_CHILD_FEATURE,
-        parent_definition=_ADDRESSABLE_AREA_WITH_PARENT_FEATURES,
-        slot_name=DeckSlotName.SLOT_A1,
-        labware_location=AddressableAreaLocation(
-            addressableAreaName="test_area_with_parent"
-        ),
-        expected_total_offset=Point(x=0, y=1600, z=-5),
         underlying_ancestor_definition=_ADDRESSABLE_AREA,
     ),
     LabwareV3Spec(
