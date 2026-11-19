@@ -1,6 +1,7 @@
 """Getters for specific adjacent slots."""
 
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import Dict, List, Optional, Union
 
 from opentrons_shared_data.robot.types import RobotType
@@ -201,11 +202,16 @@ def get_adjacent_slots(slot: int) -> List[int]:
     return get_east_west_slots(slot) + get_north_south_slots(slot)
 
 
-def _flex_column(slot: Union[DeckSlotName, StagingSlotName]) -> str:
-    """Column letter-index of a deck or staging slot, in Flex names."""
+def get_flex_slot_id(slot: Union[DeckSlotName, StagingSlotName]) -> str:
+    """Return the Flex slot id, such as A3 or A4."""
     if isinstance(slot, StagingSlotName):
-        return slot.id[-1]
-    return slot.to_ot3_equivalent().id[-1]
+        return slot.id
+    return slot.to_ot3_equivalent().id
+
+
+def _flex_column(slot: Union[DeckSlotName, StagingSlotName]) -> str:
+    """Column of a deck or staging slot, in Flex names."""
+    return get_flex_slot_id(slot)[-1]
 
 
 def get_cardinal_neighbor_slots(
@@ -226,6 +232,39 @@ def get_cardinal_neighbor_slots(
     if staging_slot is not None:
         neighbors.append(staging_slot)
     return neighbors
+
+
+class CardinalSide(StrEnum):
+    """Cardinal direction from one slot to a neighbor."""
+
+    NORTH = "north"
+    SOUTH = "south"
+    EAST = "east"
+    WEST = "west"
+
+
+def get_cardinal_neighbor_side(
+    slot: Union[DeckSlotName, StagingSlotName],
+    other: Union[DeckSlotName, StagingSlotName],
+) -> Optional[CardinalSide]:
+    """Return the cardinal side of `slot` that `other` occupies.
+
+    Diagonals and the slot itself return None.
+    """
+    if other not in get_cardinal_neighbor_slots(slot):
+        return None
+    slot_id = get_flex_slot_id(slot)
+    other_id = get_flex_slot_id(other)
+    if slot_id[0] == other_id[0]:
+        if other_id[1] > slot_id[1]:
+            return CardinalSide.EAST
+        if other_id[1] < slot_id[1]:
+            return CardinalSide.WEST
+    elif slot_id[1] == other_id[1]:
+        if other_id[0] > slot_id[0]:
+            return CardinalSide.SOUTH
+        return CardinalSide.NORTH
+    return None
 
 
 def get_north_south_neighbor_slots(
