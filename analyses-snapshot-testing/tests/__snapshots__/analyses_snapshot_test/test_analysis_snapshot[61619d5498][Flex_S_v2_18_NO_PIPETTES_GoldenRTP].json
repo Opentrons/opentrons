@@ -304,7 +304,10 @@
     }
   ],
   "config": {
-    "apiVersion": [2, 18],
+    "apiVersion": [
+      2,
+      18
+    ],
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",

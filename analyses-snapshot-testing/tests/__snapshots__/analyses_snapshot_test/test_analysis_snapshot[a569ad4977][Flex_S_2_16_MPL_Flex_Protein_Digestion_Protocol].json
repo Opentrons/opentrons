@@ -38,8 +38,13 @@
           "allowedRoles": [],
           "brand": {
             "brand": "NEST",
-            "brandId": ["360206", "360266"],
-            "links": ["https://www.nest-biotech.com/reagent-reserviors"]
+            "brandId": [
+              "360206",
+              "360266"
+            ],
+            "links": [
+              "https://www.nest-biotech.com/reagent-reserviors"
+            ]
           },
           "cornerOffsetFromSlot": {
             "x": 0,
@@ -57,7 +62,9 @@
               "metadata": {
                 "wellBottomShape": "v"
               },
-              "wells": ["A1"]
+              "wells": [
+                "A1"
+              ]
             }
           ],
           "metadata": {
@@ -67,13 +74,20 @@
             "tags": []
           },
           "namespace": "opentrons",
-          "ordering": [["A1"]],
+          "ordering": [
+            [
+              "A1"
+            ]
+          ],
           "parameters": {
             "format": "trough",
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "nest_1_reservoir_290ml",
-            "quirks": ["centerMultichannelOnWells", "touchTipDisabled"]
+            "quirks": [
+              "centerMultichannelOnWells",
+              "touchTipDisabled"
+            ]
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},
@@ -101,7 +115,9 @@
           {
             "cutoutId": "cutoutC1",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": ["singleLeftSlot"]
+            "possibleCutoutFixtureIds": [
+              "singleLeftSlot"
+            ]
           }
         ]
       },
@@ -126,7 +142,9 @@
       },
       "result": {
         "definition": {
-          "allowedRoles": ["adapter"],
+          "allowedRoles": [
+            "adapter"
+          ],
           "brand": {
             "brand": "Opentrons",
             "brandId": []
@@ -161,7 +179,9 @@
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "opentrons_flex_96_tiprack_adapter",
-            "quirks": ["tiprackAdapterFor96Channel"]
+            "quirks": [
+              "tiprackAdapterFor96Channel"
+            ]
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},
@@ -178,7 +198,9 @@
           {
             "cutoutId": "cutoutA1",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": ["singleLeftSlot"]
+            "possibleCutoutFixtureIds": [
+              "singleLeftSlot"
+            ]
           }
         ]
       },
@@ -332,18 +354,126 @@
           },
           "namespace": "opentrons",
           "ordering": [
-            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
-            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
-            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
-            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
-            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
-            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
-            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
-            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
-            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
-            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
-            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
-            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
+            [
+              "A1",
+              "B1",
+              "C1",
+              "D1",
+              "E1",
+              "F1",
+              "G1",
+              "H1"
+            ],
+            [
+              "A10",
+              "B10",
+              "C10",
+              "D10",
+              "E10",
+              "F10",
+              "G10",
+              "H10"
+            ],
+            [
+              "A11",
+              "B11",
+              "C11",
+              "D11",
+              "E11",
+              "F11",
+              "G11",
+              "H11"
+            ],
+            [
+              "A12",
+              "B12",
+              "C12",
+              "D12",
+              "E12",
+              "F12",
+              "G12",
+              "H12"
+            ],
+            [
+              "A2",
+              "B2",
+              "C2",
+              "D2",
+              "E2",
+              "F2",
+              "G2",
+              "H2"
+            ],
+            [
+              "A3",
+              "B3",
+              "C3",
+              "D3",
+              "E3",
+              "F3",
+              "G3",
+              "H3"
+            ],
+            [
+              "A4",
+              "B4",
+              "C4",
+              "D4",
+              "E4",
+              "F4",
+              "G4",
+              "H4"
+            ],
+            [
+              "A5",
+              "B5",
+              "C5",
+              "D5",
+              "E5",
+              "F5",
+              "G5",
+              "H5"
+            ],
+            [
+              "A6",
+              "B6",
+              "C6",
+              "D6",
+              "E6",
+              "F6",
+              "G6",
+              "H6"
+            ],
+            [
+              "A7",
+              "B7",
+              "C7",
+              "D7",
+              "E7",
+              "F7",
+              "G7",
+              "H7"
+            ],
+            [
+              "A8",
+              "B8",
+              "C8",
+              "D8",
+              "E8",
+              "F8",
+              "G8",
+              "H8"
+            ],
+            [
+              "A9",
+              "B9",
+              "C9",
+              "D9",
+              "E9",
+              "F9",
+              "G9",
+              "H9"
+            ]
           ],
           "parameters": {
             "format": "96Standard",
@@ -1249,7 +1379,9 @@
           {
             "cutoutId": "cutoutA1",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": ["singleLeftSlot"]
+            "possibleCutoutFixtureIds": [
+              "singleLeftSlot"
+            ]
           }
         ]
       },
@@ -1274,7 +1406,9 @@
       },
       "result": {
         "definition": {
-          "allowedRoles": ["adapter"],
+          "allowedRoles": [
+            "adapter"
+          ],
           "brand": {
             "brand": "Opentrons",
             "brandId": []
@@ -1309,7 +1443,9 @@
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "opentrons_flex_96_tiprack_adapter",
-            "quirks": ["tiprackAdapterFor96Channel"]
+            "quirks": [
+              "tiprackAdapterFor96Channel"
+            ]
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},
@@ -1326,7 +1462,9 @@
           {
             "cutoutId": "cutoutA2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": ["singleCenterSlot"]
+            "possibleCutoutFixtureIds": [
+              "singleCenterSlot"
+            ]
           }
         ]
       },
@@ -1480,18 +1618,126 @@
           },
           "namespace": "opentrons",
           "ordering": [
-            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
-            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
-            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
-            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
-            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
-            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
-            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
-            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
-            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
-            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
-            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
-            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
+            [
+              "A1",
+              "B1",
+              "C1",
+              "D1",
+              "E1",
+              "F1",
+              "G1",
+              "H1"
+            ],
+            [
+              "A10",
+              "B10",
+              "C10",
+              "D10",
+              "E10",
+              "F10",
+              "G10",
+              "H10"
+            ],
+            [
+              "A11",
+              "B11",
+              "C11",
+              "D11",
+              "E11",
+              "F11",
+              "G11",
+              "H11"
+            ],
+            [
+              "A12",
+              "B12",
+              "C12",
+              "D12",
+              "E12",
+              "F12",
+              "G12",
+              "H12"
+            ],
+            [
+              "A2",
+              "B2",
+              "C2",
+              "D2",
+              "E2",
+              "F2",
+              "G2",
+              "H2"
+            ],
+            [
+              "A3",
+              "B3",
+              "C3",
+              "D3",
+              "E3",
+              "F3",
+              "G3",
+              "H3"
+            ],
+            [
+              "A4",
+              "B4",
+              "C4",
+              "D4",
+              "E4",
+              "F4",
+              "G4",
+              "H4"
+            ],
+            [
+              "A5",
+              "B5",
+              "C5",
+              "D5",
+              "E5",
+              "F5",
+              "G5",
+              "H5"
+            ],
+            [
+              "A6",
+              "B6",
+              "C6",
+              "D6",
+              "E6",
+              "F6",
+              "G6",
+              "H6"
+            ],
+            [
+              "A7",
+              "B7",
+              "C7",
+              "D7",
+              "E7",
+              "F7",
+              "G7",
+              "H7"
+            ],
+            [
+              "A8",
+              "B8",
+              "C8",
+              "D8",
+              "E8",
+              "F8",
+              "G8",
+              "H8"
+            ],
+            [
+              "A9",
+              "B9",
+              "C9",
+              "D9",
+              "E9",
+              "F9",
+              "G9",
+              "H9"
+            ]
           ],
           "parameters": {
             "format": "96Standard",
@@ -2397,7 +2643,9 @@
           {
             "cutoutId": "cutoutA2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": ["singleCenterSlot"]
+            "possibleCutoutFixtureIds": [
+              "singleCenterSlot"
+            ]
           }
         ]
       },
@@ -2422,7 +2670,9 @@
       },
       "result": {
         "definition": {
-          "allowedRoles": ["adapter"],
+          "allowedRoles": [
+            "adapter"
+          ],
           "brand": {
             "brand": "Opentrons",
             "brandId": []
@@ -2457,7 +2707,9 @@
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "opentrons_flex_96_tiprack_adapter",
-            "quirks": ["tiprackAdapterFor96Channel"]
+            "quirks": [
+              "tiprackAdapterFor96Channel"
+            ]
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},
@@ -2474,7 +2726,9 @@
           {
             "cutoutId": "cutoutB1",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": ["singleLeftSlot"]
+            "possibleCutoutFixtureIds": [
+              "singleLeftSlot"
+            ]
           }
         ]
       },
@@ -2628,18 +2882,126 @@
           },
           "namespace": "opentrons",
           "ordering": [
-            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
-            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
-            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
-            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
-            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
-            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
-            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
-            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
-            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
-            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
-            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
-            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
+            [
+              "A1",
+              "B1",
+              "C1",
+              "D1",
+              "E1",
+              "F1",
+              "G1",
+              "H1"
+            ],
+            [
+              "A10",
+              "B10",
+              "C10",
+              "D10",
+              "E10",
+              "F10",
+              "G10",
+              "H10"
+            ],
+            [
+              "A11",
+              "B11",
+              "C11",
+              "D11",
+              "E11",
+              "F11",
+              "G11",
+              "H11"
+            ],
+            [
+              "A12",
+              "B12",
+              "C12",
+              "D12",
+              "E12",
+              "F12",
+              "G12",
+              "H12"
+            ],
+            [
+              "A2",
+              "B2",
+              "C2",
+              "D2",
+              "E2",
+              "F2",
+              "G2",
+              "H2"
+            ],
+            [
+              "A3",
+              "B3",
+              "C3",
+              "D3",
+              "E3",
+              "F3",
+              "G3",
+              "H3"
+            ],
+            [
+              "A4",
+              "B4",
+              "C4",
+              "D4",
+              "E4",
+              "F4",
+              "G4",
+              "H4"
+            ],
+            [
+              "A5",
+              "B5",
+              "C5",
+              "D5",
+              "E5",
+              "F5",
+              "G5",
+              "H5"
+            ],
+            [
+              "A6",
+              "B6",
+              "C6",
+              "D6",
+              "E6",
+              "F6",
+              "G6",
+              "H6"
+            ],
+            [
+              "A7",
+              "B7",
+              "C7",
+              "D7",
+              "E7",
+              "F7",
+              "G7",
+              "H7"
+            ],
+            [
+              "A8",
+              "B8",
+              "C8",
+              "D8",
+              "E8",
+              "F8",
+              "G8",
+              "H8"
+            ],
+            [
+              "A9",
+              "B9",
+              "C9",
+              "D9",
+              "E9",
+              "F9",
+              "G9",
+              "H9"
+            ]
           ],
           "parameters": {
             "format": "96Standard",
@@ -3545,7 +3907,9 @@
           {
             "cutoutId": "cutoutB1",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": ["singleLeftSlot"]
+            "possibleCutoutFixtureIds": [
+              "singleLeftSlot"
+            ]
           }
         ]
       },
@@ -3570,7 +3934,9 @@
       },
       "result": {
         "definition": {
-          "allowedRoles": ["adapter"],
+          "allowedRoles": [
+            "adapter"
+          ],
           "brand": {
             "brand": "Opentrons",
             "brandId": []
@@ -3605,7 +3971,9 @@
             "isMagneticModuleCompatible": false,
             "isTiprack": false,
             "loadName": "opentrons_flex_96_tiprack_adapter",
-            "quirks": ["tiprackAdapterFor96Channel"]
+            "quirks": [
+              "tiprackAdapterFor96Channel"
+            ]
           },
           "schemaVersion": 2,
           "stackingOffsetWithLabware": {},
@@ -3622,7 +3990,9 @@
           {
             "cutoutId": "cutoutB2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": ["singleCenterSlot"]
+            "possibleCutoutFixtureIds": [
+              "singleCenterSlot"
+            ]
           }
         ]
       },
@@ -3776,18 +4146,126 @@
           },
           "namespace": "opentrons",
           "ordering": [
-            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
-            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
-            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
-            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
-            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
-            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
-            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
-            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
-            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
-            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
-            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
-            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
+            [
+              "A1",
+              "B1",
+              "C1",
+              "D1",
+              "E1",
+              "F1",
+              "G1",
+              "H1"
+            ],
+            [
+              "A10",
+              "B10",
+              "C10",
+              "D10",
+              "E10",
+              "F10",
+              "G10",
+              "H10"
+            ],
+            [
+              "A11",
+              "B11",
+              "C11",
+              "D11",
+              "E11",
+              "F11",
+              "G11",
+              "H11"
+            ],
+            [
+              "A12",
+              "B12",
+              "C12",
+              "D12",
+              "E12",
+              "F12",
+              "G12",
+              "H12"
+            ],
+            [
+              "A2",
+              "B2",
+              "C2",
+              "D2",
+              "E2",
+              "F2",
+              "G2",
+              "H2"
+            ],
+            [
+              "A3",
+              "B3",
+              "C3",
+              "D3",
+              "E3",
+              "F3",
+              "G3",
+              "H3"
+            ],
+            [
+              "A4",
+              "B4",
+              "C4",
+              "D4",
+              "E4",
+              "F4",
+              "G4",
+              "H4"
+            ],
+            [
+              "A5",
+              "B5",
+              "C5",
+              "D5",
+              "E5",
+              "F5",
+              "G5",
+              "H5"
+            ],
+            [
+              "A6",
+              "B6",
+              "C6",
+              "D6",
+              "E6",
+              "F6",
+              "G6",
+              "H6"
+            ],
+            [
+              "A7",
+              "B7",
+              "C7",
+              "D7",
+              "E7",
+              "F7",
+              "G7",
+              "H7"
+            ],
+            [
+              "A8",
+              "B8",
+              "C8",
+              "D8",
+              "E8",
+              "F8",
+              "G8",
+              "H8"
+            ],
+            [
+              "A9",
+              "B9",
+              "C9",
+              "D9",
+              "E9",
+              "F9",
+              "G9",
+              "H9"
+            ]
           ],
           "parameters": {
             "format": "96Standard",
@@ -4693,7 +5171,9 @@
           {
             "cutoutId": "cutoutB2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": ["singleCenterSlot"]
+            "possibleCutoutFixtureIds": [
+              "singleCenterSlot"
+            ]
           }
         ]
       },
@@ -4741,7 +5221,9 @@
           "allowedRoles": [],
           "brand": {
             "brand": "Thermo",
-            "brandId": ["Abgene AB-0661"]
+            "brandId": [
+              "Abgene AB-0661"
+            ]
           },
           "cornerOffsetFromSlot": {
             "x": 0,
@@ -4867,18 +5349,126 @@
           },
           "namespace": "custom_beta",
           "ordering": [
-            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
-            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
-            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
-            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
-            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
-            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
-            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
-            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
-            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
-            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
-            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
-            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
+            [
+              "A1",
+              "B1",
+              "C1",
+              "D1",
+              "E1",
+              "F1",
+              "G1",
+              "H1"
+            ],
+            [
+              "A10",
+              "B10",
+              "C10",
+              "D10",
+              "E10",
+              "F10",
+              "G10",
+              "H10"
+            ],
+            [
+              "A11",
+              "B11",
+              "C11",
+              "D11",
+              "E11",
+              "F11",
+              "G11",
+              "H11"
+            ],
+            [
+              "A12",
+              "B12",
+              "C12",
+              "D12",
+              "E12",
+              "F12",
+              "G12",
+              "H12"
+            ],
+            [
+              "A2",
+              "B2",
+              "C2",
+              "D2",
+              "E2",
+              "F2",
+              "G2",
+              "H2"
+            ],
+            [
+              "A3",
+              "B3",
+              "C3",
+              "D3",
+              "E3",
+              "F3",
+              "G3",
+              "H3"
+            ],
+            [
+              "A4",
+              "B4",
+              "C4",
+              "D4",
+              "E4",
+              "F4",
+              "G4",
+              "H4"
+            ],
+            [
+              "A5",
+              "B5",
+              "C5",
+              "D5",
+              "E5",
+              "F5",
+              "G5",
+              "H5"
+            ],
+            [
+              "A6",
+              "B6",
+              "C6",
+              "D6",
+              "E6",
+              "F6",
+              "G6",
+              "H6"
+            ],
+            [
+              "A7",
+              "B7",
+              "C7",
+              "D7",
+              "E7",
+              "F7",
+              "G7",
+              "H7"
+            ],
+            [
+              "A8",
+              "B8",
+              "C8",
+              "D8",
+              "E8",
+              "F8",
+              "G8",
+              "H8"
+            ],
+            [
+              "A9",
+              "B9",
+              "C9",
+              "D9",
+              "E9",
+              "F9",
+              "G9",
+              "H9"
+            ]
           ],
           "parameters": {
             "format": "irregular",
@@ -5863,7 +6453,9 @@
           {
             "cutoutId": "cutoutC2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": ["singleCenterSlot"]
+            "possibleCutoutFixtureIds": [
+              "singleCenterSlot"
+            ]
           }
         ]
       },
@@ -6319,7 +6911,9 @@
           "allowedRoles": [],
           "brand": {
             "brand": "Thermo",
-            "brandId": ["Abgene AB-0661"]
+            "brandId": [
+              "Abgene AB-0661"
+            ]
           },
           "cornerOffsetFromSlot": {
             "x": 0,
@@ -6445,18 +7039,126 @@
           },
           "namespace": "custom_beta",
           "ordering": [
-            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
-            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
-            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
-            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
-            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
-            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
-            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
-            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
-            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
-            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
-            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
-            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
+            [
+              "A1",
+              "B1",
+              "C1",
+              "D1",
+              "E1",
+              "F1",
+              "G1",
+              "H1"
+            ],
+            [
+              "A10",
+              "B10",
+              "C10",
+              "D10",
+              "E10",
+              "F10",
+              "G10",
+              "H10"
+            ],
+            [
+              "A11",
+              "B11",
+              "C11",
+              "D11",
+              "E11",
+              "F11",
+              "G11",
+              "H11"
+            ],
+            [
+              "A12",
+              "B12",
+              "C12",
+              "D12",
+              "E12",
+              "F12",
+              "G12",
+              "H12"
+            ],
+            [
+              "A2",
+              "B2",
+              "C2",
+              "D2",
+              "E2",
+              "F2",
+              "G2",
+              "H2"
+            ],
+            [
+              "A3",
+              "B3",
+              "C3",
+              "D3",
+              "E3",
+              "F3",
+              "G3",
+              "H3"
+            ],
+            [
+              "A4",
+              "B4",
+              "C4",
+              "D4",
+              "E4",
+              "F4",
+              "G4",
+              "H4"
+            ],
+            [
+              "A5",
+              "B5",
+              "C5",
+              "D5",
+              "E5",
+              "F5",
+              "G5",
+              "H5"
+            ],
+            [
+              "A6",
+              "B6",
+              "C6",
+              "D6",
+              "E6",
+              "F6",
+              "G6",
+              "H6"
+            ],
+            [
+              "A7",
+              "B7",
+              "C7",
+              "D7",
+              "E7",
+              "F7",
+              "G7",
+              "H7"
+            ],
+            [
+              "A8",
+              "B8",
+              "C8",
+              "D8",
+              "E8",
+              "F8",
+              "G8",
+              "H8"
+            ],
+            [
+              "A9",
+              "B9",
+              "C9",
+              "D9",
+              "E9",
+              "F9",
+              "G9",
+              "H9"
+            ]
           ],
           "parameters": {
             "format": "irregular",
@@ -7901,7 +8603,9 @@
           "allowedRoles": [],
           "brand": {
             "brand": "Thermo",
-            "brandId": ["Abgene AB-0661"]
+            "brandId": [
+              "Abgene AB-0661"
+            ]
           },
           "cornerOffsetFromSlot": {
             "x": 0,
@@ -8027,18 +8731,126 @@
           },
           "namespace": "custom_beta",
           "ordering": [
-            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
-            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
-            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
-            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
-            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
-            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
-            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
-            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
-            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
-            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
-            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
-            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
+            [
+              "A1",
+              "B1",
+              "C1",
+              "D1",
+              "E1",
+              "F1",
+              "G1",
+              "H1"
+            ],
+            [
+              "A10",
+              "B10",
+              "C10",
+              "D10",
+              "E10",
+              "F10",
+              "G10",
+              "H10"
+            ],
+            [
+              "A11",
+              "B11",
+              "C11",
+              "D11",
+              "E11",
+              "F11",
+              "G11",
+              "H11"
+            ],
+            [
+              "A12",
+              "B12",
+              "C12",
+              "D12",
+              "E12",
+              "F12",
+              "G12",
+              "H12"
+            ],
+            [
+              "A2",
+              "B2",
+              "C2",
+              "D2",
+              "E2",
+              "F2",
+              "G2",
+              "H2"
+            ],
+            [
+              "A3",
+              "B3",
+              "C3",
+              "D3",
+              "E3",
+              "F3",
+              "G3",
+              "H3"
+            ],
+            [
+              "A4",
+              "B4",
+              "C4",
+              "D4",
+              "E4",
+              "F4",
+              "G4",
+              "H4"
+            ],
+            [
+              "A5",
+              "B5",
+              "C5",
+              "D5",
+              "E5",
+              "F5",
+              "G5",
+              "H5"
+            ],
+            [
+              "A6",
+              "B6",
+              "C6",
+              "D6",
+              "E6",
+              "F6",
+              "G6",
+              "H6"
+            ],
+            [
+              "A7",
+              "B7",
+              "C7",
+              "D7",
+              "E7",
+              "F7",
+              "G7",
+              "H7"
+            ],
+            [
+              "A8",
+              "B8",
+              "C8",
+              "D8",
+              "E8",
+              "F8",
+              "G8",
+              "H8"
+            ],
+            [
+              "A9",
+              "B9",
+              "C9",
+              "D9",
+              "E9",
+              "F9",
+              "G9",
+              "H9"
+            ]
           ],
           "parameters": {
             "format": "irregular",
@@ -9023,7 +9835,9 @@
           {
             "cutoutId": "cutoutD2",
             "kind": "onCutoutFixture",
-            "possibleCutoutFixtureIds": ["singleCenterSlot"]
+            "possibleCutoutFixtureIds": [
+              "singleCenterSlot"
+            ]
           }
         ]
       },
@@ -9479,7 +10293,9 @@
           "allowedRoles": [],
           "brand": {
             "brand": "Thermo",
-            "brandId": ["Abgene AB-0661"]
+            "brandId": [
+              "Abgene AB-0661"
+            ]
           },
           "cornerOffsetFromSlot": {
             "x": 0,
@@ -9605,18 +10421,126 @@
           },
           "namespace": "custom_beta",
           "ordering": [
-            ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
-            ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
-            ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
-            ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"],
-            ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
-            ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
-            ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
-            ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
-            ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
-            ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
-            ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
-            ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"]
+            [
+              "A1",
+              "B1",
+              "C1",
+              "D1",
+              "E1",
+              "F1",
+              "G1",
+              "H1"
+            ],
+            [
+              "A10",
+              "B10",
+              "C10",
+              "D10",
+              "E10",
+              "F10",
+              "G10",
+              "H10"
+            ],
+            [
+              "A11",
+              "B11",
+              "C11",
+              "D11",
+              "E11",
+              "F11",
+              "G11",
+              "H11"
+            ],
+            [
+              "A12",
+              "B12",
+              "C12",
+              "D12",
+              "E12",
+              "F12",
+              "G12",
+              "H12"
+            ],
+            [
+              "A2",
+              "B2",
+              "C2",
+              "D2",
+              "E2",
+              "F2",
+              "G2",
+              "H2"
+            ],
+            [
+              "A3",
+              "B3",
+              "C3",
+              "D3",
+              "E3",
+              "F3",
+              "G3",
+              "H3"
+            ],
+            [
+              "A4",
+              "B4",
+              "C4",
+              "D4",
+              "E4",
+              "F4",
+              "G4",
+              "H4"
+            ],
+            [
+              "A5",
+              "B5",
+              "C5",
+              "D5",
+              "E5",
+              "F5",
+              "G5",
+              "H5"
+            ],
+            [
+              "A6",
+              "B6",
+              "C6",
+              "D6",
+              "E6",
+              "F6",
+              "G6",
+              "H6"
+            ],
+            [
+              "A7",
+              "B7",
+              "C7",
+              "D7",
+              "E7",
+              "F7",
+              "G7",
+              "H7"
+            ],
+            [
+              "A8",
+              "B8",
+              "C8",
+              "D8",
+              "E8",
+              "F8",
+              "G8",
+              "H8"
+            ],
+            [
+              "A9",
+              "B9",
+              "C9",
+              "D9",
+              "E9",
+              "F9",
+              "G9",
+              "H9"
+            ]
           ],
           "parameters": {
             "format": "irregular",
@@ -11057,7 +11981,10 @@
     }
   ],
   "config": {
-    "apiVersion": [2, 16],
+    "apiVersion": [
+      2,
+      16
+    ],
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",

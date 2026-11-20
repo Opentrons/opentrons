@@ -201,7 +201,10 @@
       "result": {
         "brightness": 50.0,
         "contrast": 50.0,
-        "resolution": [1080, 1920],
+        "resolution": [
+          1080,
+          1920
+        ],
         "saturation": 50.0,
         "zoom": 1.0
       },
@@ -313,7 +316,10 @@
       "result": {
         "brightness": 50.0,
         "contrast": 50.0,
-        "resolution": [1080, 1920],
+        "resolution": [
+          1080,
+          1920
+        ],
         "saturation": 50.0,
         "zoom": 2.0
       },
@@ -442,7 +448,10 @@
       "result": {
         "brightness": 0.0,
         "contrast": 2.0,
-        "resolution": [1080, 1920],
+        "resolution": [
+          1080,
+          1920
+        ],
         "saturation": 1.5,
         "zoom": 1.0
       },
@@ -581,7 +590,10 @@
       "result": {
         "brightness": 50.0,
         "contrast": 50.0,
-        "resolution": [1080, 1920],
+        "resolution": [
+          1080,
+          1920
+        ],
         "saturation": 50.0,
         "zoom": 1.0
       },
@@ -665,7 +677,10 @@
     }
   ],
   "config": {
-    "apiVersion": [2, 27],
+    "apiVersion": [
+      2,
+      27
+    ],
     "protocolType": "python"
   },
   "createdAt": "TIMESTAMP",
