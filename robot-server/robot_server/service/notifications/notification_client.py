@@ -4,10 +4,13 @@ import contextlib
 import logging
 import random
 from enum import Enum
-from typing import Annotated, Any, Dict, Generator, Optional
+from typing import Annotated, Any, Generator
 
-import paho.mqtt.client as mqtt
 from fastapi import Depends
+from paho.mqtt import client as mqttc
+from paho.mqtt import enums as mqtte
+from paho.mqtt import properties as mqttp
+from paho.mqtt import reasoncodes as mqttrc
 
 from server_utils.fastapi_utils.app_state import (
     AppState,
@@ -50,7 +53,7 @@ class NotificationClient:
         host: str = "127.0.0.1",
         port: int = 1883,
         keepalive: int = 60,
-        protocol_version: int = mqtt.MQTTv5,
+        protocol_version: mqtte.MQTTProtocolVersion = mqtte.MQTTProtocolVersion.MQTTv5,
         default_qos: MQTT_QOS = MQTT_QOS.QOS_1,
         retain_message: bool = False,
     ) -> None:
@@ -63,8 +66,10 @@ class NotificationClient:
         # MQTT is somewhat particular about the client_id format and will connect erratically
         # if an unexpected string is supplied. This clientId is derived from the paho-mqtt library.
         self._client_id: str = f"robot-server-{random.randint(0, 1000000)}"
-        self._client: mqtt.Client = mqtt.Client(
-            client_id=self._client_id, protocol=protocol_version
+        self._client = mqttc.Client(
+            callback_api_version=mqtte.CallbackAPIVersion.VERSION1,
+            client_id=self._client_id,
+            protocol=protocol_version,
         )
         self._client.on_connect = self._on_connect
         self._client.on_disconnect = self._on_disconnect
@@ -122,13 +127,20 @@ class NotificationClient:
             retain=self._retain_message,
         )
 
+    @staticmethod
+    def _ok(code: mqttrc.ReasonCode | int) -> bool:
+        if isinstance(code, mqttrc.ReasonCode):
+            return not code.is_failure
+        else:
+            return code == 0
+
     def _on_connect(
         self,
-        client: mqtt.Client,
+        client: mqttc.Client,
         userdata: Any,
-        flags: Dict[str, Any],
-        rc: int,
-        properties: Optional[mqtt.Properties] = None,
+        flags: dict[str, Any],
+        reason_code: mqttrc.ReasonCode | int,
+        properties: mqttp.Properties | None = None,
     ) -> None:
         """Callback invoked when the client is successfully connected to the MQTT broker.
 
@@ -139,17 +151,19 @@ class NotificationClient:
             rc: Reason code for the connection result.
             properties: Connection properties, if any.
         """
-        if rc == 0:
+        if self._ok(reason_code):
             log.info("Successfully connected to MQTT broker.")
         else:
-            log.error(f"Failed to connect to MQTT broker with reason code: {rc}")
+            log.error(
+                f"Failed to connect to MQTT broker with reason code: {reason_code}"
+            )
 
     def _on_disconnect(
         self,
-        client: mqtt.Client,
+        client: mqttc.Client,
         userdata: Any,
-        rc: int,
-        properties: Optional[mqtt.Properties] = None,
+        reason_code: mqttrc.ReasonCode | int,
+        properties: mqttp.Properties | None = None,
     ) -> None:
         """Callback invoked when the client is disconnected from the MQTT broker.
 
@@ -159,10 +173,12 @@ class NotificationClient:
             rc: Reason code for the disconnection result.
             properties: Disconnection properties, if any.
         """
-        if rc == 0:
+        if self._ok(reason_code):
             log.info("Successfully disconnected from MQTT broker.")
         else:
-            log.error(f"Failed to disconnect from MQTT broker with reason code: {rc}")
+            log.error(
+                f"Failed to disconnect from MQTT broker with reason code: {reason_code}"
+            )
 
 
 _notification_client_accessor: AppStateAccessor[NotificationClient] = AppStateAccessor[
