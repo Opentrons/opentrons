@@ -425,5 +425,5 @@ If you encounter an analysis failure (`LocationNotAccessibleByPipetteError`) bec
 
 <figure class="screenshot" markdown>
 ![Protocol analysis failure message for partial tip pickup problems with a vacuum collar](../img/vacuum-partial-tip-error.png){ width="80%" }
-<figcaption>Protocol analysis failure cause by a vacuum collar conflict.</figcaption>
+<figcaption>Protocol analysis failure caused by a vacuum collar conflict.</figcaption>
 </figure>
