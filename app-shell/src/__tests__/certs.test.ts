@@ -4,8 +4,6 @@ import * as x509 from '@peculiar/x509'
 import * as Fernet from 'fernet'
 import { describe, expect, it, vi } from 'vitest'
 
-import 'core-js/full/reflect'
-
 import {
   createRobotHttpsAgent,
   decryptFromOTDetails,

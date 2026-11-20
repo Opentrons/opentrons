@@ -1,6 +1,8 @@
 import { cleanup } from '@testing-library/react'
 import { afterEach, vi } from 'vitest'
 
+// tsyringe (via @peculiar/x509) needs Reflect metadata before it is imported.
+import 'core-js/full/reflect'
 import '@testing-library/jest-dom/vitest'
 
 vi.mock('protocol-designer/src/labware-defs/utils')
