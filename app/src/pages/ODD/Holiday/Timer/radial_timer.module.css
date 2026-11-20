@@ -16,14 +16,20 @@
 
 .radial_timer_track {
   fill: none;
-  stroke: white;
+  stroke: var(--grey-60);
   stroke-width: 3px;
+}
+
+.radial_timer_value {
+  font-size: 100px;
+  font-weight: 600;
+  color: white;
 }
 
 .radial_timer_progress {
   animation: radial-timer-animation var(--animation-duration) linear forwards;
   fill: none;
-  stroke: var(--grey-60);
+  stroke: white;
   stroke-dasharray: var(--ring-circumference);
   stroke-linecap: round;
   stroke-width: 3px;

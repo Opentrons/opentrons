@@ -1,7 +1,7 @@
-import { ReactNode } from 'react'
-
 import styles from './holiday.module.css'
 import { Snowflakes } from './Snowflakes'
+
+import type { ReactNode } from 'react'
 
 export function Loading(): ReactNode {
   return (
