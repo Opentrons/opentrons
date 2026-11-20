@@ -412,16 +412,13 @@ One exception is when the `start` nozzle is on the side of the pipette facing th
 
 The following table lists the allowed partial tip configurations by collar location.
 
-| Collar location | Affected slot | Pipette | Allowed configurations |
-|-----------------|---------------|---------|------------------------|
-| **A3** | **B3** | 8-channel, 96-channel | Layouts starting in row A (`start="A1"` or `"A12"`), including `COLUMN` |
-| **A3** | **A2** | 96-channel only | Layouts starting in column 12 (`start="A12"` or `"H12"`), or `ROW` layouts |
-| **A4** | **A3** | 96-channel only | Layouts starting in column 12 (`start="A12"` or `"H12"`), or `ROW` layouts |
+| Collar slot | Adjacent  slot | 8-channel pipette | 96-channel pipette |
+|-----------------|---------------|-------------------|--------------------|
+| **A3** | **B3** | `start="A1"` (`SINGLE`) | Layouts starting in row A (`start="A1"` or `"A12"`), including `COLUMN` |
+| **A3** | **A2** | All partial layouts | Layouts starting in column 12 (`start="A12"` or `"H12"`), or `ROW` layouts |
+| **A4** | **A3** | All partial layouts | Layouts starting in column 12 (`start="A12"` or `"H12"`), or `ROW` layouts |
 
-!!! note
-    8-channel pipettes only have a single column of nozzles and are unaffected by collars in slots to their left or right. However, when a collar is in A3, an 8-channel pipettes is still blocked from pipetting in slot B3 when using `start="H1"` because the unused nozzles overhang backward into A3.
-
-If you encounter an analysis failure (`LocationNotAccessibleByPipetteError`) because of an instrument conflict with a vacuum collar, the error massage will suggest other partial tip configurations for your deck layout. You can also resolve the error moving the collar or the labware to a non-adjacent slot.
+If you encounter an analysis failure (`LocationNotAccessibleByPipetteError`) because of an instrument conflict with a vacuum collar, the error massage will suggest other configurations for your deck layout. You can also resolve the error moving the collar or the labware to a non-adjacent slot.
 
 <figure class="screenshot" markdown>
 ![Protocol analysis failure message for partial tip pickup problems with a vacuum collar](../img/vacuum-partial-tip-error.png){ width="80%" }
