@@ -16,6 +16,7 @@ import { LabwareOnDeck } from './LabwareOnDeck'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
+  CutoutId,
   DeckDefinition,
   Liquid,
   RobotType,
@@ -36,6 +37,7 @@ interface DeckViewLabwareProps {
   hoveredSlot: string | null
   selectedSlot: string | null
   selectedRunTimeCommand?: RunTimeCommand
+  stagingAreaCutoutIds: CutoutId[]
 }
 
 export function DeckViewLabware(props: DeckViewLabwareProps): ReactNode {
@@ -51,6 +53,7 @@ export function DeckViewLabware(props: DeckViewLabwareProps): ReactNode {
     hoveredSlot,
     selectedSlot,
     selectedRunTimeCommand,
+    stagingAreaCutoutIds,
   } = props
   const { labware, modules, pipettes } = robotState
 
@@ -127,6 +130,7 @@ export function DeckViewLabware(props: DeckViewLabwareProps): ReactNode {
             setHoveredSlot={setHoveredSlot}
             hover={hoveredSlot}
             selectedSlot={selectedSlot}
+            stagingAreaCutoutIds={stagingAreaCutoutIds}
           >
             {showCommandSummary ? null : (
               <StyledText desktopStyle="captionRegular" color={COLORS.white}>

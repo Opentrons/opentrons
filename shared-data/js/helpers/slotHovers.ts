@@ -24,7 +24,6 @@ export const getFlexHoverDimensions = (
   const X_ADJUSTMENT = -17
   const X_DIMENSION_MIDDLE_SLOTS = 160.3
   const X_DIMENSION_OUTER_SLOTS = columnFourIsOccupied ? 160.0 : 246.5
-  const X_DIMENSION_4TH_COLUMN_SLOTS = 175.0
   const Y_DIMENSION = hasTCOnSlot ? 294.0 : 106.0
 
   const yAdjustment = -10
@@ -52,12 +51,11 @@ export const getFlexHoverDimensions = (
 
   const isMiddleOfDeck =
     slotId === 'A2' || slotId === 'B2' || slotId === 'C2' || slotId === 'D2'
+  const isFourthColumn = FOURTH_COLUMN_SLOTS.includes(slotId)
 
   let xDimension = X_DIMENSION_OUTER_SLOTS
-  if (isMiddleOfDeck) {
+  if (isMiddleOfDeck || isFourthColumn) {
     xDimension = X_DIMENSION_MIDDLE_SLOTS
-  } else if (FOURTH_COLUMN_SLOTS.includes(slotId)) {
-    xDimension = X_DIMENSION_4TH_COLUMN_SLOTS
   }
   const x = hasTCOnSlot ? xAdjustedSlotPosition + 20 : xAdjustedSlotPosition
   const y = hasTCOnSlot ? ySlotPosition - 70 : ySlotPosition

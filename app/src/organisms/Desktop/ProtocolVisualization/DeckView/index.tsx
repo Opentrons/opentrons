@@ -21,6 +21,7 @@ import {
   getDeckDefFromRobotType,
   isAddressableAreaStandardSlot,
   OT2_ROBOT_TYPE,
+  STAGING_AREA_CUTOUTS,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
@@ -97,15 +98,12 @@ export function DeckView(props: DeckViewProps): ReactNode {
     wasteChuteEntities,
     stagingAreaEntities,
     labwareEntities,
-    moduleEntities,
   } = invariantContext
   const { labware, modules, pipettes } = robotState
   const loadLabwareCommands = commands.filter(
     command => command.commandType === 'loadLabware'
   )
-  const hasFlexStacker = Object.values(moduleEntities).some(
-    module => module.type === FLEX_STACKER_MODULE_TYPE
-  )
+  const hasWasteChute = Object.values(wasteChuteEntities).length > 0
   const flexStackerModules = Object.values(modules).filter(
     module => module.moduleState.type === FLEX_STACKER_MODULE_TYPE
   )
@@ -114,30 +112,23 @@ export function DeckView(props: DeckViewProps): ReactNode {
     flexStackerModules.map(module => `${module.slot.slice(0, 1)}3`)
   )
 
-  const flexStackerAsStagingAreas = Object.fromEntries(
-    flexStackerModules.map(module => {
-      const row = module.slot.slice(0, 1)
-      const location = `cutout${row}3`
-      const id = `flex-stacker-${module.slot}`
-
-      return [
-        id,
-        {
-          id,
-          location,
-        },
-      ]
-    })
+  // Skip D3 when a waste chute owns that cutout.
+  const flexStagingCutoutIds: CutoutId[] = STAGING_AREA_CUTOUTS.filter(
+    cutoutId => !(hasWasteChute && cutoutId === WASTE_CHUTE_CUTOUT)
   )
-
-  const baseViewBox = `${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`
+  const filteredStagingAreas = Object.fromEntries(
+    flexStagingCutoutIds.map(cutoutId => [
+      `staging-${cutoutId}`,
+      { id: `staging-${cutoutId}`, location: cutoutId },
+    ])
+  )
+  const stagingAreaLocations = new Set<string>(flexStagingCutoutIds)
   const stackerViewBox = useMemo(() => {
-    if (!hasFlexStacker) return baseViewBox
     const [originX, originY] = deckDef.cornerOffsetFromOrigin
     const [deckWidth, deckHeight] = deckDef.dimensions
 
     return `${originX} ${originY} ${deckWidth + extraSize} ${deckHeight}`
-  }, [baseViewBox, deckDef, hasFlexStacker])
+  }, [deckDef])
 
   const labwareEntitiesExtended = Object.entries(labwareEntities).reduce(
     (acc: Record<string, LabwareEntityExtended>, [key, entity]) => {
@@ -163,14 +154,6 @@ export function DeckView(props: DeckViewProps): ReactNode {
   const wasteChuteStagingAreaFixtures = Object.values(
     stagingAreaEntities
   ).filter(stagingArea => stagingArea.location === WASTE_CHUTE_CUTOUT)
-  const filteredStagingAreas = {
-    ...flexStackerAsStagingAreas,
-    ...stagingAreaEntities,
-  }
-
-  const stagingAreaLocations = new Set(
-    Object.values(filteredStagingAreas).map(sa => sa.location)
-  )
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
     aa => {
       return (
@@ -346,18 +329,13 @@ export function DeckView(props: DeckViewProps): ReactNode {
                   setSelectedSlot={setSelectedSlot}
                   robotState={robotState}
                   invariantContext={invariantContext}
-                  stagingAreaCutoutIds={Object.values(stagingAreaEntities).map(
-                    areas => areas.location as CutoutId
-                  )}
+                  stagingAreaCutoutIds={flexStagingCutoutIds}
                   {...{
                     deckDef,
                   }}
                   selectedRunTimeCommand={selectedRunTimeCommand}
                 />
-                <SlotLabels
-                  robotType={robotType}
-                  show4thColumn={Object.values(stagingAreaEntities).length > 0}
-                />
+                <SlotLabels robotType={robotType} show4thColumn />
               </>
             )}
           </RobotCoordinateSpaceWithRef>

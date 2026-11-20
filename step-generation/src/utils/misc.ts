@@ -1642,6 +1642,7 @@ const FOURTH_COLUMN_TO_CUTOUT_MAP = {
   B4: 'cutoutB3',
   C4: 'cutoutC3',
   D4: 'cutoutD3',
+  [VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA]: 'cutoutA3',
 }
 
 export function createStagingAreaForInvariantContext(
@@ -1655,7 +1656,9 @@ export function createStagingAreaForInvariantContext(
     params.location !== 'systemLocation' &&
     params.location !== 'wasteChuteLocation' &&
     'addressableAreaName' in params.location &&
-    STAGING_AREA_SLOTS.includes(params.location.addressableAreaName)
+    (STAGING_AREA_SLOTS.includes(params.location.addressableAreaName) ||
+      params.location.addressableAreaName ===
+        VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA)
   ) {
     const id = uuid()
     const addressableAreaName = params.location.addressableAreaName
