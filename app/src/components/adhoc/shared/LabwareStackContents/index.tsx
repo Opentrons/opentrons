@@ -10,7 +10,6 @@ import {
   SPACING,
   StyledText,
   styleProps,
-  truncateString,
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '/app/redux/config'
@@ -25,9 +24,6 @@ const HIDE_SCROLLBAR = css`
   }
 `
 
-const MAX_CHARS_FOR_DISPLAY_NAME_ODD = 44
-const MAX_CHARS_FOR_DISPLAY_NAME_DESKTOP = 30
-
 interface LabwareStackContentsProps extends StyleProps {
   labwareInStack: LabwareInStack[]
   selectedLabware: LabwareInStack
@@ -41,9 +37,6 @@ export function LabwareStackContents(
   const { labwareInStack, selectedLabware, setSelectedLabware } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('protocol_setup')
-  const MAX_CHARS = isOnDevice
-    ? MAX_CHARS_FOR_DISPLAY_NAME_ODD
-    : MAX_CHARS_FOR_DISPLAY_NAME_DESKTOP
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -68,7 +61,7 @@ export function LabwareStackContents(
             <RadioButton
               key={index}
               radioButtonType="small"
-              buttonLabel={truncateString(labware.displayName, MAX_CHARS)}
+              buttonLabel={labware.displayName}
               buttonValue={labware.labwareId}
               id={labware.labwareId}
               isSelected={isSelected}

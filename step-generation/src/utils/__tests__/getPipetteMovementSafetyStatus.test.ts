@@ -9,13 +9,16 @@ import {
   fixtureP100096V2Specs,
   fixtureTiprack1000ul,
   fixtureTiprackAdapter,
+  H1_NOZZLE,
+  PARTIAL_COLUMN,
+  ROW,
   SINGLE,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
 
 import { getPipetteMovementSafetyStatus } from '..'
-import { CLEAN } from '../../constants'
+import { CLEAN, VACUUM_DOCK_LOCATION } from '../../constants'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../../types'
@@ -265,6 +268,201 @@ describe('getPipetteMovementSafetyStatus', () => {
       nozzleConfiguration: COLUMN,
     })
     expect(isSafe).toEqual(false)
+  })
+
+  const collarId = 'collarId'
+  const withCollar = (
+    plateSlot: string,
+    collarStack: string[]
+  ): { robotState: RobotState; invariantContext: InvariantContext } => {
+    const plate = fixture96Plate as LabwareDefinition2
+    return {
+      robotState: {
+        ...mockRobotState,
+        labware: {
+          [mockLabwareId]: { stack: [mockLabwareId, plateSlot] },
+          [collarId]: { stack: collarStack },
+        },
+        modules: {
+          vacuum: { slot: 'A3', moduleState: {} as any },
+        },
+      },
+      invariantContext: {
+        ...mockInvariantProperties,
+        labwareEntities: {
+          ...mockInvariantProperties.labwareEntities,
+          [collarId]: {
+            id: collarId,
+            labwareDefURI: 'opentrons/opentrons_vacuum_manifold_collar_short/1',
+            pythonName: 'collar',
+            def: {
+              ...plate,
+              parameters: {
+                ...plate.parameters,
+                loadName: 'opentrons_vacuum_manifold_collar_short',
+                quirks: ['vacuumModuleDock'],
+              },
+              metadata: {
+                ...plate.metadata,
+                displayName: 'Vacuum collar',
+              },
+            },
+          },
+        },
+      },
+    }
+  }
+
+  it('allows a full 8-channel move beside a north collar', () => {
+    const { robotState, invariantContext } = withCollar('B3', [
+      collarId,
+      'vacuum',
+      'A3',
+    ])
+    invariantContext.pipetteEntities.pip.spec = {
+      ...fixtureP100096V2Specs,
+      channels: 8,
+    }
+    const { isSafe } = getPipetteMovementSafetyStatus({
+      robotState,
+      invariantContext,
+      pipetteId: mockPipId,
+      labwareId: mockLabwareId,
+      wellTargetName: mockWellName,
+      primaryNozzle: A1_NOZZLE,
+      nozzleConfiguration: ALL,
+    })
+    expect(isSafe).toEqual(true)
+  })
+
+  it('allows a full 96-channel move beside an east collar', () => {
+    const { robotState, invariantContext } = withCollar('A2', [
+      collarId,
+      'vacuum',
+      'A3',
+    ])
+    const { isSafe } = getPipetteMovementSafetyStatus({
+      robotState,
+      invariantContext,
+      pipetteId: mockPipId,
+      labwareId: mockLabwareId,
+      wellTargetName: mockWellName,
+      primaryNozzle: A1_NOZZLE,
+      nozzleConfiguration: ALL,
+    })
+    expect(isSafe).toEqual(true)
+  })
+
+  it('allows a row starting at A1 beside an east collar', () => {
+    const { robotState, invariantContext } = withCollar('A2', [
+      collarId,
+      'vacuum',
+      'A3',
+    ])
+    const { isSafe } = getPipetteMovementSafetyStatus({
+      robotState,
+      invariantContext,
+      pipetteId: mockPipId,
+      labwareId: mockLabwareId,
+      wellTargetName: 'B1',
+      primaryNozzle: A1_NOZZLE,
+      nozzleConfiguration: ROW,
+    })
+    expect(isSafe).toEqual(true)
+  })
+
+  it('rejects a column whose primary is not on the east edge', () => {
+    const { robotState, invariantContext } = withCollar('A2', [
+      collarId,
+      'vacuum',
+      'A3',
+    ])
+    const status = getPipetteMovementSafetyStatus({
+      robotState,
+      invariantContext,
+      pipetteId: mockPipId,
+      labwareId: mockLabwareId,
+      wellTargetName: mockWellName,
+      primaryNozzle: A1_NOZZLE,
+      nozzleConfiguration: COLUMN,
+    })
+    expect(status).toEqual({
+      isSafe: false,
+      reason: expect.objectContaining({
+        type: 'vacuumCollarCollision',
+        side: 'east',
+        slot: 'A2',
+        collarSlot: 'A3',
+        primaryNozzle: A1_NOZZLE,
+        suggestion:
+          'a configuration whose primary nozzle is A12 or H12, or a row starting at A1 or H1',
+      }),
+    })
+  })
+
+  it('allows column 12 beside an east collar on the dock', () => {
+    const { robotState, invariantContext } = withCollar('A3', [
+      collarId,
+      VACUUM_DOCK_LOCATION,
+    ])
+    const { isSafe } = getPipetteMovementSafetyStatus({
+      robotState,
+      invariantContext,
+      pipetteId: mockPipId,
+      labwareId: mockLabwareId,
+      wellTargetName: mockWellName,
+      primaryNozzle: A12_NOZZLE,
+      nozzleConfiguration: COLUMN,
+    })
+    expect(isSafe).toEqual(true)
+  })
+
+  it('rejects an 8-channel partial column whose primary faces away from a north collar', () => {
+    const { robotState, invariantContext } = withCollar('B3', [
+      collarId,
+      'vacuum',
+      'A3',
+    ])
+    invariantContext.pipetteEntities.pip.spec = {
+      ...fixtureP100096V2Specs,
+      channels: 8,
+    }
+    const status = getPipetteMovementSafetyStatus({
+      robotState,
+      invariantContext,
+      pipetteId: mockPipId,
+      labwareId: mockLabwareId,
+      wellTargetName: mockWellName,
+      primaryNozzle: H1_NOZZLE,
+      nozzleConfiguration: PARTIAL_COLUMN,
+    })
+    expect(status).toEqual({
+      isSafe: false,
+      reason: expect.objectContaining({
+        type: 'vacuumCollarCollision',
+        side: 'north',
+        channels: 8,
+        suggestion: 'a configuration whose primary nozzle is A1',
+      }),
+    })
+  })
+
+  it('ignores a collar on a diagonal slot', () => {
+    const { robotState, invariantContext } = withCollar('B2', [
+      collarId,
+      'vacuum',
+      'A3',
+    ])
+    const { isSafe } = getPipetteMovementSafetyStatus({
+      robotState,
+      invariantContext,
+      pipetteId: mockPipId,
+      labwareId: mockLabwareId,
+      wellTargetName: mockWellName,
+      primaryNozzle: A1_NOZZLE,
+      nozzleConfiguration: COLUMN,
+    })
+    expect(isSafe).toEqual(true)
   })
   //    todo(jr, 4/23/24): add more test cases, test thermocycler collision - i'll do this in a follow up
 })

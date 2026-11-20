@@ -687,20 +687,19 @@ def test_allow_labware_in_stacker_quote_slot_unquote(
 
 
 @pytest.mark.parametrize(
-    ("vacuum_module_location", "blocked_location"),
+    ("vacuum_module_location", "neighbor_location"),
     [
         (DeckSlotName.SLOT_A3, DeckSlotName.SLOT_B3),
         (DeckSlotName.SLOT_D3, DeckSlotName.SLOT_C3),
     ],
 )
-def test_no_modules_adjacent_to_vacuum_module(
+def test_modules_allowed_adjacent_to_vacuum_module(
     vacuum_module_location: DeckSlotName,
-    blocked_location: DeckSlotName,
+    neighbor_location: DeckSlotName,
 ) -> None:
-    """A vacuum module should block modules on the neighboring standard slot.
+    """A vacuum module does not block modules on the neighboring standard slot.
 
-    Gripper paddles collide with the vacuum collar when they open on a module
-    in that neighboring slot (A3 → B3, D3 → C3).
+    Gripper moves beside the collar are rejected during analysis instead.
     """
     vacuum_module = deck_conflict.VacuumModule(
         highest_z_including_labware=123, name_for_errors="some_vacuum_module"
@@ -709,33 +708,18 @@ def test_no_modules_adjacent_to_vacuum_module(
         highest_z_including_labware=123, name_for_errors="some_other_module"
     )
 
-    with pytest.raises(
-        deck_conflict.DeckConflictError,
-        match=(
-            f"some_vacuum_module in slot {vacuum_module_location}"
-            f" prevents some_other_module from using slot {blocked_location}"
-        ),
-    ):
-        deck_conflict.check(
-            existing_items={vacuum_module_location: vacuum_module},
-            new_location=blocked_location,
-            new_item=other_module,
-            robot_type="OT-3 Standard",
-        )
-
-    with pytest.raises(
-        deck_conflict.DeckConflictError,
-        match=(
-            f"some_other_module in slot {blocked_location}"
-            f" prevents some_vacuum_module from using slot {vacuum_module_location}"
-        ),
-    ):
-        deck_conflict.check(
-            existing_items={blocked_location: other_module},
-            new_location=vacuum_module_location,
-            new_item=vacuum_module,
-            robot_type="OT-3 Standard",
-        )
+    deck_conflict.check(
+        existing_items={vacuum_module_location: vacuum_module},
+        new_location=neighbor_location,
+        new_item=other_module,
+        robot_type="OT-3 Standard",
+    )
+    deck_conflict.check(
+        existing_items={neighbor_location: other_module},
+        new_location=vacuum_module_location,
+        new_item=vacuum_module,
+        robot_type="OT-3 Standard",
+    )
 
 
 @pytest.mark.parametrize(
