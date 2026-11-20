@@ -9,10 +9,10 @@ description = "Tools for deploying our static web applications Labware Library a
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "boto3>=1.40.24",
-    "pytest>=8.4.1",
-    "rich>=14.1.0",
-    "ruff>=0.12.11",
+  "boto3>=1.40.24",
+  "pytest>=8.4.1",
+  "rich>=14.1.0",
+  "ruff>=0.12.11",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -29,12 +29,12 @@ src = ["*.py", "test"]
 
 [tool.ruff.lint]
 select = [
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
-    "F",  # pyflakes
-    "I",  # isort
-    "C",  # flake8-comprehensions
-    "B",  # flake8-bugbear
+  "E", # pycodestyle errors
+  "W", # pycodestyle warnings
+  "F", # pyflakes
+  "I", # isort
+  "C", # flake8-comprehensions
+  "B", # flake8-bugbear
 ]
 fixable = ["ALL"]
 

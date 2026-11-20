@@ -10,8 +10,8 @@ Summary:
 
 - Extend [`tsconfig-base.json`](../tsconfig-base.json): strict mode, `composite`, `rootDir: "src"`, `outDir: "lib"`, project **references** to packages you import (`components`, `shared-data`, `step-generation`).
 - **No default exports** in source (ESLint `import/no-default-export`). Exceptions: Vite config, Storybook stories.
-- **Prettier:** no semicolons, single quotes (double in JSX), trailing commas ES5, print width 80, 2-space indent, LF.
-- **Import order** (Prettier `@ianvs/prettier-plugin-sort-imports`): `react` → third party → `@opentrons/*` → relative → `import type` → assets.
+- **Oxfmt:** no semicolons, single quotes (double in JSX), trailing commas ES5, print width 80, 2-space indent, LF.
+- **Import order** (Oxfmt): `react` → third party → `@opentrons/*` → relative → `import type` → assets.
 - **Cross-package:** this package already lists `@opentrons/components`, `@opentrons/shared-data`, and `@opentrons/step-generation` in `package.json`; keep imports in source limited until UI lands (no imports from `app/`). Tests in `src/__tests__/workspace-dependencies.test.ts` verify those packages resolve.
 - **Lodash:** import per function (`import map from 'lodash/map'`), not `import _ from 'lodash'`.
 - **Types:** prefer `import type` for type-only imports.

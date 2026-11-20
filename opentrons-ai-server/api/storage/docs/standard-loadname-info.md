@@ -705,8 +705,6 @@ Total number of labware: 86
         - high volume: 5–1000 µL
       - flex_96channel_200
         - low volume: 1–200 µL
-  
-  
 
 </Pipettes with volume>
 

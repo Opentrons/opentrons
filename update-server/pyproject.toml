@@ -8,50 +8,48 @@ description = "A server to update software and firmware on Opentrons robots"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
-authors = [
-    { name = "Opentrons", email = "engineering@opentrons.com" },
-]
+authors = [{ name = "Opentrons", email = "engineering@opentrons.com" }]
 classifiers = [
-    "Private :: Do Not Upload"  # Prevent uploading to PyPI.
+  "Private :: Do Not Upload", # Prevent uploading to PyPI.
 ]
 dependencies = [
-    "typing-extensions>=4.0.0,<5",
-    "server-utils==0.0.0",
-    "python-dotenv==1.0.1",
-    "python-multipart==0.0.28",
-    "pydantic-settings==2.4.0",
-    "uvicorn==0.27.0.post1",
-    "systemd-python==234; sys_platform == 'linux'",
-    "fastapi==0.100.0",
+  "typing-extensions>=4.0.0,<5",
+  "server-utils==0.0.0",
+  "python-dotenv==1.0.1",
+  "python-multipart==0.0.28",
+  "pydantic-settings==2.4.0",
+  "uvicorn==0.27.0.post1",
+  "systemd-python==234; sys_platform == 'linux'",
+  "fastapi==0.100.0",
 ]
 dynamic = ['version']
 
 [dependency-groups]
 # Robot dependencies - exact versions for robot deployment
 robot = [
-    "pydantic==2.11.7",
-    "server-utils==0.0.0",
-    "python-dotenv==1.0.1",
-    "python-multipart==0.0.28",
-    "pydantic-settings==2.4.0",
-    "uvicorn==0.27.0.post1",
-    "systemd-python==234; sys_platform == 'linux'",
-    "fastapi==0.100.0",
+  "pydantic==2.11.7",
+  "server-utils==0.0.0",
+  "python-dotenv==1.0.1",
+  "python-multipart==0.0.28",
+  "pydantic-settings==2.4.0",
+  "uvicorn==0.27.0.post1",
+  "systemd-python==234; sys_platform == 'linux'",
+  "fastapi==0.100.0",
 ]
 dev = [
-    "ruff==0.17.4",
-    "pytest==9.2.0",
-    "pytest-watch==4.2.0",
-    "pytest-cov==7.1.0",
-    "pytest-asyncio==1.4.1.post1",
-    "httpx==0.27.2",
-    "coverage==7.16.2",
-    "mypy==2.4.1",
-    "decoy==2.6.0",
-    "build==1.6.1",
-    "setuptools==84.2.1",
-    # Only used by oe_upload.py, the standalone dev script for pushing updates.
-    "aiohttp>=3.12.14,<4",
+  "ruff==0.17.4",
+  "pytest==9.2.0",
+  "pytest-watch==4.2.0",
+  "pytest-cov==7.1.0",
+  "pytest-asyncio==1.4.1.post1",
+  "httpx==0.27.2",
+  "coverage==7.16.2",
+  "mypy==2.4.1",
+  "decoy==2.6.0",
+  "build==1.6.1",
+  "setuptools==84.2.1",
+  # Only used by oe_upload.py, the standalone dev script for pushing updates.
+  "aiohttp>=3.12.14,<4",
 ]
 
 [project.urls]
@@ -62,7 +60,8 @@ dev = [
 required-version = "==0.12.1"
 # Stub for systemd-python so uv can resolve on macOS (no libsystemd).
 dependency-metadata = [
-    { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [] },
+  { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
+  ] },
 ]
 # cooldown time for security
 exclude-newer = "1 week"
@@ -89,9 +88,9 @@ known-first-party = ["server_utils"]
 exclude = ["otupdate/_version.py"]
 
 [tool.hatch.build.hooks.vcs-tunable]
-version-file="otupdate/_version.py"
-tag-pattern='v(?P<version>.*)'
-fallback_version='0.0.0-dev'
+version-file = "otupdate/_version.py"
+tag-pattern = 'v(?P<version>.*)'
+fallback_version = '0.0.0-dev'
 
 [tool.hatch.version]
 source = 'vcs-tunable'
@@ -99,20 +98,17 @@ source = 'vcs-tunable'
 [tool.hatch.version.raw-options]
 root = '..'
 git_describe_command = 'git describe --dirty --tags --long --match=v[0-9]*.[0-9]*'
-fallback_version='0.0.0-dev'
+fallback_version = '0.0.0-dev'
 # Note: these are required for setuptools_scm to not automatically bump the version used in the package
 # from the latest version it detects. This would actually be kind of useful, but we can only do it if
 # everything is doing it since everything is coversioned (otherwise it breaks pipenv sync)
-version_scheme='only-version'
-local_scheme='no-local-version'
+version_scheme = 'only-version'
+local_scheme = 'no-local-version'
 
 
 [tool.hatch.build.targets.wheel]
 packages = ["otupdate"]
-exclude = [
-    "tests",
-    "tests.*",
-]
+exclude = ["tests", "tests.*"]
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'opentrons/LICENSE'
 
@@ -120,20 +116,27 @@ exclude = [
 include = ['otupdate', 'LICENSE', 'tests', 'uv.lock']
 
 [tool.pytest]
-addopts = ["--cov=otupdate", "--cov-report", "term-missing:skip-covered", "--cov-report", "xml:coverage.xml", "--strict-markers"]
+addopts = [
+  "--cov=otupdate",
+  "--cov-report",
+  "term-missing:skip-covered",
+  "--cov-report",
+  "xml:coverage.xml",
+  "--strict-markers",
+]
 asyncio_mode = "auto"
 markers = [
-    "exclude_boot_vfat: tests that ensure success if there's no bootfs",
-    "exclude_boot_vfat_hash: tests that check if there's no boot hash",
-    "bad_boot_vfat_hash: tests that work if theres a bad boot hash",
-    "bad_sig: tests that work if theres a bad sig",
-    "bad_hash: tests that work if theres a bad hash",
-    "exclude_rootfs_ext4_hash: check if theres no rootfs hash",
-    "exclude_rootfs_ext4_hash_sig: check if theres no hash sig",
-    "exclude_rootfs_ext4: check if theres no rootfs",
-    "bad_cert_path: bad local cert for code signing",
-    "no_cert_path: no local cert for code signing",
-    "bad_rootfs_ext4_hash: bad rootfs hash",
+  "exclude_boot_vfat: tests that ensure success if there's no bootfs",
+  "exclude_boot_vfat_hash: tests that check if there's no boot hash",
+  "bad_boot_vfat_hash: tests that work if theres a bad boot hash",
+  "bad_sig: tests that work if theres a bad sig",
+  "bad_hash: tests that work if theres a bad hash",
+  "exclude_rootfs_ext4_hash: check if theres no rootfs hash",
+  "exclude_rootfs_ext4_hash_sig: check if theres no hash sig",
+  "exclude_rootfs_ext4: check if theres no rootfs",
+  "bad_cert_path: bad local cert for code signing",
+  "no_cert_path: no local cert for code signing",
+  "bad_rootfs_ext4_hash: bad rootfs hash",
 ]
 
 [tool.mypy]
@@ -152,16 +155,16 @@ ignore_missing_imports = true
 # and remove these overrides when able.
 [[tool.mypy.overrides]]
 module = [
-    "tests.conftest",
-    "tests.common.conftest",
-    "tests.common.config",
-    "tests.common.test_config",
-    "tests.common.test_control",
-    "tests.common.test_file_actions",
-    "tests.common.test_ssh_key_management",
-    "tests.common.test_update",
-    "tests.openembedded.conftest",
-    "tests.openembedded.test_control",
-    "tests.openembedded.test_updater",
+  "tests.conftest",
+  "tests.common.conftest",
+  "tests.common.config",
+  "tests.common.test_config",
+  "tests.common.test_control",
+  "tests.common.test_file_actions",
+  "tests.common.test_ssh_key_management",
+  "tests.common.test_update",
+  "tests.openembedded.conftest",
+  "tests.openembedded.test_control",
+  "tests.openembedded.test_updater",
 ]
 ignore_errors = true

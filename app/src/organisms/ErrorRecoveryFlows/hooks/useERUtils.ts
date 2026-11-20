@@ -13,6 +13,7 @@ import {
   useNotifyRunQuery,
 } from '/app/resources/runs'
 
+import type { ErrorRecoveryFlowsProps } from '..'
 import { getNextSteps } from '../utils'
 import { useCleanupRecoveryState } from './useCleanupRecoveryState'
 import { useDeckMapUtils } from './useDeckMapUtils'
@@ -30,7 +31,6 @@ import { useShowDoorInfo } from './useShowDoorInfo'
 import type { LabwareDefinition, RobotType } from '@opentrons/shared-data'
 import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 import type { StepCounts } from '/app/resources/protocols/hooks'
-import type { ErrorRecoveryFlowsProps } from '..'
 import type { IRecoveryMap, RecoveryRoute, RouteStep } from '../types'
 import type { UseDeckMapUtilsResult } from './useDeckMapUtils'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'

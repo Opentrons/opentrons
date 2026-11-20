@@ -1,6 +1,6 @@
 ---
-title: "Opentrons OT-2: First Run"
-description: "Download the app, connect power and Ethernet, and power on the OT-2."
+title: 'Opentrons OT-2: First Run'
+description: 'Download the app, connect power and Ethernet, and power on the OT-2.'
 ---
 
 The OT-2 is powered by an external power supply that converts AC wall current to the 36 VDC used by the robot's internal systems. You control the robot through the Opentrons OT-2 App and a computer connected using the supplied Ethernet cable and dongle. This section guides you through downloading the Opentrons OT-2 App, connecting your computer to the OT-2, and connecting the robot to the external power supply.
@@ -13,26 +13,26 @@ The OT-2 is powered by an external power supply that converts AC wall current to
 
 2. Connect the Ethernet cable to the OT-2 and your computer. If your computer does not have an Ethernet port, use the provided Ethernet-to-USB dongle.
 
-    ![laptop USB-Ethernet connection](../images/usb-ethernet.png)
+   ![laptop USB-Ethernet connection](../images/usb-ethernet.png)
 
 ## Connecting the power cables
 
 3. Connect the round end of the power cable to your OT-2. The OT-2 uses an asymmetrical 4-pin power connector. When connecting the power cable to the robot:
 
-    - Match the connector's flat side to the flat side of the robot's power port.
-    - An aligned power cable attaches easily; a misaligned cable does not.
-    - Do not plug the power supply into a wall outlet or turn on the power until instructed to do so.
+   - Match the connector's flat side to the flat side of the robot's power port.
+   - An aligned power cable attaches easily; a misaligned cable does not.
+   - Do not plug the power supply into a wall outlet or turn on the power until instructed to do so.
 
-    ![power connection alignment](../images/power-connector-alignment.png)
+   ![power connection alignment](../images/power-connector-alignment.png)
 
 4. Connect the power cable to the external power supply, and then connect plug to a wall outlet. Your OT-2 ships with a power plug specific to your country or region.
 
-    ![Regional IEC power plugs](../images/iec-plugs.png)
+   ![Regional IEC power plugs](../images/iec-plugs.png)
 
 5. Turn on the power by pressing the power button on the OT-2.
 
-    ![external power supply connection](../images/ot2-power.png)
-After turning on the power, it may take up to 45 seconds, or longer, before the OT-2 starts running. During the startup process:
+   ![external power supply connection](../images/ot2-power.png)
+   After turning on the power, it may take up to 45 seconds, or longer, before the OT-2 starts running. During the startup process:
 
 - The light on the front of the robot will blink on and off and then turn solid blue.
 - The gantry will move to its home position.
@@ -41,7 +41,7 @@ After turning on the power, it may take up to 45 seconds, or longer, before the 
 </div>
 
 !!!note
-    If the blue light on the front of the robot does not turn solid after the robot has been powered on for more than five minutes, contact Opentrons Support.
+If the blue light on the front of the robot does not turn solid after the robot has been powered on for more than five minutes, contact Opentrons Support.
 
 ## Making a LAN connection
 
@@ -68,14 +68,14 @@ The OT-2 can connect to Wi-Fi networks with the following security types:
 - 802.1x or "eduroam" (common to academic institutions)
 - WPA2 personal
 - WPA2 enterprise, including:
-    - EAP-TTLS with TLS
-    - EAP-TTLS with MS-CHAP v2
-    - EAP-TTLS with MD5
-    - EAP-PEAP with MS-CHAP v2
-    - EAP-TLS
+  - EAP-TTLS with TLS
+  - EAP-TTLS with MS-CHAP v2
+  - EAP-TTLS with MD5
+  - EAP-PEAP with MS-CHAP v2
+  - EAP-TLS
 
 !!!note "Captive portals not supported"
-    The OT-2 cannot be used on or connect to a [captive portal network](https://en.wikipedia.org/wiki/Captive_portal). Typically, these are the kind of networks deployed at airports, hotels, and other public access points. If no other networks are available, use a direct USB or Ethernet connection to manage your robot.
+The OT-2 cannot be used on or connect to a [captive portal network](https://en.wikipedia.org/wiki/Captive_portal). Typically, these are the kind of networks deployed at airports, hotels, and other public access points. If no other networks are available, use a direct USB or Ethernet connection to manage your robot.
 
 ## Install software updates
 

@@ -1,6 +1,6 @@
 ---
-title: "Flex Stacker: Additional Product Information"
-description: "Warranty, support, app download, and manufacturer information for the Stacker."
+title: 'Flex Stacker: Additional Product Information'
+description: 'Warranty, support, app download, and manufacturer information for the Stacker.'
 ---
 
 ## Warranty

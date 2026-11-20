@@ -20,10 +20,10 @@ http://<robot_ip>:8080
 
 ### CLI Arguments
 
-| Argument | Default | Description |
-|---|---|---|
+| Argument      | Default     | Description                                                                     |
+| ------------- | ----------- | ------------------------------------------------------------------------------- |
 | `--test-name` | `test-data` | Name of the sub-folder under the testing data directory to watch for CSV files. |
-| `--port` | `8080` | HTTP port the server listens on. |
+| `--port`      | `8080`      | HTTP port the server listens on.                                                |
 
 ---
 
@@ -43,10 +43,10 @@ The directory is created automatically if it does not exist.
 
 Two plots are shown by default, each driven by its own CSV file pattern:
 
-| Plot | File Pattern | Columns |
-|---|---|---|
-| **Pressure vs Time** | `PressureData` | `current_gauge_pressure`, `target_gauge_pressure`, `pressure_abs_a`, `pressure_abs_b`, `pressure_atm` |
-| **Flow Rate vs Time** | `FlowrateData` | `Flow_rate(sLM)` |
+| Plot                  | File Pattern   | Columns                                                                                               |
+| --------------------- | -------------- | ----------------------------------------------------------------------------------------------------- |
+| **Pressure vs Time**  | `PressureData` | `current_gauge_pressure`, `target_gauge_pressure`, `pressure_abs_a`, `pressure_abs_b`, `pressure_atm` |
+| **Flow Rate vs Time** | `FlowrateData` | `Flow_rate(sLM)`                                                                                      |
 
 The server performs a recursive search for the most recently modified file whose stem contains the pattern string (e.g. a file named `PressureData_2024-01-01.csv` is matched by the `PressureData` pattern).
 
@@ -75,16 +75,16 @@ file_patterns = ["PressureData", "FlowrateData", "YourNewPattern"]
 const plotConfigs = [
   // ... existing configs ...
   {
-    divId: 'plotly3',              // unique HTML div ID
-    xColumn: 'Time(s)',            // CSV column for the x-axis
-    yColumns: ['your_column'],     // CSV column(s) for the y-axis
+    divId: 'plotly3', // unique HTML div ID
+    xColumn: 'Time(s)', // CSV column for the x-axis
+    yColumns: ['your_column'], // CSV column(s) for the y-axis
     title: 'Your Plot Title',
     yAxisLabel: 'Units',
     colors: ['#ff9900'],
     filePattern: 'YourNewPattern', // must match the pattern added in server.py
-    lineStyles: ['solid'],         // 'solid' | 'dash' | 'dot' | 'dashdot'
+    lineStyles: ['solid'], // 'solid' | 'dash' | 'dot' | 'dashdot'
   },
-];
+]
 ```
 
 A secondary (right-side) y-axis is supported via `yAxis2Label` and `secondaryAxisColumns`. See the commented example in `index_plot.js` for details.
@@ -93,11 +93,11 @@ A secondary (right-side) y-axis is supported via `yAxis2Label` and `secondaryAxi
 
 ## File Overview
 
-| File | Description |
-|---|---|
-| `server.py` | Python HTTP server — serves the frontend and CSV data via `/data/latest` and `/name` endpoints. |
-| `__main__.py` | Entry point; parses CLI args and calls `server.run()`. |
-| `index.html` | Dashboard HTML page. |
-| `index_plot.js` | Plot configuration and Plotly rendering logic. |
-| `plotly-2.12.1.min.js` | Bundled Plotly.js library (offline-capable). |
-| `favicon.png` | Browser tab icon. |
+| File                   | Description                                                                                     |
+| ---------------------- | ----------------------------------------------------------------------------------------------- |
+| `server.py`            | Python HTTP server — serves the frontend and CSV data via `/data/latest` and `/name` endpoints. |
+| `__main__.py`          | Entry point; parses CLI args and calls `server.run()`.                                          |
+| `index.html`           | Dashboard HTML page.                                                                            |
+| `index_plot.js`        | Plot configuration and Plotly rendering logic.                                                  |
+| `plotly-2.12.1.min.js` | Bundled Plotly.js library (offline-capable).                                                    |
+| `favicon.png`          | Browser tab icon.                                                                               |

@@ -19,7 +19,9 @@ export interface PasswordComplexityRequirements {
 }
 
 export type PasswordComplexityErrorKind =
-  'tooShort' | 'invalidCharacters' | 'missingSpecialCharacters'
+  | 'tooShort'
+  | 'invalidCharacters'
+  | 'missingSpecialCharacters'
 
 /**
  * Returns the first password-complexity failure for `password`.

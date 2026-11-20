@@ -6,7 +6,8 @@ import type {
 } from './constants'
 
 export type AlertId =
-  typeof ALERT_U2E_DRIVER_OUTDATED | typeof ALERT_APP_UPDATE_AVAILABLE
+  | typeof ALERT_U2E_DRIVER_OUTDATED
+  | typeof ALERT_APP_UPDATE_AVAILABLE
 
 export interface AlertTriggeredAction {
   type: typeof ALERT_TRIGGERED

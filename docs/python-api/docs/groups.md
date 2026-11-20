@@ -1,6 +1,6 @@
 ---
-title: "Python API: Step Grouping"
-description: "Use step grouping to organize groups of commands in Python protocols."
+title: 'Python API: Step Grouping'
+description: 'Use step grouping to organize groups of commands in Python protocols.'
 ---
 
 Step grouping lets you organize groups of commands within your Python protocols. This can be especially helpful when writing or working with long protocols. Beginning with API version 2.29, use commands to separate groups of steps:
@@ -11,7 +11,7 @@ Step grouping lets you organize groups of commands within your Python protocols.
 The examples on this page demonstrate using either method to create step groups that are visible in your Python protocol file, or in [visualization](../flex/opentrons-app/protocol-viz.md) in the Opentrons App.
 
 !!! note
-    Step grouping doesn't affect the execution of your protocol. It's simply a way to organize writing and assessing your Python protocols.
+Step grouping doesn't affect the execution of your protocol. It's simply a way to organize writing and assessing your Python protocols.
 
 The first example uses the context manager [`ProtocolContext.group_steps()`][opentrons.protocol_api.ProtocolContext.group_steps] to create a group of steps, contained inside a `with` block:
 
@@ -28,7 +28,8 @@ with protocol.group_steps(name="Aspirate and Dispense Buffer", description="Tran
     )
     pipette.drop_tip
 ```
-*New in version 2.29*
+
+_New in version 2.29_
 
 Each command you add inside the `with` block becomes a part of the step group.
 
@@ -52,7 +53,8 @@ pipette.drop_tip
 
 step_group_1.end_group()
 ```
-*New in version 2.29*
+
+_New in version 2.29_
 
 Step groups can organize a protocol with hundreds of commands into a handful of easily readable groups. This makes a long Python protocol easier to understand, whether in your preferred code editor or in [protocol visualization](../flex/opentrons-app/protocol-viz.md).
 

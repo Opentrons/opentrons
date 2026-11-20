@@ -92,11 +92,11 @@ When it finishes it prints the report path; open it in a browser
 
 ## Notes and caveats
 
-- **Build time.** The script builds the full docs site twice, which takes about 30 seconds. 
+- **Build time.** The script builds the full docs site twice, which takes about 30 seconds.
   The first build also resolves and downloads dependencies, so expect a few minutes; later runs are faster.
 - **Output is a directory.** The rendered pages need their co-located theme assets, so
   the result can't be a single standalone HTML file.
-- **Old refs.** Each worktree builds with *its own* `uv.lock` and docs config, so the
+- **Old refs.** Each worktree builds with _its own_ `uv.lock` and docs config, so the
   tool faithfully reproduces how that commit would have built — but a ref whose docs
   build was actually broken will fail to build here too (the error is surfaced).
 - **Structure dependency.** If the mkdocs-material theme

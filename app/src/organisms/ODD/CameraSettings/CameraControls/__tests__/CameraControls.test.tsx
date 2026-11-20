@@ -7,11 +7,10 @@ import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resource
 import { useCameraSettingsValues } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 
 import { CameraControls } from '..'
+import type { CameraControlsProps } from '..'
 import { CameraControlsHome } from '../CameraControlsHome'
 import { CameraTileSetting } from '../CameraTileSetting'
 import { ZoomSettingsView } from '../ZoomSettingsView'
-
-import type { CameraControlsProps } from '..'
 
 vi.mock('/app/local-resources/images/hooks/useCameraSettingsValues')
 vi.mock('../CameraControlsHome')

@@ -29,14 +29,15 @@ The file is made up of the following keys:values which are all optional.
 
 For available fields, see:
 
-* [simulator.py](../../api/src/opentrons/hardware_control/backends/simulator.py)
-* [ot3simulator.py](../../api/src/opentrons/hardware_control/backends/ot3simulator.py)
+- [simulator.py](../../api/src/opentrons/hardware_control/backends/simulator.py)
+- [ot3simulator.py](../../api/src/opentrons/hardware_control/backends/ot3simulator.py)
 
 ### Attached modules
+
 ```
 {
   "attached_modules": {
-    # A mapping of module type to an optional list of setup 
+    # A mapping of module type to an optional list of setup
     # function calls which will be called in order.
     "thermocycler": [
       {
@@ -88,11 +89,11 @@ This is the same format as `robot_settings.json` as defined in [robot_configs](.
     configs: {
         "name": ...,
         "version": ....,
-        ..... 
+        .....
     }
 }
 ```
 
 ## How to use
 
-Use `OT_ROBOT_SERVER_simulator_configuration_file_path` environment variable to point to a custom simulator configuration file. 
+Use `OT_ROBOT_SERVER_simulator_configuration_file_path` environment variable to point to a custom simulator configuration file.

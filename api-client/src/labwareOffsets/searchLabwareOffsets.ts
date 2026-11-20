@@ -13,7 +13,8 @@ export interface SearchLabwareOffsetsRequest {
     id?: string
     definitionUri?: string
     locationSequence?:
-      LabwareOffsetLocationSequenceComponent[] | typeof ANY_LOCATION
+      | LabwareOffsetLocationSequenceComponent[]
+      | typeof ANY_LOCATION
     mostRecentOnly?: boolean
   }>
 }

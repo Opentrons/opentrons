@@ -656,7 +656,8 @@ export type ReferenceFields =
   | 'mix_position_reference'
 
 export type DelayCheckboxBaseFields =
-  'aspirate_delay_checkbox' | 'dispense_delay_checkbox'
+  | 'aspirate_delay_checkbox'
+  | 'dispense_delay_checkbox'
 export type DelayCheckboxMoveLiquidFields =
   | DelayCheckboxBaseFields
   | 'aspirate_submerge_delay_seconds'
@@ -664,7 +665,8 @@ export type DelayCheckboxMoveLiquidFields =
   | 'dispense_submerge_delay_seconds'
   | 'dispense_retract_delay_seconds'
 export type DelaySecondsBaseFields =
-  'aspirate_delay_seconds' | 'dispense_delay_seconds'
+  | 'aspirate_delay_seconds'
+  | 'dispense_delay_seconds'
 export type DelaySecondsMoveLiquidFields =
   | DelaySecondsBaseFields
   | 'aspirate_submerge_delay_seconds'

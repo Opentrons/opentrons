@@ -19,12 +19,12 @@ import {
 } from '/app/resources/runs'
 import { formatTimestamp } from '/app/transformations/runs'
 
+import type { RunHeaderContentProps } from '..'
 import { isSupportedVersion } from '../../utils'
 import { LabeledValue } from '../LabeledValue'
 import styles from './runheadersectionlower.module.css'
 
 import type { ReactNode } from 'react'
-import type { RunHeaderContentProps } from '..'
 
 // Note thd following minimum supported versions from Protocol Visualization PRD
 const MIN_SUPPORTED_JSON_SCHEMA_VERSION = 6

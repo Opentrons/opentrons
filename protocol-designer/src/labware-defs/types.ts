@@ -23,7 +23,9 @@ export type LabwareUploadMessage =
     }
   | {
       messageType:
-        'EXACT_LABWARE_MATCH' | 'USES_STANDARD_NAMESPACE' | 'ONLY_TIPRACK'
+        | 'EXACT_LABWARE_MATCH'
+        | 'USES_STANDARD_NAMESPACE'
+        | 'ONLY_TIPRACK'
     }
   | (NameConflictFields & {
       messageType: 'LABWARE_NAME_CONFLICT'

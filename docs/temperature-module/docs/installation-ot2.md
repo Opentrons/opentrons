@@ -1,6 +1,6 @@
 ---
-title: "Temperature Module: OT-2 Attachment Steps"
-description: "Mount the module on the OT-2 deck and connect USB and power."
+title: 'Temperature Module: OT-2 Attachment Steps'
+description: 'Mount the module on the OT-2 deck and connect USB and power.'
 hide: toc
 ---
 
@@ -14,9 +14,9 @@ To install the Temperature Module on your OT-2:
 
 3. Connect the power cable to the module. The Temperature Module has an asymmetrical 4-pin power connector. When connecting the power cable to the module:
 
-    - Match the connector's flat side to the flat side of the module's power port.
-    - Aligned cables attach easily; misaligned cables do not.
-    - _Do not_ plug the power cable into a wall outlet until instructed to do so.
+   - Match the connector's flat side to the flat side of the module's power port.
+   - Aligned cables attach easily; misaligned cables do not.
+   - _Do not_ plug the power cable into a wall outlet until instructed to do so.
 
     <figure class="screenshot" markdown>
     ![Image of aligned power cable](images/module-power-connector.png){style="width: 60%; margin-left: 0;"}

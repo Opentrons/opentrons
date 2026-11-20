@@ -28,8 +28,8 @@ import stagingAreaMagneticBlockGen1 from '/app/assets/images/staging_area_magnet
 import stagingArea from '/app/assets/images/staging_area_slot.png'
 import temperatureModule from '/app/assets/images/temp_deck_gen_2_transparent.png'
 import thermoModuleGen2 from '/app/assets/images/thermocycler_gen_2_closed.png'
-import wasteChuteStagingArea from '/app/assets/images/waste_chute_with_staging_area.png'
 import wasteChute from '/app/assets/images/waste_chute.png'
+import wasteChuteStagingArea from '/app/assets/images/waste_chute_with_staging_area.png'
 
 import type { CutoutFixtureId } from '@opentrons/shared-data'
 

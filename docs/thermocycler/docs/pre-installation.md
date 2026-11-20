@@ -1,6 +1,6 @@
 ---
-title: "Thermocycler Module: Before You Begin"
-description: "Deck placement, Flex caddies, OT-2 exhaust duct, and anchor adjustments."
+title: 'Thermocycler Module: Before You Begin'
+description: 'Deck placement, Flex caddies, OT-2 exhaust duct, and anchor adjustments.'
 ---
 
 Review this section for important information about the Thermocycler's deck placement, alignment, and anchor adjustments.
@@ -33,10 +33,10 @@ Before installation:
 
 The supported deck slot positions for the Thermocycler depend on the robot you’re using.
 
-| Robot Model | Deck Placement |
-|----|----|
-| Flex | Requires deck slots A1, B1 ,and the A1 expansion slot. |
-| OT-2 | Requires deck slots 7, 8, 10, and 11. |
+| Robot Model | Deck Placement                                         |
+| ----------- | ------------------------------------------------------ |
+| Flex        | Requires deck slots A1, B1 ,and the A1 expansion slot. |
+| OT-2        | Requires deck slots 7, 8, 10, and 11.                  |
 
 To properly align the module relative to the robot, make sure its exhaust port faces to the rear (away from the center of the deck). This keeps the exhaust port clear and aligns the power and USB ports to the left side of the robot for easy access.
 

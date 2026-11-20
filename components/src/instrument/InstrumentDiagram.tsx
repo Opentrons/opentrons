@@ -1,19 +1,19 @@
+import type { StyleProps } from '..'
 import { Flex } from '../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../styles'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { ReactNode } from 'react'
 import type { PipetteV2Specs } from '@opentrons/shared-data'
-import type { StyleProps } from '..'
 import type { Mount } from '../robot-types'
 
 import eightChannelFlexSrc from './eight-channel-flex.png'
 import multiSrc from './multi-channel_GEN1_800px.png'
 import multiGEN2Src from './multi-channel_GEN2_800px.png'
 import ninetySixSrc from './ninety-six-channel-gen1.png'
-import singleSrc from './single_channel_GEN1_800px.png'
-import singleGEN2Src from './single-channel_GEN2_800px.png'
 import singleFlexSrc from './single-channel-flex.png'
+import singleGEN2Src from './single-channel_GEN2_800px.png'
+import singleSrc from './single_channel_GEN1_800px.png'
 
 export interface InstrumentDiagramProps extends StyleProps {
   mount: Mount

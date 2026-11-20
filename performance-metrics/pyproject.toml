@@ -7,11 +7,9 @@ name = "performance_metrics"
 description = "Library for working with performance metrics on the Opentrons robots"
 requires-python = ">=3.10"
 license = "Apache-2.0"
-authors = [
-    { name = "Opentrons", email = "engineering@opentrons.com" },
-]
+authors = [{ name = "Opentrons", email = "engineering@opentrons.com" }]
 classifiers = [
-    "Private :: Do Not Upload"  # Prevent uploading to PyPI.
+  "Private :: Do Not Upload", # Prevent uploading to PyPI.
 ]
 dependencies = []
 dynamic = ["version"]
@@ -39,13 +37,19 @@ local_scheme = 'no-local-version'
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/performance_metrics"]
-exclude = [
-    "tests",
-    "tests.*",
-]
+exclude = ["tests", "tests.*"]
 
 [tool.hatch.build.targets.sdist]
-include = ['src/performance_metrics', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = [
+  'src/performance_metrics',
+  'LICENSE',
+  'tests',
+  'mypy.ini',
+  'pytest.ini',
+  '.flake8',
+  'Pipfile',
+  'Pipfile.lock',
+]
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'performance_metrics/LICENSE'

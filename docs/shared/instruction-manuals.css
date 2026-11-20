@@ -14,7 +14,7 @@ div.parts-list figure {
 /* Bolder darker text for parts list captions */
 div.parts-list figcaption {
   font-weight: 600;
-  color: #4A4C4E;
+  color: #4a4c4e;
 }
 
 /* But regular styling for sub-captions, e.g. screw size */
@@ -35,8 +35,8 @@ figure.screenshot img {
 figure.side-by-side p {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start; 
-  gap: 2%; 
+  align-items: flex-start;
+  gap: 2%;
 }
 
 figure.side-by-side img {
@@ -46,35 +46,33 @@ figure.side-by-side img {
 /* Circular bullets for instruction lists */
 
 .instruction-list > ol {
-  list-style: none; 
-  padding-left: 0; 
+  list-style: none;
+  padding-left: 0;
 }
-
 
 .instruction-list > ol > li {
-  margin-bottom: 0.5em; 
-  position: relative; 
-  padding-left: 2.5em; 
+  margin-bottom: 0.5em;
+  position: relative;
+  padding-left: 2.5em;
 }
 
-
 .instruction-list > ol > li::before {
-  content: counter(list-item); 
-  background-color: #006CFA; 
-  color: white; 
-  border-radius: 50%; 
-  width: 1.8em; 
-  height: 1.8em; 
-  line-height: 1.8em; 
-  text-align: center; 
-  display: inline-flex; 
-  justify-content: center; 
-  align-items: center; 
-  position: absolute; 
-  left: 0; 
-  top: 0; 
-  font-weight: bold; 
-  font-size: 0.9em; 
+  content: counter(list-item);
+  background-color: #006cfa;
+  color: white;
+  border-radius: 50%;
+  width: 1.8em;
+  height: 1.8em;
+  line-height: 1.8em;
+  text-align: center;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: bold;
+  font-size: 0.9em;
 }
 
 .instruction-list > ol > li img {
@@ -92,10 +90,10 @@ figure.side-by-side img {
   vertical-align: middle;
   border: 1px solid black;
   margin-right: 5px;
- }
+}
 
 .status-dot.white {
-  background-color: #F8F6F0;
+  background-color: #f8f6f0;
 }
 
 .status-dot.green {
@@ -103,7 +101,7 @@ figure.side-by-side img {
 }
 
 .status-dot.blue {
-  background-color: #006CFA;
+  background-color: #006cfa;
 }
 
 .status-dot.red {
@@ -111,7 +109,7 @@ figure.side-by-side img {
 }
 
 .status-dot.yellow {
-  background-color: #F09D20;
+  background-color: #f09d20;
 }
 
 /* Creates dot with red to blue spectrum lines. See plate reader LED table. */
@@ -122,7 +120,7 @@ figure.side-by-side img {
 
 /* Longitudinal split dot for two-color LEDs */
 .status-dot.yellow-red-split {
-  background-image: linear-gradient(to right, #F09D20 50%, red 50%);
+  background-image: linear-gradient(to right, #f09d20 50%, red 50%);
   background-color: transparent;
 }
 

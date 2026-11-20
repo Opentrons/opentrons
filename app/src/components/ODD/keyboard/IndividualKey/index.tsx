@@ -1,5 +1,8 @@
 import { KeyboardReact as Keyboard } from 'react-simple-keyboard'
 
+import '../index.css'
+import './index.css'
+
 import {
   customDisplayForIndividual,
   softwareKeyboardButtonAttributes,
@@ -9,9 +12,6 @@ import { useSoftwareKeyboardControl } from '../utils/useSoftwareKeyboardControl'
 import type { MutableRefObject, ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { SoftwareKeyboardControlOptions } from '../utils/useSoftwareKeyboardControl'
-
-import '../index.css'
-import './index.css'
 
 // TODO (kk:04/05/2024) add debug to make debugging easy
 interface IndividualKeyProps {

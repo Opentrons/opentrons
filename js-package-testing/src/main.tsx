@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
 import { I18nextProvider } from 'react-i18next'
+import { createRoot } from 'react-dom/client'
 
 import '@opentrons/protocol-visualization/styles'
 import '@opentrons/components/styles/global'

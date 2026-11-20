@@ -46,7 +46,8 @@ export interface DeckConfigStyleDeckMapContentProps {
 }
 
 export type DeckMapContentProps =
-  DeckConfigStyleDeckMapContentProps | InterventionStyleDeckMapContentProps
+  | DeckConfigStyleDeckMapContentProps
+  | InterventionStyleDeckMapContentProps
 
 export const DeckMapContent: (
   props: DeckMapContentProps

@@ -17,6 +17,8 @@ import {
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 import { getRunModuleRenderInfo } from '/app/organisms/InterventionModal/utils'
 
+import type { ErrorRecoveryFlowsProps } from '..'
+
 import type { Run, RunData } from '@opentrons/api-client'
 import type {
   CutoutConfigProtocolSpec,
@@ -31,7 +33,6 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { RunModuleInfo } from '/app/organisms/InterventionModal/utils'
-import type { ErrorRecoveryFlowsProps } from '..'
 import type { ERUtilsProps, ERUtilsResults } from './useERUtils'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 

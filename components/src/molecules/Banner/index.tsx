@@ -15,7 +15,11 @@ import type { IconProps } from '../../helix/icons'
 import type { StyleProps } from '../../primitives'
 
 export type BannerType =
-  'success' | 'warning' | 'error' | 'updating' | 'informing'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'updating'
+  | 'informing'
 
 /**
  * the design team has stopped using Banner

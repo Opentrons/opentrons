@@ -1,6 +1,6 @@
 ---
-title: "Thermocycler Module: Maintenance and Cleaning"
-description: "Cleaning procedures and when to contact support."
+title: 'Thermocycler Module: Maintenance and Cleaning'
+description: 'Cleaning procedures and when to contact support.'
 ---
 
 ## Maintenance
@@ -11,10 +11,7 @@ Users should not attempt to service or repair the Thermocycler themselves. If yo
 
 The following table lists the chemicals you can use to clean your Thermocycler. Diluted alcohol and distilled water are our recommended cleaning products, but you can refer to this list for other cleaning options.
 
-!!!warning
-    - Do not use acetone to clean the Thermocycler.
-    - Do not disassemble the Thermocycler for cleaning or attempt to clean its internal electronic components or mechanical parts.
-    - Do not put the Thermocycler in an autoclave.
+!!!warning - Do not use acetone to clean the Thermocycler. - Do not disassemble the Thermocycler for cleaning or attempt to clean its internal electronic components or mechanical parts. - Do not put the Thermocycler in an autoclave.
 
 <table>
   <thead>

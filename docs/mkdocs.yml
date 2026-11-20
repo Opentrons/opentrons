@@ -50,11 +50,11 @@ plugins:
             line_length: 80
             group_by_category: false
             filters:
-              - "public"
-              - "!^__"
-              - "!broker"
-              - "!geometry"
-              - "!load_labware_object"
+              - 'public'
+              - '!^__'
+              - '!broker'
+              - '!geometry'
+              - '!load_labware_object'
             show_root_heading: true
             show_root_full_path: false
             show_symbol_type_toc: true
@@ -110,7 +110,7 @@ extra_css:
   - python-api.css
 
 extra:
-  apiLevel: "2.30"
-  robot_stack_version: "10.0.0"
+  apiLevel: '2.30'
+  robot_stack_version: '10.0.0'
 
 copyright: '© Opentrons 2026. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'

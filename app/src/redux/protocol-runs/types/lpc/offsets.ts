@@ -10,7 +10,8 @@ import type {
 } from '@opentrons/shared-data'
 
 export type LabwareOffsetLocSeqOrAnyLoc =
-  LabwareOffsetLocationSequence | typeof ANY_LOCATION
+  | LabwareOffsetLocationSequence
+  | typeof ANY_LOCATION
 
 export interface ModStackupDetail {
   kind: 'module'
@@ -67,7 +68,8 @@ interface BaseOffsetLocationDetails extends LabwareLocationInfo {
 }
 
 export type OffsetLocationDetails =
-  DefaultOffsetLocationDetails | LocationSpecificOffsetLocationDetails
+  | DefaultOffsetLocationDetails
+  | LocationSpecificOffsetLocationDetails
 
 export interface DefaultOffsetLocationDetails extends BaseOffsetLocationDetails {
   addressableAreaName: FlexAddressableAreaName

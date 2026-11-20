@@ -1,0 +1,78 @@
+{
+  "printWidth": 80,
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": false,
+  "singleQuote": true,
+  "jsxSingleQuote": false,
+  "trailingComma": "es5",
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "arrowParens": "avoid",
+  "endOfLine": "lf",
+  "sortImports": {
+    "newlinesBetween": false,
+    "customGroups": [
+      {
+        "groupName": "react-type",
+        "modifiers": ["type"],
+        "elementNamePattern": ["react*"]
+      },
+      {
+        "groupName": "opentrons-type",
+        "modifiers": ["type"],
+        "elementNamePattern": ["@opentrons/**"]
+      },
+      {
+        "groupName": "root-type",
+        "modifiers": ["type"],
+        "elementNamePattern": ["/**"]
+      },
+      {
+        "groupName": "relative-type",
+        "modifiers": ["type"],
+        "elementNamePattern": [".", "./**", "../**"]
+      },
+      {
+        "groupName": "react",
+        "elementNamePattern": ["react*"]
+      },
+      {
+        "groupName": "opentrons",
+        "elementNamePattern": ["@opentrons/**"]
+      },
+      {
+        "groupName": "root-internal",
+        "elementNamePattern": ["/**"]
+      },
+      {
+        "groupName": "assets",
+        "elementNamePattern": [
+          "**/assets/**",
+          "**/*.{png,jpg,jpeg,gif,svg,webm,mp4}"
+        ]
+      }
+    ],
+    "groups": [
+      "builtin",
+      "react",
+      "external",
+      { "newlinesBetween": true },
+      ["side_effect", "side_effect_style"],
+      { "newlinesBetween": true },
+      "opentrons",
+      { "newlinesBetween": true },
+      "root-internal",
+      { "newlinesBetween": true },
+      ["sibling", "parent", "index"],
+      { "newlinesBetween": true },
+      ["type-builtin", "type-external"],
+      "react-type",
+      "opentrons-type",
+      "root-type",
+      "relative-type",
+      { "newlinesBetween": true },
+      "assets"
+    ]
+  }
+}

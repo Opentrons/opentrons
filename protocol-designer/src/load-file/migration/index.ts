@@ -22,7 +22,6 @@ import { migrateFile as migrateFileEightSeven } from './8_7_0'
 import { migrateFile as migrateFileEightEight } from './8_8_0'
 import { isBroken890Export, migrateFile as migrateFileEightNine } from './8_9_0'
 import { migrateFile as migrateFileEightTen } from './8_10_0'
-
 // import { migrateFile as migrateFileEightEleven } from './8_11_0'
 
 import type {

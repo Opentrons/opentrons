@@ -15,9 +15,9 @@ import { useToaster } from '/app/organisms/ToasterOven'
 import { getCameraUsageState } from '/app/redux/protocol-runs'
 
 import { ProtocolSetupCamera } from '..'
+import type { ProtocolSetupCameraProps } from '..'
 
 import type { Mock } from 'vitest'
-import type { ProtocolSetupCameraProps } from '..'
 
 vi.mock('/app/organisms/ODD/CameraSettings')
 vi.mock('/app/components/adhoc/ODD/ODDBackButton')

@@ -108,9 +108,11 @@ Minimal example (see [`src/i18n.ts`](src/i18n.ts) and
 
 ```tsx
 import { I18nextProvider } from 'react-i18next'
-import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
+import i18n from 'i18next'
+
 import { shared_en_resources } from '@opentrons/components/localization'
+
 import protocolVisualizationEn from './locale/en/protocol_visualization.json'
 
 void i18n.use(initReactI18next).init({

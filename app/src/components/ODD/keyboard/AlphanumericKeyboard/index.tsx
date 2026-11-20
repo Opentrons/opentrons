@@ -2,6 +2,9 @@ import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import Keyboard from 'react-simple-keyboard'
 
+import '../index.css'
+import './index.css'
+
 import { getAppLanguage } from '/app/redux/config'
 
 import {
@@ -10,16 +13,11 @@ import {
   layoutCandidates,
   softwareKeyboardButtonAttributes,
 } from '../constants'
+import { useSoftwareKeyboardControl } from '../utils/useSoftwareKeyboardControl'
 
 import type { MutableRefObject, ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { LayoutName } from '../types'
-
-import '../index.css'
-import './index.css'
-
-import { useSoftwareKeyboardControl } from '../utils/useSoftwareKeyboardControl'
-
 import type { SoftwareKeyboardControlOptions } from '../utils/useSoftwareKeyboardControl'
 
 // TODO (kk:04/05/2024) add debug to make debugging easy

@@ -9,7 +9,6 @@ import {
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 
-import { i18n } from '../../../../assets/localization'
 import { openIngredientSelector } from '../../../../labware-ingred/actions'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
@@ -20,6 +19,8 @@ import { LabwareCard } from '../index'
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
+import { i18n } from '../../../../assets/localization'
 
 const mockNavigate = vi.fn()
 

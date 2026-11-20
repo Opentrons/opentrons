@@ -228,7 +228,7 @@ class SerialPortHttpAgent extends http.Agent {
   declare sockets: NodeJS.Dict<Socket[]>
 
   declare getName: (options: NodeJS.Dict<unknown>) => string
-  declare removeSocket: (socket: Socket, options: NodeJS.Dict<unknown>) => void;
+  declare removeSocket: (socket: Socket, options: NodeJS.Dict<unknown>) => void
 
   // node can assign a keylogger to the agent for debugging, this allows adding the keylog listener to the event
   declare [kOnKeylog]: (...args: unknown[]) => void

@@ -1,6 +1,6 @@
 ---
-title: "Plate Reader: Product Specifications"
-description: "Dimensions, weight, optical specs, and included parts for the plate reader."
+title: 'Plate Reader: Product Specifications'
+description: 'Dimensions, weight, optical specs, and included parts for the plate reader.'
 ---
 
 ![Module parts with labels](images/plate-reader-labeled.svg)
@@ -16,13 +16,13 @@ description: "Dimensions, weight, optical specs, and included parts for the plat
 
 ## Physical Specifications
 
-| Specification | Description |
-|:--------------|:------------|
-| Module dimensions | 155.3 mm L x 95.5 mm W x 57 mm H |
-| Module weight | 790 g |
-| Composition | Aluminum |
-| Pollution degree | 2 |
-| Service life | 10 years with average use of 4 hours per day |
+| Specification     | Description                                  |
+| :---------------- | :------------------------------------------- |
+| Module dimensions | 155.3 mm L x 95.5 mm W x 57 mm H             |
+| Module weight     | 790 g                                        |
+| Composition       | Aluminum                                     |
+| Pollution degree  | 2                                            |
+| Service life      | 10 years with average use of 4 hours per day |
 
 ## Measurement Specifications
 

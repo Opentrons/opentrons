@@ -5,9 +5,9 @@ import startCase from 'lodash/startCase'
 
 import { titleCase } from '@opentrons/shared-data'
 
-import { resources } from './assets/localization'
-
 import type { InitOptions } from 'i18next'
+
+import { resources } from './assets/localization'
 
 export const US_ENGLISH = 'en-US'
 export const SIMPLIFIED_CHINESE = 'zh-CN'

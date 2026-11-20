@@ -13,7 +13,11 @@ import {
 import type { ReactNode } from 'react'
 
 export type ModalContentMixedType =
-  'icon' | 'image' | 'spinner' | 'no-media' | undefined
+  | 'icon'
+  | 'image'
+  | 'spinner'
+  | 'no-media'
+  | undefined
 
 export type ModalContentMixedIcons = 'error' | 'caution' | 'neutral'
 
@@ -45,10 +49,12 @@ interface ModalContentMixedNoMediaProps {
 }
 
 type ModalContentMixedMandatoryHeadlineProps =
-  ModalContentMixedIconProps | ModalContentMixedImageProps
+  | ModalContentMixedIconProps
+  | ModalContentMixedImageProps
 
 type ModalContentMixedNoMandatoryHeadlineProps =
-  ModalContentMixedSpinnerProps | ModalContentMixedNoMediaProps
+  | ModalContentMixedSpinnerProps
+  | ModalContentMixedNoMediaProps
 
 interface ModalContentMixedTextProps {
   headline: string

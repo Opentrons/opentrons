@@ -5,8 +5,8 @@ import debounce from 'lodash/debounce'
 
 import { Icon, Link, StyledText } from '@opentrons/components'
 
-import logoSvgThree from '/app/assets/images/logo_nav_three.svg'
 import logoSvg from '/app/assets/images/logo_nav.svg'
+import logoSvgThree from '/app/assets/images/logo_nav_three.svg'
 
 import styles from './navbar.module.css'
 

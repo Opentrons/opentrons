@@ -5,12 +5,13 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { GRIPPER_LOCATION } from '@opentrons/step-generation'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../assets/localization'
 import { InstrumentsInfo } from '../InstrumentsInfo'
 
 import type { ComponentProps } from 'react'
 import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
 import type { PipetteOnDeck } from '../../../step-forms'
+
+import { i18n } from '../../../assets/localization'
 
 const mockSetShowEditInstrumentsModal = vi.fn()
 const mockPipettes = [

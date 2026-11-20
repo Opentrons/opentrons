@@ -6,10 +6,11 @@ import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { Hardware } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../assets/localization'
 import { FlexHardware } from '../../../components/organisms'
 import { getFileMetadata, getRobotType } from '../../../file-data/selectors'
 import { getAdditionalEquipmentEntities } from '../../../step-forms/selectors'
+
+import { i18n } from '../../../assets/localization'
 
 vi.mock('../../../step-forms/selectors')
 vi.mock('../../../file-data/selectors')

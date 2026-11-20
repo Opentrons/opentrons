@@ -14,7 +14,7 @@
   "compilerOptions": {
     "composite": true,
     "rootDir": "src",
-    "outDir": "lib",
+    "outDir": "lib"
   },
   "include": ["typings", "src"],
   "exclude": ["**/*.stories.tsx"]

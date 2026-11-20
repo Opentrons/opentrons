@@ -1,6 +1,6 @@
 ---
-title: "Opentrons OT-2: Labware Types"
-description: "Reservoirs, well plates, tube racks, and other labware types in the Labware Library."
+title: 'Opentrons OT-2: Labware Types'
+description: 'Reservoirs, well plates, tube racks, and other labware types in the Labware Library.'
 ---
 
 This section covers the different types of labware included in the Opentrons Labware Library for use with the OT-2.
@@ -39,7 +39,6 @@ The Labware Library includes many 96-well plates, including Opentrons and third-
 
 For a full example of a 96-well plate, reference the [Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt definition](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_96_wellplate_200ul_pcr_full_skirt/3.json) on GitHub.
 
-
 ### 384-well plates
 
 The Labware Library includes 384-well plates for applications that require greater well density or smaller liquid quantities. The OT-2 single-channel and 8-channel pipettes can work with the well geometry on these plates.
@@ -53,7 +52,7 @@ Try using the [Opentrons Labware Creator](https://labware.opentrons.com/#/create
 OT-2 tips come in racks that hold 96 tips. Currently, we offer tips in 20 µL, 200 µL, 300 µL, and 1000 µL sizes. These are clear, non-conducting, polypropylene tips that are available with or without filters. See the [Tips & Labware section](https://opentrons.com/products/categories/tips-&-labware) of the Opentrons website if you need tips for your OT-2 pipettes.
 
 !!! tip
-    For best performance, use the smallest tips that can hold the amount of liquid you need to aspirate.
+For best performance, use the smallest tips that can hold the amount of liquid you need to aspirate.
 
 ### Tip compatibility
 

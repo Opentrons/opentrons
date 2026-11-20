@@ -13,12 +13,12 @@ import {
   getModuleDisplayName,
 } from '@opentrons/shared-data'
 
+import type { FormattedPipetteOffsetCalibration } from '..'
 import { ModuleCalibrationOverflowMenu } from './ModuleCalibrationOverflowMenu'
 import { formatLastCalibrated } from './utils'
 
 import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
-import type { FormattedPipetteOffsetCalibration } from '..'
 
 interface ModuleCalibrationItemsProps {
   attachedModules: AttachedModule[]

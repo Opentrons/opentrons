@@ -38,7 +38,9 @@ export type CheckedLabwareFile =
   | ValidLabwareFile
 
 export type FailedLabwareFile =
-  InvalidLabwareFile | DuplicateLabwareFile | OpentronsLabwareFile
+  | InvalidLabwareFile
+  | DuplicateLabwareFile
+  | OpentronsLabwareFile
 
 // state types
 

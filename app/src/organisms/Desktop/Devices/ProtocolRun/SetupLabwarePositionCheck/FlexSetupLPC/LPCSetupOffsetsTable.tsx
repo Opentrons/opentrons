@@ -15,8 +15,9 @@ import {
 import { LabwareOffsetsTable } from '/app/organisms/LabwareOffsetsTable'
 import { selectTotalCountLocationSpecificOffsets } from '/app/redux/protocol-runs'
 
-import type { ReactNode } from 'react'
 import type { SetupLabwarePositionCheckProps } from '..'
+
+import type { ReactNode } from 'react'
 
 export function LPCSetupOffsetsTable(
   props: SetupLabwarePositionCheckProps

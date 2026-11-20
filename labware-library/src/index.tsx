@@ -2,10 +2,10 @@
 import { hydrate, render } from 'react-dom'
 import { HashRouter, Route, Routes } from 'react-router-dom'
 
+import './styles.global.module.css'
+
 import { App } from './components/App'
 import { LabwareCreator } from './labware-creator'
-
-import './styles.global.module.css'
 
 export * from './labware-creator'
 

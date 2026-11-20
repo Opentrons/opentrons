@@ -1,8 +1,7 @@
+import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { screen } from '@testing-library/react'
 
 import { StorageBar } from '..'
 import { renderWithProviders } from '../../../testing/utils'

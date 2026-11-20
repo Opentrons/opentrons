@@ -18,6 +18,7 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '..'
+import type { CutoutConfig, CutoutConfigMap, DeckConfiguration } from '..'
 import {
   getAAComboFixtureDisplayName,
   getAddedMissingThermocyclerFixtures,
@@ -33,7 +34,6 @@ import {
 import { getDeckDefFromRobotType } from '../helpers'
 
 import type { Mock } from 'vitest'
-import type { CutoutConfig, CutoutConfigMap, DeckConfiguration } from '..'
 
 vi.mock('react-i18next', () => ({
   useTranslation: vi.fn(),

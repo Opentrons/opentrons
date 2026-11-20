@@ -4,7 +4,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../assets/localization'
 import { MaterialsListModal } from '../../../components/organisms/MaterialsListModal'
 import {
   getFileMetadata,
@@ -28,6 +27,8 @@ import { StartingDeck } from '../StartingDeck'
 import { StepsInfo } from '../StepsInfo'
 
 import type { NavigateFunction } from 'react-router-dom'
+
+import { i18n } from '../../../assets/localization'
 
 vi.mock('../../../step-forms/selectors')
 vi.mock('../../../tutorial/selectors')

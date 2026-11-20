@@ -2,10 +2,10 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { DropdownMenu } from '..'
+import type { DropdownOption } from '..'
 import { renderWithProviders } from '../../../../testing/utils'
 
 import type { ComponentProps } from 'react'
-import type { DropdownOption } from '..'
 
 const mockOptions: DropdownOption[] = [
   { name: 'Option 1', value: 'option1' },

@@ -43,7 +43,7 @@
       }
     </script>
     <script>
-      ;(function() {
+      ;(function () {
         var w = window
         var ic = w.Intercom
         if (typeof ic === 'function') {
@@ -51,11 +51,11 @@
           ic('update', intercomSettings)
         } else {
           var d = document
-          var i = function() {
+          var i = function () {
             i.c(arguments)
           }
           i.q = []
-          i.c = function(args) {
+          i.c = function (args) {
             i.q.push(args)
           }
           w.Intercom = i
@@ -1593,15 +1593,19 @@
           </div>
           <h3>Sign Up For Our Newsletter</h3>
           <div>
-            <script charset="utf-8" type="text/javascript" src="https://js.hsforms.net/forms/v2.js"></script>
-              <script>
-                hbspt.forms.create({
-                region: "na1",
-                portalId: "5383285",
-                formId: "210adc2c-072f-4c9c-a812-6367469358d5",
-                version: "V2_PRERELEASE"
-                });
-              </script>
+            <script
+              charset="utf-8"
+              type="text/javascript"
+              src="https://js.hsforms.net/forms/v2.js"
+            ></script>
+            <script>
+              hbspt.forms.create({
+                region: 'na1',
+                portalId: '5383285',
+                formId: '210adc2c-072f-4c9c-a812-6367469358d5',
+                version: 'V2_PRERELEASE',
+              })
+            </script>
           </div>
           <p class="copyrite">
             &#169;&nbsp;OPENTRONS
@@ -1631,7 +1635,10 @@
             <li><a href="https://blog.opentrons.com/">Blog</a></li>
             <li><a href="https://opentrons.com/contact">Contact Us</a></li>
             <li>
-              <a href="https://opentrons.com/jobs" target="_blank" class="hiring"
+              <a
+                href="https://opentrons.com/jobs"
+                target="_blank"
+                class="hiring"
                 >WE'RE HIRING</a
               >
             </li>
@@ -1639,10 +1646,14 @@
           <ul>
             <li>Resources</li>
             <li>
-              <a href="https://support.opentrons.com" target="_blank">Support</a>
+              <a href="https://support.opentrons.com" target="_blank"
+                >Support</a
+              >
             </li>
             <li>
-              <a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a>
+              <a href="http://docs.opentrons.com/" target="_blank"
+                >Opentrons API</a
+              >
             </li>
             <li>
               <a
@@ -1660,13 +1671,13 @@
     </footer>
     <!-- End Footer -->
     <script>
-      $(document).ready(function() {
-        $('.footerForm').submit(function(event) {
+      $(document).ready(function () {
+        $('.footerForm').submit(function (event) {
           event.preventDefault()
           var data = {}
           $('.footerForm')
             .serializeArray()
-            .map(function(x) {
+            .map(function (x) {
               data[x.name] = x.value
             })
           ga(
@@ -1685,13 +1696,13 @@
             dataType: 'json',
             contentType: 'application/json',
             data: JSON.stringify(data),
-            success: function(res) {
+            success: function (res) {
               console.log(`success: ${res}`)
               $('.footerForm').fadeOut('slow')
               $('.caption')[0].innerHTML =
                 "Thanks for contacting us! We'll get back to you as quick as we can."
             },
-            error: function(err) {
+            error: function (err) {
               console.log(`err: ${JSON.stringify(err)}`)
             },
           })
@@ -1699,11 +1710,11 @@
           return false
         })
 
-        $('form.validate').submit(function(event) {
+        $('form.validate').submit(function (event) {
           var data = {}
           $('form.validate')
             .serializeArray()
-            .map(function(x) {
+            .map(function (x) {
               data[x.name] = x.value
             })
           // ga('send', 'event', 'Newsletter', 'Signup', window.location.href, { 'dimension1': data.EMAIL })
@@ -1717,7 +1728,7 @@
 
     <!-- Begin Navigation Scripts -->
     <script>
-      ;(function(w, d, s, l, i) {
+      ;(function (w, d, s, l, i) {
         w[l] = w[l] || []
         w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })
         var f = d.getElementsByTagName(s)[0],
@@ -1794,7 +1805,7 @@
         })
       }
       var navbar = document.querySelector('.navbar-menu')
-      document.addEventListener('click', function(event) {
+      document.addEventListener('click', function (event) {
         var isClickInside = navbar.contains(event.target)
         if (!isClickInside && window.innerWidth >= 1024) {
           close()

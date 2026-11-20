@@ -12,7 +12,7 @@
 .banner_v1 {
   display: flex;
   justify-content: space-between;
-  align-items:center;
+  align-items: center;
 }
 
 @media only screen and (min-width: 1024px) {
@@ -51,7 +51,7 @@
 }
 
 .beta {
-  background-color: #6657D5;
+  background-color: #6657d5;
   color: white;
   text-transform: capitalize;
   border-radius: 5px;

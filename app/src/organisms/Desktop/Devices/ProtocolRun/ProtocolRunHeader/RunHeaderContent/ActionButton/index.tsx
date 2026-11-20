@@ -22,13 +22,13 @@ import { getCameraUsageState } from '/app/redux/protocol-runs'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { useCurrentRunId, useProtocolDetailsForRun } from '/app/resources/runs'
 
+import type { RunHeaderContentProps } from '..'
 import { RobotOutOfStorageModal } from '../../../../RobotOutOfStorageModal.tsx'
 import { getFallbackRobotSerialNumber } from '../../utils'
 import { useActionButtonProperties } from './hooks'
 
 import type { MutableRefObject, ReactNode } from 'react'
 import type { State } from '/app/redux/types'
-import type { RunHeaderContentProps } from '..'
 
 export type BaseActionButtonProps = RunHeaderContentProps
 

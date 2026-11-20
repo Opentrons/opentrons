@@ -168,7 +168,8 @@ export function useLPCAnalytics({
 
 function getSlotNameFrom(
   locationSequence:
-    LabwareOffsetLocationSequenceComponent[] | typeof ANY_LOCATION
+    | LabwareOffsetLocationSequenceComponent[]
+    | typeof ANY_LOCATION
 ): string | null {
   const slot = locationSequence[locationSequence.length - 1]
 
@@ -186,7 +187,8 @@ function getSlotNameFrom(
 
 function getOffsetKindFrom(
   locationSequence:
-    LabwareOffsetLocationSequenceComponent[] | typeof ANY_LOCATION
+    | LabwareOffsetLocationSequenceComponent[]
+    | typeof ANY_LOCATION
 ): 'default' | 'appliedLocation' {
   return locationSequence === ANY_LOCATION ? 'default' : 'appliedLocation'
 }

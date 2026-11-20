@@ -1,5 +1,5 @@
 ---
-title: "Python API: Volume Modes"
+title: 'Python API: Volume Modes'
 description: How to work with very small volumes of liquid on Opentrons Flex.
 ---
 
@@ -11,14 +11,14 @@ pipette50.pick_up_tip()
 pipette50.aspirate(1, plate["A1"])
 ```
 
-*New in version 2.15*
+_New in version 2.15_
 
 Passing different values to `configure_for_volume()` changes the minimum and maximum volume of Flex 50 µL pipettes as follows:
 
-| Value      | Minimum Volume (µL) | Maximum Volume (µL) |
-|------------|---------------------|---------------------|
-| 1–4.9      | 1                   | 30                  |
-| 5–50       | 5                   | 50                  |
+| Value | Minimum Volume (µL) | Maximum Volume (µL) |
+| ----- | ------------------- | ------------------- |
+| 1–4.9 | 1                   | 30                  |
+| 5–50  | 5                   | 50                  |
 
 When you use `configure_for_volume()` for a Flex 50 µL pipette, you also define the default push out volume:
 
@@ -28,8 +28,8 @@ When you use `configure_for_volume()` for a Flex 50 µL pipette, you also define
 For more, see [Push Out After Dispense][push-out-after-dispense].
 
 !!! note
-    The pipette must not contain liquid when you call `configure_for_volume()`, or the API will raise an error.
-    
+The pipette must not contain liquid when you call `configure_for_volume()`, or the API will raise an error.
+
     Also, if the pipette is in a well location that may contain liquid, it will move upward to ensure it is not immersed in liquid before changing its mode. Calling `configure_for_volume()` *before* `pick_up_tip()` helps to avoid this situation.
 
 In a protocol that handles many different volumes, it's a good practice to call `configure_for_volume()` once for each [`transfer()`][opentrons.protocol_api.InstrumentContext.transfer] or [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate], specifying the volume that you are about to handle. When operating with a list of volumes, nest `configure_for_volume()` inside a `for` loop to ensure that the pipette is properly configured for each volume:

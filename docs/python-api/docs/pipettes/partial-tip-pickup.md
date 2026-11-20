@@ -1,18 +1,18 @@
 ---
-title: "Python API: Partial Tip Pickup"
-description: "Pick up tips with a subset of channels on multi-channel pipettes."
+title: 'Python API: Partial Tip Pickup'
+description: 'Pick up tips with a subset of channels on multi-channel pipettes.'
 ---
 
 By default, multi-channel pipettes always use all of their nozzles to pick up tips and handle liquids: an 8-channel pipette picks up 8 tips at once, and a 96-channel pipette picks up 96 tips at once. Partial tip pickup lets you configure a multi-channel pipette to use fewer tips. This expands the liquid handling capabilities of your robot without having to physically switch pipettes, and is especially useful for the Flex 96-Channel Pipette, which occupies both pipette mounts.
 
 Before getting started with partial tip pickup, make sure your protocol specifies an API version that supports the configuration you need.
 
-| Pipette                  | Partial configuration | Minimum API version |
-|--------------------------|----------------------|--------------------|
-| Flex 96-Channel Pipette  | Column               | 2.16               |
-| Flex 96-Channel Pipette  | Single, row          | 2.20               |
-| Flex 8-Channel Pipettes  | Single, partial column | 2.20               |
-| OT-2 Multi-Channel Pipettes  | Single, partial column | 2.20               |
+| Pipette                     | Partial configuration  | Minimum API version |
+| --------------------------- | ---------------------- | ------------------- |
+| Flex 96-Channel Pipette     | Column                 | 2.16                |
+| Flex 96-Channel Pipette     | Single, row            | 2.20                |
+| Flex 8-Channel Pipettes     | Single, partial column | 2.20                |
+| OT-2 Multi-Channel Pipettes | Single, partial column | 2.20                |
 
 ## Nozzle layouts
 
@@ -60,7 +60,7 @@ def run(protocol: protocol_api.ProtocolContext):
     )
 ```
 
-*New in version 2.16*
+_New in version 2.16_
 
 Let’s unpack some of the details of this code.
 
@@ -83,7 +83,7 @@ pipette.pick_up_tip()  # picks up A2-H2 from tip rack
 ```
 
 !!! warning
-    [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip] always accepts a `location` argument, regardless of nozzle configuration. Do not pass a value that would lead the pipette to line up over more tips in the rack than specified by the current layout. For example, setting `COLUMN` layout and then calling `pipette.pick_up_tip(tip_rack["A2"])` on a full tip rack will lead to unexpected pipetting behavior and potential crashes.
+[`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip] always accepts a `location` argument, regardless of nozzle configuration. Do not pass a value that would lead the pipette to line up over more tips in the rack than specified by the current layout. For example, setting `COLUMN` layout and then calling `pipette.pick_up_tip(tip_rack["A2"])` on a full tip rack will lead to unexpected pipetting behavior and potential crashes.
 
 ### Row layout
 
@@ -109,7 +109,7 @@ def run(protocol: protocol_api.ProtocolContext):
     )
 ```
 
-*New in version 2.20*
+_New in version 2.20_
 
 Setting `start="H1"` means the pipette will use its frontmost nozzles to pick up tips, starting from the back of the tip rack:
 
@@ -122,29 +122,29 @@ pipette.pick_up_tip()  # picks up B1-B12 from tip rack
 You can also set `start="A1"` to use the backmost nozzles and pick up from the front of the tip rack.
 
 !!! note
-    Consider the placement of your tip rack when choosing the `start` value for row pickup. The pipette cannot pick up from back to front (`start="H1"`) on tip racks in row A of the deck, nor can it pick up from front to back (`start="A1"`) on tip racks in row D of the deck. This is because the pipette can't move far enough backward or forward, respectively, to align over those tips. Use a different `start` value, or load the tip rack in row B or C.
+Consider the placement of your tip rack when choosing the `start` value for row pickup. The pipette cannot pick up from back to front (`start="H1"`) on tip racks in row A of the deck, nor can it pick up from front to back (`start="A1"`) on tip racks in row D of the deck. This is because the pipette can't move far enough backward or forward, respectively, to align over those tips. Use a different `start` value, or load the tip rack in row B or C.
 
 ### Single layout
 
 Single-tip pickup is available on both 8-channel and 96-channel pipettes. 8-channel pipettes can pick up a single tip with either the front or back nozzle. 96-channel pipettes can pick up a single tip with any of the corner nozzles.
 
 !!! note
-    Remember that only the A1 and H12 nozzles of the 96-channel pipette contain pressure sensors. Avoid using the A12 and H1 nozzles for single-tip pickup if you need to detect liquid presence within wells.
+Remember that only the A1 and H12 nozzles of the 96-channel pipette contain pressure sensors. Avoid using the A12 and H1 nozzles for single-tip pickup if you need to detect liquid presence within wells.
 
 The `start` parameter sets the first and only nozzle used in the configuration. It also affects the order in which the pipette picks up tips. When using automatic tip tracking, single-tip configurations always consume all tips within a single column before proceeding to another column.
 
-| Pipette type | `start` well | Pickup order |
-|--------------|--------------|--------------|
-| 8-channel    | A1           | Front to back, left to right<br>(H1 through A1, H2 through A2, …) |
-| 8-channel    | H1           | Back to front, left to right<br>(A1 through H1, A2 through H2, …) |
+| Pipette type | `start` well | Pickup order                                                          |
+| ------------ | ------------ | --------------------------------------------------------------------- |
+| 8-channel    | A1           | Front to back, left to right<br>(H1 through A1, H2 through A2, …)     |
+| 8-channel    | H1           | Back to front, left to right<br>(A1 through H1, A2 through H2, …)     |
 | 96-channel   | A1           | Front to back, right to left<br>(H12 through A12, H11 through A11, …) |
 | 96-channel   | H1           | Back to front, right to left<br>(A12 through H12, A11 through H11, …) |
-| 96-channel   | A12          | Front to back, left to right<br>(H1 through A1, H2 through A2, …) |
-| 96-channel   | H12          | Back to front, left to right<br>(A1 through H1, A2 through H2, …) |
+| 96-channel   | A12          | Front to back, left to right<br>(H1 through A1, H2 through A2, …)     |
+| 96-channel   | H12          | Back to front, left to right<br>(A1 through H1, A2 through H2, …)     |
 
 !!! warning
-    In certain conditions, tips in adjacent columns may cling to empty nozzles during single-tip pickup. You can avoid this by overriding automatic tip tracking to pick up tips row by row, rather than column by column. The code sample below demonstrates how to pick up tips this way.
-    
+In certain conditions, tips in adjacent columns may cling to empty nozzles during single-tip pickup. You can avoid this by overriding automatic tip tracking to pick up tips row by row, rather than column by column. The code sample below demonstrates how to pick up tips this way.
+
     However, as with all partial tip layouts, be careful that you don't place the pipette in a position where it overlaps more tips than intended.
 
 Here is the start of a protocol that imports the `SINGLE` and `ALL` layout constants, loads an 8-channel pipette, and sets it to pick up a single tip.
@@ -171,7 +171,7 @@ def run(protocol: protocol_api.ProtocolContext):
     )
 ```
 
-*New in version 2.20*
+_New in version 2.20_
 
 To pick up tips row by row, first construct a list of all wells in the tip rack ordered from A1, A2 … H11, H12. One way to do this is to use [`sum()`](https://docs.python.org/3/library/functions.html#sum) to flatten the list of lists returned by [`Labware.rows()`][opentrons.protocol_api.labware.Labware.rows]:
 
@@ -223,8 +223,8 @@ To specify the number of tips to pick up, add the `end` parameter when calling [
 When picking up 3, 5, 6, or 7 tips, extra tips will be left at the front of each column. You can use these tips with a different nozzle configuration, or you can manually re-rack them at the end of your protocol for future use.
 
 !!! warning
-    In certain conditions, tips in adjacent columns may cling to empty nozzles during partial-column pickup. You can avoid this by overriding automatic tip tracking to pick up tips row by row, rather than column by column. The code sample below demonstrates how to pick up tips this way.
-    
+In certain conditions, tips in adjacent columns may cling to empty nozzles during partial-column pickup. You can avoid this by overriding automatic tip tracking to pick up tips row by row, rather than column by column. The code sample below demonstrates how to pick up tips this way.
+
     However, as with all partial tip layouts, be careful that you don't place the pipette in a position where it overlaps more tips than intended.
 
 Here is the start of a protocol that imports the `PARTIAL_COLUMN` and `ALL` layout constants, loads an 8-channel pipette, and sets it to pick up four tips:
@@ -249,9 +249,9 @@ def run(protocol: protocol_api.ProtocolContext):
     )
 ```
 
-*New in version 2.20*
+_New in version 2.20_
 
-When pipetting in partial column configuration, remember that *the frontmost channel of the pipette is its primary channel*. To pick up tips across the back half of the rack, then across the front half of the rack, construct a list of that includes all and only the wells in row D and row H:
+When pipetting in partial column configuration, remember that _the frontmost channel of the pipette is its primary channel_. To pick up tips across the back half of the rack, then across the front half of the rack, construct a list of that includes all and only the wells in row D and row H:
 
 ```python
 tips_by_row = partial_rack.rows_by_name()["D"] + partial_rack.rows_by_name()["H"]
@@ -279,8 +279,8 @@ pipette.transfer(
 ```
 
 !!! warning
-    Do not move the pipette to row A of labware when in `PARTIAL_COLUMN` configuration! This is different than when pipetting to a full column, either with the 8-channel pipette in `ALL` configuration or with the 96-channel pipette in `COLUMN` configuration.
-    
+Do not move the pipette to row A of labware when in `PARTIAL_COLUMN` configuration! This is different than when pipetting to a full column, either with the 8-channel pipette in `ALL` configuration or with the 96-channel pipette in `COLUMN` configuration.
+
     If you pipette to row A, the frontmost tip will move to row A and the other tips—further back in the layout—will hang over the back edge of the labware. They will not enter the correct wells and they will likely cause a crash.
 
 ## Tip rack adapters
@@ -313,7 +313,7 @@ full_tip_racks = [tips_3, tips_4]
 ```
 
 !!! tip
-    It's also good practice to keep separate lists of tip racks when using multiple partial tip pickup configurations (e.g., using both column 1 and column 12 in the same protocol). This improves positional accuracy when picking up tips. Additionally, use Labware Position Check in the Opentrons App to ensure that the partial configuration is well-aligned to the rack.
+It's also good practice to keep separate lists of tip racks when using multiple partial tip pickup configurations (e.g., using both column 1 and column 12 in the same protocol). This improves positional accuracy when picking up tips. Additionally, use Labware Position Check in the Opentrons App to ensure that the partial configuration is well-aligned to the rack.
 
 Now, when you configure the nozzle layout, you can reference the appropriate list as the value of `tip_racks`:
 
@@ -349,18 +349,18 @@ The API will raise errors for potential crashes when using a partial nozzle conf
 When using partial nozzle configurations around the back, right, and front edges of the deck, there are limitations on how far the pipette can move beyond the outer edge of the deck slot. The API will raise an error if you try to pipette beyond these outer `extents` of the working area.
 
 !!! tip
-    There are no extents-related limitations on slots B1, B2, C1, and C2. When performing partial pickup and pipetting in these slots, you only have to consider [possible labware conflicts](#arranging-labware).
+There are no extents-related limitations on slots B1, B2, C1, and C2. When performing partial pickup and pipetting in these slots, you only have to consider [possible labware conflicts](#arranging-labware).
 
 One way to think of deck extents is in terms of where you can pick up tips or pipette to a 96-well plate loaded in a given slot. These limitations only apply when using a layout that places the pipette further towards the windows of the robot than an `ALL` layout would. For example, using a `ROW` layout with the frontmost nozzles of the 96-channel pipette, it will never move farther forward than the H row of a labware in slots D1–D3. But using a `ROW` layout with the backmost nozzles would bring it farther forward—it could collide with the front window, except that the API prevents it.
 
 The following table summarizes the limitations in place along each side of the deck.
 
-| Deck slots | Nozzle configuration | Inaccessible wells |
-|------------|---------------------|-------------------|
-| A1–D1 (left edge) | Rightmost column | None (all wells accessible) |
-| A1–A3 (back edge) | Frontmost row    | Rows A–G                |
-| A3–D3 (right edge)| Leftmost column  | Columns 11–12           |
-| D1–D3 (front edge)| Backmost row     | Rows F–H                |
+| Deck slots         | Nozzle configuration | Inaccessible wells          |
+| ------------------ | -------------------- | --------------------------- |
+| A1–D1 (left edge)  | Rightmost column     | None (all wells accessible) |
+| A1–A3 (back edge)  | Frontmost row        | Rows A–G                    |
+| A3–D3 (right edge) | Leftmost column      | Columns 11–12               |
+| D1–D3 (front edge) | Backmost row         | Rows F–H                    |
 
 To visualize these limitations, the below deck map shades all wells that have a single limitation in light blue, and all wells that have two limitations in dark blue.
 
@@ -382,7 +382,7 @@ pipette.configure_nozzle_layout(
 ```
 
 !!! note
-    When using a column 1 layout, the pipette can't reach the rightmost portion of labware in slots A3–D3. Any well that is within 29 mm of the right edge of the slot may be inaccessible. Use a column 12 layout if you need to pipette in that area.
+When using a column 1 layout, the pipette can't reach the rightmost portion of labware in slots A3–D3. Any well that is within 29 mm of the right edge of the slot may be inaccessible. Use a column 12 layout if you need to pipette in that area.
 
 When using column 12, the pipette overhangs space to the left of wherever it is picking up tips or pipetting. For this reason, it's a good idea to organize tip racks front to back on the deck. If you place them side by side, the rack to the right will be inaccessible. For example, let's load three tip racks in the front left corner of the deck:
 
@@ -400,6 +400,6 @@ Now the pipette will be able to access the racks in column 1 only. `pick_up_tip(
 You would get a similar error trying to aspirate from or dispense into a well plate in slot D3, since there is a tip rack to the left.
 
 !!! tip
-    When using column 12 nozzles for partial tip pickup and pipetting, generally organize your deck with the shortest labware on the left side of the deck, and the tallest labware on the right side.
-    
+When using column 12 nozzles for partial tip pickup and pipetting, generally organize your deck with the shortest labware on the left side of the deck, and the tallest labware on the right side.
+
     Similarly, when using the frontmost row of nozzles for partial tip pickup and pipetting, organize your deck with the shortest labware towards the back of the deck, and the tallest labware towards the front of the deck.

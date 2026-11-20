@@ -7,13 +7,13 @@ import { LPCFlows } from '/app/organisms/LabwarePositionCheck'
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 import { selectLabwareOffsetsToAddToRun } from '/app/redux/protocol-runs'
 
+import type { SetupLabwarePositionCheckProps } from '..'
 import { LPCOffsetsSnippets } from './LPCOffsetsSnippets'
 import { LPCSetupFlexBtns } from './LPCSetupFlexBtns'
 import { LPCSetupOffsetsTable } from './LPCSetupOffsetsTable'
 
 import type { ReactNode } from 'react'
 import type { State } from '/app/redux/types'
-import type { SetupLabwarePositionCheckProps } from '..'
 
 export function FlexSetupLPC(props: SetupLabwarePositionCheckProps): ReactNode {
   const { launchLPC, showLPC, lpcProps } = props.lpcUtils

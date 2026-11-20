@@ -43,7 +43,8 @@ export interface InterventionInfoStackedProps extends BaseInterventionInfo {
 }
 
 export type InterventionInfoProps =
-  InterventionInfoDefaultProps | InterventionInfoStackedProps
+  | InterventionInfoDefaultProps
+  | InterventionInfoStackedProps
 
 export function InterventionInfo(props: InterventionInfoProps): ReactNode {
   const content = buildContent(props)

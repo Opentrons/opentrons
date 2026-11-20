@@ -4,10 +4,10 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { SortButton } from '..'
+import type { SortDirection } from '..'
 import { renderWithProviders } from '../../../testing/utils'
 
 import type { ComponentProps } from 'react'
-import type { SortDirection } from '..'
 
 vi.mock('../../../helix/icons', () => ({
   Icon: ({ name, ...props }: { name: string }) => (

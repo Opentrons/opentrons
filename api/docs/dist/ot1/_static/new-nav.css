@@ -11,12 +11,12 @@
 header#nav {
   font-family: 'Open Sans', sans-serif;
   font-size: 100%;
-	font: inherit;
+  font: inherit;
 }
 header#nav a.btn {
-  font-family: 'AkkoPro-Medium', 'Ropa Sans', 'Open Sans',sans-serif;
-  text-shadow: 0 2px 4px rgba(0,0,0,.15);
-  letter-spacing: .5px;
+  font-family: 'AkkoPro-Medium', 'Ropa Sans', 'Open Sans', sans-serif;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  letter-spacing: 0.5px;
   border-radius: 6px;
   padding: 0 10px;
   background-color: #0070ff;
@@ -291,7 +291,13 @@ header#nav .navbar .main-menu .main-menu-li #sns .navbar-ul-li .schedule-demo {
   justify-content: center;
 }
 
-header#nav .navbar .main-menu .main-menu-li #sns .navbar-ul-li .schedule-demo:hover {
+header#nav
+  .navbar
+  .main-menu
+  .main-menu-li
+  #sns
+  .navbar-ul-li
+  .schedule-demo:hover {
   opacity: 0.7;
 }
 
@@ -299,20 +305,48 @@ header#nav .navbar .main-menu .main-menu-li #sns .navbar-ul-li:first-child {
   padding-left: 30px;
 }
 
-header#nav .navbar .main-menu .main-menu-li #sns .navbar-ul-li .protocol-items li {
+header#nav
+  .navbar
+  .main-menu
+  .main-menu-li
+  #sns
+  .navbar-ul-li
+  .protocol-items
+  li {
   padding-left: 0;
   margin-top: 0;
   margin-bottom: 10px;
 }
-header#nav .navbar .main-menu .main-menu-li #sns .navbar-ul-li .protocol-items li a {
+header#nav
+  .navbar
+  .main-menu
+  .main-menu-li
+  #sns
+  .navbar-ul-li
+  .protocol-items
+  li
+  a {
   padding-left: 0;
   padding-bottom: 0;
 }
-header#nav .navbar .main-menu .main-menu-li #protocols .protocol-items .protocol-items-span {
+header#nav
+  .navbar
+  .main-menu
+  .main-menu-li
+  #protocols
+  .protocol-items
+  .protocol-items-span {
   padding-right: 30px;
 }
 
-header#nav .navbar .main-menu .main-menu-li #sns .navbar-ul-li .protocol-items .blue-text {
+header#nav
+  .navbar
+  .main-menu
+  .main-menu-li
+  #sns
+  .navbar-ul-li
+  .protocol-items
+  .blue-text {
   padding-left: 0;
   font-weight: 700;
   text-decoration: none;
@@ -472,7 +506,13 @@ header#nav .navbar .main-menu .main-menu-li .navbar-ul .navbar-ul-li {
   margin: 0;
 }
 
-header#nav .navbar .main-menu .main-menu-li .navbar-ul .navbar-ul-li .support-sales {
+header#nav
+  .navbar
+  .main-menu
+  .main-menu-li
+  .navbar-ul
+  .navbar-ul-li
+  .support-sales {
   height: 30px;
   color: #707070;
   letter-spacing: 0.7px;
@@ -551,11 +591,23 @@ header#nav .navbar .main-menu .main-menu-li .protocol-nav .protocol-items {
   width: auto;
 }
 
-header#nav .navbar .main-menu .main-menu-li .protocol-nav .protocol-items .github {
+header#nav
+  .navbar
+  .main-menu
+  .main-menu-li
+  .protocol-nav
+  .protocol-items
+  .github {
   margin-bottom: 0;
 }
 
-header#nav .navbar .main-menu .main-menu-li .protocol-nav .protocol-items .protocol-bottom {
+header#nav
+  .navbar
+  .main-menu
+  .main-menu-li
+  .protocol-nav
+  .protocol-items
+  .protocol-bottom {
   margin-bottom: 30px;
 }
 
@@ -566,7 +618,13 @@ header#nav .navbar .main-menu .main-menu-li .protocol-nav .protocol-items span {
   line-height: 20px;
 }
 
-header#nav .navbar .main-menu .main-menu-li .protocol-nav .protocol-items .blue-text {
+header#nav
+  .navbar
+  .main-menu
+  .main-menu-li
+  .protocol-nav
+  .protocol-items
+  .blue-text {
   padding-left: 25px;
   color: #056efb;
   text-decoration: none;

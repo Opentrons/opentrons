@@ -30,7 +30,9 @@ import type { ReactNode } from 'react'
 import type { AuthUserResponse, UpdateSelfRequest } from '@opentrons/api-client'
 
 type AdminHubPages =
-  'user_management' | 'crs_settings' | 'personal_account_settings'
+  | 'user_management'
+  | 'crs_settings'
+  | 'personal_account_settings'
 
 export function AdminHub(): ReactNode {
   const robotName = useLocalRobotName()

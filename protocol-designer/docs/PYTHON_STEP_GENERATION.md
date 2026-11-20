@@ -8,7 +8,8 @@ The command creators produce a `CommandCreatorResult`. We'll augment that to inc
 
 ```typescript
 export type CommandCreatorResult =
-  CommandsAndWarnings | CommandCreatorErrorResponse
+  | CommandsAndWarnings
+  | CommandCreatorErrorResponse
 
 export interface CommandsAndWarnings {
   commands: CreateCommand[]

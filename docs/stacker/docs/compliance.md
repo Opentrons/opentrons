@@ -1,6 +1,6 @@
 ---
-title: "Flex Stacker: Safety and Compliance"
-description: "Safe use guidelines, safety symbols, and regulatory compliance for the Stacker."
+title: 'Flex Stacker: Safety and Compliance'
+description: 'Safe use guidelines, safety symbols, and regulatory compliance for the Stacker.'
 ---
 
 Opentrons recommends that you follow the safe use specifications listed in this section and throughout this manual.
@@ -95,18 +95,18 @@ The Flex Stacker has been tested and found to be in compliance with all applicab
 
 ### Safety
 
-| Rule ID | Title |
-|----|----|
-| IEC/UL/CSA 61010-1 | Safety Requirements for Electrical Equipment for Measurement, Control, and Laboratory Use–Part 1: General Requirements |
+| Rule ID                | Title                                                                                                                                                                           |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| IEC/UL/CSA 61010-1     | Safety Requirements for Electrical Equipment for Measurement, Control, and Laboratory Use–Part 1: General Requirements                                                          |
 | IEC/UL/CSA 61010-2-051 | Safety Requirements for Electrical Equipment for Measurement, Control and Laboratory Use - Part 2-051: Particular Requirements for Laboratory Equipment for Mixing and Stirring |
 
 ### Electromagnetic Compatibility
 
-| Rule ID | Title |
-|----|----|
-| EN/BSI 61326-1 | Electrical Equipment for Measurement, Control, and Laboratory Use–EMC Requirements–Part 1: General Requirements |
-| FCC 47 CFR Part 15 Subpart B Class A | Equipment Authorization of Unintentional Radiators |
-| IC ICES-003 | Spectrum Management and Telecommunications–Interference-Causing Equipment Standard–Information Technology Equipment (Including Digital Apparatus) |
+| Rule ID                              | Title                                                                                                                                             |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| EN/BSI 61326-1                       | Electrical Equipment for Measurement, Control, and Laboratory Use–EMC Requirements–Part 1: General Requirements                                   |
+| FCC 47 CFR Part 15 Subpart B Class A | Equipment Authorization of Unintentional Radiators                                                                                                |
+| IC ICES-003                          | Spectrum Management and Telecommunications–Interference-Causing Equipment Standard–Information Technology Equipment (Including Digital Apparatus) |
 
 ### Hazardous Substances
 
@@ -134,7 +134,7 @@ Caution: This equipment is not intended for use in residential environments and 
     ![WEEE symbol](images/iso-warnings/WEEE.svg)
 </figure>
 
-Opentrons is dedicated to adhering to the EU Directive on Waste Electrical and Electronic Equipment (WEEE – 2012/19/EU). Our goal is to ensure that our products are properly disposed of or recycled once they reach the end of their useful life. 
+Opentrons is dedicated to adhering to the EU Directive on Waste Electrical and Electronic Equipment (WEEE – 2012/19/EU). Our goal is to ensure that our products are properly disposed of or recycled once they reach the end of their useful life.
 
 Opentrons products that fall under the WEEE directive are labeled with the ![WEEE symbol](images/iso-warnings/WEEE.svg){: style="vertical-align: middle; height: 1.25em;"} symbol, signifying that they should not be thrown away with regular household waste but must be collected and handled separately.
 
@@ -146,10 +146,10 @@ Cancer and reproductive harm – [www.P65Warnings.ca.gov](https://www.p65warning
 
 You can install and use Stackers with the [Opentrons Flex HEPA/UV Module](https://opentrons.com/products/opentrons-flex-hepa-uv-module). Newer Flex models, the HEPA/UV module, and the Stacker all include features that help protect you from UV-C exposure and prevent the UV lights from operating unsafely.
 
-| Safety feature | Description |
-|----|----|
-|Side panels | The replacement side panel that comes with the User Kit is opaque to UV-C light. The other panels on the robot block UV-spectrum light to below a level which represents an exposure risk. |
-| Attachment sensors | The Stacker and HEPA/UV Module each use sensors and switches to determine if they’re installed properly. These devices deactivate/disable the UV lights when the Stacker door is open, or these components are improperly installed, removed during operation, or misaligned.|
+| Safety feature     | Description                                                                                                                                                                                                                                                                   |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Side panels        | The replacement side panel that comes with the User Kit is opaque to UV-C light. The other panels on the robot block UV-spectrum light to below a level which represents an exposure risk.                                                                                    |
+| Attachment sensors | The Stacker and HEPA/UV Module each use sensors and switches to determine if they’re installed properly. These devices deactivate/disable the UV lights when the Stacker door is open, or these components are improperly installed, removed during operation, or misaligned. |
 
 ## Flex, Stacker, and HEPA/UV Compatibility
 
@@ -163,14 +163,14 @@ The serial number can be found on the certification sticker on the back of each 
 ![Flex serial number](images/serial-number-cropped2.png){width="50%"}
 
 !!!note
-    The upgrade kit must be installed by an Opentrons field service technician only.
+The upgrade kit must be installed by an Opentrons field service technician only.
 
 Compare these serial number versions to the serial number on your robot to determine if it needs the Stacker retrofit kit installed.
 
-| Version | Example | Retrofit required |
-|----|----|----|
-| A10 | FLX**A10**20240201234 | Yes |
-| A20 | FLX**A20**20250321003 | Yes |
-| A30 | FLX**A30**20250908004 | No |
+| Version | Example               | Retrofit required |
+| ------- | --------------------- | ----------------- |
+| A10     | FLX**A10**20240201234 | Yes               |
+| A20     | FLX**A20**20250321003 | Yes               |
+| A30     | FLX**A30**20250908004 | No                |
 
 Contact [Opentrons Sales](https://opentrons.com/contact) if you're unsure about your robot's manufacture date and/or have a robot that needs to be upgraded.

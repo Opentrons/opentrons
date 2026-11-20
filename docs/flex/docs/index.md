@@ -1,6 +1,6 @@
 ---
-title: "Opentrons Flex Instruction Manual"
-description: "Official instruction manual for the Opentrons Flex liquid handling robot."
+title: 'Opentrons Flex Instruction Manual'
+description: 'Official instruction manual for the Opentrons Flex liquid handling robot.'
 ---
 
 <style>
@@ -14,7 +14,7 @@ div.cover {
 
 # Instruction Manual
 
-![<# alt text #>](images/flex-hero.png "flex-hero.png")
+![<# alt text #>](images/flex-hero.png 'flex-hero.png')
 
 **Opentrons Labworks Inc.**
 

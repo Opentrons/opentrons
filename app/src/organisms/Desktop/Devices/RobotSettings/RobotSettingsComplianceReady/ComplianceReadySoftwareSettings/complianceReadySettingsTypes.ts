@@ -84,7 +84,8 @@ export function isAuditInputFieldId(
 export function isForceTextInputFieldId(
   id: SettingFieldId
 ): id is
-  keyof typeof AUTH_INPUT_FIELD_IDS | keyof typeof AUDIT_INPUT_FIELD_IDS {
+  | keyof typeof AUTH_INPUT_FIELD_IDS
+  | keyof typeof AUDIT_INPUT_FIELD_IDS {
   return isAuthInputFieldId(id) || isAuditInputFieldId(id)
 }
 

@@ -30,12 +30,12 @@ import {
 } from '/app/resources/runs'
 
 import { RunProgressMeter } from '..'
+import { useDownloadRunLog } from '../../Devices/hooks'
 import {
   mockUseAllCommandsResponseNonDeterministic,
   mockUseCommandResultNonDeterministic,
   NON_DETERMINISTIC_COMMAND_KEY,
 } from '../__fixtures__'
-import { useDownloadRunLog } from '../../Devices/hooks'
 
 import type { ComponentProps } from 'react'
 import type { RunCommandSummary } from '@opentrons/api-client'

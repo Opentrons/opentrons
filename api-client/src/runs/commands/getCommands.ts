@@ -1,6 +1,6 @@
+import type { CommandsData } from '..'
 import { GET, request } from '../../request'
 
-import type { CommandsData } from '..'
 import type { ResponsePromise } from '../../request'
 import type { HostConfig } from '../../types'
 import type { GetRunCommandsParamsRequest } from './types'

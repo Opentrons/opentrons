@@ -322,7 +322,10 @@ export const FAKE_AA = [
 ]
 
 export type FlexFakeAddressableAreaName =
-  'fakeA4' | 'fakeB4' | 'fakeC4' | 'fakeD4'
+  | 'fakeA4'
+  | 'fakeB4'
+  | 'fakeC4'
+  | 'fakeD4'
 
 export type FakeCutoutFixtureId =
   | 'fakeStagingAreaRightSlot'
@@ -330,7 +333,8 @@ export type FakeCutoutFixtureId =
   | 'fakeStagingSlotWithMagBlockV1'
 
 export type AddressableAreaNamesWithFakes =
-  AddressableAreaName | FlexFakeAddressableAreaName
+  | AddressableAreaName
+  | FlexFakeAddressableAreaName
 
 export type AddressableAreaWithFakes = AddressableArea | FakeAddressableArea
 

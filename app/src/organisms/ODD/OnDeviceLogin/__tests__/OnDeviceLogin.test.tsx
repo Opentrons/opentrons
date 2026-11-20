@@ -7,10 +7,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 
 import { OnDeviceLogin } from '..'
+import type { LoginStep } from '..'
 
 import type { ComponentProps, ReactNode } from 'react'
 import type * as ReactI18next from 'react-i18next'
-import type { LoginStep } from '..'
 
 vi.mock('react-i18next', async importOriginal => {
   const actual = await importOriginal<typeof ReactI18next>()

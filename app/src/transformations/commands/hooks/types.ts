@@ -34,4 +34,7 @@ export interface ProtocolFixture {
 }
 
 export type ProtocolHardware =
-  ProtocolPipette | ProtocolModule | ProtocolGripper | ProtocolFixture
+  | ProtocolPipette
+  | ProtocolModule
+  | ProtocolGripper
+  | ProtocolFixture

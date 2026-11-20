@@ -1,6 +1,6 @@
 ---
-title: "Python API: Pipette Characteristics"
-description: "Pipette specs, channels, and volume ranges in the Python API."
+title: 'Python API: Pipette Characteristics'
+description: 'Pipette specs, channels, and volume ranges in the Python API.'
 ---
 
 Each Opentrons pipette has different capabilities, which you'll want to take advantage of in your protocols. This page covers some fundamental pipette characteristics.
@@ -15,18 +15,18 @@ Finally, the volume ranges of pipettes affect what you can do with them. The vol
 
 All [building block](../building-block-commands/index.md) and [complex commands](../complex-commands/index.md) work with single- and multi-channel pipettes.
 
-To keep the protocol API consistent when using single- and multi-channel pipettes, location arguments of pipetting commands use the pipette's *primary channel*. For multi-channel pipettes picking up tips with all of their channels, the back-left channel is considered primary. When using fewer channels, the `start` parameter of the [`configure_nozzle_layout()`][opentrons.protocol_api.InstrumentContext.configure_nozzle_layout] method can change the pipette's primary channel. See [Partial Tip Pickup](partial-tip-pickup.md) for more information.
+To keep the protocol API consistent when using single- and multi-channel pipettes, location arguments of pipetting commands use the pipette's _primary channel_. For multi-channel pipettes picking up tips with all of their channels, the back-left channel is considered primary. When using fewer channels, the `start` parameter of the [`configure_nozzle_layout()`][opentrons.protocol_api.InstrumentContext.configure_nozzle_layout] method can change the pipette's primary channel. See [Partial Tip Pickup](partial-tip-pickup.md) for more information.
 
 !!!note
-    Complex commands with liquid classes, like [`transfer_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class], handle multi-channel movement differently. By default, they expect a list of *all wells* that the pipette will access. If you want to only provide the wells that the primary channel will access, set `group_wells=False` when using those commands.
+Complex commands with liquid classes, like [`transfer_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class], handle multi-channel movement differently. By default, they expect a list of _all wells_ that the pipette will access. If you want to only provide the wells that the primary channel will access, set `group_wells=False` when using those commands.
 
 With a pipette's default settings, you can generally access the wells indicated in the table below. Moving to any other well may cause the pipette to crash.
 
-| Channels | 96-well plate | 384-well plate |
-|----------|---------------|---------------|
+| Channels | 96-well plate    | 384-well plate   |
+| -------- | ---------------- | ---------------- |
 | 1        | Any well, A1–H12 | Any well, A1–P24 |
-| 8        | A1–A12        | A1–B24        |
-| 96       | A1 only       | A1–B2         |
+| 8        | A1–A12           | A1–B24           |
+| 96       | A1 only          | A1–B2            |
 
 Also, you should apply any location offset, such as [`Well.top()`][opentrons.protocol_api.labware.Well.top] or [`Well.bottom()`][opentrons.protocol_api.labware.Well.bottom], to the well accessed by the primary channel. Since all of the pipette's channels move together, each channel will have the same offset relative to the well that it is over.
 
@@ -113,6 +113,7 @@ After picking up a tip, let’s tell the robot to aspirate 100 µL from the well
 ```python
 right.aspirate(volume=100, location=plate["A1"])
 ```
+
 The eight pipette channels will only aspirate from every other well in the column: A1, C1, E1, G1, I1, K1, M1, and O1.
 
 Finally, let’s tell the robot to dispense 100 µL into the well plate at location B1:
@@ -165,12 +166,12 @@ pipette.dispense(200, plate["A2"])  # 100 µL/s
 pipette.blow_out()                  # 300 µL/s
 ```
 
-These flow rates will remain in effect until you change the `flow_rate` attribute again *or* call [`configure_for_volume()`][opentrons.protocol_api.InstrumentContext.configure_for_volume]. Calling `configure_for_volume()` always resets all pipette flow rates to the defaults for the mode that it sets.
+These flow rates will remain in effect until you change the `flow_rate` attribute again _or_ call [`configure_for_volume()`][opentrons.protocol_api.InstrumentContext.configure_for_volume]. Calling `configure_for_volume()` always resets all pipette flow rates to the defaults for the mode that it sets.
 
 !!! note
-    In API version 2.13 and earlier, [`InstrumentContext.speed`][opentrons.protocol_api.InstrumentContext.speed] offered similar functionality to `.flow_rate`. It attempted to set the plunger speed in mm/s. Due to technical limitations, that speed could only be approximate. You must use `.flow_rate` in version 2.14 and later, and you should consider replacing older code that sets `.speed`.
+In API version 2.13 and earlier, [`InstrumentContext.speed`][opentrons.protocol_api.InstrumentContext.speed] offered similar functionality to `.flow_rate`. It attempted to set the plunger speed in mm/s. Due to technical limitations, that speed could only be approximate. You must use `.flow_rate` in version 2.14 and later, and you should consider replacing older code that sets `.speed`.
 
-*New in version 2.0*
+_New in version 2.0_
 
 ### Flex pipette flow rates
 
@@ -299,11 +300,11 @@ Additionally, all OT-2 GEN2 pipettes have a default head speed of 400 mm/s and a
 The OT-2 works with the GEN1 and GEN2 pipette models. The newer GEN2 pipettes have different volume ranges than the older GEN1 pipettes. With some exceptions, the volume ranges for GEN2 pipettes overlap those used by the GEN1 models. If your protocol specifies a GEN1 pipette, but you have a GEN2 pipette with a compatible volume range, you can still run your protocol. The OT-2 will consider the GEN2 pipette to have the same minimum volume as the GEN1 pipette. The following table lists the volume compatibility between the GEN2 and GEN1 pipettes.
 
 | GEN2 Pipette              | GEN1 Pipette              | GEN1 Volume |
-|---------------------------|---------------------------|-------------|
-| P20   Single-Channel GEN2 | P10   Single-Channel GEN1 | 1–10     µL |
-| P20   Multi-Channel  GEN2 | P10   Multi-Channel  GEN1 | 1–10     µL |
-| P300  Single-Channel GEN2 | P300  Single-Channel GEN1 | 30–300   µL |
-| P300  Multi-Channel  GEN2 | P300  Multi-Channel  GEN1 | 20–200   µL |
+| ------------------------- | ------------------------- | ----------- |
+| P20 Single-Channel GEN2   | P10 Single-Channel GEN1   | 1–10 µL     |
+| P20 Multi-Channel GEN2    | P10 Multi-Channel GEN1    | 1–10 µL     |
+| P300 Single-Channel GEN2  | P300 Single-Channel GEN1  | 30–300 µL   |
+| P300 Multi-Channel GEN2   | P300 Multi-Channel GEN1   | 20–200 µL   |
 | P1000 Single-Channel GEN2 | P1000 Single-Channel GEN1 | 100–1000 µL |
 
 The single- and multi-channel P50 GEN1 pipettes are the exceptions here. If your protocol uses a P50 GEN1 pipette, there is no backward compatibility with a related GEN2 pipette. To replace a P50 GEN1 with a corresponding GEN2 pipette, edit your protocol to load a P20 Single-Channel GEN2 (for volumes below 20 µL) or a P300 Single-Channel GEN2 (for volumes between 20 and 50 µL).

@@ -1,12 +1,12 @@
 ---
-title: "Compliance Ready Software: Complete a protocol"
-description: "Completing a protocol run in Compliance Ready Software."
+title: 'Compliance Ready Software: Complete a protocol'
+description: 'Completing a protocol run in Compliance Ready Software.'
 ---
 
 When a protocol is complete, you'll need to sign for the run in the Opentrons App or on the Flex touchscreen. Signing for a run is the final checkpoint to completing a protocol run, and adds your legal name and user ID to every user action captured for the protocol.
 
 !!! note
-    By default, only administrator accounts can sign for a completed protocol run. Use Compliance Ready Software [settings](../features/admin.md#compliance-ready-software-settings) to: 
+By default, only administrator accounts can sign for a completed protocol run. Use Compliance Ready Software [settings](../features/admin.md#compliance-ready-software-settings) to:
 
     * Allow any user to sign for a protocol run.
     * Choose whether a signature should be required after a protocol run.
@@ -16,14 +16,14 @@ When a protocol is complete, you'll need to sign for the run in the Opentrons Ap
   <figcaption>Sign for a protocol run in the Opentrons App.</figcaption>
 </figure>
 
-Until you sign, the protocol run isn't complete in the Opentrons App or on the Flex touchscreen. You'll be blocked from completing other actions until signing when this default setting is on. 
+Until you sign, the protocol run isn't complete in the Opentrons App or on the Flex touchscreen. You'll be blocked from completing other actions until signing when this default setting is on.
 
 <figure class="screenshot" markdown>
   ![Sign for a protocol run before completing other actions.](../images/block-until-signed.png)
   <figcaption>You'll need to sign for the run before proceeding to other protocols or actions on your Flex.</figcaption> 
 </figure>
 
-After signing, your Flex will prompt you to download audit logs. [Audit logs](files.md) are files the Flex generates containing data like responsible users, timestamps, and documentation for every robot action. 
+After signing, your Flex will prompt you to download audit logs. [Audit logs](files.md) are files the Flex generates containing data like responsible users, timestamps, and documentation for every robot action.
 
 To conserve space, these files are not saved to the Flex by default. Instead, you'll need to download them from the Opentrons App after signing for your protocol run.
 
@@ -34,9 +34,9 @@ To conserve space, these files are not saved to the Flex by default. Instead, yo
 
 Administrators can [change this setting](../settings.md#download-files-after-a-run) to save audit logs locally on your Flex. Remember that you'll still need to frequently download and delete logs from the robot.
 
-When you're finished, end your session on the Flex by logging out: 
+When you're finished, end your session on the Flex by logging out:
 
-* In the Opentrons App, click the account icon in the top right and choose **Log out**.
-* On the Flex touchscreen, press and hold the top edge of the screen. Drag the opaque screen that appears to the bottom of the touchscreen, then release to log out. 
+- In the Opentrons App, click the account icon in the top right and choose **Log out**.
+- On the Flex touchscreen, press and hold the top edge of the screen. Drag the opaque screen that appears to the bottom of the touchscreen, then release to log out.
 
-You can download additional protocol files before you log out, or in your next session. 
+You can download additional protocol files before you log out, or in your next session.

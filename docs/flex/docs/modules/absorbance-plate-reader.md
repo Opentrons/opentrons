@@ -1,19 +1,19 @@
 ---
-title: "Opentrons Flex: Absorbance Plate Reader"
-description: "Absorbance Plate Reader Module on Flex: on-deck spectrophotometry."
+title: 'Opentrons Flex: Absorbance Plate Reader'
+description: 'Absorbance Plate Reader Module on Flex: on-deck spectrophotometry.'
 ---
 
 ![plate reader hero](../images/plate-reader-hero-lid-off.png)
 
 !!! info "Additional Documentation"
-    For complete instructions on module installation and use, see the [Absorbance Plate Reader Instruction Manual](../../absorbance-plate-reader/index.md).
+For complete instructions on module installation and use, see the [Absorbance Plate Reader Instruction Manual](../../absorbance-plate-reader/index.md).
 
 ## Plate reader features
 
 The Opentrons Absorbance Plate Reader Module is a deck-mounted, fully automated spectrophotometer. It uses light absorbance to determine sample concentrations. This module is ideal for a broad array of applications, including protein quantification, sample normalization, cell viability assays, and bacterial growth monitoring. The plate reader is designed for indoor laboratory research and other non-in-vitro diagnostic analyses.
 
 !!!note
-    The Opentrons Flex Absorbance Plate Reader Module may currently not be offered, used or put on the market in any European Patent Convention States due to a third-party patent application.
+The Opentrons Flex Absorbance Plate Reader Module may currently not be offered, used or put on the market in any European Patent Convention States due to a third-party patent application.
 
 ### Measurement capabilities
 
