@@ -15,7 +15,7 @@ dependencies = [
     "systemd-python==234; sys_platform=='linux'",
     "sqlalchemy==1.4.51",
     "pydantic-settings==2.4.0",
-    "fastapi==0.100.0",
+    "fastapi==0.162.2",
     "uvicorn==0.54.0",
     "anyio==4.16.0",
     "typing-extensions>=4.0.0,<5",
@@ -40,7 +40,7 @@ robot = [
     "systemd-python==234; sys_platform=='linux'",
     "sqlalchemy==1.4.51",
     "pydantic-settings==2.4.0",
-    "fastapi==0.100.0",
+    "fastapi==0.162.2",
     "uvicorn==0.54.0",
     "anyio==4.16.0",
     "python-dotenv==1.2.4",
@@ -148,9 +148,6 @@ asyncio_mode = "auto"
 filterwarnings = [
     "error::sqlalchemy.exc.RemovedIn20Warning",
     "error::pydantic.PydanticDeprecatedSince20",
-    # FastAPI 0.100.0 calls pydantic_core's deprecated `general_plain_validator_function`
-    # internally. Ignore until we upgrade FastAPI.
-    "ignore:`general_plain_validator_function` is deprecated:DeprecationWarning",
 ]
 
 [tool.mypy]

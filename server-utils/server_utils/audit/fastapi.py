@@ -88,7 +88,7 @@ async def get_supplied_user_notes(
         decoded = urllib.parse.unquote(opentrons_user_notes)
     except Exception as base_e:
         raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=fastapi.status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=f"The user documentation could not be parsed: {str(base_e)}",
         ) from base_e
     stripped = decoded.strip()

@@ -103,6 +103,6 @@ class _SelfClient(Client):
                 f" Body: {repr(raw_response.body)}."
             )
         parsed_response = TokenIntrospectionResponse.model_validate_json(
-            raw_response.body
+            bytes(raw_response.body)
         )
         return parsed_response

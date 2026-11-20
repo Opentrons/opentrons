@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Annotated, Union
 
 import fastapi
-from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
+from starlette.status import HTTP_422_UNPROCESSABLE_CONTENT
 
 from opentrons_shared_data.deck.types import DeckDefinitionV6
 from server_utils.audit.fastapi import get_audit_logger
@@ -58,7 +58,7 @@ router = LightRouter()
         fastapi.status.HTTP_200_OK: {
             "model": SimpleBody[models.DeckConfigurationResponse]
         },
-        fastapi.status.HTTP_422_UNPROCESSABLE_ENTITY: {
+        fastapi.status.HTTP_422_UNPROCESSABLE_CONTENT: {
             "model": ErrorBody[models.InvalidDeckConfiguration]
         },
     },
@@ -91,7 +91,7 @@ async def put_deck_configuration(  # noqa: D103
         error_data = validation_mapping.map_out(validation_errors)
         return await PydanticResponse.create(
             content=ErrorBody.model_construct(errors=error_data),
-            status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=HTTP_422_UNPROCESSABLE_CONTENT,
         )
 
 

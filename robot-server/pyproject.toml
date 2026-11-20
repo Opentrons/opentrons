@@ -14,7 +14,7 @@ dependencies = [
     "opentrons-shared-data==0.0.0",
     "server-utils==0.0.0",
     "anyio==4.16.0",
-    "fastapi==0.100.0",
+    "fastapi==0.162.2",
     "python-dotenv==1.2.4",
     "python-multipart==0.0.33",
     "pydantic==2.11.7",
@@ -41,7 +41,7 @@ robot = [
     "opentrons-shared-data==0.0.0",
     "server-utils==0.0.0",
     "anyio==4.16.0",
-    "fastapi==0.100.0",
+    "fastapi==0.162.2",
     "python-dotenv==1.2.4",
     "python-multipart==0.0.33",
     "pydantic==2.11.7",
@@ -186,9 +186,6 @@ markers = [
 filterwarnings = [
     "error::sqlalchemy.exc.RemovedIn20Warning",
     "error::pydantic.PydanticDeprecatedSince20",
-    # FastAPI 0.100.0 calls pydantic_core's deprecated `general_plain_validator_function`
-    # internally. Ignore until we upgrade FastAPI.
-    "ignore:`general_plain_validator_function` is deprecated:DeprecationWarning",
 ]
 
 [tool.mypy]

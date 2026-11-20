@@ -1,7 +1,7 @@
 """Tests for /subsystems routes."""
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Dict, Set
+from typing import TYPE_CHECKING, Any, Dict, Set
 
 import pytest
 from decoy import Decoy
@@ -508,7 +508,7 @@ async def test_begin_update(
     update_manager: FirmwareUpdateManager, decoy: Decoy
 ) -> None:
     """It should begin an update given proper data."""
-    request = decoy.mock(cls=Request)
+    request = decoy.mock(cls=Request[Any])
     response = decoy.mock(cls=Response)
     subsystem = SubSystem.gantry_x
     url = URL("http://127.0.0.1:31950/subsystems/updates")
@@ -550,7 +550,7 @@ async def test_begin_update_subsystem_not_found(
     update_manager: FirmwareUpdateManager, decoy: Decoy
 ) -> None:
     """It should return an error if a specified subsystem is not present."""
-    request = decoy.mock(cls=Request)
+    request = decoy.mock(cls=Request[Any])
     response = decoy.mock(cls=Response)
     subsystem = SubSystem.gantry_x
 
@@ -571,7 +571,7 @@ async def test_begin_update_update_in_progress(
     update_manager: FirmwareUpdateManager, decoy: Decoy
 ) -> None:
     """It should return a redirect if a subsystem is already being updated."""
-    request = decoy.mock(cls=Request)
+    request = decoy.mock(cls=Request[Any])
     response = decoy.mock(cls=Response)
     url = URL("http://127.0.0.1:31950/subsystems/updates")
     subsystem = SubSystem.gantry_x
@@ -601,7 +601,7 @@ async def test_begin_update_id_exists(
 ) -> None:
     """It should return an error if an update id is duplicated."""
     response = decoy.mock(cls=Response)
-    request = decoy.mock(cls=Request)
+    request = decoy.mock(cls=Request[Any])
     subsystem = SubSystem.gantry_x
 
     update_id = "some-id"

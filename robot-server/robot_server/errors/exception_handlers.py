@@ -43,14 +43,29 @@ log = getLogger(__name__)
 
 
 def _route_is_legacy(request: Request) -> bool:
-    """Check if router handling the request is a legacy v1 endpoint."""
+    """Check if router handling the request is a legacy v1 endpoint.
+
+    FastAPI 0.16x+ keeps `include_router(..., tags=...)` on an effective route
+    context instead of copying them onto the leaf `APIRoute`, so prefer that
+    when present. Fall back to the leaf route / router lookup for older
+    behavior and for routes registered directly on the app.
+    """
+    fastapi_scope = request.scope.get("fastapi") or {}
+    effective = fastapi_scope.get("effective_route_context")
+    if effective is not None:
+        return V1_TAG in (getattr(effective, "tags", None) or [])
+
+    route = request.scope.get("route")
+    if isinstance(route, APIRoute):
+        return V1_TAG in route.tags
+
     router = request.scope.get("router")
     endpoint = request.scope.get("endpoint")
 
     if router:
-        for route in router.routes:
-            if isinstance(route, APIRoute) and route.endpoint == endpoint:
-                return V1_TAG in route.tags
+        for candidate in router.routes:
+            if isinstance(candidate, APIRoute) and candidate.endpoint == endpoint:
+                return V1_TAG in candidate.tags
 
     return False
 
@@ -136,7 +151,7 @@ async def handle_validation_error(
 
     return await handle_api_error(
         request,
-        response.as_error(status.HTTP_422_UNPROCESSABLE_ENTITY),
+        response.as_error(status.HTTP_422_UNPROCESSABLE_CONTENT),
     )
 
 

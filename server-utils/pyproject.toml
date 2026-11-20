@@ -12,7 +12,7 @@ description = "Common utilities for various Opentrons Python servers."
 dependencies = [
     "aiohttp>=3.12.14,<4",
     "anyio==4.16.0",
-    "fastapi==0.100.0",
+    "fastapi==0.162.2",
     "python-dotenv==1.2.4",
     "pydantic>2.0.0,<3",
     "pydantic-settings>=2.0.0,<3",
@@ -122,9 +122,6 @@ addopts = ["--color=yes", "--strict-markers"]
 asyncio_mode = "auto"
 filterwarnings = [
     "error::pydantic.PydanticDeprecatedSince20",
-    # FastAPI 0.100.0 calls pydantic_core's deprecated `general_plain_validator_function`
-    # internally. Ignore until we upgrade FastAPI.
-    "ignore:`general_plain_validator_function` is deprecated:DeprecationWarning",
 ]
 
 [tool.mypy]

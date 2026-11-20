@@ -241,7 +241,7 @@ async def get_camera_capture_image_settings(
     #  If we intend to support multiple cameras in the future we'll need to store and return a dictionary of many camera settings sets.
     if cameraId != DEFAULT_CAMERA_ID:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=str(
                 f"No stored camera image settings for Camera ID: {cameraId}, current settings are for {DEFAULT_CAMERA_ID}."
             ),
@@ -287,7 +287,7 @@ async def post_camera_preview_image(
         EngineStatus.SUCCEEDED,
     ]:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=str("Cannot capture preview photo, run is not inactive."),
         )
 
@@ -325,7 +325,7 @@ async def post_camera_preview_image(
                 f.write(image_data)
         else:
             raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
                 detail=str(
                     f"Preview image capture failed with the following: {image_data.message}"
                 ),

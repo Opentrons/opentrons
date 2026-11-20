@@ -24,5 +24,5 @@ def test_api_versioning_non_versions_endpoints(
     """It should not enforce versioning requirements on some endpoints."""
     del api_client.headers["Opentrons-Version"]
     resp = api_client.get(path, follow_redirects=False)
-    assert resp.status_code != status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert resp.status_code != status.HTTP_422_UNPROCESSABLE_CONTENT
     assert resp.headers.get(API_VERSION_HEADER) == str(API_VERSION)

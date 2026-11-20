@@ -40,7 +40,7 @@ router.include_router(
     # Either teach LightRouter how to handle `responses` or stop doing
     # a custom 422 response on these endpoints.
     responses={
-        status.HTTP_422_UNPROCESSABLE_ENTITY: {
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {
             "model": LegacyErrorResponse,
         }
     },
@@ -54,7 +54,7 @@ router.include_router(
         # porting health_router from fastapi.APIRouter to our LightRouter.
         # Either teach LightRouter how to handle `responses` or stop doing
         # a custom 422 response on these endpoints.
-        status.HTTP_422_UNPROCESSABLE_ENTITY: {
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {
             "model": LegacyErrorResponse,
         }
     },

@@ -10,7 +10,7 @@ classifiers = [
 
 dependencies = [
     "server-utils==0.0.0",
-    "fastapi==0.100.0",
+    "fastapi==0.162.2",
     "pydantic==2.11.7",
     "pydantic-settings==2.4.0",
     "typing-extensions>=4.0.0,<5",
@@ -25,7 +25,7 @@ dev = {requires-python = ">=3.11"}
 # Robot dependencies - exact versions for robot deployment
 robot = [
     "server-utils==0.0.0",
-    "fastapi==0.100.0",
+    "fastapi==0.162.2",
     "pydantic==2.11.7",
     "pydantic-settings==2.4.0",
     "typing-extensions>=4.0.0,<5",
@@ -136,9 +136,6 @@ addopts = ["--color=yes", "--strict-markers"]
 asyncio_mode = "auto"
 filterwarnings = [
     "error::pydantic.PydanticDeprecatedSince20",
-    # FastAPI 0.100.0 calls pydantic_core's deprecated `general_plain_validator_function`
-    # internally. Ignore until we upgrade FastAPI.
-    "ignore:`general_plain_validator_function` is deprecated:DeprecationWarning",
 ]
 
 [tool.mypy]
