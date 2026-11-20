@@ -406,9 +406,9 @@ You would get a similar error trying to aspirate from or dispense into a well pl
 
 ## Vacuum Module conflicts
 
-When a tall or short collar is seated on the vacuum base in slot A3 or staged on A4, it can become an obstacle for a multi-channel pipette configured for partial tip pickup or pipetting in an adjacent slot.
+When a tall or short collar is seated on the vacuum base in slot A3 or staged on A4, it can block a multi-channel pipette configured for partial tip pickup or pipetting in an adjacent slot.
 
-One exception is when the `start` nozzle is on the side of the pipette facing the collar. This works because it keeps the unused part of the pipette away from the collar.
+You can avoid a collision by setting the `start` nozzle to the side of the pipette facing the collar. This works because it keeps the unused part of the pipette away from the collar.
 
 The following table lists the allowed partial tip configurations by collar location.
 
