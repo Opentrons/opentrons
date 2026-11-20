@@ -151,6 +151,27 @@ describe('getLabwareDisplayLocation with translations', () => {
           }
         })
       })
+
+      detailLevels.forEach(detailLevel => {
+        it(`should use vacuum main/dock slot not A3+A4 with detailLevel "${detailLevel}"`, () => {
+          vi.mocked(getModuleModel).mockReturnValue('vacuumModuleV1')
+          vi.mocked(getModuleDisplayLocation).mockReturnValue('A3')
+          vi.mocked(getModuleDisplayName).mockReturnValue('Vacuum Module GEN1')
+          vi.mocked(getModuleType).mockReturnValue('vacuumModuleType')
+          vi.mocked(getOccludedSlotCountForModule).mockReturnValue(1)
+
+          render({
+            location: { moduleId: 'vacuum123' },
+            params: { ...defaultParams, detailLevel },
+          })
+
+          if (detailLevel === 'full') {
+            screen.getByText('Vacuum Module GEN1 in Slot A3')
+          } else {
+            screen.getByText('Slot A3')
+          }
+        })
+      })
     })
 
     describe('adapter location', () => {
