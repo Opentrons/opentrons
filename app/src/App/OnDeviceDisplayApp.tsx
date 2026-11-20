@@ -88,6 +88,8 @@ import { ModalPortalRoot } from './portal'
 import type { ReactNode } from 'react'
 import type { HostConfig } from '@opentrons/api-client'
 import type { Dispatch } from '/app/redux/types'
+import { StartScreen } from '../pages/ODD/Holiday/StartScreen'
+import { RunScreen } from '../pages/ODD/Holiday/RunScreen'
 
 // forces electron to think we're online which means axios won't elide
 // network calls to localhost. see ./hacks.ts for more.
@@ -164,9 +166,9 @@ function getPathComponent(
     case '/robot-settings/update-robot-during-onboarding':
       return <UpdateRobotDuringOnboarding />
     case '/runs/:runId/run':
-      return <RunningProtocol />
+      return <RunScreen />
     case '/runs/:runId/setup':
-      return <ProtocolSetup />
+      return <StartScreen />
     case '/runs/:runId/summary':
       return <RunSummary />
     case '/run-loading':

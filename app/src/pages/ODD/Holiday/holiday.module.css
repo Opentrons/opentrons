@@ -1,0 +1,94 @@
+.snowflake {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  animation: snowflake 10s linear infinite calc(random(0, 10) * 1s);
+  background-color: white;
+  opacity: random(0.5, 1);
+
+  --random-x0: random(0vw, 100vw);
+  --random-x-offset: random(-50px, 50px);
+}
+
+@keyframes snowflake {
+  0% {
+    transform: translateY(0) translateX(var(--random-x0));
+  }
+
+  50% {
+    transform: translateY(50vh)
+      translateX(calc(var(--random-x0) + var(--random-x-offset)));
+  }
+
+  100% {
+    transform: translateY(100vh)
+      translateX(calc(var(--random-x0) - calc(var(--random-x-offset))));
+  }
+}
+
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, #006bdd, #00103f);
+}
+
+.startscreen_title {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%) rotate(-5deg);
+  font-size: 4rem;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  animation: title-animation 4s linear infinite;
+  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+  text-shadow: 0 0 10px rgb(0 0 0);
+}
+
+.loading_title {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%) rotate(-5deg);
+  font-size: 4rem;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  animation: title-animation 4s linear infinite;
+  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+  text-shadow: 0 0 10px rgb(0 0 0);
+}
+
+.startscreen_subtitle {
+  position: absolute;
+  top: 90%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+  text-shadow: 0 0 10px rgb(0 0 0);
+  color: white;
+}
+
+@keyframes title-animation {
+  0% {
+    transform: translateX(-50%) rotate(-5deg) scale(1);
+  }
+
+  50% {
+    transform: translateX(-50%) rotate(-10deg) scale(1.1);
+  }
+}
+
+.timer_container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
