@@ -10,6 +10,7 @@ import styles from './holiday.module.css'
 import { Snowflakes } from './Snowflakes'
 
 import type { ReactNode } from 'react'
+import type { GamePhase } from './RunScreen'
 
 export function Instructions({
   setGamePhase,
@@ -19,9 +20,11 @@ export function Instructions({
   const [countdown, setCountdown] = useState<string>()
   const runId = useCurrentRunId()
   const { play } = useRunControls(runId)
-  const isPaused = useCurrentRunStatus() === 'paused'
+  const runStatus = useCurrentRunStatus()
+  const isPaused = runStatus === 'paused'
 
   useEffect(() => {
+    console.log('runStatus', runStatus)
     if (!isPaused) return
     const interval = setInterval(() => {
       setCountdown((prev: string | undefined) => {
@@ -36,7 +39,7 @@ export function Instructions({
         setGamePhase('playing')
         return prev
       })
-    }, 2000)
+    }, 1000)
 
     return () => clearInterval(interval)
   }, [isPaused])

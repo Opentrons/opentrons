@@ -1,6 +1,6 @@
-import { ReactNode } from 'react'
-
 import styles from './holiday.module.css'
+
+import type { ReactNode } from 'react'
 
 export function Snowflake(): ReactNode {
   return <div className={styles.snowflake} />

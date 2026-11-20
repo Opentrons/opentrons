@@ -16,6 +16,7 @@ export function useCurrentRunRoute(currentRunId: string): string | null {
   const { data: runRecord, isFetching } = useNotifyRunQuery(currentRunId, {
     refetchInterval: CURRENT_RUN_POLL,
   })
+  console.log('runRecord', runRecord)
 
   // grabbing run id off of the run query to have all routing info come from one source of truth
   const runId = runRecord?.data.id
@@ -23,6 +24,11 @@ export function useCurrentRunRoute(currentRunId: string): string | null {
   const runStatus = runRecord?.data.status
 
   if (isFetching || runRecord?.data.id !== currentRunId) {
+    console.log('isFetching', isFetching)
+    console.log(
+      'runRecord?.data.id !== currentRunId',
+      runRecord?.data.id !== currentRunId
+    )
     return null
   } else if (
     runStatus === RUN_STATUS_SUCCEEDED ||

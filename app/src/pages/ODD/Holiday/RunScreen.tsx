@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 
+// oxlint-disable-next-line no-restricted-imports
 import { useAllCommandsQuery } from '@opentrons/react-api-client'
 
-import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
-import { useCurrentRunId, useNotifyAllCommandsQuery } from '/app/resources/runs'
+import { useCurrentRunId } from '/app/resources/runs'
 
 import { GrabbingPrize } from './GrabbingPrize'
 import styles from './holiday.module.css'
@@ -14,12 +14,12 @@ import { RadialTimer } from './Timer'
 import type { ReactNode } from 'react'
 
 function TimerScreen(): ReactNode {
-  const [start, setStart] = useState(Date.now())
+  const [start] = useState(Date.now())
 
   return (
     <div className={styles.background}>
       <div className={styles.timer_container}>
-        <RadialTimer from={start} until={start + 60000} />
+        <RadialTimer from={start} until={start + 30000} />
       </div>
       <Snowflakes count={100} />
     </div>
@@ -39,7 +39,7 @@ export function RunScreen(): ReactNode {
       pageLength: 5,
     },
     {
-      refetchInterval: 500,
+      refetchInterval: 1000,
     }
   )
   useEffect(() => {
