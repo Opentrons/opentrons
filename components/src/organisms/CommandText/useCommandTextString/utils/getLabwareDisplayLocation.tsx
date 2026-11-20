@@ -7,6 +7,7 @@ import {
   getOccludedSlotCountForModule,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   TRASH_BIN_FIXTURE,
+  VACUUM_MODULE_TYPE,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
 } from '@opentrons/shared-data'
 
@@ -85,8 +86,12 @@ export function getLabwareDisplayLocation(
   }
   // Module location without adapter
   else if (moduleModel != null && adapterName == null) {
-    const moduleSlot = getModuleDeckLabel(getModuleType(moduleModel), slotName)
-    if (getModuleType(moduleModel) === FLEX_STACKER_MODULE_TYPE) {
+    const moduleType = getModuleType(moduleModel)
+    const moduleSlot =
+      moduleType === VACUUM_MODULE_TYPE
+        ? slotName
+        : getModuleDeckLabel(moduleType, slotName)
+    if (moduleType === FLEX_STACKER_MODULE_TYPE) {
       // in hopper location always return Stacker {{row}}
       return t('stacker_hopper_display', {
         row: getSlotRow(moduleSlot as string),
@@ -98,10 +103,7 @@ export function getLabwareDisplayLocation(
     return isOnDevice
       ? `${getModuleDisplayName(moduleModel)}, ${moduleSlot}`
       : t('module_in_slot', {
-          count: getOccludedSlotCountForModule(
-            getModuleType(moduleModel),
-            params.robotType
-          ),
+          count: getOccludedSlotCountForModule(moduleType, params.robotType),
           module: getModuleDisplayName(moduleModel),
           slot_name: moduleSlot,
         })

@@ -8,7 +8,10 @@ import {
   getModuleDef,
   HEATERSHAKER_MODULE_TYPE,
   OT2_STANDARD_DECKID,
+  STD_SLOT_X_DIM,
+  STD_SLOT_Y_DIM,
   TEMPERATURE_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import type { ReactNode } from 'react'
@@ -79,6 +82,30 @@ export const ModuleCommandSummary = (
       : 0
   const hopperAdjustmentX = showHopperAdjustment ? 190 : 0
   const hopperAdjustmentY = showHopperAdjustment ? -5 : 0
+
+  // Vacuum footprint includes the dock; outline only the main plate interface.
+  if (def?.moduleType === VACUUM_MODULE_TYPE) {
+    return (
+      <DeckLabelSet
+        ref={labelContainerRef}
+        deckLabels={[
+          {
+            text: commandSummary,
+            isSelected: true,
+            isLast: true,
+            moduleModel: def?.model,
+            isZoomed: false,
+          },
+        ]}
+        x={position[0] + def.labwareOffset.x}
+        y={position[1] + def.labwareOffset.y - labelContainerHeight}
+        width={def.dimensions.labwareInterfaceXDimension ?? STD_SLOT_X_DIM}
+        height={def.dimensions.labwareInterfaceYDimension ?? STD_SLOT_Y_DIM}
+        showModuleIcon={showModuleIcon}
+      />
+    )
+  }
+
   const x =
     position[0] +
     def.cornerOffsetFromSlot.x +
