@@ -408,7 +408,7 @@ You would get a similar error trying to aspirate from or dispense into a well pl
 
 When a tall or short collar is seated on the vacuum base in slot A3 or staged on A4, it can become an obstacle for a multi-channel pipette configured for partial tip pickup or pipetting in an adjacent slot.
 
-One exception is when the pipette's `start` nozzle is on the side of the pipette facing the collar. This keeps the unused part of the pipette away from the collar.
+One exception is when the `start` nozzle is on the side of the pipette facing the collar. This works because it keeps the unused part of the pipette away from the collar.
 
 The following table lists the allowed partial tip configurations by collar location.
 
@@ -421,7 +421,7 @@ The following table lists the allowed partial tip configurations by collar locat
 !!! note
     8-channel pipettes only have a single column of nozzles. These instruments are unaffected by collars to their left or right (e.g., pipetting in slot A2 while a collar is in A3). However, they are still blocked from pipetting in slot B3 when using `start="H1"` (including `PARTIAL_COLUMN` and back-to-front `SINGLE` layouts).
 
-If you encounter a protocol analysis failure (`LocationNotAccessibleByPipetteError`) because of an instrument conflict with a vacuum collar, the error massage will suggest other partial tip configurations for your deck layout. You can also resolve the error moving the collar or the labware to a non-adjacent slot.
+If you encounter an analysis failure (`LocationNotAccessibleByPipetteError`) because of an instrument conflict with a vacuum collar, the error massage will suggest other partial tip configurations for your deck layout. You can also resolve the error moving the collar or the labware to a non-adjacent slot.
 
 <figure class="screenshot" markdown>
 ![Protocol analysis failure message for partial tip pickup problems with a vacuum collar](../img/vacuum-partial-tip-error.png){ width="80%" }
