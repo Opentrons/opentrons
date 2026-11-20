@@ -115,7 +115,7 @@ All targets run from `opentrons-ai-server/`.
 | ---------------- | ------------------------------------------------------------- |
 | `make setup`     | Install all deps (`uv sync --frozen --extra dev`)             |
 | `make teardown`  | Delete `.venv/`                                               |
-| `make format`    | Auto-fix lint + format with ruff, then prettier for .md/.json |
+| `make format`    | Auto-fix lint + format with ruff, then oxfmt for .md/.json    |
 | `make lint`      | Check lint (ruff) + type check (mypy) — no auto-fix           |
 | `make prep`      | `format` then `lint` then `unit-test`                         |
 | `make unit-test` | Run unit tests (`pytest tests -m unit`)                       |
