@@ -9,6 +9,7 @@
   background-color: var(--white);
   container-name: detail-container;
   container-type: inline-size;
+  height: 100%;
 }
 
 .command_step {
