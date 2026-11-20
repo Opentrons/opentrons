@@ -69,6 +69,9 @@ import { showDownloadLogsModal } from '../organisms/ODD/DownloadAuditLogsModal'
 import { DragToLogOutOverlay } from '../organisms/ODD/OnDeviceLogin/DragToLogOutOverlay'
 import { showLoginModal } from '../organisms/ODD/OnDeviceLogin/LoginModal'
 import { AdminHub } from '../pages/ODD/AdminHub'
+import { RunScreen } from '../pages/ODD/Holiday/RunScreen'
+import { StartScreen } from '../pages/ODD/Holiday/StartScreen'
+import { ThanksForPlaying } from '../pages/ODD/Holiday/ThanksForPlaying'
 import { RunLoading } from '../pages/ODD/RunLoading/RunLoading'
 import { showSignRunModal } from '../pages/ODD/RunSummary/SignRun'
 import { getLocalRobotAccessToken } from '../redux/robot-auth'
@@ -88,8 +91,6 @@ import { ModalPortalRoot } from './portal'
 import type { ReactNode } from 'react'
 import type { HostConfig } from '@opentrons/api-client'
 import type { Dispatch } from '/app/redux/types'
-import { StartScreen } from '../pages/ODD/Holiday/StartScreen'
-import { RunScreen } from '../pages/ODD/Holiday/RunScreen'
 
 // forces electron to think we're online which means axios won't elide
 // network calls to localhost. see ./hacks.ts for more.
@@ -170,7 +171,7 @@ function getPathComponent(
     case '/runs/:runId/setup':
       return <StartScreen />
     case '/runs/:runId/summary':
-      return <RunSummary />
+      return <ThanksForPlaying />
     case '/run-loading':
       return <RunLoading />
     case '/welcome':

@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react'
 
-import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
+import { useAllCommandsQuery } from '@opentrons/react-api-client'
 
+import { useCurrentRunStatus } from '/app/organisms/RunTimeControl'
+import { useCurrentRunId, useNotifyAllCommandsQuery } from '/app/resources/runs'
+
+import { GrabbingPrize } from './GrabbingPrize'
 import styles from './holiday.module.css'
 import { Instructions } from './Instructions'
 import { Snowflakes } from './Snowflakes'
@@ -22,16 +26,48 @@ function TimerScreen(): ReactNode {
   )
 }
 
+export type GamePhase = 'loading' | 'instructions' | 'playing' | 'grabbing'
+
 export function RunScreen(): ReactNode {
-  const isPaused = useCurrentRunStatus() === 'paused'
-  const [hasBeenPaused, setHasBeenPaused] = useState(false)
-  const [showInstructions, setShowInstructions] = useState(true)
+  const runId = useCurrentRunId()
 
+  const [gamePhase, setGamePhase] = useState<GamePhase>('loading')
+
+  const { data: commands } = useAllCommandsQuery(
+    runId,
+    {
+      pageLength: 5,
+    },
+    {
+      refetchInterval: 500,
+    }
+  )
   useEffect(() => {
-    if (isPaused) setHasBeenPaused(true)
-    if (!isPaused && hasBeenPaused) setShowInstructions(false)
-  }, [isPaused])
+    if (!commands?.data) {
+      console.log('no commands')
+      return
+    }
+    if (
+      gamePhase === 'playing' &&
+      commands.data.some(
+        command =>
+          command.commandType === 'comment' &&
+          command.params.message === 'grabbing'
+      )
+    ) {
+      console.log('grabbing')
+      setGamePhase('grabbing')
+    }
+    console.log('commands', commands.data)
+  }, [commands, gamePhase])
 
-  if (showInstructions) return <Instructions />
-  return <TimerScreen />
+  switch (gamePhase) {
+    case 'loading':
+    case 'instructions':
+      return <Instructions setGamePhase={setGamePhase} />
+    case 'playing':
+      return <TimerScreen />
+    case 'grabbing':
+      return <GrabbingPrize />
+  }
 }

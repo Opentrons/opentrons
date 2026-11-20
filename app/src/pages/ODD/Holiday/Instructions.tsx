@@ -11,7 +11,11 @@ import { Snowflakes } from './Snowflakes'
 
 import type { ReactNode } from 'react'
 
-export function Instructions(): ReactNode {
+export function Instructions({
+  setGamePhase,
+}: {
+  setGamePhase: (phase: GamePhase) => void
+}): ReactNode {
   const [countdown, setCountdown] = useState<string>()
   const runId = useCurrentRunId()
   const { play } = useRunControls(runId)
@@ -29,6 +33,7 @@ export function Instructions(): ReactNode {
           return 'Go!'
         }
         play()
+        setGamePhase('playing')
         return prev
       })
     }, 2000)
@@ -39,8 +44,8 @@ export function Instructions(): ReactNode {
   return (
     <div className={styles.background}>
       <p className={styles.instructions}>
-        Use the joystick to move the gripper, and press the button to try and
-        grab a prize! You have 60 seconds!
+        Use the joystick to move the gripper! Press the button to grab your
+        prize! You have 60 seconds!
       </p>
       <h2 className={styles.instructions_countdown}>{countdown}</h2>
       <Snowflakes count={100} />

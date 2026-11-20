@@ -5,7 +5,7 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  animation: snowflake 10s linear infinite calc(random(0, 10) * 1s);
+  animation: snowflake 10s linear infinite calc(random(-10, 0) * 1s);
   background-color: white;
   opacity: random(0.5, 1);
 
@@ -74,6 +74,30 @@
   font-family: 'Comic Sans MS', 'Comic Sans', cursive;
   text-shadow: 0 0 10px rgb(0 0 0);
   color: white;
+}
+
+.instructions {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+  text-shadow: 0 0 10px rgb(0 0 0);
+  text-align: center;
+  color: white;
+  font-size: 30px;
+}
+
+.instructions_countdown {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+  text-shadow: 0 0 10px rgb(0 0 0);
+  text-align: center;
+  color: white;
+  font-size: 100px;
 }
 
 @keyframes title-animation {
