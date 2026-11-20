@@ -3,7 +3,6 @@ import {
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   getPositionFromSlotId,
   isAddressableAreaStandardSlot,
-  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
 import { getSlotIsEmpty } from '../utils/getSlotIsEmpty'
@@ -43,17 +42,15 @@ export function DeckViewSlots(props: DeckViewSlotsProps): ReactNode {
     stagingAreaCutoutIds,
     slotIdsBlockedBySpanning,
   } = props
-  const isFlex = robotType !== OT2_ROBOT_TYPE
   return (
     <>
       {deckDef.locations.addressableAreas.reduce<JSX.Element[]>(
         (acc, addressableArea) => {
           const addressableAreas =
             isAddressableAreaStandardSlot(addressableArea.id, deckDef) ||
-            (isFlex &&
-              FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS.includes(
-                addressableArea.id
-              ))
+            FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS.includes(
+              addressableArea.id
+            )
           const slotPosition = getPositionFromSlotId(
             addressableArea.id,
             deckDef

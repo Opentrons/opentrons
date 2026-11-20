@@ -103,7 +103,6 @@ export function DeckView(props: DeckViewProps): ReactNode {
   const loadLabwareCommands = commands.filter(
     command => command.commandType === 'loadLabware'
   )
-  const isFlex = robotType !== OT2_ROBOT_TYPE
   const hasWasteChute = Object.values(wasteChuteEntities).length > 0
   const flexStackerModules = Object.values(modules).filter(
     module => module.moduleState.type === FLEX_STACKER_MODULE_TYPE
@@ -113,13 +112,10 @@ export function DeckView(props: DeckViewProps): ReactNode {
     flexStackerModules.map(module => `${module.slot.slice(0, 1)}3`)
   )
 
-  // Flex always shows staging slots.
   // Skip D3 when a waste chute owns that cutout.
-  const flexStagingCutoutIds: CutoutId[] = isFlex
-    ? STAGING_AREA_CUTOUTS.filter(
-        cutoutId => !(hasWasteChute && cutoutId === WASTE_CHUTE_CUTOUT)
-      )
-    : []
+  const flexStagingCutoutIds: CutoutId[] = STAGING_AREA_CUTOUTS.filter(
+    cutoutId => !(hasWasteChute && cutoutId === WASTE_CHUTE_CUTOUT)
+  )
   const filteredStagingAreas = Object.fromEntries(
     flexStagingCutoutIds.map(cutoutId => [
       `staging-${cutoutId}`,
@@ -127,14 +123,12 @@ export function DeckView(props: DeckViewProps): ReactNode {
     ])
   )
   const stagingAreaLocations = new Set<string>(flexStagingCutoutIds)
-  const baseViewBox = `${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`
   const stackerViewBox = useMemo(() => {
-    if (!isFlex) return baseViewBox
     const [originX, originY] = deckDef.cornerOffsetFromOrigin
     const [deckWidth, deckHeight] = deckDef.dimensions
 
     return `${originX} ${originY} ${deckWidth + extraSize} ${deckHeight}`
-  }, [baseViewBox, deckDef, isFlex])
+  }, [deckDef])
 
   const labwareEntitiesExtended = Object.entries(labwareEntities).reduce(
     (acc: Record<string, LabwareEntityExtended>, [key, entity]) => {
@@ -341,7 +335,7 @@ export function DeckView(props: DeckViewProps): ReactNode {
                   }}
                   selectedRunTimeCommand={selectedRunTimeCommand}
                 />
-                <SlotLabels robotType={robotType} show4thColumn={isFlex} />
+                <SlotLabels robotType={robotType} show4thColumn />
               </>
             )}
           </RobotCoordinateSpaceWithRef>
