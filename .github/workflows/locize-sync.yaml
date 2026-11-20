@@ -51,9 +51,21 @@ jobs:
           LOCIZE_PROJECT_ID: ${{ secrets.LOCIZE_PROJECT_ID }}
         run: uv run scripts/locize_sync.py ${{ inputs.locize_action }}
 
+      # GITHUB_TOKEN cannot push a new branch cut from a release branch that
+      # has diverged from the default branch. GitHub times out deciding whether
+      # that push creates or edits workflow files. An app token with workflows
+      # write skips that check.
+      - name: Create GitHub App token
+        id: locize-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          app-id: ${{ vars.LOCIZE_APP_ID }}
+          private-key: ${{ secrets.LOCIZE_APP_PRIVATE_KEY }}
+
       - name: Create pull request
         uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7.0.11
         with:
+          token: ${{ steps.locize-token.outputs.token }}
           branch: automation/locize-${{ inputs.locize_action }}-${{ github.run_id }}
           base: ${{ inputs.target_branch }}
           commit-message: 'chore(locize): ${{ inputs.locize_action }} via workflow'
