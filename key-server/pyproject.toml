@@ -14,8 +14,8 @@ dependencies = [
     "pydantic==2.11.7",
     "pydantic-settings==2.4.0",
     "typing-extensions>=4.0.0,<5",
-    "uvicorn==0.27.0.post1",
-    "cryptography==42.0.5"
+    "uvicorn==0.54.0",
+    "cryptography==50.0.2"
 ]
 
 [tool.uv.dependency-groups]
@@ -29,8 +29,8 @@ robot = [
     "pydantic==2.11.7",
     "pydantic-settings==2.4.0",
     "typing-extensions>=4.0.0,<5",
-    "uvicorn==0.27.0.post1",
-    "cryptography==42.0.5"
+    "uvicorn==0.54.0",
+    "cryptography==50.0.2"
 ]
 dev = [
     "ruff==0.17.4",
