@@ -10,6 +10,7 @@
   "bracketSameLine": false,
   "arrowParens": "avoid",
   "endOfLine": "lf",
+  "ignorePatterns": ["**/dist/**"],
   "sortImports": {
     "newlinesBetween": false,
     "customGroups": [
