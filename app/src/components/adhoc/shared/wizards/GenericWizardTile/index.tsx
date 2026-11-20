@@ -70,6 +70,7 @@ export interface GenericWizardTileProps {
   proceedButton?: JSX.Element
   backIsDisabled?: boolean
   disableProceedReason?: string
+  hideOverflowRight?: boolean
 }
 
 export function GenericWizardTile(props: GenericWizardTileProps): ReactNode {
@@ -84,6 +85,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): ReactNode {
     proceedButton,
     backIsDisabled,
     disableProceedReason,
+    hideOverflowRight,
   } = props
   const { t } = useTranslation('shared')
   const isOnDevice = useSelector(getIsOnDevice)
@@ -111,7 +113,11 @@ export function GenericWizardTile(props: GenericWizardTileProps): ReactNode {
           </Flex>
           {bodyText}
         </Flex>
-        <Flex flex="1" justifyContent={JUSTIFY_CENTER}>
+        <Flex
+          flex="1"
+          justifyContent={JUSTIFY_CENTER}
+          {...(hideOverflowRight ? { overflow: 'hidden' } : {})}
+        >
           {rightHandBody}
         </Flex>
       </Flex>

@@ -10,7 +10,6 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
   SPACING,
   StyledText,
@@ -39,7 +38,7 @@ export const AboutModuleSlideout = (
   props: AboutModuleSlideoutProps
 ): JSX.Element | null => {
   const { module, isExpanded, onCloseClick, firmwareUpdateClick } = props
-  const { i18n, t } = useTranslation(['device_details', 'shared'])
+  const { t } = useTranslation(['device_details', 'shared'])
   const moduleName = getModuleDisplayName(module.moduleModel)
   const runStatus = useCurrentRunStatus()
   const [showBanner, setShowBanner] = useState<boolean>(true)
@@ -96,45 +95,35 @@ export const AboutModuleSlideout = (
           </Banner>
         </Flex>
       ) : null}
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            data-testid={`alert_item_version_${String(module.moduleModel)}`}
-          >
-            <StyledText
-              forwardedAs="h6"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              color={COLORS.grey60}
-            >
-              {i18n.format(t('current_version'), 'upperCase')}
-            </StyledText>
-            <StyledText
-              forwardedAs="p"
-              paddingTop={SPACING.spacing4}
-              paddingBottom={SPACING.spacing16}
-            >
-              {module.firmwareVersion}
-            </StyledText>
-          </Flex>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          data-testid={`alert_item_version_${String(module.moduleModel)}`}
+        >
+          <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
+            {t('current_version')}
+          </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            {module.firmwareVersion}
+          </StyledText>
         </Flex>
-        <StyledText
-          forwardedAs="h6"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.grey60}
-          data-testid={`alert_item_serial_number_text_${String(
-            module.moduleModel
-          )}`}
-        >
-          {i18n.format(t('serial_number'), 'upperCase')}
-        </StyledText>
-        <StyledText
-          forwardedAs="p"
-          paddingTop={SPACING.spacing4}
-          data-testid={`alert_item_serial_${String(module.moduleModel)}`}
-        >
-          {module.serialNumber}
-        </StyledText>
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <StyledText
+            desktopStyle="captionRegular"
+            color={COLORS.grey60}
+            data-testid={`alert_item_serial_number_text_${String(
+              module.moduleModel
+            )}`}
+          >
+            {t('serial_number')}
+          </StyledText>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            data-testid={`alert_item_serial_${String(module.moduleModel)}`}
+          >
+            {module.serialNumber}
+          </StyledText>
+        </Flex>
       </Flex>
     </Slideout>
   )

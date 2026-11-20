@@ -91,6 +91,7 @@ export const TipSvg = ({
         strokeWidth="2"
         fill="none"
         strokeLinecap="round"
+        style={{ mixBlendMode: 'multiply' }}
       />
     </g>
   )

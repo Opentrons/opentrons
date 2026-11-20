@@ -36,6 +36,9 @@ from opentrons.protocol_engine.errors.exceptions import (
 from opentrons.protocol_engine.execution.vacuum_module_movement_flagger import (
     VacuumModuleMovementFlagger,
 )
+from opentrons.protocol_engine.resources.labware_validation import (
+    validate_definition_is_vacuum_module_dock,
+)
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 from opentrons.protocol_engine.state.state import StateStore
 from opentrons.types import Point
@@ -65,11 +68,12 @@ def _limit_jaw_open(
     restrict_pickup_approach: bool,
     restrict_drop_retract: bool,
 ) -> bool:
-    """Limit jaw width only for the phase next to a vacuum collar.
+    """Limit jaw width only for the phase next to a vacuum module.
 
-    Pickup opens are limited when the labware being picked up has a collar to
-    the north or south. Drop and post-drop slide opens are limited only when
-    the drop location does. Every other open homes the jaw fully.
+    Pickup opens are limited when a vacuum module is north or south of the
+    labware being picked up. Drop and post-drop slide opens are limited only
+    when the drop location has one. Every other open homes the jaw fully.
+    Moving the collar itself uses a separate, slower pickup speed.
     """
     if dropping or after_drop:
         return restrict_drop_retract
@@ -346,7 +350,7 @@ class LabwareMovementHandler:
                     speed=waypoint_data.speed,
                 )
 
-            # If the drop was next to a collar, stay at the collar-safe width
+            # If the drop was next to a vacuum module, stay at the limited width
             # instead of homing the jaw fully open. Otherwise close to idle.
             if restrict_drop_retract:
                 await ot3api.hold_jaw_width(open_width_mm)
@@ -403,8 +407,7 @@ class LabwareMovementHandler:
     @staticmethod
     def _is_vacuum_module_collar(labware_definition: LabwareDefinition) -> bool:
         """True for labware that docks on the vacuum module (collars/adapters)."""
-        quirks = labware_definition.parameters.quirks
-        return quirks is not None and "vacuumModuleDock" in quirks
+        return validate_definition_is_vacuum_module_dock(labware_definition)
 
     def _is_vacuum_module_location(self, location: LabwareLocation) -> bool:
         """True when the location is the vacuum module."""

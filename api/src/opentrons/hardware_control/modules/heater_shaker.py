@@ -329,15 +329,14 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self._driver.set_temperature(celsius)
         await self._poller.wait_next_good_poll()
 
-    # TODO(mc, 2022-10-10): remove `awaiting_temperature` argument,
-    # and instead, wait until status is holding
-    async def await_temperature(self, awaiting_temperature: float) -> None:
-        """Await temperature in degrees Celsius.
+    async def await_temperature(self) -> None:
+        """Wait until the Heater-Shaker is holding at its target temperature.
 
-        Polls the Heater-Shaker's current temperature until
-        the specified temperature is reached. If `awaiting_temperature`
-        is different than the current target temperature,
-        the resulting behavior may be unpredictable.
+        Holding means |current - target| < 0.7 °C, matching `temperature_status`.
+        Do not wait for an exact current reading: the module cannot actively cool,
+        and PID overshoot above target would hang a cooling-style wait forever.
+
+        If no target is set, this can hang.
         """
         if self.is_simulated:
             return
@@ -346,12 +345,8 @@ class HeaterShaker(mod_abc.AbstractModule):
         await self._poller.wait_next_good_poll()
 
         async def _await_temperature() -> None:
-            if self.temperature_status == TemperatureStatus.HEATING:
-                while self.temperature < awaiting_temperature:
-                    await self._poller.wait_next_poll()
-            elif self.temperature_status == TemperatureStatus.COOLING:
-                while self.temperature > awaiting_temperature:
-                    await self._poller.wait_next_poll()
+            while self.temperature_status != TemperatureStatus.HOLDING:
+                await self._poller.wait_next_poll()
 
         await self.run_task_fault_tolerant(_await_temperature, DEFAULT_COMMAND_RETRIES)
 
