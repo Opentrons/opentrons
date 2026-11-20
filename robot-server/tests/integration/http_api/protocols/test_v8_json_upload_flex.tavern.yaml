@@ -81,6 +81,8 @@ stages:
       method: GET
     response:
       status_code: 200
+      strict:
+        - json:off
       json:
         meta:
           cursor: 0

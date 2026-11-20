@@ -10,6 +10,7 @@ import {
 import { MultichannelSubstep } from './MultichannelSubstep'
 import { Substep } from './Substep'
 
+import type { ReactNode } from 'react'
 import type {
   SourceDestSubstepItem,
   SubstepIdentifier,
@@ -21,7 +22,7 @@ interface PipettingSubstepsProps {
   hoveredSubstep?: SubstepIdentifier | null
 }
 
-export function PipettingSubsteps(props: PipettingSubstepsProps): JSX.Element {
+export function PipettingSubsteps(props: PipettingSubstepsProps): ReactNode {
   const { substeps, selectSubstep, hoveredSubstep } = props
   const stepId = substeps.parentStepId
   const formData = useSelector(getSavedStepForms)[stepId]

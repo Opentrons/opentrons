@@ -5,7 +5,7 @@ import { StyledText } from '@opentrons/components'
 import { LabwareButton } from '../../organisms/LabwareButton'
 import styles from './labwarebuttonbasket.module.css'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
 
 interface LabwareButtonBasketProps {
@@ -19,7 +19,7 @@ interface LabwareButtonBasketProps {
 }
 export function LabwareButtonBasket(
   props: LabwareButtonBasketProps
-): JSX.Element {
+): ReactNode {
   const { stackOfLabware, labware, selectedLabware, setSelectedLabware } = props
   const { t } = useTranslation('protocol_steps')
 
@@ -30,7 +30,7 @@ export function LabwareButtonBasket(
         {stackOfLabware.map((item, index) =>
           labware[item] ? (
             <LabwareButton
-              key={`${item}_${index}`}
+              key={item}
               numberInStack={stackOfLabware.length - index}
               displayName={labware[item].def.metadata.displayName}
               isSelected={selectedLabware.includes(item)}

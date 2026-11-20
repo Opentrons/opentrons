@@ -35,7 +35,7 @@ export interface CheckboxFieldProps {
   padding?: string
 }
 
-export function CheckboxField(props: CheckboxFieldProps): JSX.Element {
+export function CheckboxField(props: CheckboxFieldProps): ReactNode {
   const {
     onChange,
     value,

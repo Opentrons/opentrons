@@ -18,7 +18,7 @@ from hardware_testing.data.csv_report import CSVReport
 from .config import TestSection, TestConfig, build_report, TESTS
 from .utils import find_stacker_port, get_estop
 from opentrons.hardware_control.execution_manager import ExecutionManager
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 from opentrons.hardware_control.modules.flex_stacker import FlexStacker
 
 

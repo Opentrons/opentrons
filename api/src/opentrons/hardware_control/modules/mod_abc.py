@@ -19,7 +19,7 @@ from .types import (
     UploadFunction,
 )
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 
 mod_log = logging.getLogger(__name__)
 

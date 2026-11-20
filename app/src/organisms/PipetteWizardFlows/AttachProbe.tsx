@@ -3,12 +3,11 @@ import { css } from 'styled-components'
 
 import {
   AnimationVideo,
-  Banner,
+  DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
-  RESPONSIVENESS,
+  InlineNotification,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
 import pipetteProbe1 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
@@ -17,32 +16,15 @@ import probing96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Probing_9
 import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/molecules/SimpleWizardBody'
 
-import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
-import {
-  getPipetteAnimations,
-  isWasteChuteOnDeck,
-  startCalibrationOnClick,
-} from './utils'
+import { FLOWS, SECTIONS } from './constants'
+import { getPipetteAnimations } from './utils'
 
-import type { UseQueryResult } from 'react-query'
-import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
 interface AttachProbeProps extends PipetteWizardStepProps {
   isExiting: boolean
-  deckConfig: UseQueryResult<DeckConfiguration>
+  showWasteChuteWarning?: boolean
 }
-
-const IN_PROGRESS_STYLE = css`
-  ${TYPOGRAPHY.pRegular};
-  text-align: ${TYPOGRAPHY.textAlignCenter};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: ${TYPOGRAPHY.fontSize28};
-    line-height: 1.625rem;
-    margin-top: ${SPACING.spacing4};
-  }
-`
 
 export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const {
@@ -52,14 +34,10 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     goBack,
     proceed,
     isExiting,
-    isOnDevice,
     flowType,
-    deckConfig,
+    selectedSlot,
+    showWasteChuteWarning = false,
   } = props
-
-  const handleOnClick = (): void => {
-    proceed()
-  }
 
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const pipetteWizardStep = { mount, flowType, section: SECTIONS.ATTACH_PROBE }
@@ -68,9 +46,8 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const displayName = attachedPipettes[mount]?.displayName
   const is8Channel = attachedPipettes[mount]?.data.channels === 8
   const is96Channel = attachedPipettes[mount]?.data.channels === 96
-  const startCalibration = startCalibrationOnClick(props, pipetteId)
 
-  const calSlotNum = 'C2'
+  const calSlotNum = selectedSlot
   let src = pipetteProbe1
   if (is8Channel) {
     src = pipetteProbe8
@@ -109,28 +86,35 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
                 pipetteName: displayName,
               })
         }
-      >
-        {isExiting ? undefined : (
-          <Flex marginX={Boolean(isOnDevice) ? '4.5rem' : '8.5625rem'}>
-            <LegacyStyledText css={IN_PROGRESS_STYLE}>
-              {t('calibration_probe_touching', { slotNumber: calSlotNum })}
-            </LegacyStyledText>
-          </Flex>
-        )}
-      </SimpleWizardInProgressBody>
+        body={
+          isExiting
+            ? undefined
+            : t('calibration_probe_touching', { slotNumber: calSlotNum })
+        }
+      />
     )
   }
 
   return (
     <GenericWizardTile
-      header={i18n.format(t('attach_probe'), 'capitalize')}
+      header={
+        <StyledText
+          desktopStyle="headingSmallBold"
+          oddStyle="level4HeaderSemiBold"
+        >
+          {i18n.format(t('attach_probe'), 'capitalize')}
+        </StyledText>
+      }
       rightHandBody={getPipetteAnimations({
         pipetteWizardStep,
         channel: attachedPipettes[mount]?.data.channels,
       })}
       bodyText={
-        <>
-          <LegacyStyledText css={BODY_STYLE}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            oddStyle="bodyTextRegular"
+          >
             <Trans
               t={t}
               i18nKey={'install_probe'}
@@ -139,28 +123,17 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
                 bold: <strong />,
               }}
             />
-          </LegacyStyledText>
-          {is96Channel && !isWasteChuteOnDeck(deckConfig) && (
-            <Banner
-              type="warning"
-              size={isOnDevice ? '1.5rem' : '1rem'}
-              marginTop={isOnDevice ? SPACING.spacing24 : SPACING.spacing16}
-            >
-              {t('waste_chute_warning_probe')}
-            </Banner>
-          )}
-        </>
+          </StyledText>
+          {showWasteChuteWarning ? (
+            <InlineNotification
+              type="alert"
+              message={t('waste_chute_96_channel_must_use_b2')}
+            />
+          ) : null}
+        </Flex>
       }
-      proceedButtonText={
-        is96Channel && isWasteChuteOnDeck(deckConfig)
-          ? i18n.format(t('shared:continue'), 'capitalize')
-          : t('begin_calibration')
-      }
-      proceed={
-        is96Channel && isWasteChuteOnDeck(deckConfig)
-          ? handleOnClick
-          : startCalibration
-      }
+      proceedButtonText={t('continue')}
+      proceed={proceed}
       back={flowType === FLOWS.ATTACH ? undefined : goBack}
     />
   )

@@ -17,6 +17,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { SetSettingOption } from './types'
 
 interface RectProps {
@@ -36,7 +37,7 @@ interface TextSizeProps {
 }
 
 // ToDo (kj:03/03/2023) We need to define the max text size and min text size also decided to the default text size position in the rectangles
-export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
+export function TextSize({ setCurrentOption }: TextSizeProps): ReactNode {
   const { t } = useTranslation(['device_settings'])
 
   const handleClick = (changeType: 'up' | 'down'): void => {

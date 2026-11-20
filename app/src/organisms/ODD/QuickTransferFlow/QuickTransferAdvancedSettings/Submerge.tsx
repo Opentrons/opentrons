@@ -17,13 +17,13 @@ import { POSITION_REFERENCE_TOP } from '@opentrons/shared-data'
 import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+import { parseNumericalInput } from '/app/resources/utils/parseNumericalInput'
 
 import { ACTIONS } from '../constants'
 
-import type { Dispatch } from 'react'
+import type { Dispatch, ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { PositionReference } from '@opentrons/shared-data'
 import type {
@@ -44,7 +44,7 @@ export function Submerge({
   state,
   dispatch,
   kind,
-}: SubmergeProps): JSX.Element {
+}: SubmergeProps): ReactNode {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
   const [currentStep, setCurrentStep] = useState<number>(1)
@@ -261,7 +261,7 @@ function SubmergeSettingComponent({
   currentStep,
   positionReference,
   wellHeight,
-}: SubmergeSettingComponentProps): JSX.Element {
+}: SubmergeSettingComponentProps): ReactNode {
   const { t } = useTranslation('quick_transfer')
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
   const inputElementRef = useRef<HTMLInputElement>(null)

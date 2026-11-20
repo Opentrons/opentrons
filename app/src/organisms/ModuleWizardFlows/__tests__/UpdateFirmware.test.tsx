@@ -84,6 +84,7 @@ describe('UpdateFirmware', () => {
       maintenanceRunId: '123',
       patchModuleAfterUpdate: vi.fn(),
       sendIdentifyModule,
+      setExitCleanupCommands: vi.fn(),
       robotName: 'otie',
     }
     mockMutation()

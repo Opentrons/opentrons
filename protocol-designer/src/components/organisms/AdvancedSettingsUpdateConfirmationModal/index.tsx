@@ -16,6 +16,7 @@ import {
 import { getMainPagePortalEl } from '../Portal'
 import { useConfirmationContent } from './useConfirmationContent'
 
+import type { ReactNode } from 'react'
 import type { FormData } from '/protocol-designer/form-types'
 
 interface AdvancedSettingsUpdateConfirmationModalProps {
@@ -28,7 +29,7 @@ interface AdvancedSettingsUpdateConfirmationModalProps {
 
 export function AdvancedSettingsUpdateConfirmationModal(
   props: AdvancedSettingsUpdateConfirmationModalProps
-): JSX.Element {
+): ReactNode {
   const {
     formData,
     fieldsChangedRequiringConfirmation,

@@ -12,6 +12,8 @@ import {
 import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 
+import type { ReactNode } from 'react'
+
 interface PipetteNotAttachedErrorModalProps {
   onExit: () => void
   onAttach: () => void
@@ -19,7 +21,7 @@ interface PipetteNotAttachedErrorModalProps {
 
 export const PipetteNotAttachedErrorModal = (
   props: PipetteNotAttachedErrorModalProps
-): JSX.Element => {
+): ReactNode => {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared', 'branded'])
 
   return (

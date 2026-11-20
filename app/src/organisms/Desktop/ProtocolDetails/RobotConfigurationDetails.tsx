@@ -65,7 +65,7 @@ interface RobotConfigurationDetailsProps {
 
 export const RobotConfigurationDetails = (
   props: RobotConfigurationDetailsProps
-): JSX.Element => {
+): ReactNode => {
   const {
     leftMountPipetteName,
     rightMountPipetteName,
@@ -202,7 +202,7 @@ export const RobotConfigurationDetails = (
         <>
           <Divider marginY={SPACING.spacing12} width="100%" />
           <RobotConfigurationDetailsItem
-            label={t('shared:extension_mount')}
+            label={t('extension_mount')}
             item={isLoading ? loadingText : extensionMountItem}
           />
         </>
@@ -309,7 +309,7 @@ interface RobotConfigurationDetailsItemProps {
 
 export const RobotConfigurationDetailsItem = (
   props: RobotConfigurationDetailsItemProps
-): JSX.Element => {
+): ReactNode => {
   const { label, item } = props
   return (
     <Flex

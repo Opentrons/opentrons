@@ -12,7 +12,7 @@ import { STYLE_BY_WELL_CONTENTS } from './Wells/StyledWells'
 import { Well } from './Wells/Well'
 
 import type { CSSProperties } from 'styled-components'
-import type { MemoExoticComponent } from 'react'
+import type { MemoExoticComponent, ReactNode } from 'react'
 import type { LabwareDefinition, LabwareWell } from '@opentrons/shared-data'
 import type { TipType, WellType } from './types'
 import type { WellMouseEvent, WellStrokeByName } from './Wells/constants'
@@ -65,7 +65,7 @@ const LabwareDetailGroup = styled.g`
   stroke-width: 1;
 `
 
-export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
+export function StaticLabwareComponent(props: StaticLabwareProps): ReactNode {
   const {
     definition,
     highlight,

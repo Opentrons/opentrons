@@ -55,6 +55,7 @@ export type UseLPCCommandsResult = UseHandleJogResult &
     isRobotMoving: boolean
     toggleRobotMoving: (isMoving: boolean) => Promise<void>
     home: () => Promise<void>
+    retryPendingPostConfirmCleanup: () => Promise<boolean>
   }
 
 // Consolidates all command handlers and handler state for injection into LPC.
@@ -117,11 +118,32 @@ export function useLPCCommands(
     chainLPCCommands,
     setErrorMessage,
   })
-  const handleConfirmLwFinalPosition = useHandleConfirmLwFinalPosition({
+  const {
+    handleConfirmLwFinalPosition,
+    handlePostConfirmCleanup,
+    hasPendingPostConfirmCleanup,
+  } = useHandleConfirmLwFinalPosition({
     ...props,
     chainLPCCommands,
     setErrorMessage,
   })
+
+  const toggleRobotMoving = (isMoving: boolean): Promise<void> =>
+    new Promise<void>(resolve => {
+      setIsRobotMoving(isMoving)
+      resolve()
+    })
+
+  const retryPendingPostConfirmCleanup = (): Promise<boolean> => {
+    if (!hasPendingPostConfirmCleanup) {
+      return Promise.resolve(false)
+    }
+
+    return toggleRobotMoving(true)
+      .then(() => handlePostConfirmCleanup())
+      .then(() => true)
+      .finally(() => toggleRobotMoving(false))
+  }
   const handleResetLwModulesOnDeck = useHandleResetLwModulesOnDeck({
     ...props,
     chainLPCCommands,
@@ -136,13 +158,10 @@ export function useLPCCommands(
       setIsDoorOpenError(false)
     },
     isRobotMoving,
-    toggleRobotMoving: (isMoving: boolean) =>
-      new Promise<void>(resolve => {
-        setIsRobotMoving(isMoving)
-        resolve()
-      }),
+    toggleRobotMoving,
     home: () =>
       chainLPCCommands(fullHomeCommands(), false).then(() => Promise.resolve()),
+    retryPendingPostConfirmCleanup,
     ...applyWorkingOffsets,
     ...handleJogUtils,
     ...handleConditionalCleanupUtils,
@@ -150,7 +169,9 @@ export function useLPCCommands(
     ...handleStartLPC,
     ...handlePrepModules,
     ...handleConfirmLwModulePlacement,
-    ...handleConfirmLwFinalPosition,
+    handleConfirmLwFinalPosition,
+    handlePostConfirmCleanup,
+    hasPendingPostConfirmCleanup,
     ...handleResetLwModulesOnDeck,
     ...handleValidMoveToMaintenancePosition,
   }

@@ -8,8 +8,7 @@ import {
 } from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-
-import { mockPipetteInfo } from '/app/resources/instruments/__fixtures__'
+import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 
 import { useTipAttachmentStatus } from '../useTipAttachmentStatus'
 
@@ -30,7 +29,7 @@ const MOCK_HOST = { ip: '1.2.3.4', port: 31950 } as any
 const MOCK_RUN_ID = 'run-123'
 
 const MOCK_ACTUAL_PIPETTE = {
-  ...mockPipetteInfo.pipetteSpecs,
+  ...fixtureP10Single,
   model: 'model',
   tipLength: {
     value: 20,

@@ -42,7 +42,7 @@ describe('AppInfo', () => {
       name: 'Software manual',
     })
     fireEvent.click(windowOpenButton)
-    expect(window.open).toHaveBeenCalledWith(DOC_URL, '_blank')
+    expect(window.open).toHaveBeenCalledWith(DOC_URL, '_blank', 'noopener')
     screen.getByRole('button', { name: 'Release notes' })
   })
   it('should call the setShowAnnouncementModal when the release notes button is clicked', () => {

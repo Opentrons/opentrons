@@ -17,6 +17,7 @@ import {
   StyledText,
   SUCCESS_TOAST,
   Toast,
+  Z_INDEX,
 } from '@opentrons/components'
 import { useHost } from '@opentrons/react-api-client'
 
@@ -36,7 +37,13 @@ import { isSSLError } from '/app/resources/auth/hooks/isSSLError'
 import { RobotCertImportModal } from '../RobotCertImport'
 import styles from './loginmodal.module.css'
 
-import type { ComponentProps, Dispatch, FormEvent, SetStateAction } from 'react'
+import type {
+  ComponentProps,
+  Dispatch,
+  FormEvent,
+  ReactNode,
+  SetStateAction,
+} from 'react'
 import type {
   HostConfig,
   UserLoginStatus,
@@ -155,7 +162,7 @@ interface LoginModalImplProps {
   uncloseable?: boolean
 }
 
-function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
+function LoginModalImpl(props: LoginModalImplProps): ReactNode {
   const { robotName, uncloseable } = props
   const modal = useModal()
   const dispatch = useDispatch()
@@ -344,9 +351,12 @@ function LoginModalImpl(props: LoginModalImplProps): JSX.Element {
       <Modal
         title={t('access_control:desktop_login_modal_header')}
         onClose={uncloseable ? undefined : handleClose}
-        // Login is 10001 so it sits above SignRun (1000) and documentation (10000).
-        // Drop to 9999 on set-new-password so the documentation modal is visible.
-        zIndexOverlay={screen.kind === 'setNewPassword' ? 9999 : 10001}
+        zIndexOverlay={
+          // bounce below documentation modal when setting a new password
+          screen.kind === 'setNewPassword'
+            ? Z_INDEX.COMPLIANCE_MODALS - 1
+            : Z_INDEX.LOGIN_MODAL
+        }
         footer={<div className={styles.modal_footer_container}>{footer}</div>}
       >
         <div className={styles.content_container}>
@@ -446,7 +456,7 @@ interface LoginViewProps {
   onForgotPasswordClick: () => void
 }
 
-function LoginView(props: LoginViewProps): JSX.Element {
+function LoginView(props: LoginViewProps): ReactNode {
   const {
     formId,
     formData,
@@ -526,7 +536,7 @@ function LoginView(props: LoginViewProps): JSX.Element {
   )
 }
 
-function ForgotPasswordView(): JSX.Element {
+function ForgotPasswordView(): ReactNode {
   const { t } = useTranslation()
 
   return (
@@ -549,7 +559,7 @@ interface SetNewPasswordViewProps {
   onPasswordFieldBlur: () => void
 }
 
-function SetNewPasswordView(props: SetNewPasswordViewProps): JSX.Element {
+function SetNewPasswordView(props: SetNewPasswordViewProps): ReactNode {
   const {
     formData,
     reason,

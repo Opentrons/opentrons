@@ -19,10 +19,12 @@ import {
 } from '/protocol-designer/analytics'
 import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 
+import type { ReactNode } from 'react'
+
 const PRIVACY_POLICY_URL = 'https://opentrons.com/privacy-policy'
 const EULA_URL = 'https://opentrons.com/eula'
 
-export function GateModal(): JSX.Element | null {
+export function GateModal(): ReactNode {
   const { t } = useTranslation('shared')
   const { appVersion, hasOptedIn } = useSelector(
     analyticsSelectors.getHasOptedIn

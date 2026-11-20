@@ -3,7 +3,7 @@
   width: 100%;
   flex-direction: column;
   align-items: flex-start;
-  padding: 0 0 6rem;
+  padding: 0;
   border-radius: var(--border-radius-8);
   background-color: var(--white);
 }

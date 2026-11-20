@@ -7,9 +7,10 @@ import { RecoverySingleColumnContentWrapper } from './RecoveryContentWrapper'
 import { RecoveryFooterButtons } from './RecoveryFooterButtons'
 import { RightColumnAnimation } from './RightColumnAnimation'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
-export function VacuumCheckCollar(props: RecoveryContentProps): JSX.Element {
+export function VacuumCheckCollar(props: RecoveryContentProps): ReactNode {
   const { routeUpdateActions } = props
   const { proceedNextStep, goBackPrevStep } = routeUpdateActions
 

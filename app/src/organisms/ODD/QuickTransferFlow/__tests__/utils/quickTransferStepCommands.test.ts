@@ -68,6 +68,7 @@ const mockInvariantContext: InvariantContext = {
       pythonName: 'mock_tiprack_1',
     },
   },
+  runtimeParameters: {},
   config: {} as any,
 }
 const mockRobotState: TimelineFrame = {

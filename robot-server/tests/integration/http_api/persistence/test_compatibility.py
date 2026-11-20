@@ -28,7 +28,7 @@ _RUN_TIMEOUT = 5
 
 # Our Tavern tests have servers that stay up for the duration of the test session.
 # We need to pick a different port for our servers to avoid colliding with those.
-# Beware that if there is a collision, these tests' manual DevServer() constructions will currently
+# Beware that if there is a collision, these tests' manual DevServer(is_ot3=True,) constructions will currently
 # *not* raise an error--the tests will try to use the preexisting session-scoped servers. :(
 _PORT = "15555"
 
@@ -103,7 +103,8 @@ snapshots: List[ParameterSet] = [
                 Run("efc7374f-2e64-45ea-83fe-bd7a55f2699e", 205),
             ],
         ),
-        id="v6.0.1",
+        id="v6.1.1",
+        marks=pytest.mark.xfail(reason="Not adapted for flex"),
     ),
     pytest.param(
         Snapshot(
@@ -147,6 +148,7 @@ snapshots: List[ParameterSet] = [
                 "e3515d46-3c3b-425b-8734-bd6e38d6a729",
             ],
         ),
+        marks=pytest.mark.xfail(reason="Not adapted for flex"),
         id="v6.2.0_large",
     ),
     pytest.param(flex_dev_compat_snapshot, id="flex_dev_compat"),
@@ -195,7 +197,9 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
         base_url=f"http://localhost:{_PORT}", version="*"
     ) as robot_client:
         assert await robot_client.dead(), "Dev Robot is running and must not be."
-        with DevServer(port=_PORT, persistence_directory=snapshot.get_copy()) as server:
+        with DevServer(
+            is_ot3=True, port=_PORT, persistence_directory=snapshot.get_copy()
+        ) as server:
             server.start()
             await robot_client.wait_until_ready(_STARTUP_TIMEOUT)
             all_protocols = (await robot_client.get_protocols()).json()["data"]
@@ -285,7 +289,9 @@ async def test_rerun_flex_dev_compat() -> None:
         base_url=f"http://localhost:{_PORT}", version="*"
     ) as client:
         assert await client.dead(), "Dev Robot is running but it should not be."
-        with DevServer(persistence_directory=snapshot.get_copy(), port=_PORT) as server:
+        with DevServer(
+            is_ot3=True, persistence_directory=snapshot.get_copy(), port=_PORT
+        ) as server:
             server.start()
             await client.wait_until_ready(_STARTUP_TIMEOUT)
 

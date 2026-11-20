@@ -1,17 +1,15 @@
 import { LEFT, RIGHT } from '@opentrons/shared-data'
 
 import { FLOWS, SECTIONS } from './constants'
-import { isWasteChuteOnDeck } from './utils'
+import { insertSelectSlotAfterAttachProbe } from './getPipetteWizardSteps'
 
-import type { UseQueryResult } from 'react-query'
 import type { Mount } from '@opentrons/api-client'
-import type { DeckConfiguration, LoadedPipette } from '@opentrons/shared-data'
+import type { LoadedPipette } from '@opentrons/shared-data'
 import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 import type { PipetteWizardStep } from './types'
 
 const calibrateAlreadyAttachedPipetteOn = (
-  mount: Mount,
-  attaching96andWasteChute: boolean
+  mount: Mount
 ): PipetteWizardStep[] => [
   {
     section: SECTIONS.BEFORE_BEGINNING,
@@ -23,29 +21,11 @@ const calibrateAlreadyAttachedPipetteOn = (
     mount,
     flowType: FLOWS.CALIBRATE,
   },
-  ...(attaching96andWasteChute
-    ? [
-        {
-          section: SECTIONS.REMOVE_WASTE_CHUTE,
-          mount,
-          flowType: FLOWS.CALIBRATE,
-        },
-      ]
-    : []),
   {
     section: SECTIONS.DETACH_PROBE,
     mount,
     flowType: FLOWS.CALIBRATE,
   },
-  ...(attaching96andWasteChute
-    ? [
-        {
-          section: SECTIONS.ATTACH_WASTE_CHUTE,
-          mount,
-          flowType: FLOWS.CALIBRATE,
-        },
-      ]
-    : []),
   { section: SECTIONS.RESULTS, mount, flowType: FLOWS.CALIBRATE },
 ]
 
@@ -148,9 +128,7 @@ const detachSingleMountAndAttachSingleMountOn = (
   },
 ]
 
-const detachTwoSingleMountsAndAttachNinetySix = (
-  wasteChute: boolean
-): PipetteWizardStep[] => [
+const detachTwoSingleMountsAndAttachNinetySix = (): PipetteWizardStep[] => [
   {
     section: SECTIONS.BEFORE_BEGINNING,
     mount: LEFT,
@@ -204,29 +182,11 @@ const detachTwoSingleMountsAndAttachNinetySix = (
     mount: LEFT,
     flowType: FLOWS.ATTACH,
   },
-  ...(wasteChute
-    ? [
-        {
-          section: SECTIONS.REMOVE_WASTE_CHUTE,
-          mount: LEFT,
-          flowType: FLOWS.DETACH,
-        },
-      ]
-    : []),
   {
     section: SECTIONS.DETACH_PROBE,
     mount: LEFT,
     flowType: FLOWS.ATTACH,
   },
-  ...(wasteChute
-    ? [
-        {
-          section: SECTIONS.ATTACH_WASTE_CHUTE,
-          mount: LEFT,
-          flowType: FLOWS.DETACH,
-        },
-      ]
-    : []),
   {
     section: SECTIONS.RESULTS,
     mount: LEFT,
@@ -234,9 +194,7 @@ const detachTwoSingleMountsAndAttachNinetySix = (
   },
 ]
 
-const detachSingleMountOnLeftAndAttachNinetySix = (
-  wasteChute: boolean
-): PipetteWizardStep[] => [
+const detachSingleMountOnLeftAndAttachNinetySix = (): PipetteWizardStep[] => [
   {
     section: SECTIONS.BEFORE_BEGINNING,
     mount: LEFT,
@@ -279,29 +237,11 @@ const detachSingleMountOnLeftAndAttachNinetySix = (
     mount: LEFT,
     flowType: FLOWS.ATTACH,
   },
-  ...(wasteChute
-    ? [
-        {
-          section: SECTIONS.REMOVE_WASTE_CHUTE,
-          mount: LEFT,
-          flowType: FLOWS.DETACH,
-        },
-      ]
-    : []),
   {
     section: SECTIONS.DETACH_PROBE,
     mount: LEFT,
     flowType: FLOWS.ATTACH,
   },
-  ...(wasteChute
-    ? [
-        {
-          section: SECTIONS.ATTACH_WASTE_CHUTE,
-          mount: LEFT,
-          flowType: FLOWS.DETACH,
-        },
-      ]
-    : []),
   {
     section: SECTIONS.RESULTS,
     mount: LEFT,
@@ -309,9 +249,7 @@ const detachSingleMountOnLeftAndAttachNinetySix = (
   },
 ]
 
-const detachSingleMountOnRightAndAttachNinetySix = (
-  wasteChute: boolean
-): PipetteWizardStep[] => [
+const detachSingleMountOnRightAndAttachNinetySix = (): PipetteWizardStep[] => [
   {
     section: SECTIONS.BEFORE_BEGINNING,
     mount: RIGHT,
@@ -354,29 +292,11 @@ const detachSingleMountOnRightAndAttachNinetySix = (
     mount: LEFT,
     flowType: FLOWS.ATTACH,
   },
-  ...(wasteChute
-    ? [
-        {
-          section: SECTIONS.REMOVE_WASTE_CHUTE,
-          mount: LEFT,
-          flowType: FLOWS.DETACH,
-        },
-      ]
-    : []),
   {
     section: SECTIONS.DETACH_PROBE,
     mount: LEFT,
     flowType: FLOWS.ATTACH,
   },
-  ...(wasteChute
-    ? [
-        {
-          section: SECTIONS.ATTACH_WASTE_CHUTE,
-          mount: LEFT,
-          flowType: FLOWS.DETACH,
-        },
-      ]
-    : []),
   {
     section: SECTIONS.RESULTS,
     mount: LEFT,
@@ -384,9 +304,7 @@ const detachSingleMountOnRightAndAttachNinetySix = (
   },
 ]
 
-const fromEmptyGantryAttachNinetySix = (
-  wasteChute: boolean
-): PipetteWizardStep[] => [
+const fromEmptyGantryAttachNinetySix = (): PipetteWizardStep[] => [
   {
     section: SECTIONS.BEFORE_BEGINNING,
     mount: LEFT,
@@ -418,29 +336,11 @@ const fromEmptyGantryAttachNinetySix = (
     mount: LEFT,
     flowType: FLOWS.ATTACH,
   },
-  ...(wasteChute
-    ? [
-        {
-          section: SECTIONS.REMOVE_WASTE_CHUTE,
-          mount: LEFT,
-          flowType: FLOWS.DETACH,
-        },
-      ]
-    : []),
   {
     section: SECTIONS.DETACH_PROBE,
     mount: LEFT,
     flowType: FLOWS.ATTACH,
   },
-  ...(wasteChute
-    ? [
-        {
-          section: SECTIONS.ATTACH_WASTE_CHUTE,
-          mount: LEFT,
-          flowType: FLOWS.DETACH,
-        },
-      ]
-    : []),
   {
     section: SECTIONS.RESULTS,
     mount: LEFT,
@@ -513,9 +413,8 @@ export const getPipetteWizardStepsForProtocol = (
   attachedPipettes: AttachedPipettesFromInstrumentsQuery,
   pipetteInfo: LoadedPipette[],
   mount: Mount,
-  deckConfig?: UseQueryResult<DeckConfiguration>
+  includeSlotSelect: boolean = true
 ): PipetteWizardStep[] | null => {
-  const wasteChute = isWasteChuteOnDeck(deckConfig)
   const requiredPipette = pipetteInfo.find(pipette => pipette.mount === mount)
   const ninetySixChannelAttached =
     attachedPipettes[LEFT]?.instrumentName === 'p1000_96' ||
@@ -527,50 +426,72 @@ export const getPipetteWizardStepsForProtocol = (
   if (requiredPipette == null) {
     //  return empty array if no pipette is required in the protocol
     return null
-  } else if (
-    requiredPipette?.pipetteName === attachedPipettes[mount]?.instrumentName
-  ) {
+  }
+
+  if (requiredPipette.pipetteName === attachedPipettes[mount]?.instrumentName) {
     // return calibration flow if correct pipette is attached
-    return calibrateAlreadyAttachedPipetteOn(
-      mount,
-      wasteChute && ninetySixChannelRequested
+    return insertSelectSlotAfterAttachProbe(
+      calibrateAlreadyAttachedPipetteOn(mount),
+      includeSlotSelect
     )
-  } else if (!ninetySixChannelRequested && ninetySixChannelAttached) {
+  }
+  if (!ninetySixChannelRequested && ninetySixChannelAttached) {
     // 96-channel pipette attached and need to attach single mount pipette
-    return detachNinetySixAndAttachSingleMountOn(mount)
-  } else if (!ninetySixChannelRequested && attachedPipettes[mount] != null) {
+    return insertSelectSlotAfterAttachProbe(
+      detachNinetySixAndAttachSingleMountOn(mount),
+      includeSlotSelect
+    )
+  }
+  if (!ninetySixChannelRequested && attachedPipettes[mount] != null) {
     // Single mount pipette attached and need to attach new single mount pipette
-    return detachSingleMountAndAttachSingleMountOn(mount)
-  } else if (
+    return insertSelectSlotAfterAttachProbe(
+      detachSingleMountAndAttachSingleMountOn(mount),
+      includeSlotSelect
+    )
+  }
+  if (
     ninetySixChannelRequested &&
     attachedPipettes[LEFT] != null &&
     attachedPipettes[RIGHT] != null
   ) {
     // Single mount pipette attached to both mounts and need to attach 96-channel pipette
-    return detachTwoSingleMountsAndAttachNinetySix(wasteChute)
-  } else if (
+    return insertSelectSlotAfterAttachProbe(
+      detachTwoSingleMountsAndAttachNinetySix(),
+      includeSlotSelect
+    )
+  }
+  if (
     ninetySixChannelRequested &&
     attachedPipettes[LEFT] != null &&
     attachedPipettes[RIGHT] == null
   ) {
     // Single mount pipette attached to left mount and need to attach 96-channel pipette
-    return detachSingleMountOnLeftAndAttachNinetySix(wasteChute)
-  } else if (
+    return insertSelectSlotAfterAttachProbe(
+      detachSingleMountOnLeftAndAttachNinetySix(),
+      includeSlotSelect
+    )
+  }
+  if (
     ninetySixChannelRequested &&
     attachedPipettes[LEFT] == null &&
     attachedPipettes[RIGHT] != null
   ) {
     // Single mount pipette attached to right mount and need to attach 96-channel pipette
-    return detachSingleMountOnRightAndAttachNinetySix(wasteChute)
-  } else {
-    // if no pipette is attached to gantry
-
-    if (ninetySixChannelRequested) {
-      // Gantry empty and need to attach 96-channel pipette
-      return fromEmptyGantryAttachNinetySix(wasteChute)
-    } else {
-      // Gantry empty and need to attach single mount pipette
-      return fromEmptyMountAttachSingleMountOn(mount)
-    }
+    return insertSelectSlotAfterAttachProbe(
+      detachSingleMountOnRightAndAttachNinetySix(),
+      includeSlotSelect
+    )
   }
+  if (ninetySixChannelRequested) {
+    // Gantry empty and need to attach 96-channel pipette
+    return insertSelectSlotAfterAttachProbe(
+      fromEmptyGantryAttachNinetySix(),
+      includeSlotSelect
+    )
+  }
+  // Gantry empty and need to attach single mount pipette
+  return insertSelectSlotAfterAttachProbe(
+    fromEmptyMountAttachSingleMountOn(mount),
+    includeSlotSelect
+  )
 }

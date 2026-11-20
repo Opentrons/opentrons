@@ -9,7 +9,7 @@ import sys
 from glob import glob
 from typing import Dict, Final, List, Optional
 
-from opentrons.drivers.rpi_drivers import usb
+from opentrons.drivers.usb import usb
 from opentrons.hardware_control import modules
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.module_control import MODULE_PORT_REGEX

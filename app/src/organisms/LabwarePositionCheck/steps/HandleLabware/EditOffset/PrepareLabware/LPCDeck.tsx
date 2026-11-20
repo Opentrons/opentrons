@@ -20,6 +20,7 @@ import {
   selectSelectedLwOverview,
 } from '/app/redux/protocol-runs'
 
+import type { ReactNode } from 'react'
 import type { LabwareOnDeck, ModuleOnDeck } from '@opentrons/components'
 import type { EditOffsetContentProps } from '/app/organisms/LabwarePositionCheck/steps/HandleLabware/EditOffset'
 import type { State } from '/app/redux/types'
@@ -31,7 +32,7 @@ import type { State } from '/app/redux/types'
  *  If LPCing the default offset, ensure the module is always cleared.
  *  If LPCing a location-specific offset, the module should only be present if the
  *    location-specific offset calls for the module to be present. */
-export function LPCDeck({ runId }: EditOffsetContentProps): JSX.Element {
+export function LPCDeck({ runId }: EditOffsetContentProps): ReactNode {
   const { protocolData, deckConfig } = useSelector(
     (state: State) => state.protocolRuns[runId].lpc!
   )

@@ -1,13 +1,10 @@
 import { useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { WARNING_TOAST } from '@opentrons/components'
+import { WARNING_TOAST, Z_INDEX } from '@opentrons/components'
 
 // eslint-disable-next-line opentrons/no-imports-across-applications
 import { useToaster } from '/app/organisms/ToasterOven'
-
-// Above typical login overlays so the toast remains visible on login.
-const TOAST_ABOVE_LOGIN_Z_INDEX = 10002
 
 export interface InsufficientPermissionsToast {
   popToast: () => void
@@ -39,7 +36,7 @@ export function useInsufficientPermissionsToast(): InsufficientPermissionsToast 
         buttonText: i18n.format(t('shared:close'), 'capitalize'),
         disableTimeout: true,
         heading: '' + t('additional_permissions_required'),
-        zIndex: TOAST_ABOVE_LOGIN_Z_INDEX,
+        zIndex: Z_INDEX.LOGIN_TOASTS,
       }
     )
   }, [eatToast, i18n, makeToast, t])

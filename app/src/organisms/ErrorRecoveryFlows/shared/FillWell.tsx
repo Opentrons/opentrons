@@ -7,9 +7,10 @@ import { LeftColumnLabwareInfo } from '/app/organisms/ErrorRecoveryFlows/shared/
 import { RecoverySingleColumnContentWrapper } from '/app/organisms/ErrorRecoveryFlows/shared/RecoveryContentWrapper'
 import { RecoveryFooterButtons } from '/app/organisms/ErrorRecoveryFlows/shared/RecoveryFooterButtons'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '/app/organisms/ErrorRecoveryFlows/types'
 
-export function FillWell(props: RecoveryContentProps): JSX.Element {
+export function FillWell(props: RecoveryContentProps): ReactNode {
   const { routeUpdateActions, failedLabwareUtils, deckMapUtils } = props
   const { t } = useTranslation('error_recovery')
   const { goBackPrevStep, proceedNextStep } = routeUpdateActions

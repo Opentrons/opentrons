@@ -13,8 +13,6 @@ import { useNetworkConnection } from '/app/resources/networking/hooks/useNetwork
 import { Navigation } from '..'
 import { NavigationMenu } from '../NavigationMenu'
 
-import type { ComponentProps } from 'react'
-
 vi.mock('/app/local-resources/dom-utils')
 vi.mock('/app/resources/networking/hooks/useNetworkConnection')
 vi.mock('/app/redux/discovery')
@@ -23,19 +21,17 @@ vi.mock('../NavigationMenu')
 
 mockConnectedRobot.name = '12345678901234567'
 
-const render = (props: ComponentProps<typeof Navigation>) => {
+const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <Navigation {...props} />
+      <Navigation />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )[0]
 }
 
 describe('Navigation', () => {
-  let props: ComponentProps<typeof Navigation>
   beforeEach(() => {
-    props = {}
     vi.mocked(getLocalRobot).mockReturnValue(mockConnectedRobot)
     vi.mocked(useAccountIconInitial).mockReturnValue({
       showIcon: false,
@@ -53,7 +49,7 @@ describe('Navigation', () => {
     })
   })
   it('should render text and they have attribute', () => {
-    render(props)
+    render()
     screen.getByRole('link', { name: '123456789012...' }) // because of the truncate function
     const allProtocols = screen.getByRole('link', { name: 'Protocols' })
     expect(allProtocols).toHaveAttribute('href', '/protocols')
@@ -75,27 +71,15 @@ describe('Navigation', () => {
       connectionStatus: 'Not connected',
       icon: 'wifi',
     })
-    render(props)
+    render()
     expect(screen.getByLabelText('network icon')).toBeInTheDocument()
   })
   it('should render the overflow btn and clicking on it renders the menu', () => {
-    render(props)
+    render()
     fireEvent.click(
       screen.getByRole('button', { name: 'overflow menu button' })
     )
     screen.getByText('mock NavigationMenu')
-  })
-  it('should call the setNavMenuIsOpened prop when you click on the overflow menu button', () => {
-    props = {
-      ...props,
-      setNavMenuIsOpened: vi.fn(),
-    }
-    render(props)
-    fireEvent.click(
-      screen.getByRole('button', { name: 'overflow menu button' })
-    )
-    screen.getByText('mock NavigationMenu')
-    expect(props.setNavMenuIsOpened).toHaveBeenCalled()
   })
   describe('account icon', () => {
     const linkName = 'Account'
@@ -103,7 +87,7 @@ describe('Navigation', () => {
       vi.mocked(useAccountIconInitial).mockReturnValue({
         showIcon: false,
       })
-      render(props)
+      render()
       expect(
         screen.queryByRole('link', { name: linkName })
       ).not.toBeInTheDocument()
@@ -113,7 +97,7 @@ describe('Navigation', () => {
         showIcon: true,
         iconContents: 'T',
       })
-      render(props)
+      render()
       const accountLink = screen.getByRole('link', { name: linkName })
       expect(accountLink).toHaveAttribute('href', '/account')
       expect(accountLink).toHaveTextContent('T')

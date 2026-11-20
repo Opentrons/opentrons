@@ -8,11 +8,12 @@ import {
 import { CancelRun } from './CancelRun'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
 export function FillWellAndRetryNewTips(
   props: RecoveryContentProps
-): JSX.Element {
+): ReactNode {
   const { recoveryMap, routeUpdateActions } = props
   const { step, route } = recoveryMap
   const { MANUAL_FILL_AND_RETRY_NEW_TIPS, DROP_TIP_FLOWS, CANCEL_RUN } =

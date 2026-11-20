@@ -34,15 +34,19 @@ import {
   WRAP,
 } from '@opentrons/components'
 import {
+  useAccessControlEnabledQuery,
   useErrorRecoverySettings,
+  useGetRobotServerAccessControlSettingsQuery,
   useProtocolQuery,
   useRunCommandErrors,
 } from '@opentrons/react-api-client'
 
+import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
 import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { RunTimer } from '/app/molecules/RunTimer'
 import { handleTipsAttachedModal } from '/app/organisms/DropTipWizardFlows'
+import { DownloadAuditLogsModal } from '/app/organisms/ODD/DownloadAuditLogsModal'
 import { RunFailedModal } from '/app/organisms/ODD/RunningProtocol'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import {
@@ -61,6 +65,7 @@ import {
   useTrackEvent,
 } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
+import { useIsLogDeleted } from '/app/resources/audit/useIsLogDeleted'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import { useTipAttachmentStatus } from '/app/resources/instruments'
 import {
@@ -68,31 +73,37 @@ import {
   formatTimeWithUtcLabel,
   useCloseCurrentRun,
   useCurrentRunCommands,
-  useIsRunCurrent,
   useNotifyRunQuery,
   useRunCreatedAtTimestamp,
   useRunTimestamps,
 } from '/app/resources/runs'
 import { onDeviceDisplayFormatTimestamp } from '/app/transformations/runs'
 
+import { SignRun } from './SignRun'
+
+import type { ReactNode } from 'react'
 import type { IconName } from '@opentrons/components'
 import type { OnDeviceRouteParams } from '/app/App/types'
 import type { PipetteWithTip } from '/app/resources/instruments'
 
-export function RunSummary(): JSX.Element {
+export function RunSummary(): ReactNode {
   const { runId } = useParams<
     keyof OnDeviceRouteParams
   >() as OnDeviceRouteParams
   const { t } = useTranslation('run_details')
   const navigate = useNavigate()
-  const { data: runRecord } = useNotifyRunQuery(runId, {
-    staleTime: Infinity,
-    onError: () => {
-      // in case the run is remotely deleted by a desktop app, navigate to the dash
-      navigate('/dashboard')
-    },
-  })
-  const isRunCurrent = useIsRunCurrent(runId)
+  const { data: runRecord, isLoading: isRunRecordLoading } = useNotifyRunQuery(
+    runId,
+    {
+      onError: () => {
+        // in case the run is remotely deleted by a desktop app, navigate to the dash
+        navigate('/dashboard')
+      },
+    }
+  )
+
+  // optimistically assume the run is current until the run record is loaded
+  const isRunCurrent = runRecord == null ? true : runRecord?.data.current
   const runStatus = runRecord?.data.status ?? null
   const didRunSucceed = runStatus === RUN_STATUS_SUCCEEDED
   const wasRunCanceled = runStatus === RUN_STATUS_STOPPED
@@ -150,6 +161,7 @@ export function RunSummary(): JSX.Element {
   const trackEvent = useTrackEvent()
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
+  const documentationState = useDocumentationState()
   const { closeCurrentRun } = useCloseCurrentRun()
   const [showRunFailedModal, setShowRunFailedModal] = useState<boolean>(false)
   const [showRunAgainSpinner, setShowRunAgainSpinner] = useState<boolean>(false)
@@ -190,6 +202,78 @@ export function RunSummary(): JSX.Element {
     (hasCommandErrors && !canceledWithoutRecovery) ||
     (runRecord?.data.errors != null && runRecord?.data.errors.length > 0)
   )
+
+  const {
+    data: accessControlEnabled,
+    isLoading: isAccessControlEnabledLoading,
+  } = useAccessControlEnabledQuery()
+  const {
+    data: accessControlSettings,
+    isLoading: isAccessControlSettingsLoading,
+  } = useGetRobotServerAccessControlSettingsQuery()
+  const isSettingsLoading =
+    isAccessControlEnabledLoading || isAccessControlSettingsLoading
+  const isSigningRequired =
+    (accessControlEnabled?.data.accessControlEnabled ?? false) &&
+    (accessControlSettings?.data.requireSignoffForProtocolLog ?? false)
+  const hasSignedBy =
+    runRecord?.data.signedBy != null && runRecord.data.signedBy !== ''
+  // Wait for runRecord after sign (cache cleared) so we don't re-prompt
+  // while signedBy is still missing from the refetch.
+  const shouldPromptSignRun =
+    !isRunRecordLoading &&
+    !isSettingsLoading &&
+    isSigningRequired &&
+    !hasSignedBy
+
+  const logPeriodId = runRecord?.data.logPeriodId ?? null
+  const {
+    isLoading: isLogDeletedLoading,
+    isDeleted: isLogDeleted,
+    isError: isLogDeletedError,
+  } = useIsLogDeleted(logPeriodId ?? '')
+
+  const isDownloadingRequired =
+    (accessControlEnabled?.data.accessControlEnabled ?? false) &&
+    (accessControlSettings?.data.requireLogsToBeSavedInApp ?? false)
+  const shouldPromptDownloadLog =
+    !isRunRecordLoading &&
+    !isSettingsLoading &&
+    isDownloadingRequired &&
+    !shouldPromptSignRun &&
+    !isLogDeletedLoading &&
+    !isLogDeletedError &&
+    !isLogDeleted
+
+  // to prevent flickering
+  const [delayPassed, setDelayPassed] = useState(false)
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDelayPassed(true)
+    }, 5000)
+    return () => {
+      clearTimeout(t)
+    }
+  }, [])
+
+  // This is to prevent the ODD from getting stuck on the splash screen when interacting only from the desktop app
+  // Now, if you haven't interacted with the ODD (i.e. clicked the splash screen), and the run is dismissed, we navigate to the dashboard
+  useEffect(() => {
+    if (
+      !isRunCurrent &&
+      !splashClicked &&
+      !shouldPromptDownloadLog &&
+      delayPassed
+    ) {
+      navigate('/dashboard')
+    }
+  }, [
+    isRunCurrent,
+    splashClicked,
+    shouldPromptDownloadLog,
+    navigate,
+    delayPassed,
+  ])
 
   let headerText: string | null = null
   if (runStatus === RUN_STATUS_SUCCEEDED) {
@@ -272,19 +356,16 @@ export function RunSummary(): JSX.Element {
       }
       if (!isRunCurrent) {
         setShowSplash(false)
-        setSplashClicked(false)
         return
       }
       if (initialPipettesWithTipsCount === 0 || tipCheckSkippedBecauseER) {
         closeCurrentRunIfValid(() => {
           setShowSplash(false)
-          setSplashClicked(false)
         })
         return
       }
       if (initialPipettesWithTipsCount != null) {
         setShowSplash(false)
-        setSplashClicked(false)
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -426,6 +507,14 @@ export function RunSummary(): JSX.Element {
     </Flex>
   )
 
+  if (shouldPromptSignRun && !showSplash) {
+    return <SignRun runId={runId} documentationState={documentationState} />
+  }
+
+  if (shouldPromptDownloadLog && !showSplash) {
+    return <DownloadAuditLogsModal />
+  }
+
   return (
     <Btn
       display={DISPLAY_FLEX}
@@ -467,7 +556,7 @@ export function RunSummary(): JSX.Element {
               <SplashBody>{protocolName}</SplashBody>
             </Flex>
           </SplashFrame>
-          {splashClicked ? (
+          {splashClicked && showSplash ? (
             <Flex
               position={POSITION_ABSOLUTE}
               top="0"

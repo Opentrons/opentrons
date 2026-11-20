@@ -31,6 +31,7 @@ import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   AddressableAreaName,
   CoordinateTuple,
+  CutoutId,
   DeckSlotId,
   RobotType,
 } from '@opentrons/shared-data'
@@ -52,6 +53,8 @@ interface DeckViewOverlayProps {
   hover: string | null
   children?: ReactNode
   selectedSlot: string | null
+  /** Expanded staging cutouts (all rows when any staging is present). */
+  stagingAreaCutoutIds: CutoutId[]
 }
 
 const X_OFFSET = 30 // center the fixedTrash overlay
@@ -71,9 +74,9 @@ export function DeckViewOverlay(
     setHoveredSlot,
     hover,
     selectedSlot,
+    stagingAreaCutoutIds,
   } = props
-  const { stagingAreaEntities, moduleEntities, wasteChuteEntities } =
-    invariantContext
+  const { moduleEntities, wasteChuteEntities } = invariantContext
   const { modules } = robotState
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
   const slotMapped = HOPPER_FAKE_LOCATIONS.includes(slotId)
@@ -86,9 +89,6 @@ export function DeckViewOverlay(
     )
   })
   const tcSlots = robotType === FLEX_ROBOT_TYPE ? ['A1'] : ['8', '10', '11']
-  const stagingAreaLocations = Object.values(stagingAreaEntities)?.map(
-    stagingArea => stagingArea.location as string
-  )
   const isWasteChuteOnSlot =
     Object.values(wasteChuteEntities).length > 0 && slotMapped === 'D3'
 
@@ -132,7 +132,7 @@ export function DeckViewOverlay(
       moduleOffsetFromCutout[2] - slotOffsetFromCutout[2],
     ]
     const { width, x, y, height } = getFlexHoverDimensions(
-      stagingAreaLocations,
+      stagingAreaCutoutIds,
       cutoutId,
       slotMapped,
       hasTCOnSlot,

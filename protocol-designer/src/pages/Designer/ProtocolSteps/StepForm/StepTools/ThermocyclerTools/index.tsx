@@ -21,11 +21,12 @@ import { ProfileSettings } from './ProfileSettings'
 import { ProfileStepsSummary } from './ProfileStepsSummary'
 import { ThermocyclerState } from './ThermocyclerState'
 
+import type { ReactNode } from 'react'
 import type { StepFormProps } from '../../types'
 
 type ThermocyclerContentType = 'thermocyclerState' | 'thermocyclerProfile'
 
-export function ThermocyclerTools(props: StepFormProps): JSX.Element {
+export function ThermocyclerTools(props: StepFormProps): ReactNode {
   const {
     propsForFields,
     formData,

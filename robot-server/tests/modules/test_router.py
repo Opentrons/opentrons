@@ -8,8 +8,8 @@ from typing_extensions import Final
 
 from opentrons.calibration_storage.ot3.models.v1 import CalibrationStatus
 from opentrons.calibration_storage.types import SourceType
-from opentrons.drivers.rpi_drivers.types import PortGroup
-from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort
+from opentrons.drivers.usb.types import PortGroup
+from opentrons.drivers.usb.types import USBPort as HardwareUSBPort
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
     MagDeck,

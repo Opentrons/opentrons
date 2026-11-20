@@ -74,7 +74,7 @@ class FileProcessor:
             ]
 
             token_count_response = anthropic_client.messages.count_tokens(
-                model=model or "claude-sonnet-5",
+                model=model or "claude-sonnet-5-5",
                 messages=[{"role": "user", "content": message_content}],  # type: ignore
             )
 

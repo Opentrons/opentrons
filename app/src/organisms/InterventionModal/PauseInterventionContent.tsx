@@ -19,6 +19,8 @@ import { formatInterval } from '/app/transformations/commands'
 
 import { InterventionCommandMessage } from './InterventionCommandMessage'
 
+import type { ReactNode } from 'react'
+
 const PAUSE_INTERVENTION_CONTENT_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing12};
@@ -36,7 +38,7 @@ export interface PauseContentProps {
 export function PauseInterventionContent({
   startedAt,
   message,
-}: PauseContentProps): JSX.Element {
+}: PauseContentProps): ReactNode {
   return (
     <Flex css={PAUSE_INTERVENTION_CONTENT_STYLE}>
       <PauseHeader startedAt={startedAt} />
@@ -65,7 +67,7 @@ interface PauseHeaderProps {
   startedAt: string | null
 }
 
-function PauseHeader({ startedAt }: PauseHeaderProps): JSX.Element {
+function PauseHeader({ startedAt }: PauseHeaderProps): ReactNode {
   const { t, i18n } = useTranslation('run_details')
   const [now, setNow] = useState(Date())
   useInterval(

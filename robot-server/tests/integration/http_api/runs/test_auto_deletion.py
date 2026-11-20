@@ -24,7 +24,9 @@ async def test_runs_auto_delete(
         base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
         assert await robot_client.dead(), "Dev Robot is running and must not be."
-        with DevServer(port=port, maximum_runs=num_to_configure_as_maximum) as server:
+        with DevServer(
+            is_ot3=True, port=port, maximum_runs=num_to_configure_as_maximum
+        ) as server:
             server.start()
             await robot_client.wait_until_ready()
 

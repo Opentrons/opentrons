@@ -27,6 +27,7 @@ import { getDisplayLocation } from '/app/organisms/LegacyLabwarePositionCheck/ut
 import { getIsLabwareOffsetCodeSnippetsOn } from '/app/redux/config'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   LoadedLabware,
@@ -66,7 +67,7 @@ interface LegacyCurrentOffsetsTableProps {
 }
 export function LegacyCurrentOffsetsTable(
   props: LegacyCurrentOffsetsTableProps
-): JSX.Element {
+): ReactNode {
   const { currentOffsets, commands, labware, modules } = props
   const { t, i18n } = useTranslation(['labware_position_check', 'shared'])
   const defsByURI = getLoadedLabwareDefinitionsByUri(commands)

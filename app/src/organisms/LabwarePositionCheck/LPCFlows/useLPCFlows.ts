@@ -19,7 +19,6 @@ import {
 } from '/app/resources/runs'
 
 import {
-  useCompatibleAnalysis,
   useHandleClientAppliedOffsets,
   useLPCLabwareInfo,
   useMonitorMaintenanceRunForDeletion,
@@ -114,16 +113,8 @@ export function useLPCFlows({
   const { data: runRecord } = useNotifyRunQuery(runId ?? null, {
     refetchInterval: RUN_RECORD_INTERVAL_MS,
   })
-  const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const compatibleFlexAnalysis = useCompatibleAnalysis(
-    runId,
-    runRecord,
-    mostRecentAnalysis,
-    isFlex
-  )
-  const compatibleRobotAnalysis = isFlex
-    ? compatibleFlexAnalysis
-    : mostRecentAnalysis
+
+  const compatibleRobotAnalysis = useMostRecentCompletedAnalysis(runId)
 
   const labwareDefs = useMemo(
     () => {

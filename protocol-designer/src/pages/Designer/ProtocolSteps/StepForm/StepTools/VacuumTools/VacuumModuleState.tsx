@@ -5,12 +5,13 @@ import { VACUUM_MODE_POWER, VACUUM_VENT_OPEN } from '@opentrons/step-generation'
 
 import styles from './vacuumtools.module.css'
 
+import type { ReactNode } from 'react'
 import type { VacuumModuleState as VacuumModuleStateType } from '@opentrons/step-generation'
 
 interface VacuumModuleStateProps {
   vacuumModuleState: VacuumModuleStateType | null
 }
-export function VacuumModuleState(props: VacuumModuleStateProps): JSX.Element {
+export function VacuumModuleState(props: VacuumModuleStateProps): ReactNode {
   const { vacuumModuleState } = props
   const { t } = useTranslation('protocol_steps')
   const { currentPumpActivity, ventStatus } = vacuumModuleState ?? {}

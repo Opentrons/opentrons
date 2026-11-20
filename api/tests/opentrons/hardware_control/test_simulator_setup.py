@@ -1,61 +1,34 @@
 from pathlib import Path
-from typing import TYPE_CHECKING, Type, Union
-
-import pytest
-
-from opentrons_shared_data.robot.types import RobotType
+from typing import TYPE_CHECKING
 
 from opentrons.config import robot_configs
-from opentrons.hardware_control import API, simulator_setup
+from opentrons.hardware_control import simulator_setup
 from opentrons.hardware_control.modules import MagDeck, TempDeck, Thermocycler
 from opentrons.hardware_control.types import OT3Mount
-from opentrons.types import Mount
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
 
 
-@pytest.fixture
-def setup_klass(robot_model: RobotType) -> Type[simulator_setup.SimulatorSetup]:
-    """Get the appropriate setup class for the machine type."""
-    if robot_model == "OT-2 Standard":
-        return simulator_setup.OT2SimulatorSetup
-    else:
-        return simulator_setup.OT3SimulatorSetup
-
-
-@pytest.fixture
-def simulator_type(robot_model: RobotType) -> Union[Type[API], Type["OT3API"]]:
-    """Get the appropriate simulated hardware controller instance type."""
-    if robot_model == "OT-2 Standard":
-        return API
-    else:
-        from opentrons.hardware_control.ot3api import OT3API
-
-        return OT3API
-
-
-async def assure_simulator_type(
-    setup_klass: Type[simulator_setup.SimulatorSetup],
-    simulator_type: Union[Type[API], Type["OT3API"]],
-) -> None:
+async def assure_simulator_type() -> None:
     """It should create the appropriate kind of direct simulator."""
-    simulator = await simulator_setup.create_simulator(setup_klass())
-    assert isinstance(simulator, simulator_type)
+    simulator = await simulator_setup.create_simulator(
+        simulator_setup.OT3SimulatorSetup()
+    )
+    assert isinstance(simulator, OT3API)
 
 
-async def assure_thread_manager_type(
-    setup_klass: Type[simulator_setup.SimulatorSetup],
-    simulator_type: Union[Type[API], Type["OT3API"]],
-) -> None:
+async def assure_thread_manager_type() -> None:
     """It should create the appropriate kind of thread manager simulator."""
-    manager = await simulator_setup.create_simulator_thread_manager(setup_klass())
-    assert isinstance(object.__getattribute__(manager, "managed_obj"), simulator_type)
+    manager = await simulator_setup.create_simulator_thread_manager(
+        simulator_setup.OT3SimulatorSetup()
+    )
+    assert isinstance(object.__getattribute__(manager, "managed_obj"), OT3API)
 
 
-async def test_with_magdeck(setup_klass: Type[simulator_setup.SimulatorSetup]) -> None:
+async def test_with_magdeck() -> None:
     """It should work to build a magdeck."""
-    setup = setup_klass(
+    setup = simulator_setup.OT3SimulatorSetup(
         attached_modules={
             "magdeck": [
                 simulator_setup.ModuleItem(
@@ -88,11 +61,9 @@ async def test_with_magdeck(setup_klass: Type[simulator_setup.SimulatorSetup]) -
     assert simulator.attached_modules[1].device_info["serial"] == "1234"
 
 
-async def test_with_thermocycler(
-    setup_klass: Type[simulator_setup.SimulatorSetup],
-) -> None:
+async def test_with_thermocycler() -> None:
     """It should work to build a thermocycler."""
-    setup = setup_klass(
+    setup = simulator_setup.OT3SimulatorSetup(
         attached_modules={
             "thermocycler": [
                 simulator_setup.ModuleItem(
@@ -137,9 +108,9 @@ async def test_with_thermocycler(
     assert simulator.attached_modules[0].device_info["serial"] == "123"
 
 
-async def test_with_tempdeck(setup_klass: Type[simulator_setup.SimulatorSetup]) -> None:
+async def test_with_tempdeck() -> None:
     """It should work to build a tempdeck."""
-    setup = setup_klass(
+    setup = simulator_setup.OT3SimulatorSetup(
         attached_modules={
             "tempdeck": [
                 simulator_setup.ModuleItem(
@@ -166,44 +137,6 @@ async def test_with_tempdeck(setup_klass: Type[simulator_setup.SimulatorSetup]) 
         "status": "holding at target",
     }
     assert simulator.attached_modules[0].device_info["serial"] == "123"
-
-
-def test_persistence_ot2(tmpdir: str) -> None:
-    sim = simulator_setup.OT2SimulatorSetup(
-        attached_instruments={
-            Mount.LEFT: {"id": "an id"},
-            Mount.RIGHT: {"id": "some id"},
-        },
-        attached_modules={
-            "magdeck": [
-                simulator_setup.ModuleItem(
-                    model="magneticModuleV1",
-                    serial_number="111",
-                    calls=[simulator_setup.ModuleCall("engage", kwargs={"height": 3})],
-                )
-            ],
-            "tempdeck": [
-                simulator_setup.ModuleItem(
-                    model="temperatureModuleV2",
-                    serial_number="111",
-                    calls=[
-                        simulator_setup.ModuleCall(
-                            "set_temperature", kwargs={"celsius": 23}
-                        ),
-                        simulator_setup.ModuleCall(
-                            "set_temperature", kwargs={"celsius": 24}
-                        ),
-                    ],
-                )
-            ],
-        },
-        config=robot_configs.build_config_ot2({}),
-    )
-    file = Path(tmpdir) / "sim_setup.json"
-    simulator_setup.save_simulator_setup(sim, file)
-    test_sim = simulator_setup.load_simulator_setup(file)
-
-    assert test_sim == sim
 
 
 def test_persistence_ot3(tmpdir: str) -> None:

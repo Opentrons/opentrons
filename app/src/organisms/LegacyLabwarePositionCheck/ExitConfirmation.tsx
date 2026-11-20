@@ -23,13 +23,15 @@ import {
 import { SmallButton } from '/app/atoms/buttons'
 import { getIsOnDevice } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
+
 interface ExitConfirmationProps {
   onGoBack: () => void
   onConfirmExit: () => void
   shouldUseMetalProbe: boolean
 }
 
-export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
+export const ExitConfirmation = (props: ExitConfirmationProps): ReactNode => {
   const { i18n, t } = useTranslation(['labware_position_check', 'shared'])
   const { onGoBack, onConfirmExit, shouldUseMetalProbe } = props
   const isOnDevice = useSelector(getIsOnDevice)

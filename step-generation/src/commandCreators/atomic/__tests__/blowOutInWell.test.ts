@@ -120,4 +120,138 @@ mock_pipette.blow_out(mock_source_plate["A1"].top(z=-1.3))
       type: 'LABWARE_OFF_DECK',
     })
   })
+  it('resolves runtime parameters into the command and python', () => {
+    invariantContext.runtimeParameters = {
+      selected_pipette: {
+        variableName: 'selected_pipette',
+        displayName: 'Selected pipette',
+        type: 'string',
+        default: DEFAULT_PIPETTE,
+      },
+      selected_labware: {
+        variableName: 'selected_labware',
+        displayName: 'Selected labware',
+        type: 'string',
+        default: SOURCE_LABWARE,
+      },
+      selected_well: {
+        variableName: 'selected_well',
+        displayName: 'Selected well',
+        type: 'string',
+        default: 'A1',
+      },
+      flow_rate: {
+        variableName: 'flow_rate',
+        displayName: 'Flow rate',
+        type: 'float',
+        default: 21.1,
+      },
+      well_origin: {
+        variableName: 'well_origin',
+        displayName: 'Well origin',
+        type: 'string',
+        default: 'top',
+      },
+      z_offset: {
+        variableName: 'z_offset',
+        displayName: 'Z offset',
+        type: 'float',
+        default: -1.3,
+      },
+    }
+    const result = blowOutInWell(
+      {
+        pipetteId: 'selected_pipette',
+        labwareId: 'selected_labware',
+        wellName: 'selected_well',
+        flowRate: 'flow_rate',
+        wellLocation: {
+          origin: 'well_origin',
+          offset: { z: 'z_offset' },
+        },
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(result).toEqual({
+      commands: [
+        {
+          commandType: 'blowout',
+          key: expect.any(String),
+          params: {
+            pipetteId: DEFAULT_PIPETTE,
+            labwareId: SOURCE_LABWARE,
+            wellName: 'A1',
+            flowRate: 21.1,
+            wellLocation: {
+              origin: 'top',
+              offset: {
+                z: -1.3,
+              },
+            },
+          },
+        },
+      ],
+      python: `
+mock_pipette.flow_rate.blow_out = flow_rate
+mock_pipette.blow_out(mock_source_plate[selected_well].top(z=z_offset))
+`.trim(),
+    })
+  })
+  it('returns errors if runtime parameters are not valid', () => {
+    invariantContext.runtimeParameters = {
+      mock_rtp: {
+        variableName: 'mock_rtp',
+        displayName: 'mock rtp',
+        type: 'boolean',
+        default: false,
+      },
+      mock_string_rtp: {
+        variableName: 'mock_string_rtp',
+        displayName: 'mock string rtp',
+        type: 'string',
+        default: 'mock',
+      },
+    }
+    const result = blowOutInWell(
+      {
+        pipetteId: 'mock_rtp',
+        labwareId: 'mock_rtp',
+        wellName: 'mock_rtp',
+        flowRate: 'mock_string_rtp',
+        wellLocation: {
+          origin: 'mock_rtp',
+          offset: { z: 'mock_string_rtp' },
+        },
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_string_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_string_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+    ])
+  })
 })

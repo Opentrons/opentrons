@@ -25,6 +25,7 @@ import { useLinkedDocumentationState } from '/app/local-resources/access-control
 import { OddModal } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 
+import type { ReactNode } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface DeleteTransferConfirmationModalProps {
@@ -35,7 +36,7 @@ interface DeleteTransferConfirmationModalProps {
 export function DeleteTransferConfirmationModal({
   transferId,
   setShowDeleteConfirmationModal,
-}: DeleteTransferConfirmationModalProps): JSX.Element {
+}: DeleteTransferConfirmationModalProps): ReactNode {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const navigate = useNavigate()
   const { makeSnackbar } = useToaster()

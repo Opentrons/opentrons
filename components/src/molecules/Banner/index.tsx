@@ -73,7 +73,7 @@ const BANNER_PROPS_BY_TYPE: Record<
   },
 }
 
-export function Banner(props: BannerProps): JSX.Element {
+export function Banner(props: BannerProps): ReactNode {
   const {
     type,
     onCloseClick,

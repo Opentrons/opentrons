@@ -6,6 +6,7 @@ import { InputStepFormField } from '/protocol-designer/components/molecules'
 
 import styles from './vacuumtools.module.css'
 
+import type { ReactNode } from 'react'
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
 
@@ -14,7 +15,7 @@ export interface PumpDurationFieldProps {
   propsForFields: FieldPropsByName
 }
 
-export function PumpDurationField(props: PumpDurationFieldProps): JSX.Element {
+export function PumpDurationField(props: PumpDurationFieldProps): ReactNode {
   const { formData, propsForFields } = props
   const { t } = useTranslation('protocol_steps')
   return (

@@ -33,6 +33,7 @@ import type {
   Dispatch,
   MouseEvent,
   MutableRefObject,
+  ReactNode,
   SetStateAction,
 } from 'react'
 import type { AnalyticsEvent } from '/protocol-designer/analytics/mixpanel'
@@ -50,7 +51,7 @@ interface StepOverflowMenuProps {
   sidebarWidth: number // adjust the position of the overflow menu
 }
 
-export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
+export function StepOverflowMenu(props: StepOverflowMenuProps): ReactNode {
   const {
     stepId,
     menuRootRef,

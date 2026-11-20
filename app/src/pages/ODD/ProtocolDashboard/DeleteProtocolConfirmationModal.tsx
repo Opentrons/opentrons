@@ -27,6 +27,7 @@ import { useLinkedDocumentationState } from '/app/local-resources/access-control
 import { OddModal } from '/app/molecules/OddModal'
 import { useToaster } from '/app/organisms/ToasterOven'
 
+import type { ReactNode } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface DeleteProtocolConfirmationModalProps {
@@ -37,7 +38,7 @@ interface DeleteProtocolConfirmationModalProps {
 export function DeleteProtocolConfirmationModal({
   protocolId,
   setShowDeleteConfirmationModal,
-}: DeleteProtocolConfirmationModalProps): JSX.Element {
+}: DeleteProtocolConfirmationModalProps): ReactNode {
   const { i18n, t } = useTranslation(['protocol_list', 'shared'])
   const { makeSnackbar } = useToaster()
   const [showIcon, setShowIcon] = useState<boolean>(false)

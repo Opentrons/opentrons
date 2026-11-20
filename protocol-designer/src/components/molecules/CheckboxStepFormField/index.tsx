@@ -20,7 +20,7 @@ type CheckboxStepFormFieldProps = FieldProps & {
 
 export function CheckboxStepFormField(
   props: CheckboxStepFormFieldProps
-): JSX.Element {
+): ReactNode {
   const {
     disabled,
     isIndeterminate,

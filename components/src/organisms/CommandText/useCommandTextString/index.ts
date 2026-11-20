@@ -454,6 +454,16 @@ export function useCommandTextString(
         }),
       }
 
+    case 'createCSV':
+    case 'csvWriteRow':
+      return {
+        kind: 'generic',
+        commandText: utils.getCSVCommandText({
+          ...fullParams,
+          command,
+        }),
+      }
+
     case undefined:
     case null:
       return { kind: 'generic', commandText: '' }

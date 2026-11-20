@@ -9,13 +9,14 @@ import {
   LegacyStyledText,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { SetSettingOption } from './types'
 
 interface RobotNameProps {
   setCurrentOption: SetSettingOption
 }
 
-export function RobotName({ setCurrentOption }: RobotNameProps): JSX.Element {
+export function RobotName({ setCurrentOption }: RobotNameProps): ReactNode {
   const { t } = useTranslation(['device_settings'])
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>

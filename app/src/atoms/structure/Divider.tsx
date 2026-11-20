@@ -1,6 +1,6 @@
 import { Box, COLORS, SPACING } from '@opentrons/components'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 type Props = ComponentProps<typeof Box>
 
@@ -8,7 +8,7 @@ type Props = ComponentProps<typeof Box>
  * ToDo
  * from a semantic standpoint, we should replace div with hr.
  */
-export function Divider(props: Props): JSX.Element {
+export function Divider(props: Props): ReactNode {
   const { marginY } = props
   return (
     <Box

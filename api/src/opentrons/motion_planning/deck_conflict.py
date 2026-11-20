@@ -430,6 +430,20 @@ def _create_flex_restrictions(  # noqa: C901
                 source_location=location,
             )
         )
+    elif isinstance(item, VacuumModule):
+        if isinstance(location, StagingSlotName):
+            raise DeckConflictError(
+                "Cannot have a module loaded on a staging area slot."
+            )
+        # The vacuum module occupies its own slot. Labware on the module is
+        # tracked as part of the module, not as a separate slot item.
+        restrictions.append(
+            _NothingAllowed(
+                location=location,
+                source_item=item,
+                source_location=location,
+            )
+        )
     elif location in _flex_slots_allowing_stacker():
         restrictions.append(
             _NothingButStackerAllowed(

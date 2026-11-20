@@ -23,6 +23,7 @@ import {
   updateConfigValue,
 } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 import type { SetSettingOption } from './types'
 
@@ -51,7 +52,7 @@ interface TouchscreenBrightnessProps {
 
 export function TouchscreenBrightness({
   setCurrentOption,
-}: TouchscreenBrightnessProps): JSX.Element {
+}: TouchscreenBrightnessProps): ReactNode {
   const { t } = useTranslation(['device_settings'])
   const dispatch = useDispatch<Dispatch>()
   const initialBrightnessRawValue = useSelector(

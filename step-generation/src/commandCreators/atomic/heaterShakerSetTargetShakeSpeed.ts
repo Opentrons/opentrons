@@ -1,21 +1,37 @@
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import * as errorCreators from '../../errorCreators'
-import { uuid } from '../../utils'
+import {
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
+  uuid,
+} from '../../utils'
 
-import type { HeaterShakerSetAndWaitForShakeSpeedCreateCommand } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+import type {
+  CommandCreator,
+  CommandCreatorError,
+  HeaterShakerSetTargetShakeSpeedStepGenArgs,
+} from '../../types'
 
 export const heaterShakerSetTargetShakeSpeed: CommandCreator<
-  HeaterShakerSetAndWaitForShakeSpeedCreateCommand['params']
+  HeaterShakerSetTargetShakeSpeedStepGenArgs
 > = (args, invariantContext, prevRobotState) => {
-  const { moduleEntities } = invariantContext
-  const { moduleId, rpm } = args
-
-  if (moduleId === null) {
-    return {
-      errors: [errorCreators.missingModuleError()],
-    }
+  const { moduleEntities, runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
+  const rpm = resolveNumericRuntimeValue(args.rpm, runtimeParameters)
+  const errors: CommandCreatorError[] = []
+  if (moduleId == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: args.moduleId })
+    )
+  }
+  if (typeof args.rpm === 'string' && rpm == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: args.rpm })
+    )
+  }
+  if (errors.length > 0 || moduleId == null || rpm == null) {
+    return { errors }
   }
 
   if (moduleEntities[moduleId]?.type !== HEATERSHAKER_MODULE_TYPE) {
@@ -36,6 +52,6 @@ export const heaterShakerSetTargetShakeSpeed: CommandCreator<
         },
       },
     ],
-    python: `${pythonName}.set_and_wait_for_shake_speed(${rpm})`,
+    python: `${pythonName}.set_and_wait_for_shake_speed(${args.rpm})`,
   }
 }

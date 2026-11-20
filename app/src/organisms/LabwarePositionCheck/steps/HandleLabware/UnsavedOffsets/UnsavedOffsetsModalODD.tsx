@@ -18,6 +18,7 @@ import {
   selectSelectedLwOverview,
 } from '/app/redux/protocol-runs'
 
+import type { ReactNode } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
@@ -30,7 +31,7 @@ export const handleUnsavedOffsetsModalODD = (
 }
 
 const UnsavedOffsetsModalODD = NiceModal.create(
-  (props: LPCWizardContentProps): JSX.Element => {
+  (props: LPCWizardContentProps): ReactNode => {
     const { runId } = props
     const { t } = useTranslation('labware_position_check')
     const dispatch = useDispatch()

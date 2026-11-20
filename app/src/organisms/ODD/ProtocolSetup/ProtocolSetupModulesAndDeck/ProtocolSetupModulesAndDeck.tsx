@@ -35,7 +35,7 @@ import { ModuleTable } from './ModuleTable'
 import { SetupInstructionsModal } from './SetupInstructionsModal'
 import { getUnmatchedModulesForProtocol } from './utils'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { SetupScreens } from '../types'
 
 const ATTACHED_MODULE_POLL_MS = 5000
@@ -52,7 +52,7 @@ interface ProtocolSetupModulesAndDeckProps {
 export function ProtocolSetupModulesAndDeck({
   runId,
   setSetupScreen,
-}: ProtocolSetupModulesAndDeckProps): JSX.Element {
+}: ProtocolSetupModulesAndDeckProps): ReactNode {
   const { i18n, t } = useTranslation('protocol_setup')
   const [showSetupInstructionsModal, setShowSetupInstructionsModal] =
     useState<boolean>(false)

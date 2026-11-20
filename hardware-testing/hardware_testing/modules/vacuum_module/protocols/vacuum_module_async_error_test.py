@@ -51,6 +51,7 @@ requirements = {
 _PRESET_GCODE: dict[str, str] = {
     "waste_full": "async ERR401:waste container full",
     "pressure_not_reached": "async ERR400:pressure not reached",
+    "none": "",
 }
 
 _SCENARIO_CHOICES: list[ParameterChoice] = [
@@ -114,8 +115,9 @@ def add_parameters(parameters: ParameterContext) -> None:
         variable_name="async_error_preset",
         display_name="Async Error Preset",
         description="Recoverable vacuum async error to inject after starting vacuum.",
-        default="waste_full",
+        default="none",
         choices=[
+            {"display_name": "None", "value": "none"},
             {"display_name": "Waste container full (ERR401)", "value": "waste_full"},
             {
                 "display_name": "Pressure not reached (ERR400)",
@@ -143,8 +145,16 @@ def add_parameters(parameters: ParameterContext) -> None:
         display_name="Vacuum Hold (seconds)",
         variable_name="vacuum_hold_seconds",
         description="Hold duration for timed vacuum background tasks and profile steps.",
-        default=60,
+        default=30,
         minimum=10,
+        maximum=600,
+    )
+    parameters.add_int(
+        display_name="Vacuum Timeout (seconds)",
+        variable_name="vacuum_timeout_seconds",
+        description="Timeout before pressure is considered not reached, disabled if 0.",
+        default=0,
+        minimum=0,
         maximum=600,
     )
     parameters.add_int(
@@ -217,34 +227,37 @@ def _start_vacuum_task(
     target_pressure = ctx.params.target_pressure_mbar  # type: ignore[attr-defined]
     target_power = ctx.params.target_percent_power  # type: ignore[attr-defined]
     hold_seconds = ctx.params.vacuum_hold_seconds  # type: ignore[attr-defined]
+    timeout_seconds = ctx.params.vacuum_timeout_seconds or None  # type: ignore[attr-defined]
     profile_repetitions = ctx.params.profile_repetitions  # type: ignore[attr-defined]
 
     if selected_api == "start_set_vacuum_pressure":
         ctx.comment(
             f"Starting start_set_vacuum_pressure to {target_pressure} mbar "
-            f"for {hold_seconds}s (background task)."
+            f"for {hold_seconds}s timeout {timeout_seconds}s (background task)."
         )
         return vm_mod.start_set_vacuum_pressure(
             target_pressure,
-            hold_seconds,
+            duration_s=hold_seconds,
+            timeout_s=timeout_seconds,
             vent_after=False,
         )
 
     if selected_api == "start_set_vacuum_power":
         ctx.comment(
             f"Starting start_set_vacuum_power at {target_power}% "
-            f"for {hold_seconds}s (background task)."
+            f"for {hold_seconds}s timeout {timeout_seconds}s (background task)."
         )
         return vm_mod.start_set_vacuum_power(
             target_power,
-            hold_seconds,
+            duration_s=hold_seconds,
+            timeout_s=timeout_seconds,
             vent_after=False,
         )
 
     if selected_api == "start_execute_profile":
         ctx.comment(
             f"Starting start_execute_profile with one pressure step to "
-            f"{target_pressure} mbar for {hold_seconds}s, "
+            f"{target_pressure} mbar for {hold_seconds}s timeout {timeout_seconds}s, "
             f"{profile_repetitions} repetition(s) (background task)."
         )
         return vm_mod.start_execute_profile(
@@ -253,6 +266,7 @@ def _start_vacuum_task(
                     "enable_pump": True,
                     "gauge_pressure_mbar": target_pressure,
                     "hold_time_seconds": hold_seconds,
+                    "timeout_seconds": timeout_seconds,
                     "vent_after": False,
                 }
             ],
@@ -273,12 +287,13 @@ def _wait_for_injection(ctx: ProtocolContext, vacuum_api: str) -> None:
 
 def _inject_async_error(ctx: ProtocolContext, vm_mod: VacuumModuleContext) -> str:
     gcode_response = _resolve_gcode_response(ctx)
-    ctx.comment(f"Injecting async G-code response: {gcode_response!r}")
-    inject_async_gcode_response(vm_mod, gcode_response)
-    ctx.comment(
-        "Async error injected. Recoverable errors (ERR400/ERR401) should enter "
-        "associated-command recovery instead of stopping the run."
-    )
+    if gcode_response:
+        ctx.comment(f"Injecting async G-code response: {gcode_response!r}")
+        inject_async_gcode_response(vm_mod, gcode_response)
+        ctx.comment(
+            "Async error injected. Recoverable errors (ERR400/ERR401) should enter "
+            "associated-command recovery instead of stopping the run."
+        )
     return gcode_response
 
 

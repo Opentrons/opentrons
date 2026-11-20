@@ -33,7 +33,7 @@ export interface MediaContainerContentProps {
 
 export function MediaContainerContent(
   props: MediaContainerContentProps
-): JSX.Element {
+): ReactNode {
   const {
     mediaContent,
     centerPrimaryText,

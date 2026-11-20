@@ -9,6 +9,7 @@ import { getUsbDeviceDisplayRows } from '/app/redux/system-info/selectors'
 
 import styles from './devices.module.css'
 
+import type { ReactNode } from 'react'
 import type { SetSettingOption } from '../types'
 
 interface DevicesProps {
@@ -19,7 +20,7 @@ interface DevicesProps {
 export function Devices({
   robotName,
   setCurrentOption,
-}: DevicesProps): JSX.Element {
+}: DevicesProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const deviceRows = useSelector(getUsbDeviceDisplayRows)
 

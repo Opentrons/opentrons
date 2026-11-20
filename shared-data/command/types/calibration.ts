@@ -55,10 +55,12 @@ export type CalibrationCreateCommand =
 
 interface CalibratePipetteParams {
   mount: PipetteMount
+  slot?: 'B2' | 'C2'
 }
 interface CalibrateGripperParams {
   jaw: 'front' | 'rear'
   otherJawOffset?: Vector3D
+  slot?: 'B2' | 'C2'
 }
 interface CalibrateModuleParams {
   moduleId: string

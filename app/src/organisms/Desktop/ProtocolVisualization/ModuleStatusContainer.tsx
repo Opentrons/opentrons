@@ -4,13 +4,15 @@ import { StyledText } from '@opentrons/components'
 
 import styles from './ModuleContainer/modulecontainer.module.css'
 
+import type { ReactNode } from 'react'
+
 interface ModuleStatusContainerProps {
   title: string
   children: React.ReactNode
 }
 export const ModuleStatusContainer = (
   props: ModuleStatusContainerProps
-): JSX.Element => {
+): ReactNode => {
   const { t } = useTranslation('protocol_visualization')
   const { title, children } = props
   return (

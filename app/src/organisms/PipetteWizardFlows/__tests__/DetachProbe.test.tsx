@@ -38,6 +38,7 @@ describe('DetachProbe', () => {
       handleCommandError: vi.fn(),
       isRobotMoving: false,
       isOnDevice: false,
+      selectedSlot: 'B2',
     }
     vi.mocked(InProgressModal).mockReturnValue(<div>mock in progress</div>)
   })

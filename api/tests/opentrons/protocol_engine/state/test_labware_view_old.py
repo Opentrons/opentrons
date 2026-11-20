@@ -1349,6 +1349,180 @@ def test_raise_if_labware_cannot_be_stacked_is_adapter() -> None:
         )
 
 
+def _vacuum_spacer_def(
+    load_name: str,
+    *,
+    seat: bool = False,
+    parent_load_names: list[str] | None = None,
+) -> LabwareDefinition2:
+    quirks = ["providesStackingDefault", "vacuumSpacer"]
+    if seat:
+        quirks.append("vacuumSpacerSeat")
+    stacking = {"default": Vector3D(x=0, y=0, z=0)}
+    for parent in parent_load_names or []:
+        stacking[parent] = Vector3D(x=0, y=0, z=0)
+    return LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        allowedRoles=[LabwareRole.adapter],
+        parameters=Parameters2.model_construct(
+            loadName=load_name,
+            format="irregular",
+            isTiprack=False,
+            isMagneticModuleCompatible=False,
+            quirks=quirks,
+        ),
+        stackingOffsetWithLabware=stacking,
+        compatibleParentLabware=parent_load_names,
+    )
+
+
+def test_vacuum_spacers_can_stack_on_each_other() -> None:
+    """The 3.2/5.2/7.25 mm spacers may stack in any order; 12.8 mm may sit on them."""
+    s1_def = _vacuum_spacer_def("opentrons_vacuum_manifold_spacer_3.2mm")
+    s2_def = _vacuum_spacer_def(
+        "opentrons_vacuum_manifold_spacer_5.2mm",
+        parent_load_names=["opentrons_vacuum_manifold_spacer_3.2mm"],
+    )
+    subject = get_labware_view(
+        labware_by_id={
+            "s1": LoadedLabware(
+                id="s1",
+                loadName="opentrons_vacuum_manifold_spacer_3.2mm",
+                definitionUri="s1-uri",
+                location=ModuleLocation(moduleId="vacuum-id"),
+            ),
+        },
+        definitions_by_uri={"s1-uri": s1_def},
+    )
+
+    assert (
+        subject.raise_if_labware_cannot_be_stacked(
+            top_labware_definition=s2_def, bottom_labware_id="s1"
+        )
+        is True
+    )
+
+
+def test_vacuum_spacer_cannot_sit_on_s4() -> None:
+    """The 12.8 mm spacer has locating clips and must be the topmost spacer."""
+    s4_def = _vacuum_spacer_def("opentrons_vacuum_manifold_spacer_12.8mm", seat=True)
+    s1_def = _vacuum_spacer_def(
+        "opentrons_vacuum_manifold_spacer_3.2mm",
+        parent_load_names=["opentrons_vacuum_manifold_spacer_5.2mm"],
+    )
+    subject = get_labware_view(
+        labware_by_id={
+            "s4": LoadedLabware(
+                id="s4",
+                loadName="opentrons_vacuum_manifold_spacer_12.8mm",
+                definitionUri="s4-uri",
+                location=ModuleLocation(moduleId="vacuum-id"),
+            ),
+        },
+        definitions_by_uri={"s4-uri": s4_def},
+    )
+
+    with pytest.raises(errors.LabwareCannotBeStackedError, match="topmost spacer"):
+        subject.raise_if_labware_cannot_be_stacked(
+            top_labware_definition=s1_def, bottom_labware_id="s4"
+        )
+
+
+def test_vacuum_spacer_cannot_duplicate_or_use_all_four() -> None:
+    """At most one of each spacer, and at most three spacers in a stack."""
+    s1_def = _vacuum_spacer_def("opentrons_vacuum_manifold_spacer_3.2mm")
+    s2_def = _vacuum_spacer_def(
+        "opentrons_vacuum_manifold_spacer_5.2mm",
+        parent_load_names=["opentrons_vacuum_manifold_spacer_3.2mm"],
+    )
+    s3_def = _vacuum_spacer_def(
+        "opentrons_vacuum_manifold_spacer_7.25mm",
+        parent_load_names=["opentrons_vacuum_manifold_spacer_5.2mm"],
+    )
+    s4_def = _vacuum_spacer_def(
+        "opentrons_vacuum_manifold_spacer_12.8mm",
+        seat=True,
+        parent_load_names=["opentrons_vacuum_manifold_spacer_7.25mm"],
+    )
+    subject = get_labware_view(
+        labware_by_id={
+            "s1": LoadedLabware(
+                id="s1",
+                loadName="opentrons_vacuum_manifold_spacer_3.2mm",
+                definitionUri="s1-uri",
+                location=ModuleLocation(moduleId="vacuum-id"),
+            ),
+            "s2": LoadedLabware(
+                id="s2",
+                loadName="opentrons_vacuum_manifold_spacer_5.2mm",
+                definitionUri="s2-uri",
+                location=OnLabwareLocation(labwareId="s1"),
+            ),
+            "s3": LoadedLabware(
+                id="s3",
+                loadName="opentrons_vacuum_manifold_spacer_7.25mm",
+                definitionUri="s3-uri",
+                location=OnLabwareLocation(labwareId="s2"),
+            ),
+        },
+        definitions_by_uri={"s1-uri": s1_def, "s2-uri": s2_def, "s3-uri": s3_def},
+    )
+
+    with pytest.raises(
+        errors.LabwareCannotBeStackedError, match="already in the stack"
+    ):
+        subject.raise_if_labware_cannot_be_stacked(
+            top_labware_definition=s1_def, bottom_labware_id="s3"
+        )
+
+    with pytest.raises(errors.LabwareCannotBeStackedError, match="unstable"):
+        subject.raise_if_labware_cannot_be_stacked(
+            top_labware_definition=s4_def, bottom_labware_id="s3"
+        )
+
+
+def test_labware_can_sit_on_stacked_vacuum_spacers() -> None:
+    """A plate may sit on a spacer that is itself on another spacer."""
+    s1_def = _vacuum_spacer_def("opentrons_vacuum_manifold_spacer_3.2mm")
+    s2_def = _vacuum_spacer_def(
+        "opentrons_vacuum_manifold_spacer_5.2mm",
+        parent_load_names=["opentrons_vacuum_manifold_spacer_3.2mm"],
+    )
+    plate_def = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        allowedRoles=[LabwareRole.labware],
+        parameters=Parameters2.model_construct(
+            loadName="opentrons_96_wellplate_200ul_pcr_full_skirt",
+            format="irregular",
+            isTiprack=False,
+            isMagneticModuleCompatible=False,
+        ),
+        stackingOffsetWithLabware={},
+    )
+    subject = get_labware_view(
+        labware_by_id={
+            "s1": LoadedLabware(
+                id="s1",
+                loadName="opentrons_vacuum_manifold_spacer_3.2mm",
+                definitionUri="s1-uri",
+                location=ModuleLocation(moduleId="vacuum-id"),
+            ),
+            "s2": LoadedLabware(
+                id="s2",
+                loadName="opentrons_vacuum_manifold_spacer_5.2mm",
+                definitionUri="s2-uri",
+                location=OnLabwareLocation(labwareId="s1"),
+            ),
+        },
+        definitions_by_uri={"s1-uri": s1_def, "s2-uri": s2_def},
+    )
+
+    assert (
+        subject.raise_if_labware_cannot_be_stacked(
+            top_labware_definition=plate_def, bottom_labware_id="s2"
+        )
+        is True
+    )
+
+
 def test_raise_if_labware_cannot_be_stacked_not_validated() -> None:
     """It should raise if the labware name is not in the definition stacking overlap."""
     subject = get_labware_view(
@@ -2081,6 +2255,37 @@ def test_get_stacker_labware_overlap_offset_uses_default_when_no_match() -> None
 
     result = subject.get_stacker_labware_overlap_offset([top_def, bottom_def])
     assert result == OverlapOffset(x=10, y=20, z=30)
+
+
+@pytest.mark.parametrize(
+    "quirks,should_raise",
+    [
+        (["filterPlate"], True),
+        (["filterPlate", "noLabwarePositionCheck"], True),
+        (None, False),
+        ([], False),
+    ],
+)
+def test_raise_if_labware_incompatible_with_vacuum_module(
+    quirks: list[str] | None, should_raise: bool
+) -> None:
+    """Filter plates cannot sit directly on the vacuum module."""
+    subject = get_labware_view()
+    definition = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+        parameters=Parameters2.model_construct(  # type: ignore[call-arg]
+            loadName="some_filter_plate",
+            quirks=quirks,
+        ),
+    )
+
+    if should_raise:
+        with pytest.raises(
+            errors.LabwareIsNotAllowedInLocationError,
+            match="directly onto the vacuum module",
+        ):
+            subject.raise_if_labware_incompatible_with_vacuum_module(definition)
+    else:
+        subject.raise_if_labware_incompatible_with_vacuum_module(definition)
 
 
 def test_get_grip_force(

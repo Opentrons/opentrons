@@ -3,10 +3,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import {
-  useAllPipetteOffsetCalibrationsQuery,
-  useInstrumentsQuery,
-} from '@opentrons/react-api-client'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -60,9 +57,6 @@ const render = () => {
 describe('ProtocolSetupInstruments', () => {
   beforeEach(() => {
     mockCreateLiveCommand.mockResolvedValue(null)
-    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
-      .calledWith()
-      .thenReturn({ data: { data: [] } } as any)
     when(vi.mocked(useMostRecentCompletedAnalysis))
       .calledWith(RUN_ID)
       .thenReturn(mockRecentAnalysis)

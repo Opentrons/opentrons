@@ -47,6 +47,8 @@ const HEADER_STYLE = css`
   ${TYPOGRAPHY.h1Default};
   margin-top: ${SPACING.spacing24};
   margin-bottom: ${SPACING.spacing8};
+  text-align: ${TYPOGRAPHY.textAlignCenter};
+  padding: 0 ${SPACING.spacing32};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: 2rem;
@@ -54,13 +56,20 @@ const HEADER_STYLE = css`
     line-height: ${SPACING.spacing40};
   }
 `
+
+const ERROR_HEADER_STYLE = css`
+  ${HEADER_STYLE};
+  margin-top: ${SPACING.spacing40};
+`
+
 const SUBHEADER_STYLE = css`
   ${TYPOGRAPHY.pRegular};
   margin-left: 6.25rem;
   margin-right: 6.25rem;
   margin-bottom: ${SPACING.spacing32};
   text-align: ${TYPOGRAPHY.textAlignCenter};
-  height: 1.75rem;
+  min-height: 1.75rem;
+  font-size: 0.875rem;
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: ${TYPOGRAPHY.fontSize28};
@@ -78,7 +87,7 @@ const FLEX_SPACING_STYLE = css`
   }
 `
 
-export function SimpleWizardBodyContent(props: Props): JSX.Element {
+export function SimpleWizardBodyContent(props: Props): ReactNode {
   const {
     iconColor,
     children,
@@ -158,14 +167,20 @@ export function SimpleWizardBodyContent(props: Props): JSX.Element {
                 marginBottom={SPACING.spacing24}
               />
             )}
-            <LegacyStyledText css={HEADER_STYLE}>{header}</LegacyStyledText>
-            {subHeader != null ? (
-              <LegacyStyledText css={SUBHEADER_STYLE}>
-                {subHeader}
+            <Flex gap={SPACING.spacing8} flexDirection="column">
+              <LegacyStyledText
+                css={isSuccess ? HEADER_STYLE : ERROR_HEADER_STYLE}
+              >
+                {header}
               </LegacyStyledText>
-            ) : (
-              <Flex aria-label="flex_spacing" css={FLEX_SPACING_STYLE} />
-            )}
+              {subHeader != null ? (
+                <LegacyStyledText css={SUBHEADER_STYLE}>
+                  {subHeader}
+                </LegacyStyledText>
+              ) : (
+                <Flex aria-label="flex_spacing" css={FLEX_SPACING_STYLE} />
+              )}
+            </Flex>
           </>
         )}
       </Flex>

@@ -48,6 +48,7 @@ describe('DetachPipette', () => {
       isFetching: false,
       setFetching: vi.fn(),
       isOnDevice: false,
+      selectedSlot: 'B2',
     }
     vi.mocked(InProgressModal).mockReturnValue(<div>mock in progress</div>)
   })

@@ -9,13 +9,14 @@ import {
 
 import { InputStepFormField } from '/protocol-designer/components/molecules'
 
+import type { ReactNode } from 'react'
 import type { FieldPropsByName } from '../../types'
 
 interface ReadSettingsProps {
   propsForFields: FieldPropsByName
 }
 
-export function ReadSettings(props: ReadSettingsProps): JSX.Element {
+export function ReadSettings(props: ReadSettingsProps): ReactNode {
   const { propsForFields } = props
 
   const { t } = useTranslation('form')

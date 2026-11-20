@@ -15,7 +15,7 @@ export interface LabeledCheckboxProps {
   onChange: ChangeEventHandler<HTMLInputElement>
 }
 
-export function LabeledCheckbox(props: LabeledCheckboxProps): JSX.Element {
+export function LabeledCheckbox(props: LabeledCheckboxProps): ReactNode {
   const { label, value, name, onChange } = props
   const checkboxClass = cx(styles.labeled_checkbox, props.className)
   return (

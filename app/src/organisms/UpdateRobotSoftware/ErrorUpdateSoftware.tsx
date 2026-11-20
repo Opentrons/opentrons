@@ -22,7 +22,7 @@ interface ErrorUpdateSoftwareProps {
 export function ErrorUpdateSoftware({
   errorMessage,
   children,
-}: ErrorUpdateSoftwareProps): JSX.Element {
+}: ErrorUpdateSoftwareProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared'])
 
   return (

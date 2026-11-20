@@ -5,6 +5,7 @@ import type {
   useCreateCommandMutation,
 } from '@opentrons/react-api-client'
 import type { CreateCommand, Vector3D } from '@opentrons/shared-data'
+import type { CalibrationDeckSlot } from '/app/organisms/PipetteWizardFlows/types'
 import type {
   MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
   MOVE_PIN_TO_FRONT_JAW,
@@ -18,6 +19,7 @@ import type {
 
 export type GripperWizardStep =
   | BeforeBeginningStep
+  | SelectSlotStep
   | MovePinStep
   | MountGripperStep
   | FirmwareUpdateStep
@@ -49,6 +51,9 @@ export const GRIPPER_FLOW_FINISH_ACTIONS: Record<
 
 export interface BeforeBeginningStep {
   section: typeof SECTIONS.BEFORE_BEGINNING
+}
+export interface SelectSlotStep {
+  section: typeof SECTIONS.SELECT_SLOT
 }
 export interface MovePinStep {
   section: typeof SECTIONS.MOVE_PIN
@@ -101,4 +106,5 @@ export interface GripperWizardStepProps {
   attachedGripper: {} | null
   errorMessage: string | null
   setErrorMessage: (message: string | null) => void
+  selectedSlot: CalibrationDeckSlot
 }

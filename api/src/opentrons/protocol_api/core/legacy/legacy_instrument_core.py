@@ -318,7 +318,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
                     num_channels=self.get_channels(),
                 )
             except AssertionError:
-                # Similarly to :py:meth:`return_tips`, the failure case here
+                # Similarly to `return_tips()`, the failure case here
                 # just means the tip can't be reused, so don't actually stop
                 # the protocol
                 _log.warning(

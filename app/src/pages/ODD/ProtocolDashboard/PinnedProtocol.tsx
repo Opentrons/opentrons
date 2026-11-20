@@ -24,7 +24,7 @@ import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { useUpdatedLastRunTime } from './hooks'
 import { LongPressModal } from './LongPressModal'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
@@ -65,7 +65,7 @@ const cardStyleBySize: {
 
 interface PinnedProtocolProps {
   protocol: ProtocolResource
-  longPress: Dispatch<SetStateAction<boolean>>
+  longPress?: Dispatch<SetStateAction<boolean>>
   setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
   setTargetProtocolId: (targetProtocolId: string) => void
   cardSize?: CardSizeType
@@ -73,7 +73,7 @@ interface PinnedProtocolProps {
   isRequiredCSV?: boolean
 }
 
-export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
+export function PinnedProtocol(props: PinnedProtocolProps): ReactNode {
   const {
     protocol,
     longPress,
@@ -102,7 +102,7 @@ export function PinnedProtocol(props: PinnedProtocolProps): JSX.Element {
   }
   useEffect(() => {
     if (longpress.isLongPressed) {
-      longPress(true)
+      longPress?.(true)
     }
   }, [longpress.isLongPressed, longPress])
 

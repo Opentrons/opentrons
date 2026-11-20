@@ -12,7 +12,6 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { useLogger } from '/app/logger'
 import { UploadInput } from '/app/molecules/UploadInput'
 import { useToaster } from '/app/organisms/ToasterOven'
 import {
@@ -37,14 +36,15 @@ export function ProtocolUploadInput(
 ): JSX.Element | null {
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
-  const logger = useLogger(new URL('', import.meta.url).pathname)
   const trackEvent = useTrackEvent()
   const { makeToast } = useToaster()
 
   const handleUpload = (file: File): Promise<void> => {
     return remote.getFilePathFrom(file).then(filePath => {
       if (filePath == null) {
-        logger.warn('Failed to upload file, path not found')
+        console.warn(
+          '[app/src/organisms/Desktop/ProtocolsLanding/ProtocolUploadInput.tsx]: Failed to upload file, path not found'
+        )
       }
       if (isValidProtocolFileName(file.name)) {
         dispatch(addProtocol(filePath))

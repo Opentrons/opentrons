@@ -54,6 +54,7 @@ import {
   getAvailableShellUpdate,
 } from '/app/redux/shell'
 
+import type { ReactNode } from 'react'
 import type { Dispatch, State } from '/app/redux/types'
 
 const SOFTWARE_SYNC_URL = 'https://support.opentrons.com/s/'
@@ -64,7 +65,7 @@ const ENABLE_APP_UPDATE_NOTIFICATIONS = 'Enable app update notifications'
 const ENABLE_UPDATE_AUTODOWNLOAD = 'Enable update autodownload'
 const uuid: () => string = uuidv4
 
-export function GeneralSettings(): JSX.Element {
+export function GeneralSettings(): ReactNode {
   const { t } = useTranslation(['app_settings', 'shared', 'branded'])
   const dispatch = useDispatch<Dispatch>()
   const trackEvent = useTrackEvent()

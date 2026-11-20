@@ -20,6 +20,7 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
+import type { ReactNode } from 'react'
 import type {
   AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
@@ -41,7 +42,7 @@ interface MagneticBlockItemProps {
   selected?: boolean
 }
 
-export function MagneticBlockItem(props: MagneticBlockItemProps): JSX.Element {
+export function MagneticBlockItem(props: MagneticBlockItemProps): ReactNode {
   const { t } = useTranslation('deck_configuration')
 
   const {

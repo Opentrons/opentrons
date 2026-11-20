@@ -3,8 +3,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { A1_NOZZLE, ALL } from '@opentrons/shared-data'
 
 import { pickUpTip } from '..'
+import { MANUAL } from '../../../constants'
 import {
   DEFAULT_PIPETTE,
+  getErrorResult,
   getRobotStateWithTipStandard,
   getSuccessResult,
   makeContext,
@@ -46,5 +48,95 @@ describe('pickUpTip', () => {
     expect(getSuccessResult(result).python).toBe(
       `mock_pipette.pick_up_tip(location=mock_tip_rack_1)`
     )
+  })
+  it('resolves pipetteId, labwareId, and wellName when they are runtime parameters', () => {
+    invariantContext.runtimeParameters = {
+      selected_pipette: {
+        variableName: 'selected_pipette',
+        displayName: 'Selected pipette',
+        type: 'string',
+        default: DEFAULT_PIPETTE,
+      },
+      selected_tiprack: {
+        variableName: 'selected_tiprack',
+        displayName: 'Selected tiprack',
+        type: 'string',
+        default: TIPRACK_1,
+      },
+      selected_well: {
+        variableName: 'selected_well',
+        displayName: 'Selected well',
+        type: 'string',
+        default: 'B1',
+      },
+    }
+    const result = pickUpTip(
+      {
+        pipetteId: 'selected_pipette',
+        labwareId: 'selected_tiprack',
+        wellName: 'selected_well',
+        primaryNozzle: A1_NOZZLE,
+        nozzles: ALL,
+        tipTrackingOption: MANUAL,
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(result).toEqual({
+      commands: [
+        {
+          commandType: 'pickUpTip',
+          key: expect.any(String),
+          params: {
+            pipetteId: DEFAULT_PIPETTE,
+            labwareId: TIPRACK_1,
+            wellName: 'B1',
+          },
+        },
+      ],
+      python:
+        'mock_pipette.pick_up_tip(location=mock_tip_rack_1[selected_well])',
+    })
+  })
+  it('returns errors if pipetteId, labwareId, and wellName are not string runtime parameters', () => {
+    invariantContext.runtimeParameters = {
+      mock_rtp: {
+        variableName: 'mock_rtp',
+        displayName: 'mock rtp',
+        type: 'boolean',
+        default: false,
+      },
+      mock_int_rtp: {
+        variableName: 'mock_int_rtp',
+        displayName: 'mock int rtp',
+        type: 'int',
+        default: 1,
+      },
+    }
+    const result = pickUpTip(
+      {
+        pipetteId: 'mock_rtp',
+        labwareId: 'mock_int_rtp',
+        wellName: 'mock_rtp',
+        primaryNozzle: A1_NOZZLE,
+        nozzles: ALL,
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getErrorResult(result).errors).toEqual([
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_int_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+      {
+        message: 'Runtime parameter "mock_rtp" is missing',
+        type: 'INVALID_RUNTIME_PARAMETER',
+      },
+    ])
   })
 })

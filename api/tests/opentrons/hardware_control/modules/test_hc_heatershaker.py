@@ -6,9 +6,10 @@ from decoy import Decoy
 
 from . import require_live_data_real_string
 from opentrons.drivers.asyncio.communication.errors import ErrorResponse, UnhandledGcode
+from opentrons.drivers.heater_shaker.abstract import AbstractHeaterShakerDriver
 from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
-from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import RPM, HeaterShakerLabwareLatchStatus, Temperature
+from opentrons.drivers.usb.types import USBPort
 from opentrons.hardware_control import ExecutionManager, modules, poller
 from opentrons.hardware_control.modules.heater_shaker import HeaterShakerReader
 from opentrons.hardware_control.modules.types import (
@@ -114,7 +115,7 @@ async def test_sim_state(simulating_module: modules.HeaterShaker) -> None:
 async def test_sim_update(simulating_module: modules.HeaterShaker) -> None:
     """It should update its simulated state."""
     await simulating_module.start_set_temperature(10)
-    await simulating_module.await_temperature(10)
+    await simulating_module.await_temperature()
     assert simulating_module.temperature == 10
     assert simulating_module.target_temperature == 10
     assert simulating_module.temperature_status == TemperatureStatus.HOLDING
@@ -139,7 +140,7 @@ async def test_await_both(simulating_module: modules.HeaterShaker) -> None:
     """It should wait for speed and temp."""
     await simulating_module.start_set_temperature(10)
     await simulating_module.set_speed(2000)
-    await simulating_module.await_temperature(10)
+    await simulating_module.await_temperature()
     assert simulating_module.temperature_status == TemperatureStatus.HOLDING
     assert simulating_module.speed_status == SpeedStatus.HOLDING
 
@@ -330,3 +331,98 @@ async def test_reader_raises_error_from_get_error(
             serial=None,
         )
     )
+
+
+async def _hs_module_with_hardware_driver(
+    decoy: Decoy,
+    usb_port: USBPort,
+    mock_execution_manager: ExecutionManager,
+    module_error_callback: ModuleErrorCallback,
+    module_disconnected_callback: ModuleDisconnectedCallback,
+    temperatures: list[Temperature],
+) -> modules.HeaterShaker:
+    """Build a Heater-Shaker whose driver is not a simulator."""
+    mock_driver = decoy.mock(cls=AbstractHeaterShakerDriver)
+    readings = iter(temperatures)
+
+    def next_temperature(*_args: object, **_kwargs: object) -> Temperature:
+        try:
+            return next(readings)
+        except StopIteration:
+            return temperatures[-1]
+
+    decoy.when(await mock_driver.get_temperature()).then_do(next_temperature)
+    decoy.when(await mock_driver.get_rpm()).then_return(RPM(current=0, target=None))
+    decoy.when(await mock_driver.get_labware_latch_status()).then_return(
+        HeaterShakerLabwareLatchStatus.IDLE_CLOSED
+    )
+    decoy.when(await mock_driver.get_error_state()).then_return(None)  # type: ignore[func-returns-value]
+    decoy.when(await mock_driver.disconnect()).then_return(None)  # type: ignore[func-returns-value]
+    decoy.when(await mock_execution_manager.wait_for_is_running()).then_return(None)  # type: ignore[func-returns-value]
+
+    reader = HeaterShakerReader(driver=mock_driver)
+    poller_obj = poller.Poller(reader=reader, interval=0.01)
+    module = modules.HeaterShaker(
+        port="/dev/ot_module_sim_heatershaker0",
+        usb_port=usb_port,
+        hw_control_loop=asyncio.get_running_loop(),
+        driver=mock_driver,
+        reader=reader,
+        poller=poller_obj,
+        device_info={},
+        execution_manager=mock_execution_manager,
+        error_callback=module_error_callback,
+        disconnected_callback=module_disconnected_callback,
+    )
+    await poller_obj.start()
+    return module
+
+
+async def test_await_temperature_returns_when_overshoot_enters_holding(
+    decoy: Decoy,
+    usb_port: USBPort,
+    mock_execution_manager: ExecutionManager,
+    module_error_callback: ModuleErrorCallback,
+    module_disconnected_callback: ModuleDisconnectedCallback,
+) -> None:
+    """Overshoot >= 0.7 °C is COOLING. Wait until HOLDING, not until current <= target."""
+    module = await _hs_module_with_hardware_driver(
+        decoy,
+        usb_port,
+        mock_execution_manager,
+        module_error_callback,
+        module_disconnected_callback,
+        temperatures=[
+            Temperature(current=37.72, target=37.0),
+            Temperature(current=37.72, target=37.0),
+            Temperature(current=37.5, target=37.0),
+        ],
+    )
+    try:
+        await asyncio.wait_for(module.await_temperature(), timeout=2)
+        assert module.temperature_status == TemperatureStatus.HOLDING
+    finally:
+        await module.cleanup()
+
+
+async def test_await_temperature_returns_immediately_when_already_holding(
+    decoy: Decoy,
+    usb_port: USBPort,
+    mock_execution_manager: ExecutionManager,
+    module_error_callback: ModuleErrorCallback,
+    module_disconnected_callback: ModuleDisconnectedCallback,
+) -> None:
+    """Already in the 0.7 °C HOLDING band should not wait for an exact match."""
+    module = await _hs_module_with_hardware_driver(
+        decoy,
+        usb_port,
+        mock_execution_manager,
+        module_error_callback,
+        module_disconnected_callback,
+        temperatures=[Temperature(current=37.2, target=37.0)],
+    )
+    try:
+        await asyncio.wait_for(module.await_temperature(), timeout=2)
+        assert module.temperature_status == TemperatureStatus.HOLDING
+    finally:
+        await module.cleanup()

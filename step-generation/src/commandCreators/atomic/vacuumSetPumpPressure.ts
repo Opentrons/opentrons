@@ -1,22 +1,62 @@
 import * as errorCreators from '../../errorCreators'
 import { vacuumModuleStateGetter } from '../../robotStateSelectors'
 import {
-  formatPyValue,
+  formatPyRuntimeValue,
   getModuleHasLiveTask,
   indentPyLines,
+  resolveBooleanRuntimeValue,
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
   uuid,
 } from '../../utils'
 import { getVacuumPumpHoldArgsPython } from '../../utils/vacuumPythonArgs/getVacuumPumpHoldArgsPython'
 
-import type { CommandCreator, VacuumPumpPressureArgs } from '../../types'
+import type {
+  CommandCreator,
+  VacuumSetPumpPressureStepGenArgs,
+} from '../../types'
 
 // TODO: (nd, 2026-04-20) command creator implementation
-export const vacuumSetPumpPressure: CommandCreator<VacuumPumpPressureArgs> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
-  const { moduleId, gaugePressure, duration, ventAfter } = args
+export const vacuumSetPumpPressure: CommandCreator<
+  VacuumSetPumpPressureStepGenArgs
+> = (args, invariantContext, prevRobotState) => {
+  const { gaugePressure, duration, ventAfter } = args
+  const { runtimeParameters } = invariantContext
+  const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
+  const resolvedGaugePressure = resolveNumericRuntimeValue(
+    gaugePressure,
+    runtimeParameters
+  )
+  const resolvedDuration =
+    duration == null
+      ? undefined
+      : resolveNumericRuntimeValue(duration, runtimeParameters)
+  const resolvedVentAfter =
+    ventAfter == null
+      ? undefined
+      : resolveBooleanRuntimeValue(ventAfter, runtimeParameters)
+
+  const rawValues = [args.moduleId, gaugePressure, duration, ventAfter]
+  const resolvedValues = [
+    moduleId,
+    resolvedGaugePressure,
+    resolvedDuration,
+    resolvedVentAfter,
+  ]
+  const errors = rawValues.flatMap((value, i) =>
+    typeof value === 'string' && resolvedValues[i] === null
+      ? [errorCreators.invalidRuntimeParameter({ parameterName: value })]
+      : []
+  )
+  if (
+    errors.length > 0 ||
+    moduleId == null ||
+    resolvedGaugePressure == null ||
+    resolvedDuration === null ||
+    resolvedVentAfter === null
+  ) {
+    return { errors }
+  }
   const module = invariantContext.moduleEntities[moduleId]
 
   const moduleState = vacuumModuleStateGetter(prevRobotState, moduleId)
@@ -40,13 +80,13 @@ export const vacuumSetPumpPressure: CommandCreator<VacuumPumpPressureArgs> = (
 
   const holdArgs = isTimedHold
     ? {
-        duration,
-        ventAfter,
+        duration: resolvedDuration,
+        ventAfter: resolvedVentAfter,
         taskId,
       }
     : null
 
-  const gaugePressureArg = `gauge_pressure_mbar=${formatPyValue(gaugePressure)}`
+  const gaugePressureArg = `gauge_pressure_mbar=${formatPyRuntimeValue(gaugePressure)}`
   const holdArgsPython = isTimedHold
     ? getVacuumPumpHoldArgsPython(duration, ventAfter)
     : []
@@ -60,7 +100,7 @@ export const vacuumSetPumpPressure: CommandCreator<VacuumPumpPressureArgs> = (
         key: uuid(),
         params: {
           moduleId,
-          gaugePressure,
+          gaugePressure: resolvedGaugePressure,
           ...(holdArgs != null ? holdArgs : {}),
         },
       },

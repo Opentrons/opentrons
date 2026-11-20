@@ -92,7 +92,7 @@
 
 .menu {
   position: absolute;
-  z-index: 99;
+  z-index: var(--z-index-menus);
   top: 100%;
   right: 0;
   left: 0;
@@ -109,7 +109,7 @@
 
 .menu_control_bridge {
   position: absolute;
-  z-index: 99;
+  z-index: var(--z-index-menus);
   top: calc(100% - 2px);
   right: 0;
   left: 0;

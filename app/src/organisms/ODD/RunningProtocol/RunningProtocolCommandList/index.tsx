@@ -12,6 +12,7 @@ import { CommandIcon } from '/app/molecules/Command'
 import { ProtocolPlayPauseHeader } from '../shared/ProtocolPlayPauseHeader'
 import styles from './commandlist.module.css'
 
+import type { ReactNode } from 'react'
 import type { ViewportListRef } from 'react-viewport-list'
 import type { RunStatus } from '@opentrons/api-client'
 import type {
@@ -45,7 +46,7 @@ export function RunningProtocolCommandList({
   onTogglePlayPause,
   currentRunCommandIndex,
   allRunDefs,
-}: RunningProtocolCommandListProps): JSX.Element {
+}: RunningProtocolCommandListProps): ReactNode {
   const viewPortRef = useRef<HTMLDivElement | null>(null)
   const ref = useRef<ViewportListRef>(null)
 

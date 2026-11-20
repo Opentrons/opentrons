@@ -36,7 +36,7 @@ import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
 import { ControlContainer } from './ControlContainer'
 
 import type { CSSProperties } from 'styled-components'
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type { IconName } from '@opentrons/components'
 import type { Axis, Bearing, Jog, Plane, Sign, StepSize } from './types'
 
@@ -226,7 +226,7 @@ interface DirectionControlProps {
   buttonColor?: string
 }
 
-export function DirectionControl(props: DirectionControlProps): JSX.Element {
+export function DirectionControl(props: DirectionControlProps): ReactNode {
   const { planes, jog, stepSize, initialPlane } = props
   const [currentPlane, setCurrentPlane] = useState<Plane>(
     initialPlane ?? planes[0]
@@ -426,7 +426,7 @@ interface ArrowKeysProps {
   stepSize: StepSize
 }
 
-export const ArrowKeys = (props: ArrowKeysProps): JSX.Element => {
+export const ArrowKeys = (props: ArrowKeysProps): ReactNode => {
   const { plane, jog, stepSize } = props
   const controls = CONTROLS_CONTENTS_BY_PLANE[plane].controls
 
@@ -449,9 +449,7 @@ export const ArrowKeys = (props: ArrowKeysProps): JSX.Element => {
   )
 }
 
-export function TouchDirectionControl(
-  props: DirectionControlProps
-): JSX.Element {
+export function TouchDirectionControl(props: DirectionControlProps): ReactNode {
   const { planes, jog, stepSize, initialPlane } = props
   const [currentPlane, setCurrentPlane] = useState<Plane>(
     initialPlane ?? planes[0]

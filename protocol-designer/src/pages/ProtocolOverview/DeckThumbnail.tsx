@@ -39,7 +39,7 @@ import {
 import { useUpdateDeckConfigurationFromStartingDeck } from '../Designer/DeckSetup/hooks/useUpdateDeckConfigurationFromStartingDeck'
 import { DeckThumbnailDetails } from './DeckThumbnailDetails'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
 import type { CutoutId, DeckSlotId, RobotType } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
@@ -66,7 +66,7 @@ interface DeckThumbnailProps {
   setHoverSlot: Dispatch<SetStateAction<string | null>>
   robotType: RobotType
 }
-export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
+export function DeckThumbnail(props: DeckThumbnailProps): ReactNode {
   const { hoverSlot, setHoverSlot, robotType } = props
   const initialDeckSetup = useSelector(getInitialDeckSetup)
   const { deckConfig } = useSelector(getDeckConfiguration)

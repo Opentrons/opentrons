@@ -129,10 +129,11 @@ class RunController:
         result = await self._run_orchestrator_store.run(
             deck_configuration=deck_configuration,
         )
+        # Commands are added to the database procedurally during a run
         self._run_store.update_run_state(
             run_id=self._run_id,
             summary=result.state_summary,
-            commands=result.commands,
+            commands=None,
             command_annotations=result.command_annotations,
             run_time_parameters=result.parameters,
         )

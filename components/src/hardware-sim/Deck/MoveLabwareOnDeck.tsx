@@ -13,7 +13,7 @@ import { BaseDeck } from '../BaseDeck'
 import { LabwareRender } from '../Labware'
 import { resolveLabwareLocation } from './resolveLabwareLocation'
 
-import type { PropsWithChildren } from 'react'
+import type { PropsWithChildren, ReactNode } from 'react'
 import type {
   DeckConfiguration,
   DeckDefinition,
@@ -264,7 +264,7 @@ function usePositionChangeReset(
  */
 function AlignSplashToLabware(
   props: PropsWithChildren<{ labwareDefinition: LabwareDefinition }>
-): JSX.Element {
+): ReactNode {
   const { labwareDefinition, children } = props
   const labwareViewBox = getLabwareViewBox(labwareDefinition)
   const labwareOriginToFrontLeftCorner = {

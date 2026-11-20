@@ -1,26 +1,43 @@
 import * as errorCreators from '../../errorCreators'
-import { uuid } from '../../utils'
+import { resolveStringRuntimeValue, uuid } from '../../utils'
 
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
-
-interface DropTipArgs {
-  pipette: string
-  wellName?: string
-  dropTipLocation?: string
-  isReturnTip?: boolean
-}
+import type {
+  CommandCreator,
+  CommandCreatorError,
+  DropTipStepGenArgs,
+} from '../../types'
 
 /**
  * Note that this command creator is now only applied to dropping tips into tipracks
  * For dropping tips into trash bins or waste chutes, use dropTipInWasteChute or dropTipInTrashBin
  */
-export const dropTip: CommandCreator<DropTipArgs> = (
+export const dropTip: CommandCreator<DropTipStepGenArgs> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { pipette, dropTipLocation, wellName, isReturnTip } = args
+  const { isReturnTip } = args
+  const { runtimeParameters } = invariantContext
+  const pipette = resolveStringRuntimeValue(args.pipette, runtimeParameters)
+  const dropTipLocation =
+    args.dropTipLocation == null
+      ? undefined
+      : resolveStringRuntimeValue(args.dropTipLocation, runtimeParameters)
+  const wellName =
+    args.wellName == null
+      ? undefined
+      : resolveStringRuntimeValue(args.wellName, runtimeParameters)
+  const rawValues = [args.pipette, args.dropTipLocation, args.wellName]
+  const resolvedValues = [pipette, dropTipLocation, wellName]
+  const errors: CommandCreatorError[] = rawValues.flatMap((value, i) =>
+    typeof value === 'string' && resolvedValues[i] == null
+      ? [errorCreators.invalidRuntimeParameter({ parameterName: value })]
+      : []
+  )
+  if (errors.length > 0 || pipette == null) {
+    return { errors }
+  }
   // No-op if there is no tip
   if (!prevRobotState.tipState.pipettes[pipette]?.hasTip) {
     return {

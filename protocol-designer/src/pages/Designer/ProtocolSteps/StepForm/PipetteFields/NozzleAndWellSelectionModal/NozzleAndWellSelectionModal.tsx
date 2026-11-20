@@ -36,7 +36,7 @@ interface NozzleAndWellSelectionModalProps {
 
 export function NozzleAndWellSelectionModal(
   props: NozzleAndWellSelectionModalProps
-): JSX.Element {
+): ReactNode {
   const {
     children,
     totalSteps,

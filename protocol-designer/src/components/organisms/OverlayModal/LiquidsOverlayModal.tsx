@@ -7,13 +7,13 @@ import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-co
 
 import { OverlayModal } from '.'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 
 export function LiquidLayoutOverlayModalContainer({
   showLiquidOverflowMenu,
 }: {
   showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
-}): JSX.Element {
+}): ReactNode {
   const { t } = useTranslation('liquids')
 
   const dispatch = useDispatch()

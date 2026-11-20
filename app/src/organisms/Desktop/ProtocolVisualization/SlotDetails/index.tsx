@@ -13,6 +13,7 @@ import { TipDisposalSlot } from '../SecondWindow/TipDisposalSlot'
 import { TipPickupSlot } from '../SecondWindow/TipPickupSlot'
 import styles from './slotdetails.module.css'
 
+import type { ReactNode } from 'react'
 import type {
   Liquid,
   LoadLabwareRunTimeCommand,
@@ -32,7 +33,7 @@ interface SlotDetailsProps {
   analysis: ProtocolAnalysisOutput
   liquids: Liquid[]
 }
-export function SlotDetails(props: SlotDetailsProps): JSX.Element {
+export function SlotDetails(props: SlotDetailsProps): ReactNode {
   const { slotId, robotState, invariantContext, analysis, liquids } = props
   const { labware, modules } = robotState
   const {
@@ -132,32 +133,33 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
     }
   }
 
-  return (
-    <>
-      {isSlotEmpty ? (
-        <div className={styles.slot_detail_container}>
-          <SlotDetailsEmptyState slotId={slotId} />
-        </div>
-      ) : null}
-      <div className={styles.slot_container}>
-        <div className={styles.slot_details}>
-          {renderLabwareContent()}
-          {disposalType != null ? (
-            <TipDisposalSlot
-              robotState={robotState}
-              disposalType={disposalType}
-            />
-          ) : null}
-          {moduleOnSlot != null ? (
-            <ModuleContainer
-              moduleId={moduleOnSlot[0]}
-              moduleEntities={moduleEntities}
-              moduleRobotState={modules}
-              slotId={mappedSlot}
-            />
-          ) : null}
-        </div>
+  if (isSlotEmpty) {
+    return (
+      <div className={styles.slot_detail_container}>
+        <SlotDetailsEmptyState slotId={slotId} />
       </div>
-    </>
+    )
+  }
+
+  return (
+    <div className={styles.slot_container}>
+      <div className={styles.slot_details}>
+        {renderLabwareContent()}
+        {disposalType != null ? (
+          <TipDisposalSlot
+            robotState={robotState}
+            disposalType={disposalType}
+          />
+        ) : null}
+        {moduleOnSlot != null ? (
+          <ModuleContainer
+            moduleId={moduleOnSlot[0]}
+            moduleEntities={moduleEntities}
+            moduleRobotState={modules}
+            slotId={mappedSlot}
+          />
+        ) : null}
+      </div>
+    </div>
   )
 }

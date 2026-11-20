@@ -6,9 +6,10 @@ import {
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
-export function VacuumCarboyFullSkip(props: RecoveryContentProps): JSX.Element {
+export function VacuumCarboyFullSkip(props: RecoveryContentProps): ReactNode {
   const { recoveryMap } = props
   const { step, route } = recoveryMap
   const { VACUUM_CARBOY_FULL_SKIP } = RECOVERY_MAP

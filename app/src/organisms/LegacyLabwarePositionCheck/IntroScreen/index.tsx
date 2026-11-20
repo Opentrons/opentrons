@@ -34,7 +34,7 @@ import { RobotMotionLoader } from '../RobotMotionLoader'
 import { TwoUpTileLayout } from '../TwoUpTileLayout'
 import { getPrepCommands } from './getPrepCommands'
 
-import type { Dispatch } from 'react'
+import type { Dispatch, ReactNode } from 'react'
 import type { LabwareOffset } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
@@ -160,7 +160,7 @@ interface ViewOffsetsProps {
   existingOffsets: LabwareOffset[]
   labwareDefinitions: LabwareDefinition[]
 }
-function ViewOffsets(props: ViewOffsetsProps): JSX.Element {
+function ViewOffsets(props: ViewOffsetsProps): ReactNode {
   const { existingOffsets, labwareDefinitions } = props
   const { t, i18n } = useTranslation('labware_position_check')
   const [showOffsetsTable, setShowOffsetsModal] = useState(false)

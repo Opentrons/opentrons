@@ -1,6 +1,8 @@
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
+import { Z_INDEX } from '@opentrons/components'
+
 import { getTopPortalEl } from '/app/App/portal'
 import { OddModal } from '/app/molecules/OddModal'
 
@@ -31,7 +33,7 @@ export function TipSelectionModal(
       <OddModal
         header={modalHeader}
         onOutsideClick={areTipsSelected ? toggleModal : undefined}
-        zIndex={15}
+        zIndex={Z_INDEX.MODAL_DETAILS}
       >
         <TipSelection {...props} />
       </OddModal>,

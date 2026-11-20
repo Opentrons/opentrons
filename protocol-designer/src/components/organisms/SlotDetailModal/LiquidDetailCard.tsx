@@ -23,7 +23,7 @@ import {
   MICRO_LITERS,
 } from '@opentrons/shared-data'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { IngredInputs } from '/protocol-designer/labware-ingred/types'
 import type { WellContentsByNumber } from './index'
 
@@ -36,7 +36,7 @@ interface LiquidDetailCardProps {
   selectedValue: string
 }
 
-export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
+export function LiquidDetailCard(props: LiquidDetailCardProps): ReactNode {
   const {
     liquidId,
     liquidInfo,

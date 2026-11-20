@@ -22,9 +22,10 @@ import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 import { usePriorModuleState } from '../../hooks/usePriorModuleState'
 import { PriorTemperatureState } from './PriorTemperatureState'
 
+import type { ReactNode } from 'react'
 import type { StepFormProps } from '../../types'
 
-export function TemperatureTools(props: StepFormProps): JSX.Element {
+export function TemperatureTools(props: StepFormProps): ReactNode {
   const { propsForFields, formData } = props
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const moduleLabwareOptions = useSelector(getTemperatureLabwareOptions)

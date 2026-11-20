@@ -2,6 +2,6 @@
   display: flex;
   min-width: 0;
   flex: 1;
-  flex-direction: column;
-  gap: var(--spacing-4);
+  align-items: center;
+  gap: var(--spacing-8);
 }

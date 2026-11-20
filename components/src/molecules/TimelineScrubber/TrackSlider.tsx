@@ -3,7 +3,7 @@ import { useCallback, useRef, useState } from 'react'
 
 import styles from './timelinescrubber.module.css'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 
 export interface TrackData {
   id: string // unique id
@@ -15,10 +15,7 @@ interface TrackSliderProps {
   onChange: (id: string, newValue: number) => void
 }
 
-export function TrackSlider({
-  track,
-  onChange,
-}: TrackSliderProps): JSX.Element {
+export function TrackSlider({ track, onChange }: TrackSliderProps): ReactNode {
   const trackRef = useRef<HTMLDivElement>(null)
   const [isDragging, setIsDragging] = useState<boolean>(false)
   const THUMB_RADIUS_PX = 6

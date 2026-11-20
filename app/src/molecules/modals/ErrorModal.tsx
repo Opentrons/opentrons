@@ -7,6 +7,7 @@ import { getModalPortalEl } from '/app/App/portal'
 
 import styles from './styles.module.css'
 
+import type { ReactNode } from 'react'
 import type { ButtonProps } from '@opentrons/components'
 
 interface Props {
@@ -20,7 +21,7 @@ interface Props {
 const DEFAULT_HEADING = 'Unexpected Error'
 const AN_UNKNOWN_ERROR_OCCURRED = 'An unknown error occurred'
 
-export function ErrorModal(props: Props): JSX.Element {
+export function ErrorModal(props: Props): ReactNode {
   const { description, error } = props
   const heading = props.heading != null ? props.heading : DEFAULT_HEADING
   let closeButtonProps: ButtonProps = {

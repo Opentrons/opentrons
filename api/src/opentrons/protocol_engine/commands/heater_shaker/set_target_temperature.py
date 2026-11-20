@@ -87,7 +87,7 @@ class SetTargetTemperatureImpl(
                     hs_module_substate.module_id + "-temp"
                 ):
                     await hs_hardware_module.start_set_temperature(validated_temp)
-                    await hs_hardware_module.await_temperature(validated_temp)
+                    await hs_hardware_module.await_temperature()
 
         task = await self._task_handler.create_task(
             task_function=start_set_temperature, id=params.taskId

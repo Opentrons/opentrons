@@ -51,9 +51,9 @@ describe('UpdateRobotBanner', () => {
   it('should display correct information', () => {
     render(props)
     screen.getByText(
-      'A robot software update is required to run protocols with this version of the Opentrons App.'
+      'Update robot software to run protocols on this app version.'
     )
-    const btn = screen.getByRole('button', { name: 'View update' })
+    const btn = screen.getByRole('button', { name: 'Update now' })
     fireEvent.click(btn)
     expect(handleUpdateBuildroot).toHaveBeenCalled()
   })
@@ -66,7 +66,7 @@ describe('UpdateRobotBanner', () => {
     })
     render(props)
     const bannerText = screen.queryByText(
-      'A robot software update is required to run protocols with this version of the Opentrons App.'
+      'Update robot software to run protocols on this app version.'
     )
     expect(bannerText).toBeNull()
   })
@@ -79,7 +79,7 @@ describe('UpdateRobotBanner', () => {
     })
     render(props)
     screen.getByText(
-      'A robot software update is required to run protocols with this version of the Opentrons App.'
+      'Update robot software to run protocols on this app version.'
     )
   })
 
@@ -89,7 +89,7 @@ describe('UpdateRobotBanner', () => {
     }
     render(props)
     const bannerText = screen.queryByText(
-      'A robot software update is required to run protocols with this version of the Opentrons App.'
+      'Update robot software to run protocols on this app version.'
     )
     expect(bannerText).toBeNull()
   })

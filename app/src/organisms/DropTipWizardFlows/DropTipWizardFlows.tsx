@@ -7,6 +7,7 @@ import {
   useDropTipWithType,
 } from './hooks'
 
+import type { ReactNode } from 'react'
 import type { PipetteData } from '@opentrons/api-client'
 import type { PipetteModelSpecs, RobotType } from '@opentrons/shared-data'
 import type {
@@ -49,9 +50,7 @@ export interface DropTipWizardFlowsProps {
   fixitCommandTypeUtils?: FixitCommandTypeUtils
 }
 
-export function DropTipWizardFlows(
-  props: DropTipWizardFlowsProps
-): JSX.Element {
+export function DropTipWizardFlows(props: DropTipWizardFlowsProps): ReactNode {
   const { fixitCommandTypeUtils } = props
 
   const issuedCommandsType: IssuedCommandsType =

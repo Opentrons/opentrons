@@ -7,7 +7,7 @@ interface HandleEnterProps {
   onEnter: () => void
 }
 
-export function HandleEnter(props: HandleEnterProps): JSX.Element {
+export function HandleEnter(props: HandleEnterProps): ReactNode {
   const { children, onEnter } = props
 
   return (

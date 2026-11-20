@@ -34,33 +34,26 @@ export const useLongPress = (): UseLongPressResult => {
   const [isEnabled, setIsEnabled] = useState<boolean>(true)
   const interactiveRef = useRef(null)
 
-  const enable = (): void => {
-    if (interactiveRef?.current != null) {
-      interact(interactiveRef.current as unknown as HTMLElement)
-        .pointerEvents({
-          holdDuration: HOLD_DURATION_MS,
-        })
-        .on('hold', (_event: PointerEvent) => {
-          setIsLongPressed(isLongPressed => !isLongPressed)
-        })
-        .on('tap', (_event: PointerEvent) => {
-          setIsTapped(isTapped => !isTapped)
-        })
-    }
-  }
-  const disable = (): void => {
-    if (interactiveRef?.current != null) {
-      interact(interactiveRef.current as unknown as HTMLElement).unset()
-    }
-  }
-
   useEffect(() => {
-    if (isEnabled) {
-      enable()
-    } else {
-      disable()
+    const element = interactiveRef.current
+    if (element == null || !isEnabled) {
+      return
     }
-    return disable
+
+    const interactable = interact(element as unknown as HTMLElement)
+      .pointerEvents({
+        holdDuration: HOLD_DURATION_MS,
+      })
+      .on('hold', (_event: PointerEvent) => {
+        setIsLongPressed(isLongPressed => !isLongPressed)
+      })
+      .on('tap', (_event: PointerEvent) => {
+        setIsTapped(isTapped => !isTapped)
+      })
+
+    return () => {
+      interactable.unset()
+    }
   }, [isEnabled])
 
   return {

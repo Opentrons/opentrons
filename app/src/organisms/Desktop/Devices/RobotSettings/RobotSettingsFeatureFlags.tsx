@@ -15,7 +15,7 @@ import {
 import { ToggleButton } from '/app/atoms/buttons'
 import { useDocumentationState } from '/app/local-resources/access-control/useDocumentationState'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { RobotSettingsField } from '@opentrons/api-client'
 
 const NON_FEATURE_FLAG_SETTINGS = [
@@ -29,7 +29,7 @@ const NON_FEATURE_FLAG_SETTINGS = [
   'disableStatusBar',
 ]
 
-export function RobotSettingsFeatureFlags(): JSX.Element {
+export function RobotSettingsFeatureFlags(): ReactNode {
   const robotSettingsQuery = useRobotSettingsQuery()
   const settings = robotSettingsQuery.data?.settings ?? []
   const featureFlags = settings.filter(

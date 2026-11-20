@@ -16,6 +16,7 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
+import type { ReactNode } from 'react'
 import type {
   AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
@@ -36,7 +37,7 @@ interface ThermocyclerItemProps {
   selected?: boolean
 }
 
-export function ThermocyclerItem(props: ThermocyclerItemProps): JSX.Element {
+export function ThermocyclerItem(props: ThermocyclerItemProps): ReactNode {
   const { t } = useTranslation('deck_configuration')
 
   const {

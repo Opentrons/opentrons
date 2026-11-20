@@ -108,6 +108,7 @@ from .labware_origin_math.stackup_origin_to_labware_origin import (
 from .modules import ModuleView
 from .pipettes import PipetteView
 from .wells import WellView
+from opentrons.motion_planning.adjacent_slots_getters import get_north_south_slots
 from opentrons.types import (
     DeckSlotName,
     MeniscusTrackingTarget,
@@ -938,6 +939,34 @@ class GeometryView:
                 "Provided location is not linked to an addressable area on the deck.",
                 details={"terminal-location": repr(current_loc)},
             )
+
+    def get_north_south_neighbors(
+        self, location: LabwareLocation
+    ) -> List[LoadedLabware]:
+        """Return loaded labware whose ancestor slot is north or south of this location."""
+        try:
+            parent = self.get_parent_from_location(location)
+            slot = fixture_validation.get_slot_name_from_addressable_area(parent)
+        except (LabwareNotOnDeckError, ValueError):
+            return []
+        if not isinstance(slot, DeckSlotName):
+            return []
+        neighbor_ints = set(get_north_south_slots(slot.to_ot3_equivalent().as_int()))
+        neighbors: List[LoadedLabware] = []
+        for labware in self._labware.get_all():
+            try:
+                ancestor = self.get_ancestor_slot_name(labware.id)
+            except (
+                LabwareNotOnDeckError,
+                InvalidLabwarePositionError,
+                errors.LocationIsLidDockSlotError,
+            ):
+                continue
+            if not isinstance(ancestor, DeckSlotName):
+                continue
+            if ancestor.to_ot3_equivalent().as_int() in neighbor_ints:
+                neighbors.append(labware)
+        return neighbors
 
     def ensure_location_not_occupied(  # noqa: C901
         self,

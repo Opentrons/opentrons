@@ -1,10 +1,5 @@
 // ToDo (kk:04/25/2024) re-organized all constants
 
-export const ANALYTICS_PIPETTE_OFFSET_STARTED: 'analytics:PIPETTE_OFFSET_STARTED' =
-  'analytics:PIPETTE_OFFSET_STARTED'
-export const ANALYTICS_TIP_LENGTH_STARTED: 'analytics:TIP_LENGTH_STARTED' =
-  'analytics:TIP_LENGTH_STARTED'
-
 export const ANALYTICS_LIQUID_SETUP_VIEW_TOGGLE = 'liquidSetupViewToggle'
 export const ANALYTICS_ADD_CUSTOM_LABWARE = 'addCustomLabware'
 export const ANALYTICS_U2E_DRIVE_ALERT_DISMISSED = 'u2eDriverAlertDismissed'

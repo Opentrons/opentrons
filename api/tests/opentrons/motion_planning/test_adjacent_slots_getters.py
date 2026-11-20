@@ -7,14 +7,21 @@ import pytest
 from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.motion_planning.adjacent_slots_getters import (
+    CardinalSide,
     _MixedTypeSlots,
     get_adjacent_slots,
     get_adjacent_staging_slot,
+    get_cardinal_neighbor_side,
+    get_cardinal_neighbor_slots,
     get_east_slot,
     get_east_west_slots,
     get_north_slot,
+    get_north_south_neighbor_slots,
     get_north_south_slots,
+    get_north_south_staging_slots,
+    get_north_staging_slot,
     get_south_slot,
+    get_south_staging_slot,
     get_surrounding_slots,
     get_west_of_staging_slot,
     get_west_slot,
@@ -100,6 +107,47 @@ def test_get_north_south_slots(
 def test_get_adjacent_slots(slot: int, expected_adjacent: List[int]) -> None:
     """It should return a list of adjacent slots."""
     assert sorted(get_adjacent_slots(slot)) == sorted(expected_adjacent)
+
+
+@pytest.mark.parametrize(
+    argnames=["slot", "expected_north", "expected_south", "expected_both"],
+    argvalues=[
+        (
+            StagingSlotName.SLOT_A4,
+            None,
+            StagingSlotName.SLOT_B4,
+            [StagingSlotName.SLOT_B4],
+        ),
+        (
+            StagingSlotName.SLOT_B4,
+            StagingSlotName.SLOT_A4,
+            StagingSlotName.SLOT_C4,
+            [StagingSlotName.SLOT_A4, StagingSlotName.SLOT_C4],
+        ),
+        (
+            StagingSlotName.SLOT_C4,
+            StagingSlotName.SLOT_B4,
+            StagingSlotName.SLOT_D4,
+            [StagingSlotName.SLOT_B4, StagingSlotName.SLOT_D4],
+        ),
+        (
+            StagingSlotName.SLOT_D4,
+            StagingSlotName.SLOT_C4,
+            None,
+            [StagingSlotName.SLOT_C4],
+        ),
+    ],
+)
+def test_get_north_south_staging_slots(
+    slot: StagingSlotName,
+    expected_north: Optional[StagingSlotName],
+    expected_south: Optional[StagingSlotName],
+    expected_both: List[StagingSlotName],
+) -> None:
+    """It should return the staging slots north and south in column 4."""
+    assert get_north_staging_slot(slot) == expected_north
+    assert get_south_staging_slot(slot) == expected_south
+    assert get_north_south_staging_slots(slot) == expected_both
 
 
 @pytest.mark.parametrize(
@@ -209,3 +257,102 @@ def test_get_surrounding_slots(
         get_surrounding_slots(slot=slot, robot_type=robot_type)
         == expected_surrounding_slots
     )
+
+
+@pytest.mark.parametrize(
+    ("slot", "expected"),
+    [
+        (
+            DeckSlotName.SLOT_A3,
+            [
+                DeckSlotName.SLOT_A2,
+                DeckSlotName.SLOT_B3,
+                StagingSlotName.SLOT_A4,
+            ],
+        ),
+        (
+            DeckSlotName.SLOT_B3,
+            [
+                DeckSlotName.SLOT_B2,
+                DeckSlotName.SLOT_A3,
+                DeckSlotName.SLOT_C3,
+                StagingSlotName.SLOT_B4,
+            ],
+        ),
+        (
+            DeckSlotName.SLOT_B2,
+            [
+                DeckSlotName.SLOT_B3,
+                DeckSlotName.SLOT_B1,
+                DeckSlotName.SLOT_A2,
+                DeckSlotName.SLOT_C2,
+            ],
+        ),
+        (
+            StagingSlotName.SLOT_A4,
+            [StagingSlotName.SLOT_B4, DeckSlotName.SLOT_A3],
+        ),
+        (
+            StagingSlotName.SLOT_B4,
+            [
+                StagingSlotName.SLOT_A4,
+                StagingSlotName.SLOT_C4,
+                DeckSlotName.SLOT_B3,
+            ],
+        ),
+    ],
+)
+def test_get_cardinal_neighbor_slots(
+    slot: DeckSlotName | StagingSlotName,
+    expected: List[DeckSlotName | StagingSlotName],
+) -> None:
+    """Cardinal neighbors include the staging column and skip diagonals."""
+    assert get_cardinal_neighbor_slots(slot) == expected
+
+
+@pytest.mark.parametrize(
+    ("slot", "expected"),
+    [
+        (DeckSlotName.SLOT_A3, [DeckSlotName.SLOT_B3]),
+        (
+            DeckSlotName.SLOT_B3,
+            [DeckSlotName.SLOT_A3, DeckSlotName.SLOT_C3],
+        ),
+        (DeckSlotName.SLOT_B2, [DeckSlotName.SLOT_A2, DeckSlotName.SLOT_C2]),
+        (StagingSlotName.SLOT_A4, [StagingSlotName.SLOT_B4]),
+        (
+            StagingSlotName.SLOT_B4,
+            [StagingSlotName.SLOT_A4, StagingSlotName.SLOT_C4],
+        ),
+        (DeckSlotName.from_primitive("12"), [DeckSlotName.SLOT_B3]),
+        (None, []),
+    ],
+)
+def test_get_north_south_neighbor_slots(
+    slot: DeckSlotName | StagingSlotName | None,
+    expected: List[DeckSlotName | StagingSlotName],
+) -> None:
+    """North/south neighbors are the same-column slice of the cardinal set."""
+    assert get_north_south_neighbor_slots(slot) == expected
+
+
+@pytest.mark.parametrize(
+    ("slot", "other", "expected"),
+    [
+        (DeckSlotName.SLOT_A3, StagingSlotName.SLOT_A4, CardinalSide.EAST),
+        (DeckSlotName.SLOT_A3, DeckSlotName.SLOT_A2, CardinalSide.WEST),
+        (DeckSlotName.SLOT_A3, DeckSlotName.SLOT_B3, CardinalSide.SOUTH),
+        (DeckSlotName.SLOT_B3, DeckSlotName.SLOT_A3, CardinalSide.NORTH),
+        (DeckSlotName.SLOT_A3, DeckSlotName.SLOT_B2, None),
+        (StagingSlotName.SLOT_A4, DeckSlotName.SLOT_A3, CardinalSide.WEST),
+        (StagingSlotName.SLOT_B4, StagingSlotName.SLOT_A4, CardinalSide.NORTH),
+        (DeckSlotName.from_primitive("12"), DeckSlotName.SLOT_A2, CardinalSide.WEST),
+    ],
+)
+def test_get_cardinal_neighbor_side(
+    slot: DeckSlotName | StagingSlotName,
+    other: DeckSlotName | StagingSlotName,
+    expected: Optional[CardinalSide],
+) -> None:
+    """The side is the cardinal direction from slot to other."""
+    assert get_cardinal_neighbor_side(slot, other) == expected

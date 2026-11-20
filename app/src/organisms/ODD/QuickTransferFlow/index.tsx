@@ -23,13 +23,13 @@ import { SelectTipRack } from './SelectTipRack'
 import { SummaryAndSettings } from './SummaryAndSettings'
 import { VolumeEntry } from './VolumeEntry'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
 import type { QuickTransferWizardState } from './types'
 
 const initialQuickTransferState: QuickTransferWizardState = {}
 
-export const QuickTransferFlow = (): JSX.Element => {
+export const QuickTransferFlow = (): ReactNode => {
   const navigate = useNavigate()
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()

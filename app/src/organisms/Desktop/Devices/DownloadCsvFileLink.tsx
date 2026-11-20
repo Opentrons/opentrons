@@ -14,6 +14,8 @@ import { useHost } from '@opentrons/react-api-client'
 import { isFileSaveCanceledError } from '/app/local-resources/files/fileSaveCanceledError'
 import { saveFileFromUrl } from '/app/redux/shell/remote'
 
+import type { ReactNode } from 'react'
+
 interface DownloadCsvFileLinkProps {
   fileId: string
   fileName: string
@@ -21,7 +23,7 @@ interface DownloadCsvFileLinkProps {
 
 export function DownloadCsvFileLink(
   props: DownloadCsvFileLinkProps
-): JSX.Element {
+): ReactNode {
   const { fileId, fileName } = props
   const { t } = useTranslation('run_details')
   const host = useHost()

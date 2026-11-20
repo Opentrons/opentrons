@@ -6,11 +6,10 @@ import {
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
-export function VacuumCarboyFullRetry(
-  props: RecoveryContentProps
-): JSX.Element {
+export function VacuumCarboyFullRetry(props: RecoveryContentProps): ReactNode {
   const { recoveryMap } = props
   const { step, route } = recoveryMap
   const { VACUUM_CARBOY_FULL_RETRY } = RECOVERY_MAP

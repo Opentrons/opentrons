@@ -57,7 +57,11 @@ metadata = {
     'protocolName': 'Aspiration and Dispense',
     'author': 'Your Name <your.email@example.com>',
     'description': 'A simple protocol to aspirate from a test tube and dispense into a PCR plate using a Gen2 20µl pipette',
-    'apiLevel': '2.15'
+}
+
+requirements = {
+    'robotType': 'OT-2',
+    'apiLevel': '2.28',
 }
 
 def run(protocol: protocol_api.ProtocolContext):

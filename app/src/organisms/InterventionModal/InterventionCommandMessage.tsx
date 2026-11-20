@@ -13,6 +13,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 const INTERVENTION_COMMAND_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   grid-gap: ${SPACING.spacing4};
@@ -45,7 +47,7 @@ export interface InterventionCommandMessageProps {
 
 export function InterventionCommandMessage({
   commandMessage,
-}: InterventionCommandMessageProps): JSX.Element {
+}: InterventionCommandMessageProps): ReactNode {
   const { t } = useTranslation('protocol_command_text')
 
   return (

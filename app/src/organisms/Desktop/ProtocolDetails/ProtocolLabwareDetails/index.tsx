@@ -13,17 +13,17 @@ import {
 } from '@opentrons/components'
 import { getLabwareDefIsStandard } from '@opentrons/shared-data'
 
-import { Divider } from '/app/atoms/structure'
 import { getRequiredLabwareDetailsFromLoadCommands } from '/app/transformations/commands'
 
 import { LabwareDetailOverflowMenu } from './LabwareDetailOverflowMenu'
 
+import type { ReactNode } from 'react'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { LabwareDefAndDate } from '/app/local-resources/labware'
 
 export const ProtocolLabwareDetails = (props: {
   commands: RunTimeCommand[]
-}): JSX.Element => {
+}): ReactNode => {
   const { commands } = props
   const { t } = useTranslation('protocol_details')
 
@@ -33,12 +33,20 @@ export const ProtocolLabwareDetails = (props: {
   return (
     <>
       {labwareAndLidDetails.length > 0 ? (
-        <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-          <Flex flexDirection={DIRECTION_ROW}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          width="100%"
+          gap={SPACING.spacing12}
+        >
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            gap={SPACING.spacing24}
+            paddingRight="2.25rem"
+            justifyContent="space-between"
+          >
             <StyledText
               desktopStyle="bodyDefaultRegular"
               color={COLORS.grey60}
-              marginBottom={SPACING.spacing8}
               data-testid="ProtocolLabwareDetails_labware_name"
               width="66%"
             >
@@ -52,17 +60,19 @@ export const ProtocolLabwareDetails = (props: {
               {t('quantity')}
             </StyledText>
           </Flex>
-          {labwareAndLidDetails?.map((labware, index) => (
-            <ProtocolLabwareDetailItem
-              key={index}
-              isStandard={getLabwareDefIsStandard(labware.labwareDef)}
-              displayName={labware.labwareDef.metadata.displayName}
-              quantity={labware.quantity}
-              labware={{ definition: labware.labwareDef }}
-              lidDisplayName={labware.lidDisplayName}
-              data-testid={`ProtocolLabwareDetails_item_${index}`}
-            />
-          ))}
+          <Flex gap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
+            {labwareAndLidDetails?.map((labware, index) => (
+              <ProtocolLabwareDetailItem
+                key={index}
+                isStandard={getLabwareDefIsStandard(labware.labwareDef)}
+                displayName={labware.labwareDef.metadata.displayName}
+                quantity={labware.quantity}
+                labware={{ definition: labware.labwareDef }}
+                lidDisplayName={labware.lidDisplayName}
+                data-testid={`ProtocolLabwareDetails_item_${index}`}
+              />
+            ))}
+          </Flex>
         </Flex>
       ) : (
         <InfoScreen content={t('no_labware_specified')} />
@@ -81,56 +91,62 @@ interface ProtocolLabwareDetailItemProps {
 
 export const ProtocolLabwareDetailItem = (
   props: ProtocolLabwareDetailItemProps
-): JSX.Element => {
+): ReactNode => {
   const { t } = useTranslation('protocol_details')
   const { isStandard, displayName, quantity, labware, lidDisplayName } = props
   return (
-    <>
-      <Divider width="100%" />
+    <Flex
+      flexDirection={DIRECTION_ROW}
+      padding={SPACING.spacing8}
+      alignItems={ALIGN_CENTER}
+      backgroundColor={COLORS.grey20}
+      borderRadius={SPACING.spacing4}
+      gap={SPACING.spacing16}
+    >
       <Flex
         flexDirection={DIRECTION_ROW}
-        marginY={SPACING.spacing8}
         alignItems={ALIGN_CENTER}
+        width="100%"
       >
-        <Flex
-          flexDirection={DIRECTION_ROW}
-          alignItems={ALIGN_CENTER}
-          width="66%"
-          marginRight={SPACING.spacing20}
-        >
-          {isStandard ? (
-            <Icon
-              color={COLORS.blue50}
-              name="check-decagram"
-              height="1rem"
-              minHeight="1rem"
-              minWidth="1rem"
-              marginRight={SPACING.spacing4}
-            />
-          ) : (
-            <Flex marginLeft={SPACING.spacing20} />
-          )}
-          <Flex flexDirection={DIRECTION_COLUMN}>
+        {isStandard && (
+          <Icon
+            color={COLORS.blue50}
+            name="check-decagram"
+            height="1rem"
+            minHeight="1rem"
+            minWidth="1rem"
+            marginRight={SPACING.spacing4}
+          />
+        )}
+        <Flex flexDirection={DIRECTION_COLUMN}>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            paddingRight={SPACING.spacing32}
+          >
+            {displayName}
+          </StyledText>
+          {lidDisplayName != null ? (
             <StyledText
               desktopStyle="bodyDefaultRegular"
+              color={COLORS.grey60}
               paddingRight={SPACING.spacing32}
             >
-              {displayName}
+              {t('with_lid_name', { lid: lidDisplayName })}
             </StyledText>
-            {lidDisplayName != null ? (
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                color={COLORS.grey60}
-                paddingRight={SPACING.spacing32}
-              >
-                {t('with_lid_name', { lid: lidDisplayName })}
-              </StyledText>
-            ) : null}
-          </Flex>
+          ) : null}
         </Flex>
-        <StyledText desktopStyle="bodyDefaultRegular">{quantity}</StyledText>
-        <LabwareDetailOverflowMenu labware={labware} />
       </Flex>
-    </>
+      <Flex
+        width="70px"
+        flex="1 0 auto"
+        alignItems={ALIGN_CENTER}
+        textAlign="center"
+      >
+        <StyledText desktopStyle="bodyDefaultRegular" width="100%">
+          {quantity}
+        </StyledText>
+      </Flex>
+      <LabwareDetailOverflowMenu labware={labware} />
+    </Flex>
   )
 }

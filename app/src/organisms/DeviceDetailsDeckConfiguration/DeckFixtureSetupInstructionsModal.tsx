@@ -16,6 +16,7 @@ import imgSrc from '/app/assets/images/on-device-display/deck_fixture_setup_qrco
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { OddModal } from '/app/molecules/OddModal'
 
+import type { ReactNode } from 'react'
 import type { ModalProps } from '@opentrons/components'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
@@ -31,7 +32,7 @@ interface DeckFixtureSetupInstructionsModalProps {
 export function DeckFixtureSetupInstructionsModal({
   setShowSetupInstructionsModal,
   isOnDevice = false,
-}: DeckFixtureSetupInstructionsModalProps): JSX.Element {
+}: DeckFixtureSetupInstructionsModalProps): ReactNode {
   const { i18n, t } = useTranslation(['device_details', 'shared', 'branded'])
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('deck_fixture_setup_instructions'),

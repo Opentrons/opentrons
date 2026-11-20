@@ -9,6 +9,7 @@ import {
   PRODUCT,
   RobotCoordsForeignDiv,
   useCommandTypeSummaries,
+  Z_INDEX,
 } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
@@ -57,7 +58,7 @@ export function Ot2FixedTrashCommandSummary(
           bottom: 0,
           left: 0,
           transform: 'rotate(180deg) scaleX(-1)',
-          zIndex: 1,
+          zIndex: Z_INDEX.BASE,
           border: `3px solid ${COLORS.blue50}`,
           display: DISPLAY_FLEX,
           alignItems: ALIGN_CENTER,

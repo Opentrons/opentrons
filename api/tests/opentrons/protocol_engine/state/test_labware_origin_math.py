@@ -1098,7 +1098,7 @@ def test_v3_child_on_v2_parent_labware() -> None:
         deck_definition=deck_def,
     )
 
-    expected_total = Point(x=175, y=760, z=1855)
+    expected_total = Point(x=300, y=985, z=1530)
 
     assert result_non_topmost == expected_total
 

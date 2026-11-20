@@ -8,10 +8,11 @@ from opentrons_shared_data.robot.types import RobotTypeEnum
 from opentrons_shared_data.util import StrEnum
 
 from opentrons.calibration_storage import (
-    delete_robot_deck_attitude,
     gripper_offset,
-    ot2,
     ot3,
+)
+from opentrons.calibration_storage.ot3.module_offset import (
+    clear_module_offset_calibrations,
 )
 from opentrons.config import IS_ROBOT
 
@@ -165,12 +166,11 @@ def reset_boot_scripts() -> None:
 
 
 def reset_deck_calibration(robot_type: RobotTypeEnum) -> None:
-    delete_robot_deck_attitude()
-    ot2.clear_pipette_offset_calibrations() if robot_type is RobotTypeEnum.OT2 else ot3.clear_pipette_offset_calibrations()
+    ot3.clear_pipette_offset_calibrations()
 
 
 def reset_pipette_offset(robot_type: RobotTypeEnum) -> None:
-    ot2.clear_pipette_offset_calibrations() if robot_type is RobotTypeEnum.OT2 else ot3.clear_pipette_offset_calibrations()
+    ot3.clear_pipette_offset_calibrations()
 
 
 def reset_gripper_offset() -> None:
@@ -179,22 +179,11 @@ def reset_gripper_offset() -> None:
 
 
 def reset_tip_length_calibrations(robot_type: RobotTypeEnum) -> None:
-    if robot_type is RobotTypeEnum.OT2:
-        ot2.clear_tip_length_calibration()
-        ot2.clear_pipette_offset_calibrations()
-    else:
-        raise UnrecognizedOption("Tip Length calibration not supported on Flex")
+    raise UnrecognizedOption("Tip Length calibration not supported on Flex")
 
 
 def reset_module_calibration() -> None:
-    try:
-        from opentrons.calibration_storage.ot3.module_offset import (
-            clear_module_offset_calibrations,
-        )
-
-        clear_module_offset_calibrations()
-    except ImportError:
-        log.warning("Tried to clear module offset calibrations on an OT-2")
+    clear_module_offset_calibrations()
 
 
 def reset_authorized_keys() -> None:

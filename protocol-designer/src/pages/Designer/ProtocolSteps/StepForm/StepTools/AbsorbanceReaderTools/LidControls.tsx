@@ -9,6 +9,7 @@ import {
 
 import { ToggleStepFormField } from '/protocol-designer/components/molecules'
 
+import type { ReactNode } from 'react'
 import type { FieldProps } from '../../types'
 
 interface LidControlsProps {
@@ -17,7 +18,7 @@ interface LidControlsProps {
   paddingX?: string
 }
 
-export function LidControls(props: LidControlsProps): JSX.Element {
+export function LidControls(props: LidControlsProps): ReactNode {
   const { fieldProps, label, paddingX = '0' } = props
   const { t } = useTranslation('form')
   return (

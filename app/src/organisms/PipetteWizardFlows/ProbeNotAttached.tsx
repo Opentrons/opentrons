@@ -9,11 +9,10 @@ import {
   COLORS,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   PrimaryButton,
   RESPONSIVENESS,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
 import { SmallButton } from '/app/atoms/buttons'
@@ -54,9 +53,14 @@ export const ProbeNotAttached = (
             dismissError()
           }}
         >
-          <LegacyStyledText css={GO_BACK_BUTTON_STYLE}>
+          <StyledText
+            desktopStyle="bodyDefaultSemiBold"
+            oddStyle="bodyTextSemiBold"
+            color={COLORS.grey50}
+            paddingLeft={SPACING.spacing32}
+          >
             {t('shared:go_back')}
-          </LegacyStyledText>
+          </StyledText>
         </Btn>
         {isOnDevice ? (
           <SmallButton
@@ -86,23 +90,5 @@ const ALIGN_BUTTONS = css`
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     align-items: ${ALIGN_CENTER};
-  }
-`
-const GO_BACK_BUTTON_STYLE = css`
-  ${TYPOGRAPHY.pSemiBold};
-  color: ${COLORS.grey50};
-  padding-left: ${SPACING.spacing32};
-
-  &:hover {
-    opacity: 70%;
-  }
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-    font-size: ${TYPOGRAPHY.fontSize22};
-    padding-left: 0rem;
-    &:hover {
-      opacity: 100%;
-    }
   }
 `

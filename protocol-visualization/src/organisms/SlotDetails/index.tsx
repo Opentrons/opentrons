@@ -31,17 +31,9 @@ interface SlotDetailsProps {
   invariantContext: InvariantContext
   analysis: ProtocolAnalysisOutput
   liquids: Liquid[]
-  headerPortalEl?: HTMLElement | null
 }
 export function SlotDetails(props: SlotDetailsProps): ReactNode {
-  const {
-    slotId,
-    robotState,
-    invariantContext,
-    analysis,
-    liquids,
-    headerPortalEl,
-  } = props
+  const { slotId, robotState, invariantContext, analysis, liquids } = props
   const { labware, modules } = robotState
   const {
     labwareEntities,
@@ -122,7 +114,6 @@ export function SlotDetails(props: SlotDetailsProps): ReactNode {
           <TipPickupSlot
             tiprackEntity={labwareEntitiesExtended[topMostLabwareOnSlot]}
             robotState={robotState}
-            headerPortalEl={headerPortalEl}
           />
         )
       case 'labware':
@@ -133,8 +124,6 @@ export function SlotDetails(props: SlotDetailsProps): ReactNode {
             commands={commands}
             liquids={liquids}
             robotState={robotState}
-            moduleEntities={moduleEntities}
-            headerPortalEl={headerPortalEl}
           />
         )
       default:
@@ -142,43 +131,27 @@ export function SlotDetails(props: SlotDetailsProps): ReactNode {
     }
   }
 
-  return (
-    <>
-      {isSlotEmpty ? (
-        <div className={styles.slot_detail_container}>
-          <SlotDetailsEmptyState
-            slotId={slotId}
-            headerPortalEl={headerPortalEl}
-          />
-        </div>
-      ) : null}
-      <div className={styles.slot_container}>
-        <div className={styles.slot_details}>
-          {renderLabwareContent()}
-          {disposalType != null ? (
-            <TipDisposalSlot
-              robotState={robotState}
-              disposalType={disposalType}
-              headerPortalEl={
-                topMostLabwareOnSlot == null ? headerPortalEl : undefined
-              }
-            />
-          ) : null}
-          {moduleOnSlot != null ? (
-            <ModuleContainer
-              moduleId={moduleOnSlot[0]}
-              moduleEntities={moduleEntities}
-              moduleRobotState={modules}
-              slotId={mappedSlot}
-              headerPortalEl={
-                topMostLabwareOnSlot == null && disposalType == null
-                  ? headerPortalEl
-                  : undefined
-              }
-            />
-          ) : null}
-        </div>
+  if (isSlotEmpty) {
+    return (
+      <div className={styles.slot_detail_container}>
+        <SlotDetailsEmptyState />
       </div>
-    </>
+    )
+  }
+
+  return (
+    <div className={styles.slot_container}>
+      <div className={styles.slot_details}>
+        {renderLabwareContent()}
+        {disposalType != null ? <TipDisposalSlot /> : null}
+        {moduleOnSlot != null ? (
+          <ModuleContainer
+            moduleId={moduleOnSlot[0]}
+            moduleEntities={moduleEntities}
+            moduleRobotState={modules}
+          />
+        ) : null}
+      </div>
+    </div>
   )
 }

@@ -17,7 +17,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { useIsFlex } from '/app/redux-resources/robots'
-import { useIsLegacySessionInProgress } from '/app/resources/legacy_sessions'
 import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 
 import { useModuleOverflowMenu } from './hooks'
@@ -61,7 +60,6 @@ export const ModuleOverflowMenu = (
   const currentRunId = useCurrentRunId()
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { isRunTerminal, isRunStill } = useRunStatuses()
-  const isLegacySessionInProgress = useIsLegacySessionInProgress()
   const isFlex = useIsFlex(robotName)
   const isIncompatibleWithOT3 =
     isFlex && module.moduleModel === 'thermocyclerModuleV1'
@@ -70,7 +68,7 @@ export const ModuleOverflowMenu = (
   if (runId != null && isLoadedInRun) {
     isDisabled = !isRunStill
   } else if ((runId != null || currentRunId != null) && !isLoadedInRun) {
-    isDisabled = !isRunTerminal && !isLegacySessionInProgress
+    isDisabled = !isRunTerminal
   }
 
   if (isIncompatibleWithOT3) {

@@ -2,7 +2,7 @@ import { useId } from 'react'
 
 import { COLORS, CURSOR_POINTER } from '@opentrons/components'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 
 interface TipSvgProps {
   volume: number
@@ -26,7 +26,7 @@ export const TipSvg = ({
   setIsHovered,
   isHovered,
   airGapVolume,
-}: TipSvgProps): JSX.Element => {
+}: TipSvgProps): ReactNode => {
   const clipId = useId()
   const airClipId = `${clipId}-air`
 
@@ -91,6 +91,7 @@ export const TipSvg = ({
         strokeWidth="2"
         fill="none"
         strokeLinecap="round"
+        style={{ mixBlendMode: 'multiply' }}
       />
     </g>
   )

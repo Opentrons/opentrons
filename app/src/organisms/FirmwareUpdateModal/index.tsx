@@ -23,6 +23,7 @@ import { useDocumentationState } from '/app/local-resources/access-control/useDo
 import { useRequireAdminForUpdates } from '/app/local-resources/access-control/useRequireAdminForUpdates'
 import { useCurrentRobotName } from '/app/redux/robot-auth'
 
+import type { ReactNode } from 'react'
 import type { BadGripper, BadPipette, Subsystem } from '@opentrons/api-client'
 
 interface FirmwareUpdateModalProps {
@@ -72,7 +73,7 @@ const SPINNER_STYLE = css`
 
 export const FirmwareUpdateModal = (
   props: FirmwareUpdateModalProps
-): JSX.Element => {
+): ReactNode => {
   const {
     proceed,
     proceedDescription,

@@ -1,4 +1,6 @@
-export function Vacuum(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function Vacuum(): ReactNode {
   return (
     <svg
       x="-18.75"

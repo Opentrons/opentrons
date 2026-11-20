@@ -5,6 +5,7 @@ import { AlertModal } from '@opentrons/components'
 
 import { UPGRADE } from '/app/redux/robot-update'
 
+import type { ReactNode } from 'react'
 import type { ButtonProps } from '@opentrons/components'
 import type { RobotUpdateType } from '/app/redux/robot-update/types'
 
@@ -33,7 +34,7 @@ const SYSTEM_UPDATE_WARNING_STYLE = css`
 
 export function MigrationWarningModal(
   props: MigrationWarningModalProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation('device_settings')
   const { notNowButton, updateType, proceed } = props
 

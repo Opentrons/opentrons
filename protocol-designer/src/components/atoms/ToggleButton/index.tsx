@@ -2,7 +2,7 @@ import { css } from 'styled-components'
 
 import { Btn, COLORS, Flex, Icon } from '@opentrons/components'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
 
 const TOGGLE_DISABLED_STYLES = css`
@@ -45,7 +45,7 @@ interface ToggleButtonProps extends StyleProps {
   onClick?: (e: MouseEvent) => void
 }
 
-export function ToggleButton(props: ToggleButtonProps): JSX.Element {
+export function ToggleButton(props: ToggleButtonProps): ReactNode {
   const { label, toggledOn, disabled, size, ...buttonProps } = props
   const iconName = toggledOn ? 'ot-toggle-input-on' : 'ot-toggle-input-off'
 

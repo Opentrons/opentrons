@@ -17,6 +17,7 @@ import { VacuumControls } from './VacuumControls'
 import { VacuumModuleState } from './VacuumModuleState'
 import styles from './vacuumtools.module.css'
 
+import type { ReactNode } from 'react'
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
 
@@ -26,7 +27,7 @@ interface VacuumToolsProps {
   showFormErrors: boolean
 }
 
-export function VacuumTools(props: VacuumToolsProps): JSX.Element {
+export function VacuumTools(props: VacuumToolsProps): ReactNode {
   const { formData, propsForFields, showFormErrors } = props
   const dispatch = useDispatch()
   const { t } = useTranslation(['form', 'protocol_steps'])

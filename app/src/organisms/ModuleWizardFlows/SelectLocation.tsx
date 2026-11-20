@@ -42,6 +42,7 @@ import { GenericWizardTile } from '/app/molecules/GenericWizardTile'
 
 import { getFixtureIdByCutoutIdForModule } from './getFixtureIdByCutoutId'
 
+import type { ReactNode } from 'react'
 import type { CreateMaintenanceRunType } from '@opentrons/react-api-client'
 import type {
   AreaType,
@@ -65,7 +66,7 @@ export interface SelectLocationProps extends ModuleSetupWizardMaybePipetteStepPr
   isLoadedInRun: boolean
   updateDeckConfiguration: (deckConfig: DeckConfiguration) => void
 }
-export function SelectLocation(props: SelectLocationProps): JSX.Element {
+export function SelectLocation(props: SelectLocationProps): ReactNode {
   const {
     proceed,
     attachedModule,
@@ -289,7 +290,9 @@ export function SelectLocation(props: SelectLocationProps): JSX.Element {
               module: moduleName,
               port: parseModuleUSBPort(attachedModule),
             })}
-            {isFlexStacker ? null : ` ${t('location_must_be_correct')}`}
+            {isFlexStacker || isVacuumModule
+              ? null
+              : ` ${t('location_must_be_correct')}`}
           </StyledText>
           {isFlexStacker || isVacuumModule ? (
             <InlineNotification

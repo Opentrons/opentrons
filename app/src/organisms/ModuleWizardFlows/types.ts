@@ -14,6 +14,7 @@ export type ModuleSetupWizardStep =
   | CheckInstallationPinsStep
   | InstallShuttleStep
   | UpdateFirmwareStep
+  | VerifyVacuumStep
 
 export type ModuleWizardAction =
   | ModuleWizardBuildFlowAction
@@ -67,6 +68,7 @@ export interface ModuleSetupWizardBaseStepProps {
   dismissDoorOpenError: () => void
   isOnDevice: boolean
   sendIdentifyModule: SendIdentifyModule
+  setExitCleanupCommands: (commands: CreateCommand[]) => void
 }
 
 export interface ModuleSetupWizardRequiresPipetteStepProps extends ModuleSetupWizardBaseStepProps {
@@ -103,6 +105,9 @@ export interface InstallShuttleStep {
 }
 export interface UpdateFirmwareStep {
   section: typeof SECTIONS.UPDATE_FIRMWARE
+}
+export interface VerifyVacuumStep {
+  section: typeof SECTIONS.VERIFY_VACUUM
 }
 export interface SelectLocationStep {
   section: typeof SECTIONS.SELECT_LOCATION

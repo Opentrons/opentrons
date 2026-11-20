@@ -11,6 +11,7 @@ import { fixtureTiprack1000ul } from '@opentrons/shared-data'
 import styles from './tipselectionwizard.module.css'
 import { useLegendItems } from './useLegendItems'
 
+import type { ReactNode } from 'react'
 import type { TipType, WellType } from '@opentrons/components'
 import type { LabwareWellMap } from '@opentrons/shared-data'
 
@@ -20,7 +21,7 @@ interface SelectionLegendProps {
 
 export function SelectionLegend({
   selectionType,
-}: SelectionLegendProps): JSX.Element {
+}: SelectionLegendProps): ReactNode {
   const labwareWellMap = fixtureTiprack1000ul.wells as LabwareWellMap
   const isTipSelection = selectionType === 'tip'
   const legendItems = useLegendItems(selectionType)

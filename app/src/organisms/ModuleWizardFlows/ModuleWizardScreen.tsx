@@ -7,6 +7,8 @@ import { ModalShell, WizardHeader } from '@opentrons/components'
 import { getTopPortalEl } from '/app/App/portal'
 import { getIsOnDevice } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
+
 interface ModuleWizardScreenProps {
   isRobotMoving: boolean
   isModuleUpdating: boolean
@@ -16,9 +18,7 @@ interface ModuleWizardScreenProps {
   children: JSX.Element
 }
 
-export function ModuleWizardScreen(
-  props: ModuleWizardScreenProps
-): JSX.Element {
+export function ModuleWizardScreen(props: ModuleWizardScreenProps): ReactNode {
   const {
     isRobotMoving,
     isModuleUpdating,

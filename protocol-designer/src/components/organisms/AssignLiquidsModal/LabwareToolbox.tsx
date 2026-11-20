@@ -40,7 +40,7 @@ import {
   getTopDownPrimaryLabwareInHopper,
 } from './utils'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { LabwareLiquidState } from '@opentrons/step-generation'
 import type { LabwareOnDeck } from '/protocol-designer/step-forms'
 import type { ThunkDispatch } from '/protocol-designer/types'
@@ -75,7 +75,7 @@ export function LabwareStackToolbox({
   data,
   selectedLabwareIds,
   slot,
-}: LabwareStackToolboxProps): JSX.Element | null {
+}: LabwareStackToolboxProps): ReactNode {
   const { t } = useTranslation(['liquids', 'form', 'shared'])
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { makeSnackbar } = useKitchen()
@@ -114,17 +114,19 @@ export function LabwareStackToolbox({
     topDownStackIds = getFullStackFromLabwares(labware, labwareId)
   }
 
+  const primaryLabwareId =
+    selectedLabwareIds != null ? selectedLabwareIds[0] : topDownStackIds[0]
   // select the top labware in the stack if no selected labware ids are provided
   // FIXME(2026-03-03): Investigate this error about the useEffect firing on every render.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   const selectedLabware =
-    selectedLabwareIds != null ? selectedLabwareIds : [topDownStackIds[0]]
+    selectedLabwareIds != null ? selectedLabwareIds : [primaryLabwareId]
 
   useEffect(() => {
-    if (selectedLabware[0] != null) {
-      dispatch(openIngredientSelector(selectedLabware[0]))
+    if (primaryLabwareId != null) {
+      dispatch(openIngredientSelector(primaryLabwareId))
     }
-  }, [selectedLabware, dispatch])
+  }, [primaryLabwareId, dispatch])
 
   if (labwareId == null) {
     console.error('No labware ID found for LabwareStackToolbox')
@@ -279,7 +281,7 @@ export function LabwareStackToolboxContainer({
   setDefineLiquidModal,
   selectedLabwareIds,
   setShowLiquidLayoutOverlay,
-}: LabwareStackToolboxContainerProps): JSX.Element {
+}: LabwareStackToolboxContainerProps): ReactNode {
   // All selectors moved here
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
   const { labware } = useSelector(getInitialDeckSetup)

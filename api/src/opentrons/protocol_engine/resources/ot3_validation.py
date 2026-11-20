@@ -15,7 +15,7 @@ def ensure_ot3_hardware(
 ) -> OT3HardwareControlAPI:
     """Validate that the HardwareControlAPI is of OT-3 instance."""
     if hardware_api.get_robot_type() == FlexRobotType:
-        return hardware_api  # type: ignore
+        return hardware_api
 
     raise HardwareNotSupportedError(
         error_msg or "This command is supported by OT-3 only."

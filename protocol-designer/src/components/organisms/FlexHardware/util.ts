@@ -18,6 +18,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_V2_REAR_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
+  VACUUM_MODULE_V1,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
@@ -539,7 +540,11 @@ const handleCreateModule = (ctx: ModuleEntry): void => {
     return
   }
 
-  const slot = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
+  let slot: string = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
+  // hard code override for Vacuum slot since we allow UI selection in A3 OR A4
+  if (model === VACUUM_MODULE_V1) {
+    slot = 'A3'
+  }
   dispatch(createModule({ slot, model, type }))
 }
 

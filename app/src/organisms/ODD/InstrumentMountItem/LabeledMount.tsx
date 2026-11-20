@@ -16,7 +16,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { Mount } from '@opentrons/api-client'
 
 const MountButton = styled.button<{ isAttached: boolean }>`
@@ -39,7 +39,7 @@ interface LabeledMountProps {
   handleClick: MouseEventHandler
 }
 
-export function LabeledMount(props: LabeledMountProps): JSX.Element {
+export function LabeledMount(props: LabeledMountProps): ReactNode {
   const { t } = useTranslation('device_details')
   const { mount, instrumentName, handleClick } = props
   const isNinetySixChannel = instrumentName?.includes('96-Channel') ?? false

@@ -4,9 +4,10 @@ import { useSelector } from 'react-redux'
 import { DropdownStepFormField } from '/protocol-designer/components/molecules'
 import { getEquippedPipetteOptions } from '/protocol-designer/step-forms/selectors'
 
+import type { ReactNode } from 'react'
 import type { FieldProps } from '../types'
 
-export const PipetteField = (props: FieldProps): JSX.Element => {
+export const PipetteField = (props: FieldProps): ReactNode => {
   const { value } = props
   const { t } = useTranslation('protocol_steps')
   const pipetteOptions = useSelector(getEquippedPipetteOptions)

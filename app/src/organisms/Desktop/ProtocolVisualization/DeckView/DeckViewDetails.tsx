@@ -10,7 +10,7 @@ import { DeckViewSlots } from './DeckViewSlots'
 import { FixtureCommandSummary } from './FixtureCommandSummary'
 import { Ot2FixedTrashCommandSummary } from './Ot2FixedTrashCommandSummary'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   CutoutId,
   DeckDefinition,
@@ -38,7 +38,7 @@ interface DeckViewDetailsProps {
   selectedSlot: string | null
   selectedRunTimeCommand?: RunTimeCommand
 }
-export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
+export function DeckViewDetails(props: DeckViewDetailsProps): ReactNode {
   const {
     robotState,
     robotType,
@@ -89,6 +89,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
         hoveredSlot={hoveredSlot}
         selectedSlot={selectedSlot}
         selectedRunTimeCommand={selectedRunTimeCommand}
+        stagingAreaCutoutIds={stagingAreaCutoutIds}
       />
       {/* SlotControls for all empty deck */}
       <DeckViewSlots
@@ -116,6 +117,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
         hoveredSlot={hoveredSlot}
         selectedSlot={selectedSlot}
         selectedRunTimeCommand={selectedRunTimeCommand}
+        stagingAreaCutoutIds={stagingAreaCutoutIds}
       />
       {/* when commandSummary happens on a trash bin */}
       {isPipetteOverTrashBin &&

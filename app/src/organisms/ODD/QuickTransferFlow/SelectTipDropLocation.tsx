@@ -19,7 +19,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 
 import { ACTIONS } from './constants'
 
-import type { ComponentProps, Dispatch } from 'react'
+import type { ComponentProps, Dispatch, ReactNode } from 'react'
 import type { CutoutConfig } from '@opentrons/shared-data'
 import type { SmallButton } from '/app/atoms/buttons'
 import type {
@@ -40,7 +40,7 @@ export function SelectTipDropLocation({
   exitButtonProps,
   state,
   dispatch,
-}: SelectTipDropLocationProps): JSX.Element {
+}: SelectTipDropLocationProps): ReactNode {
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
   const [selectedTipDropLocation, setSelectedTipDropLocation] = useState<

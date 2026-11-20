@@ -6,13 +6,13 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 from opentrons.drivers.absorbance_reader.abstract import (
     AbstractAbsorbanceReaderDriver,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import (
     ABSMeasurementMode,
     AbsorbanceReaderDeviceState,
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderPlatePresence,
 )
+from opentrons.drivers.usb.types import USBPort
 
 if TYPE_CHECKING:
     from .async_byonoy import AsyncByonoy as AsyncByonoyType

@@ -17,8 +17,8 @@ import opentrons.config.types
 import opentrons.drivers.asyncio.communication.errors
 import opentrons.drivers.flex_stacker.errors
 import opentrons.drivers.flex_stacker.types
-import opentrons.drivers.rpi_drivers.types
 import opentrons.drivers.types
+import opentrons.drivers.usb.types
 import opentrons.drivers.utils
 import opentrons.drivers.vacuum_module.errors
 import opentrons.drivers.vacuum_module.types
@@ -85,7 +85,7 @@ HARDWARE_CLASS_PACKAGES = [
     opentrons.drivers.types,
     opentrons.hardware_control.modules.module_calibration,
     opentrons.hardware_control.modules.types,
-    opentrons.drivers.rpi_drivers.types,
+    opentrons.drivers.usb.types,
     opentrons.hardware_control.types,
     opentrons.types,
     opentrons.hardware_control.ot3_calibration,
@@ -170,9 +170,11 @@ def _pipetted_dict_dict_to_class(  # type: ignore
         default_blow_out_speeds=dictionary["default_blow_out_speeds"],
         ready_to_aspirate=bool(dictionary["ready_to_aspirate"]),
         has_tip=bool(dictionary["has_tip"]),
-        default_push_out_volume=None
-        if dictionary["default_push_out_volume"] is None
-        else float(dictionary["default_push_out_volume"]),
+        default_push_out_volume=(
+            None
+            if dictionary["default_push_out_volume"] is None
+            else float(dictionary["default_push_out_volume"])
+        ),
         supported_tips=converted_supported_tips,
         pipette_bounding_box_offsets=opentrons_shared_data.pipette.pipette_definition.PipetteBoundingBoxOffsetDefinition.model_validate(
             dictionary["pipette_bounding_box_offsets"]
@@ -180,9 +182,9 @@ def _pipetted_dict_dict_to_class(  # type: ignore
         current_nozzle_map=opentrons.hardware_control.nozzle_manager.NozzleMap.model_validate(
             dictionary["current_nozzle_map"]
         ),
-        lld_settings=None
-        if dictionary["lld_settings"] is None
-        else dictionary["lld_settings"],
+        lld_settings=(
+            None if dictionary["lld_settings"] is None else dictionary["lld_settings"]
+        ),
         plunger_positions=dictionary["plunger_positions"],
         shaft_ul_per_mm=float(dictionary["shaft_ul_per_mm"]),
         available_sensors=opentrons_shared_data.pipette.pipette_definition.AvailableSensorDefinition.model_validate(
@@ -230,9 +232,7 @@ def _path_class_to_dict(obj) -> Dict:  # type: ignore
     return {"__class__": "pathlib.Path", "path_str": str(obj)}
 
 
-def _path_dict_to_class(  # type: ignore
-    classname, d
-) -> Path:
+def _path_dict_to_class(classname, d) -> Path:  # type: ignore
     return Path(d["path_str"])
 
 

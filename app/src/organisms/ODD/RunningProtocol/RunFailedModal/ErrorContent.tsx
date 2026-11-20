@@ -5,6 +5,7 @@ import { LegacyStyledText } from '@opentrons/components'
 
 import styles from './errorcontent.module.css'
 
+import type { ReactNode } from 'react'
 import type { RunStatus } from '@opentrons/api-client'
 import type { RunCommandError } from '@opentrons/shared-data'
 
@@ -17,7 +18,7 @@ export function ErrorContent({
   errors,
   isSingleError,
   runStatus,
-}: ErrorContentProps): JSX.Element {
+}: ErrorContentProps): ReactNode {
   const { t } = useTranslation('run_details')
   return (
     <>

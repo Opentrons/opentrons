@@ -19,6 +19,7 @@ import {
   useHoverTooltip,
   useMenuHandleClickOutside,
   useMountEffect,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -43,7 +44,7 @@ import { RobotOutOfStorageModal } from './RobotOutOfStorageModal.tsx'
 import { DisconnectModal } from './RobotSettings/ConnectNetwork/DisconnectModal'
 import { handleUpdateBuildroot } from './RobotSettings/UpdateBuildroot'
 
-import type { MouseEvent, MouseEventHandler } from 'react'
+import type { MouseEvent, MouseEventHandler, ReactNode } from 'react'
 import type { DiscoveredRobot } from '/app/redux/discovery/types'
 import type { Dispatch } from '/app/redux/types'
 
@@ -53,7 +54,7 @@ interface RobotOverviewOverflowMenuProps {
 
 export const RobotOverviewOverflowMenu = (
   props: RobotOverviewOverflowMenuProps
-): JSX.Element => {
+): ReactNode => {
   const { robot } = props
   const { t } = useTranslation(['devices_landing', 'robot_controls', 'shared'])
   const {
@@ -161,7 +162,7 @@ export const RobotOverviewOverflowMenu = (
       {showOverflowMenu ? (
         <Flex
           whiteSpace={NO_WRAP}
-          zIndex={10}
+          zIndex={Z_INDEX.MODALS}
           borderRadius={BORDERS.borderRadius8}
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
