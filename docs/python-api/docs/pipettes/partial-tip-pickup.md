@@ -419,7 +419,7 @@ The following table lists the allowed partial tip configurations by collar locat
 | **A4** | **A3** | 96-channel only | Layouts starting in column 12 (`start="A12"` or `"H12"`), or `ROW` layouts |
 
 !!! note
-    8-channel pipettes only have a single column of nozzles. These instruments are unaffected by collars to their left or right (e.g., pipetting in slot A2 while a collar is in A3). However, they are still blocked from pipetting in slot B3 when using `start="H1"` (including `PARTIAL_COLUMN` and back-to-front `SINGLE` layouts).
+    8-channel pipettes only have a single column of nozzles and are unaffected by collars to their left or right (such as pipetting in slot A2 next to a collar in A3). However, when a collar is in A3, an 8-channel pipettes is still blocked from pipetting in slot B3 when using `start="H1"` because the unused nozzles overhang backward into A3..
 
 If you encounter an analysis failure (`LocationNotAccessibleByPipetteError`) because of an instrument conflict with a vacuum collar, the error massage will suggest other partial tip configurations for your deck layout. You can also resolve the error moving the collar or the labware to a non-adjacent slot.
 
