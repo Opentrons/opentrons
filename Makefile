@@ -252,7 +252,7 @@ $(SHARED_DATA_DIR)-py-lint:
 	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
 
 .PHONY: lint-js
-lint-js: check-mutating-api-client-exports lint-js-oxlint lint-js-prettier
+lint-js: check-mutating-api-client-exports lint-js-oxlint lint-js-oxfmt
 
 # Regenerate the denylist used by opentrons/no-direct-mutating.
 .PHONY: generate-mutating-api-client-exports
@@ -268,8 +268,8 @@ check-mutating-api-client-exports:
 lint-js-oxlint:
 	pnpm exec oxlint $(if $(filter true,$(quiet)),--quiet)
 
-.PHONY: lint-js-prettier
-lint-js-prettier:
+.PHONY: lint-js-oxfmt
+lint-js-oxfmt:
 	pnpm exec oxfmt --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
 
 .PHONY: lint-json

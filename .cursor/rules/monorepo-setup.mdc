@@ -103,7 +103,7 @@ JS/TS linting uses a **hybrid** setup:
 
 1. **Oxlint** (`make lint-js-oxlint`) — primary linter for most rules (fast; config in `.oxlintrc.json`)
 2. **ESLint** (`make lint-js-eslint`) — type-aware `@typescript-eslint` rules, `react-hooks/exhaustive-deps`, custom `opentrons/*` rules, and other gaps; config in `eslint.config.js` with `eslint-plugin-oxlint` disabling overlapping rules
-3. **Oxfmt** (`make lint-js-prettier`) — formatting check
+3. **Oxfmt** (`make lint-js-oxfmt`) — formatting check
 
 `make lint-json` still uses ESLint with `eslint-plugin-json` for JSON files.
 
@@ -116,7 +116,7 @@ For editor integration, install the [Oxc VS Code extension](https://oxc.rs/docs/
 | `make lint-js` | Oxlint + ESLint + Oxfmt check |
 | `make lint-js-oxlint` | Oxlint only (`.oxlintrc.json`) |
 | `make lint-js-eslint` | ESLint only (unmigrated/type-aware rules) |
-| `make lint-js-prettier` | Oxfmt only |
+| `make lint-js-oxfmt` | Oxfmt only |
 | `make lint-css` | Stylelint all CSS |
 | `make lint-json` | ESLint for JSON files |
 | `make lint-py` | Lint all robot Python projects (ruff + mypy) |

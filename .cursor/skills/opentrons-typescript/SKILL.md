@@ -317,7 +317,7 @@ Each package has a `Makefile` with some or all of:
 | `make test-js-<project>`          | Run tests for one project (e.g., `make test-js-protocol-designer`) |
 | `make lint-js`                    | ESLint + Oxfmt check                                               |
 | `make lint-js-eslint`             | ESLint only                                                        |
-| `make lint-js-prettier`           | Oxfmt only                                                         |
+| `make lint-js-oxfmt`              | Oxfmt only                                                         |
 | `make lint-css`                   | Stylelint all CSS                                                  |
 | `make format-js`                  | Auto-format with Oxfmt                                             |
 | `make format-css`                 | Auto-fix CSS with Stylelint                                        |
