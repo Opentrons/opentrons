@@ -8,6 +8,7 @@ import '@fontsource/public-sans'
 import '@fontsource/public-sans/600.css'
 import '@fontsource/public-sans/700.css'
 import '@fontsource-variable/reddit-mono'
+import '@fontsource/press-start-2p'
 
 // TODO(ew, 06/19/23): The main font is Public Sans but it does not have subscript glyphs,
 // needed to display chemical formulae on the liquids page. I've added DejaVu Sans, which

@@ -48,7 +48,7 @@
   font-weight: bold;
   text-align: center;
   animation: title-animation 4s linear infinite;
-  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+  font-family: 'Press Start 2P', sans-serif;
   text-shadow: 0 0 10px rgb(0 0 0);
 }
 
@@ -62,7 +62,7 @@
   font-weight: bold;
   text-align: center;
   animation: title-animation 4s linear infinite;
-  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+  font-family: 'Press Start 2P', sans-serif;
   text-shadow: 0 0 10px rgb(0 0 0);
 }
 
@@ -71,7 +71,7 @@
   top: 90%;
   left: 50%;
   transform: translateX(-50%);
-  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+  font-family: 'Press Start 2P', sans-serif;
   text-shadow: 0 0 10px rgb(0 0 0);
   color: white;
 }
@@ -81,7 +81,7 @@
   top: 30%;
   left: 50%;
   transform: translateX(-50%);
-  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+  font-family: 'Press Start 2P', sans-serif;
   text-shadow: 0 0 10px rgb(0 0 0);
   text-align: center;
   color: white;
@@ -93,7 +93,7 @@
   top: 50%;
   left: 50%;
   transform: translateX(-50%);
-  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+  font-family: 'Press Start 2P', sans-serif;
   text-shadow: 0 0 10px rgb(0 0 0);
   text-align: center;
   color: white;
