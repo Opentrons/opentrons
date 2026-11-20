@@ -418,7 +418,7 @@ The following table lists the allowed partial tip configurations by collar locat
 | **A3** | **A2** | All partial layouts | Layouts starting in column 12 (`start="A12"` or `"H12"`), or `ROW` layouts |
 | **A4** | **A3** | All partial layouts | Layouts starting in column 12 (`start="A12"` or `"H12"`), or `ROW` layouts |
 
-If you encounter an analysis failure (`LocationNotAccessibleByPipetteError`) because of an instrument conflict with a vacuum collar, the error massage will suggest other configurations for your deck layout. You can also resolve the error moving the collar or the labware to a non-adjacent slot.
+If you get an analysis failure (`LocationNotAccessibleByPipetteError`) because of an instrument conflict with a vacuum collar, the error massage will suggest other configurations for your deck layout. You can also resolve the error moving the collar or the labware to a non-adjacent slot.
 
 <figure class="screenshot" markdown>
 ![Protocol analysis failure message for partial tip pickup problems with a vacuum collar](../img/vacuum-partial-tip-error.png){ width="80%" }
