@@ -8,13 +8,13 @@ import { isCancellableStatus } from '/app/local-resources/runs/utils'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import { useRunCreatedAtTimestamp, useRunTimestamps } from '/app/resources/runs'
 
+import type { RunHeaderContentProps } from '..'
 import { DisplayRunStatus } from '../../DisplayRunStatus'
 import { ActionButton } from '../ActionButton'
 import { LabeledValue } from '../LabeledValue'
 import styles from './runheadersectionupper.module.css'
 
 import type { ReactNode } from 'react'
-import type { RunHeaderContentProps } from '..'
 
 // The upper row of Protocol Run Header.
 export function RunHeaderSectionUpper(props: RunHeaderContentProps): ReactNode {

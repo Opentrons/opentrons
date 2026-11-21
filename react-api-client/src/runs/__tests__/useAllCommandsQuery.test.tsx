@@ -4,8 +4,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getCommands } from '@opentrons/api-client'
 
-import { mockCommandsResponse } from '../__fixtures__'
 import { useHost } from '../../api'
+import { mockCommandsResponse } from '../__fixtures__'
 import { useAllCommandsQuery } from '../useAllCommandsQuery'
 
 import type * as React from 'react'

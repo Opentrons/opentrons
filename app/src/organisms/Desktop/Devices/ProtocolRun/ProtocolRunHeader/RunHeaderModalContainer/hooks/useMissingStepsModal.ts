@@ -9,6 +9,7 @@ import {
   MODULE_SETUP_STEP_KEY,
   ROBOT_CALIBRATION_STEP_KEY,
 } from '/app/redux/protocol-runs'
+import { selectTotalCountLocationSpecificOffsets } from '/app/redux/protocol-runs/selectors/lpc/labware/offsets'
 
 import { isAnyHeaterShakerShaking } from '../modals'
 
@@ -50,6 +51,9 @@ export function useMissingStepsModal({
   handleProceedToRunClick,
   isRunStarting,
 }: UseMissingStepsModalProps): UseMissingStepsModalResult {
+  const totalOffsetstoApply = useSelector(
+    selectTotalCountLocationSpecificOffsets(runId)
+  )
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const isHeaterShakerShaking = isAnyHeaterShakerShaking(attachedModules)
   const missingSetupSteps = useSelector<State, StepKey[]>((state: State) =>
@@ -77,6 +81,7 @@ export function useMissingStepsModal({
         ? conditionalConfirmUtils.confirm()
         : handleProceedToRunClick()
     },
+    offsetCount: totalOffsetstoApply,
     missingSteps: reportableMissingSetupSteps,
     isRunStarting,
   }

@@ -3,11 +3,11 @@ import {
   usePlayRunMutation,
 } from '@opentrons/react-api-client'
 
+import type { ErrorRecoveryFlowsProps } from '..'
 import { RECOVERY_MAP } from '../constants'
 
 import type { RunAction } from '@opentrons/api-client'
 import type { DocumentationState } from '@opentrons/react-api-client'
-import type { ErrorRecoveryFlowsProps } from '..'
 import type { ERUtilsResults } from './useERUtils'
 
 export interface RecoveryActionMutationResult {

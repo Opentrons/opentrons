@@ -120,7 +120,7 @@ export function useOnCancelRun({
   showBtnLoadingState: boolean
 } {
   const { ROBOT_CANCELING, DROP_TIP_FLOWS } = RECOVERY_MAP
-  const { isLoadingTipStatus, areTipsAttached } = tipStatusUtils
+  const { isLoadingTipStatus, aPipetteWithTip } = tipStatusUtils
   const { handleMotionRouting, proceedToRouteAndStep } = routeUpdateActions
   const { cancelRun } = recoveryCommands
 
@@ -132,7 +132,7 @@ export function useOnCancelRun({
     () => {
       if (hasUserClicked) {
         if (!isLoadingTipStatus) {
-          if (areTipsAttached) {
+          if (aPipetteWithTip != null) {
             void proceedToRouteAndStep(DROP_TIP_FLOWS.ROUTE)
           } else {
             void handleMotionRouting(true, ROBOT_CANCELING.ROUTE).then(() => {
@@ -144,7 +144,7 @@ export function useOnCancelRun({
     },
     // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hasUserClicked, isLoadingTipStatus, areTipsAttached]
+    [hasUserClicked, isLoadingTipStatus, aPipetteWithTip]
   )
 
   const handleCancelRunClick = (): void => {

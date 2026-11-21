@@ -1,7 +1,7 @@
 import { Trans, useTranslation } from 'react-i18next'
 import capitalize from 'lodash/capitalize'
 
-import { PrimaryButton, SPACING } from '@opentrons/components'
+import { PrimaryButton, SPACING, StyledText } from '@opentrons/components'
 
 import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
 import { WizardBodyText } from '/app/components/adhoc/shared/wizards/WizardBodyText'
@@ -49,10 +49,21 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
 
   return (
     <GenericWizardTile
-      header={i18n.format(
-        t(flowType === FLOWS.ATTACH ? 'unscrew_carriage' : 'reattach_carriage'),
-        'capitalize'
-      )}
+      header={
+        <StyledText
+          desktopStyle="headingSmallBold"
+          oddStyle="level4HeaderSemiBold"
+        >
+          {i18n.format(
+            t(
+              flowType === FLOWS.ATTACH
+                ? 'unscrew_carriage'
+                : 'reattach_carriage'
+            ),
+            'capitalize'
+          )}
+        </StyledText>
+      }
       rightHandBody={getPipetteAnimations96({
         section: SECTIONS.CARRIAGE,
         flowType,

@@ -1,9 +1,9 @@
 from .types import APIVersion
 
-MAX_SUPPORTED_VERSION = APIVersion(2, 31)
+MAX_SUPPORTED_VERSION = APIVersion(2, 32)
 """The maximum supported protocol API version in this release."""
 
-MIN_SUPPORTED_VERSION = APIVersion(2, 0)
+MIN_SUPPORTED_VERSION = APIVersion(2, 15)
 """The minimum supported protocol API version in this release, across all robot types."""
 
 MIN_SUPPORTED_VERSION_FOR_FLEX = APIVersion(2, 15)
@@ -16,3 +16,5 @@ handle anything but OT-2s.
 The additional bump to 2.15 is because that's what we tested on, and because it adds all the
 Flex-specific features.
 """
+
+MIN_SUPPORTED_JSON_SCHEMA_VERSION = 6

@@ -31,7 +31,8 @@ import {
   useQuickProtocolDetailsForRun,
 } from '/app/resources/runs'
 
-import { useRunHeaderRunControls } from '../hooks'
+import type { ProtocolRunHeaderProps } from '..'
+import { useCloseTerminalRun, useRunHeaderRunControls } from '../hooks'
 import { getFallbackRobotSerialNumber } from '../utils'
 import {
   useHeaterShakerConfirmationModal,
@@ -52,7 +53,6 @@ import type {
 } from '@opentrons/react-api-client/src/accessControl/types'
 import type { UseErrorRecoveryResult } from '/app/organisms/ErrorRecoveryFlows'
 import type { State } from '/app/redux/types'
-import type { ProtocolRunHeaderProps } from '..'
 import type { UseRunErrorsResult } from '../hooks'
 import type {
   UseHeaterShakerConfirmationModalResult,
@@ -99,6 +99,7 @@ export function useRunHeaderModalContainer({
   attachedModules,
   runErrors,
   closeCurrentRun,
+  isCloning = false,
 }: UseRunHeaderModalContainerProps): UseRunHeaderModalContainerResult {
   const navigate = useNavigate()
 
@@ -223,12 +224,17 @@ export function useRunHeaderModalContainer({
     isRunStarting: isApplyingOffsets,
   })
 
+  useCloseTerminalRun({
+    runId,
+    runStatus,
+    closeCurrentRun,
+  })
+
   const dropTipUtils = useRunHeaderDropTip({
     runId,
     runStatus,
-    runRecord,
     robotType,
-    closeCurrentRun,
+    isCloning,
   })
 
   const recoveryModalUtils = useErrorRecoveryFlows(runId, runStatus)

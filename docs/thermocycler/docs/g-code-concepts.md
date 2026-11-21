@@ -1,6 +1,6 @@
 ---
-title: "Thermocycler Module: G-Code Concepts"
-description: "Thermocycler G-code syntax, examples, and configuration information."
+title: 'Thermocycler Module: G-Code Concepts'
+description: 'Thermocycler G-code syntax, examples, and configuration information.'
 ---
 
 G-codes are machine-readable instructions used to control hardware. You do not need to understand or use G-codes to operate a Thermocycler with Flex or OT-2. This section is a technical resource for developers building custom applications that work with the Thermocycler.
@@ -12,7 +12,7 @@ Thermocycler G-codes are strings starting with `M` followed by an integer. Argum
 - **Syntax:** `MCOMMAND [ARGUMENT-KEY][ARGUMENT-VALUE] TERMINATOR`
 - **Examples:** `M115 \n` or `M104 S95 H120 \n`
 
-The following table explains these G-code command elements. 
+The following table explains these G-code command elements.
 
 <table>
   <thead>
@@ -74,18 +74,18 @@ Every Opentrons module returns a response after executing a command. A response 
 
 ## Connection parameters
 
-To establish a serial USB connection, your application must specify the baud rate and identify the module using its Vendor ID (VID) and Product ID (PID). 
+To establish a serial USB connection, your application must specify the baud rate and identify the module using its Vendor ID (VID) and Product ID (PID).
 
 - **Baud rate**: Defines the communication speed for the module.
-- **VID**: Identifies the manufacturer of the integrated circuit running the module's firmware. 
+- **VID**: Identifies the manufacturer of the integrated circuit running the module's firmware.
 - **PID**: Identifies the specific Thermocycler type based on its model generation.
 
 The following table lists these required connection parameters.
 
-| Module | Baud Rate | VID | PID |
-|----|----|----|----|
-| Thermocycler GEN1 | `115200` | `0x04D8` or<br> `0x239a` | `0xED8C` or <br> `0x800b` |
-| Thermocycler GEN2 | `115200` | `0x0483` | `0xED8D` |
+| Module            | Baud Rate | VID                      | PID                       |
+| ----------------- | --------- | ------------------------ | ------------------------- |
+| Thermocycler GEN1 | `115200`  | `0x04D8` or<br> `0x239a` | `0xED8C` or <br> `0x800b` |
+| Thermocycler GEN2 | `115200`  | `0x0483`                 | `0xED8D`                  |
 
 !!! tip "Making Good G-Code Connections"
-    Identifying modules by their VID and PID helps you write resilient, cross-platform code. Hard coding for a specific port (e.g., `COM3` for Windows or `/dev/ttyUSB0` for macOS) makes code brittle. By using a library like [pyserial](https://pythonhosted.org/pyserial/) to scan for specific VID/PID combinations, your application can dynamically find and connect to the correct Opentrons module regardless of its physical connection point.
+Identifying modules by their VID and PID helps you write resilient, cross-platform code. Hard coding for a specific port (e.g., `COM3` for Windows or `/dev/ttyUSB0` for macOS) makes code brittle. By using a library like [pyserial](https://pythonhosted.org/pyserial/) to scan for specific VID/PID combinations, your application can dynamically find and connect to the correct Opentrons module regardless of its physical connection point.

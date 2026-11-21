@@ -1,7 +1,12 @@
 import { StrictMode } from 'react'
-import ReactDOM from 'react-dom/client'
 import { I18nextProvider } from 'react-i18next'
 import { Auth0Provider } from '@auth0/auth0-react'
+import ReactDOM from 'react-dom/client'
+
+import '@fontsource/public-sans'
+import '@fontsource/public-sans/600.css'
+import '@fontsource/public-sans/700.css'
+import './global.css'
 
 import '@opentrons/components/styles/global'
 
@@ -17,11 +22,6 @@ import {
   STAGING_AUTH0_AUDIENCE,
   STAGING_AUTH0_CLIENT_ID,
 } from './resources/constants'
-
-import '@fontsource/public-sans'
-import '@fontsource/public-sans/600.css'
-import '@fontsource/public-sans/700.css'
-import './global.css'
 
 const rootElement = document.getElementById('root')
 

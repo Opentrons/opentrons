@@ -21,7 +21,11 @@ import type { MouseEventHandler, ReactNode } from 'react'
 import type { IconName, StyleProps } from '@opentrons/components'
 
 export type SmallButtonTypes =
-  'alert' | 'primary' | 'secondary' | 'tertiaryLowLight' | 'tertiaryHighLight'
+  | 'alert'
+  | 'primary'
+  | 'secondary'
+  | 'tertiaryLowLight'
+  | 'tertiaryHighLight'
 
 export type ButtonCategory = 'default' | 'rounded'
 

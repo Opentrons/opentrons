@@ -104,7 +104,8 @@ export function getResultingTimelineFrameFromRunCommands(
           const sequenceMap = locationSequences.reduce(
             (acc: Record<string, LabwareLocationSequence>, subArray) => {
               const firstLabware:
-                OnLabwareLocationSequenceComponent | undefined = subArray.find(
+                | OnLabwareLocationSequenceComponent
+                | undefined = subArray.find(
                 (item): item is OnLabwareLocationSequenceComponent =>
                   item.kind === 'onLabware'
               )
@@ -284,7 +285,8 @@ const getIncrementStoredLabwareCounter = (
 
 const getStoredLabwareIds = (
   command:
-    FlexStackerSetStoredLabwareRunTimeCommand | FlexStackerFillRunTimeCommand
+    | FlexStackerSetStoredLabwareRunTimeCommand
+    | FlexStackerFillRunTimeCommand
 ): string[] => {
   const allStoredLabwareIds: string[] =
     command.result?.storedLabware?.flatMap(stored =>

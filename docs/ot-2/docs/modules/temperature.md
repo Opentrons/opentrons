@@ -1,6 +1,6 @@
 ---
-title: "Opentrons OT-2: Temperature Module"
-description: "Temperature Module features, thermal blocks, and temperature range (4–95 °C)."
+title: 'Opentrons OT-2: Temperature Module'
+description: 'Temperature Module features, thermal blocks, and temperature range (4–95 °C).'
 ---
 
 ![Temperature Module](../images/temperature-module.png)
@@ -10,7 +10,7 @@ description: "Temperature Module features, thermal blocks, and temperature range
 The [Opentrons Temperature Module](https://opentrons.com/products/temperature-module-gen2?sku=991-00350-0) is a hot and cold plate module. It can reach and maintain temperatures ranging from 4 °C to 95 °C. The Temperature Module is often used in protocols that require heating, cooling, rapid temperature changes, or for long duration storage of samples and reagents at a specific, constant temperature. The module is compatible with various thermal block adapters and the Opentrons Flex and OT-2 liquid handling robots.
 
 !!! note "Additional Documentation"
-    For complete instructions on module installation and use, see the [Temperature Module Instruction Manual](../../temperature-module/index.md).
+For complete instructions on module installation and use, see the [Temperature Module Instruction Manual](../../temperature-module/index.md).
 
 ### Heating and cooling
 

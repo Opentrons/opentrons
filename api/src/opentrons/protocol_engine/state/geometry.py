@@ -385,16 +385,12 @@ class GeometryView:
         underlying_ancestor_def = self._get_stackup_underlying_ancestor_definition(
             location
         )
-        module_parent_to_child_offset = self._get_stackup_module_parent_to_child_offset(
-            location
-        )
 
         slot_front_left = self._addressable_areas.get_addressable_area_position(aa_name)
         stackup_origin_to_lw_origin = get_stackup_origin_to_labware_origin(
             context=LabwareOriginContext.PIPETTING,
             stackup_lw_info_top_to_bottom=stackup_lw_defs_locs,
             underlying_ancestor_definition=underlying_ancestor_def,
-            module_parent_to_child_offset=module_parent_to_child_offset,
             deck_definition=self._addressable_areas.deck_definition,
             slot_name=addressable_area.base_slot,
         )
@@ -428,30 +424,6 @@ class GeometryView:
             else:
                 break
         return definitions_locations_top_to_bottom
-
-    def _get_stackup_module_parent_to_child_offset(
-        self, top_most_lw_location: LabwareLocation
-    ) -> Union[Point, None]:
-        """Traverse the stackup to find the first parent-to-child module offset, if any."""
-        current_location = top_most_lw_location
-
-        while True:
-            if isinstance(current_location, ModuleLocation):
-                module_parent_to_child_offset = (
-                    self._modules.get_nominal_offset_to_child_from_addressable_area(
-                        module_id=current_location.moduleId,
-                    )
-                )
-                return module_parent_to_child_offset
-
-            if isinstance(current_location, OnLabwareLocation):
-                current_labware_id = current_location.labwareId
-                current_labware = self._labware.get(current_labware_id)
-                current_location = current_labware.location
-            else:
-                break
-
-        return None
 
     def _get_stackup_underlying_ancestor_definition(
         self, top_most_lw_location: LabwareLocation
@@ -944,9 +916,6 @@ class GeometryView:
         stackup_defs_locs = self._get_stackup_lw_info_top_to_bottom(
             labware_definition=labware_definition, location=location
         )
-        module_parent_to_child_offset = self._get_stackup_module_parent_to_child_offset(
-            location
-        )
         underlying_ancestor_def = self._get_stackup_underlying_ancestor_definition(
             location
         )
@@ -958,7 +927,6 @@ class GeometryView:
 
         aa_origin_to_lw_origin = get_stackup_origin_to_labware_origin(
             context=context_type,
-            module_parent_to_child_offset=module_parent_to_child_offset,
             underlying_ancestor_definition=underlying_ancestor_def,
             stackup_lw_info_top_to_bottom=stackup_defs_locs,
             slot_name=addressable_area.base_slot,
@@ -1266,36 +1234,20 @@ class GeometryView:
             | NotOnDeckLocationSequenceComponent
         ) = self._cutout_fixture_location_sequence_from_addressable_area(module_aa)
 
-        if self._modules.get_deck_supports_module_fixtures():
-            # On a deck with modules as cutout fixtures, we want, in order,
-            # - the addressable area of the module
-            # - the module with its module id, which is what clients want
-            # - the cutout
-            loc = self._modules.get_location(module_id)
-            model = self._modules.get_connected_model(module_id)
-            module_aa = self._modules.ensure_and_convert_module_fixture_location(
-                loc.slotName, model
-            )
-            return building + [
-                OnAddressableAreaLocationSequenceComponent(
-                    addressableAreaName=module_aa
-                ),
-                OnModuleLocationSequenceComponent(moduleId=module_id),
-                base_location,
-            ]
-        else:
-            # If the module isn't a cutout fixture, then we want
-            # - the module
-            # - the addressable area the module is loaded on
-            # - the cutout
-            location = self._modules.get_location(module_id)
-            return building + [
-                OnModuleLocationSequenceComponent(moduleId=module_id),
-                OnAddressableAreaLocationSequenceComponent(
-                    addressableAreaName=location.slotName.value
-                ),
-                base_location,
-            ]
+        # With modules as cutout fixtures, we want, in order,
+        # - the addressable area of the module
+        # - the module with its module id, which is what clients want
+        # - the cutout
+        loc = self._modules.get_location(module_id)
+        model = self._modules.get_connected_model(module_id)
+        module_aa = self._modules.ensure_and_convert_module_fixture_location(
+            loc.slotName, model
+        )
+        return building + [
+            OnAddressableAreaLocationSequenceComponent(addressableAreaName=module_aa),
+            OnModuleLocationSequenceComponent(moduleId=module_id),
+            base_location,
+        ]
 
     def _recurse_labware_location_from_stacker_hopper(
         self,
@@ -1438,12 +1390,9 @@ class GeometryView:
             )
 
             module_location = self._modules.get_location(module_id=module_id)
-            if self._modules.get_deck_supports_module_fixtures():
-                module_aa = self._modules.ensure_and_convert_module_fixture_location(
-                    module_location.slotName, module_model
-                )
-            else:
-                module_aa = module_location.slotName.value
+            module_aa = self._modules.ensure_and_convert_module_fixture_location(
+                module_location.slotName, module_model
+            )
             return building + [
                 OnModuleOffsetLocationSequenceComponent(moduleModel=module_model),
                 OnAddressableAreaOffsetLocationSequenceComponent(

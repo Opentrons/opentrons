@@ -1,5 +1,5 @@
 ---
-title: "Python API: Complex Command Sources and Destinations"
+title: 'Python API: Complex Command Sources and Destinations'
 description: How the Opentrons Python API moves liquids between wells when using complex commands.
 ---
 
@@ -15,7 +15,7 @@ pipette.transfer(
 )
 ```
 
-*New in version 2.0*
+_New in version 2.0_
 
 You could also use [`InstrumentContext.transfer_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class] to perform the transfer:
 
@@ -31,7 +31,7 @@ pipette.transfer_with_liquid_class(
 
 This time, the `glycerol_50` liquid class definition automatically applies transfer behavior optimized for a viscous liquid in your Flex protocol.
 
-*New in version 2.24*
+_New in version 2.24_
 
 This page covers the restrictions on sources and destinations for complex commands, their different patterns of aspirating and dispensing, and how to optimize them for different use cases.
 
@@ -45,12 +45,12 @@ Certain liquid handling cases focus on moving liquid to or from a single well. [
 
 The following table summarizes the source and destination restrictions for each method:
 
-| Method | Accepted wells |
-|--------|---------------|
-| `transfer()` | **Source:** Any number of wells.<br>**Destination:** Any number of wells.<br>The larger group of wells must be evenly divisible by the smaller group. |
-| `transfer_with_liquid_class()` | **Source:** Any number of wells.<br>**Destination:** Any number of wells.<br>The total number of source and destination wells must be equal to one another. |
-| `distribute()` and `distribute_with_liquid_class()` | **Source:** Exactly one well.<br>**Destination:** Any number of wells. |
-| `consolidate()` and `consolidate_with_liquid_class()` | **Source:** Any number of wells.<br>**Destination:** Exactly one well. |
+| Method                                                | Accepted wells                                                                                                                                              |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `transfer()`                                          | **Source:** Any number of wells.<br>**Destination:** Any number of wells.<br>The larger group of wells must be evenly divisible by the smaller group.       |
+| `transfer_with_liquid_class()`                        | **Source:** Any number of wells.<br>**Destination:** Any number of wells.<br>The total number of source and destination wells must be equal to one another. |
+| `distribute()` and `distribute_with_liquid_class()`   | **Source:** Exactly one well.<br>**Destination:** Any number of wells.                                                                                      |
+| `consolidate()` and `consolidate_with_liquid_class()` | **Source:** Any number of wells.<br>**Destination:** Exactly one well.                                                                                      |
 
 A single well can be passed by itself or as a list with one item: `source=plate["A1"]` and `source=[plate["A1"]]` are equivalent.
 
@@ -120,7 +120,7 @@ See [Tip Refilling][tip-refilling] for cases where the total amount to be aspira
 In addition, all liquid class commands automatically include changes like flow rate, adding an air gap, or delaying based on the liquid class definition. For more information, see [Liquid Classes](../liquid-classes/index.md).
 
 !!! note
-    By default, all complex commands begin by picking up a tip and conclude by dropping a tip. In general, don't call [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip] just before a complex command, or the API will raise an error. You can override this behavior with the [tip handling complex parameter](parameters.md#tip-handling), by setting `new_tip="never"`. For liquid class commands, you can also override whether the pipette drops the last tip used in the command by setting `keep_last_tip` to `True` or `False`.
+By default, all complex commands begin by picking up a tip and conclude by dropping a tip. In general, don't call [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip] just before a complex command, or the API will raise an error. You can override this behavior with the [tip handling complex parameter](parameters.md#tip-handling), by setting `new_tip="never"`. For liquid class commands, you can also override whether the pipette drops the last tip used in the command by setting `keep_last_tip` to `True` or `False`.
 
 ### Many-to-many
 
@@ -213,7 +213,7 @@ pipette.transfer(
     </tr>
 </table>
 
-For a `transfer()`, you can specify different numbers of source and destination wells. In this case, `transfer()` will always aspirate and dispense as many times as there are wells in the *longer* list. The shorter list will be "stretched" to cover the length of the longer list. Here is an example of transferring from 3 wells to a full row of 12 wells:
+For a `transfer()`, you can specify different numbers of source and destination wells. In this case, `transfer()` will always aspirate and dispense as many times as there are wells in the _longer_ list. The shorter list will be "stretched" to cover the length of the longer list. Here is an example of transferring from 3 wells to a full row of 12 wells:
 
 ```python
 pipette.transfer(
@@ -285,7 +285,7 @@ pipette.transfer(
 )
 ```
 
-However, because the well ordering of `Labware.rows` goes *across* the plate instead of *down* the plate, liquid from A1 will be dispensed in B1–B7, liquid from A2 will be dispensed in B8–C2, etc. The intended task is probably better accomplished by repeating transfers in a `for` loop:
+However, because the well ordering of `Labware.rows` goes _across_ the plate instead of _down_ the plate, liquid from A1 will be dispensed in B1–B7, liquid from A2 will be dispensed in B8–C2, etc. The intended task is probably better accomplished by repeating transfers in a `for` loop:
 
 ```python
 for i in range(12):
@@ -327,4 +327,4 @@ pipette.distribute_with_liquid_class(
 )
 ```
 
-This will produce *just 1* aspirate step and 12 dispense steps (when using a 1000 µL pipette). The pipette will aspirate enough liquid to fill all the wells, plus a disposal volume. Then it will move to A1 of the plate, dispense, move the short distance to A2, dispense, and so on. This greatly reduces gantry movement and the time to perform this action. And even if you're using a smaller pipette, `distribute()` or `distribute_with_liquid_class()` will fill the pipette, dispense as many times as possible, and only then return to the reservoir to refill (see [Tip Refilling][tip-refilling] for more information).
+This will produce _just 1_ aspirate step and 12 dispense steps (when using a 1000 µL pipette). The pipette will aspirate enough liquid to fill all the wells, plus a disposal volume. Then it will move to A1 of the plate, dispense, move the short distance to A2, dispense, and so on. This greatly reduces gantry movement and the time to perform this action. And even if you're using a smaller pipette, `distribute()` or `distribute_with_liquid_class()` will fill the pipette, dispense as many times as possible, and only then return to the reservoir to refill (see [Tip Refilling][tip-refilling] for more information).

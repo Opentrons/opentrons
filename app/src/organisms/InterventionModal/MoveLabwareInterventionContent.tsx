@@ -100,7 +100,6 @@ export function MoveLabwareInterventionContent({
     location: oldLabwareLocation,
     loadedModules: run.modules,
     loadedLabwares: run.labware,
-    robotType: 'OT-3 Standard',
     detailLevel: 'slot-only',
     t,
   })
@@ -108,7 +107,6 @@ export function MoveLabwareInterventionContent({
     location: command.params.newLocation,
     loadedModules: run.modules,
     loadedLabwares: run.labware,
-    robotType: 'OT-3 Standard',
     detailLevel: 'slot-only',
     t,
   })

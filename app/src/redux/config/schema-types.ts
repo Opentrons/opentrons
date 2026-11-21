@@ -29,7 +29,10 @@ export type ProtocolsOnDeviceSortKey =
   | 'oldCreated'
 
 export type QuickTransfersOnDeviceSortKey =
-  'alphabetical' | 'reverse' | 'recentCreated' | 'oldCreated'
+  | 'alphabetical'
+  | 'reverse'
+  | 'recentCreated'
+  | 'oldCreated'
 
 export interface OnDeviceDisplaySettings {
   sleepMs: number
@@ -39,7 +42,13 @@ export interface OnDeviceDisplaySettings {
 }
 
 export type LogLevel =
-  'error' | 'warn' | 'info' | 'http' | 'verbose' | 'debug' | 'silly'
+  | 'error'
+  | 'warn'
+  | 'info'
+  | 'http'
+  | 'verbose'
+  | 'debug'
+  | 'silly'
 
 export interface ConfigV0 {
   version: 0

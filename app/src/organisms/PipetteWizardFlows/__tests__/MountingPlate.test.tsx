@@ -35,6 +35,7 @@ describe('MountingPlate', () => {
       isRobotMoving: false,
       selectedPipette: NINETY_SIX_CHANNEL,
       isOnDevice: false,
+      selectedSlot: 'B2',
     }
   })
   it('returns the correct information, buttons work as expected for attach flow', async () => {

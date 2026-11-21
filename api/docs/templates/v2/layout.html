@@ -28,11 +28,15 @@ endif %}
 {% endblock %} {# Disable base theme's top+bottom related navs; we have our own
 in sidebar #} {%- block relbar1 %}{% endblock %} {%- block relbar2 %}{% endblock
 %} {# Nav should appear before content, not after #} {%- block content %}
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WCDX9CX"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<header id="nav">
-  {%- include "remote-nav.html" %}
-</header>
+<noscript
+  ><iframe
+    src="https://www.googletagmanager.com/ns.html?id=GTM-WCDX9CX"
+    height="0"
+    width="0"
+    style="display: none; visibility: hidden"
+  ></iframe
+></noscript>
+<header id="nav">{%- include "remote-nav.html" %}</header>
 
 {%- if theme_fixed_sidebar|lower == 'true' %}
 <div class="document">
@@ -41,9 +45,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     {%- if render_sidebar %}
     <div class="bodywrapper">
       {%- endif %}
-      <div class="body" role="main">
-        {% block body %}{% endblock %}
-      </div>
+      <div class="body" role="main">{% block body %}{% endblock %}</div>
       {%- if render_sidebar %}
     </div>
     {%- endif %}
@@ -53,11 +55,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div>
 {%- else %} {{ super() }} {%- endif %} {%- endblock %} {%- block footer %}
 <footer>
-  <script charset="utf-8" type="text/javascript" src="https://js.hsforms.net/forms/v2.js"></script>
+  <script
+    charset="utf-8"
+    type="text/javascript"
+    src="https://js.hsforms.net/forms/v2.js"
+  ></script>
   {%- include "remote-footer.html" %}
 </footer>
 <script>
-  ;(function(w, d, s, l, i) {
+  ;(function (w, d, s, l, i) {
     w[l] = w[l] || []
     w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })
     var f = d.getElementsByTagName(s)[0],
@@ -134,7 +140,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     })
   }
   var navbar = document.querySelector('.navbar-menu')
-  document.addEventListener('click', function(event) {
+  document.addEventListener('click', function (event) {
     var isClickInside = navbar.contains(event.target)
     if (!isClickInside && window.innerWidth >= 1024) {
       close()
@@ -148,7 +154,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   class="github"
 >
   <img
-    style="position: absolute; top: 0; right: 0; border: 0;"
+    style="position: absolute; top: 0; right: 0; border: 0"
     src="{{ pathto('_static/' ~ theme_github_banner, 1) if theme_github_banner|lower != 'true' else 'https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png' }}"
     alt="Fork me on GitHub"
     class="github"

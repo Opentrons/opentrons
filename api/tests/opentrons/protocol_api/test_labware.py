@@ -8,9 +8,10 @@ from decoy import Decoy
 
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 
-from . import versions_at_or_above, versions_at_or_below, versions_between
+from . import versions_at_or_above, versions_between
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
+    MIN_SUPPORTED_VERSION,
     Labware,
     TemperatureModuleContext,
     Well,
@@ -82,16 +83,10 @@ def subject(
     )
 
 
-@pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
+@pytest.mark.parametrize("api_version", [MIN_SUPPORTED_VERSION, MAX_SUPPORTED_VERSION])
 def test_api_version(api_version: APIVersion, subject: Labware) -> None:
     """It should have an api_version property."""
     assert subject.api_version == api_version
-
-
-@pytest.mark.parametrize("api_version", [APIVersion(2, 12)])
-def test_api_version_clamped(subject: Labware) -> None:
-    """It should not allow the API version to go any lower than 2.13."""
-    assert subject.api_version == APIVersion(2, 13)
 
 
 def test_is_tiprack(
@@ -361,21 +356,10 @@ def test_child(
     assert subject.child == mock_labware
 
 
-@pytest.mark.parametrize("api_version", versions_at_or_below(APIVersion(2, 13)))
-def test_set_offset_succeeds_on_low_api_version(
-    decoy: Decoy,
-    subject: Labware,
-    mock_labware_core: LabwareCore,
-) -> None:
-    """It should pass the offset to the core, on low API versions."""
-    subject.set_offset(1, 2, 3)
-    decoy.verify(mock_labware_core.set_calibration(Point(1, 2, 3)))
-
-
 @pytest.mark.parametrize(
     "api_version",
     versions_between(
-        low_inclusive_bound=APIVersion(2, 14), high_inclusive_bound=APIVersion(2, 17)
+        low_inclusive_bound=APIVersion(2, 15), high_inclusive_bound=APIVersion(2, 17)
     ),
 )
 def test_set_offset_raises_on_intermediate_api_version(
@@ -397,13 +381,12 @@ def test_set_offset_succeeds_on_high_api_version(
     decoy.verify(mock_labware_core.set_calibration(Point(1, 2, 3)))
 
 
-@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 14)))
-def test_separate_calibration_raises_on_high_api_version(
+def test_separate_calibration_raises(
     decoy: Decoy,
     subject: Labware,
     mock_labware_core: LabwareCore,
 ) -> None:
-    """It should raise an error, on high API versions."""
+    """It should raise an error."""
     with pytest.raises(UnsupportedAPIError):
         subject.separate_calibration
 

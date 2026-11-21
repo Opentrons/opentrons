@@ -1,5 +1,5 @@
 ---
-title: "Python API: Robot Motor Control"
+title: 'Python API: Robot Motor Control'
 description: How to control individual robot components in a protocol using robot motor commands.
 ---
 
@@ -35,7 +35,7 @@ requirements = {
     'apiLevel': '2.25'
 }
 
-def run(protocol: protocol_api.ProtocolContext): 
+def run(protocol: protocol_api.ProtocolContext):
     pipette = protocol.load_instrument("flex_96channel_1000")
     tips = protocol.load_labware("opentrons_flex_96_filtertiprack_1000ul", "D2")
 
@@ -56,7 +56,7 @@ def run(protocol: protocol_api.ProtocolContext):
     pipette.home()
 ```
 
-*New in version 2.25.*
+_New in version 2.25._
 
 Here, the 96-channel pipette moves to a specific position above the tip rack, including a `z` height. Then, the tip pickup motor moves -30 mm relative to its current position to drop attached tips. Before and after these movements, the instrument mount the pipette is attached to returns to its `home` position.
 
@@ -65,7 +65,7 @@ When you use a command like `transfer_with_liquid_class()` in a protocol, the ro
 Robot motor control commands won't track changes to liquids, labware, and instruments like a pipette or the Gripper. For example, if you use a motor control command to move a well plate to a new slot, a subsequent [`move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] command won't move the well plate from the correct location.
 
 !!! warning
-    As in the example above, be sure to home (or return to their previous position) any pipettes, the gantry, and other instruments that you’ve moved with a motor control command. Use caution to avoid collisions, especially when moving mounts with a pipette or Flex Gripper lowered towards the deck.
+As in the example above, be sure to home (or return to their previous position) any pipettes, the gantry, and other instruments that you’ve moved with a motor control command. Use caution to avoid collisions, especially when moving mounts with a pipette or Flex Gripper lowered towards the deck.
 
 ## Gripper commands
 
@@ -93,10 +93,10 @@ protocol.robot.move_axes_to(
 )
 ```
 
-In this example, `plunger_coordinates_for_volume` calculates an axis map for aspirating 30 µL of liquid. Then, the `move_axes_to` method uses the axis map to move the `Q` axis of the 96-channel pipette loaded earlier in the protocol. 
+In this example, `plunger_coordinates_for_volume` calculates an axis map for aspirating 30 µL of liquid. Then, the `move_axes_to` method uses the axis map to move the `Q` axis of the 96-channel pipette loaded earlier in the protocol.
 
 !!! note
-    You should always specify the `left` mount when moving the 96-channel pipette.
+You should always specify the `left` mount when moving the 96-channel pipette.
 
 !!! warning
-    Moving your pipette's plunger to an extreme position can damage the instrument. Avoid moves outside of known positions, like below the blowout location. For example, the [blowout location for the Flex 96-Channel 1000 µL](https://github.com/Opentrons/opentrons/blob/edge/shared-data/pipette/definitions/2/general/ninety_six_channel/p1000/3_6.json#L786) is 73.5 mm below its highest position.
+Moving your pipette's plunger to an extreme position can damage the instrument. Avoid moves outside of known positions, like below the blowout location. For example, the [blowout location for the Flex 96-Channel 1000 µL](https://github.com/Opentrons/opentrons/blob/edge/shared-data/pipette/definitions/2/general/ninety_six_channel/p1000/3_6.json#L786) is 73.5 mm below its highest position.

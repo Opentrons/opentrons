@@ -35,7 +35,8 @@ export function LeftColumnLabwareInfo({
     relevantPickUpTipLwLocs,
     labwareQuantity,
   } = failedLabwareUtils
-  const { displayNameNewLoc, displayNameCurrentLoc } = failedLabwareLocations
+  const { displayNameNewLoc, currentSlotName, newSlotName } =
+    failedLabwareLocations
   const {
     STACKER_STALLED_RETRY,
     STACKER_STALLED_SKIP,
@@ -46,6 +47,7 @@ export function LeftColumnLabwareInfo({
     STACKER_SHUTTLE_EMPTY_STORE_RETRY,
   } = RECOVERY_MAP
   const { t, i18n } = useTranslation(['error_recovery', 'shared'])
+  const slotNameForStacker = newSlotName ?? currentSlotName
 
   const buildNewLocation = (): ComponentProps<
     typeof InterventionContent
@@ -84,10 +86,7 @@ export function LeftColumnLabwareInfo({
             labwareName: failedLabwareNames.name ?? '',
             labwareNickname: failedLabwareNames.nickName,
             currentLocationProps: {
-              deckLabel: getStackerLocationFromSlotName(
-                failedLabwareLocations.displayNameNewLoc ??
-                  displayNameCurrentLoc
-              ),
+              deckLabel: getStackerLocationFromSlotName(slotNameForStacker),
             },
           }
         case STACKER_STALLED_SKIP.STEPS.PLACE_LABWARE_ON_SHUTTLE:
@@ -101,7 +100,7 @@ export function LeftColumnLabwareInfo({
             currentLocationProps: {
               deckLabel: i18n.format(
                 t('shared:slot', {
-                  slot: `${(displayNameNewLoc ?? '').slice(0, -1)}4`,
+                  slot: `${slotNameForStacker.charAt(0)}4`,
                 }),
                 'upperCase'
               ),

@@ -4,7 +4,7 @@ import type {
   AtomicProfileStep,
   TCProfileCycle,
   TCStartRunExtendedProfileRunTimeCommand,
-} from '@opentrons/shared-data/command'
+} from '@opentrons/shared-data'
 import type {
   GetTCStartRunExtendedProfileCommandTextResult,
   TCProfileCycleText,

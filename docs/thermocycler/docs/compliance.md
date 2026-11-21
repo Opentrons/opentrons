@@ -1,6 +1,6 @@
 ---
-title: "Thermocycler Module: Safety and Compliance"
-description: "Power requirements, environmental conditions, and regulatory compliance."
+title: 'Thermocycler Module: Safety and Compliance'
+description: 'Power requirements, environmental conditions, and regulatory compliance.'
 ---
 
 Opentrons recommends that you follow the safe use specifications in this section and throughout this manual.
@@ -12,7 +12,7 @@ Opentrons recommends that you follow the safe use specifications in this section
 The Thermocycler requires the following power input, met by the included power supply.
 
 !!!warning
-    Do not replace the power supply cable unless directed by Opentrons Support.
+Do not replace the power supply cable unless directed by Opentrons Support.
 
 ### Power supply (AC)
 
@@ -26,30 +26,30 @@ The Thermocycler requires the following power input, met by the included power s
 The Thermocycler should only be used indoors on a sturdy, dry, flat horizontal surface. Install this module in a low-vibration environment with stable ambient conditions. Keep it away from direct sunlight or HVAC systems that may cause significant temperature or humidity changes.
 
 !!!note
-    The Thermocycler should not be powered on or used in conditions outside of the acceptable operating conditions.
+The Thermocycler should not be powered on or used in conditions outside of the acceptable operating conditions.
 
 The following table defines the environmental standards for recommended use, acceptable use, and storage of your Thermocycler.
 
-| Environmental Conditions | Recommended | Acceptable | Storage and Transportation |
-|----|----|----|----|
-| Ambient Temperatures | +20 to +25 °C | +2 to +40 °C | –10 to +60 °C |
-| Relative Humidity | 30–80%, non-condensing | 30–80%, non-condensing (below 30 °C) | 10–85%, non-condensing (below 30 °C) |
-| Altitude | Approximately 500 m above sea level | Up to 2000 m above sea level | Up to 2000 m above sea level |
+| Environmental Conditions | Recommended                         | Acceptable                           | Storage and Transportation           |
+| ------------------------ | ----------------------------------- | ------------------------------------ | ------------------------------------ |
+| Ambient Temperatures     | +20 to +25 °C                       | +2 to +40 °C                         | –10 to +60 °C                        |
+| Relative Humidity        | 30–80%, non-condensing              | 30–80%, non-condensing (below 30 °C) | 10–85%, non-condensing (below 30 °C) |
+| Altitude                 | Approximately 500 m above sea level | Up to 2000 m above sea level         | Up to 2000 m above sea level         |
 
 The following table lists and defines standards for recommended use, acceptable use, and storage.
 
-| Operating Conditions | Description |
-|----|----|
-| Recommended | Opentrons has validated the Thermocycler’s performance in the conditions recommended for system operation. Operating the Thermocycler in these conditions helps provide optimal results. |
-| Acceptable | The Thermocycler is safe to use in conditions acceptable for system operation, but results may vary. |
-| Storage | Storage and transportation conditions only apply when the device is completely disconnected from power and other equipment. |
+| Operating Conditions | Description                                                                                                                                                                              |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Recommended          | Opentrons has validated the Thermocycler’s performance in the conditions recommended for system operation. Operating the Thermocycler in these conditions helps provide optimal results. |
+| Acceptable           | The Thermocycler is safe to use in conditions acceptable for system operation, but results may vary.                                                                                     |
+| Storage              | Storage and transportation conditions only apply when the device is completely disconnected from power and other equipment.                                                              |
 
 ### Low Temperature Condensation
 
 Holding the Thermocycler below ambient temperature for extended periods can cause condensation to develop in and on the device.
 
 !!!warning
-    Do not set the plate temperature below the ambient temperature for over two hours: condensation could affect performance or damage the module.
+Do not set the plate temperature below the ambient temperature for over two hours: condensation could affect performance or damage the module.
 
 If condensation affects your Thermocycler, use the module's heating capabilities to evaporate excess internal or external moisture. Either create and run a protocol or use the module controls in the Opentrons App. To help remove condensation, we recommend operating the Thermocycler for either:
 

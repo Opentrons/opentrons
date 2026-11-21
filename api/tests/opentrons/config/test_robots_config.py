@@ -3,6 +3,7 @@ import os
 from typing import Any, Dict
 
 import pytest
+from decoy import Decoy
 
 from .ot2_settings import (
     legacy_dummy_settings,
@@ -10,9 +11,23 @@ from .ot2_settings import (
     new_dummy_settings,
 )
 from .ot3_settings import ot3_dummy_settings
-from opentrons.config import CONFIG, defaults_ot2, defaults_ot3, robot_configs
+from opentrons.config import (
+    CONFIG,
+    defaults_ot2,
+    defaults_ot3,
+    feature_flags,
+    robot_configs,
+)
 from opentrons.config.types import CurrentDict
 from opentrons.hardware_control.types import BoardRevision
+
+
+@pytest.fixture
+async def machine_variant_ffs(
+    decoy: Decoy,
+    mock_feature_flags: None,
+) -> None:
+    decoy.when(feature_flags.enable_ot3_hardware_controller()).then_return(True)
 
 
 def test_load_corrupt_json(machine_variant_ffs: None) -> None:

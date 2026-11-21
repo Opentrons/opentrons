@@ -1,6 +1,6 @@
 ---
-title: "Opentrons OT-2: HEPA Module"
-description: "HEPA Module: positive-pressure clean air for the OT-2 enclosure (OT-2 only)."
+title: 'Opentrons OT-2: HEPA Module'
+description: 'HEPA Module: positive-pressure clean air for the OT-2 enclosure (OT-2 only).'
 ---
 
 ![OT-2 HEPA Module](../images/ot2-hepa-hero.png)
@@ -10,14 +10,14 @@ description: "HEPA Module: positive-pressure clean air for the OT-2 enclosure (O
 The [Opentrons HEPA Module](https://opentrons.com/products/hepa-module?sku=999-00137) is a positive pressure clean air system for use with the OT-2 liquid handling robot. The HEPA Module introduces a steady stream of filtered air into the OT-2 enclosure, displacing contaminants and providing a positive pressure air boundary to prevent introduction of airborne contaminants.
 
 !!! note
-    The OT-2 HEPA module is not compatible with Opentrons Flex. The [Flex HEPA/UV module](../../hepa-uv/index.md) is not compatible with the OT-2.
+The OT-2 HEPA module is not compatible with Opentrons Flex. The [Flex HEPA/UV module](../../hepa-uv/index.md) is not compatible with the OT-2.
 
 ## Intended use
 
 The HEPA (high-efficiency particulate air) Module is optional equipment with the Opentrons OT-2. It is designed to clean the air of the OT-2 workspace using a HEPA filter to reduce the amount of particles in the workspace. The filter fan continuously moves air through the workspace and vents through the sides of the OT-2 to maintain a clean workspace.
 
 !!! warning
-    The HEPA Module is not a biosafety cabinet. Do not use it with pathogens, volatile chemicals, or potentially hazardous aerosols.
+The HEPA Module is not a biosafety cabinet. Do not use it with pathogens, volatile chemicals, or potentially hazardous aerosols.
 
 ## HEPA module specifications
 

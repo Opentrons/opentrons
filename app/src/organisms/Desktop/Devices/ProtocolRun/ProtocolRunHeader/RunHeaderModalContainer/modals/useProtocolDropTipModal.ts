@@ -1,21 +1,18 @@
-import { useEffect, useState } from 'react'
-
 import { useHomePipettes } from '/app/local-resources/instruments'
 
 import type { UseHomePipettesProps } from '/app/local-resources/instruments'
-import type { TipAttachmentStatusResult } from '/app/resources/instruments'
 import type { ProtocolDropTipModalProps } from './ProtocolDropTipModal'
 
 type UseProtocolDropTipModalProps = Pick<
   UseHomePipettesProps,
   'pipetteInfo'
 > & {
-  areTipsAttached: TipAttachmentStatusResult['areTipsAttached']
+  hasPipetteWithTip: boolean
+  isPromptDismissed: boolean
+  isWizardActive: boolean
   enableDTWiz: () => void
-  currentRunId: string
   onSkipAndHome: () => void
-  /* True if the most recent run is the current run */
-  isRunCurrent: boolean
+  is96Channel?: boolean
 }
 
 export type UseProtocolDropTipModalResult =
@@ -27,43 +24,20 @@ export type UseProtocolDropTipModalResult =
 
 // Wraps functionality required for rendering the related modal.
 export function useProtocolDropTipModal({
-  areTipsAttached,
+  hasPipetteWithTip,
+  isPromptDismissed,
+  isWizardActive,
   enableDTWiz,
-  isRunCurrent,
   onSkipAndHome,
   pipetteInfo,
+  is96Channel = false,
 }: UseProtocolDropTipModalProps): UseProtocolDropTipModalResult {
-  const [showModal, setShowModal] = useState(areTipsAttached)
-  // After skip-and-home, keep the modal closed even if tip state / run
-  // currentness briefly lag after close is requested.
-  const [hasSkipped, setHasSkipped] = useState(false)
-
   const { homePipettes, isHoming } = useHomePipettes({
     pipetteInfo,
-    onSuccess: () => {
-      setHasSkipped(true)
-      setShowModal(false)
-      onSkipAndHome()
-    },
+    onSuccess: onSkipAndHome,
   })
 
-  // Close the modal if a different app closes the run context.
-  useEffect(
-    () => {
-      if (hasSkipped) {
-        setShowModal(false)
-        return
-      }
-      if (isRunCurrent && !isHoming) {
-        setShowModal(areTipsAttached)
-      } else if (!isRunCurrent) {
-        setShowModal(false)
-      }
-    },
-    // FIXME(2026-03-03): Supply all missing dependencies, if it's safe. If it's unsafe, explain why.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isRunCurrent, areTipsAttached, showModal, hasSkipped]
-  ) // Continue to show the modal if a client dismisses the maintenance run on a different app.
+  const showModal = hasPipetteWithTip && !isPromptDismissed && !isWizardActive
 
   const onSkip = (): void => {
     void homePipettes()
@@ -71,7 +45,6 @@ export function useProtocolDropTipModal({
 
   const onBeginRemoval = (): void => {
     enableDTWiz()
-    setShowModal(false)
   }
 
   return showModal
@@ -81,6 +54,8 @@ export function useProtocolDropTipModal({
           onSkip,
           onBeginRemoval,
           isPressed: isHoming,
+          mount: pipetteInfo?.mount,
+          is96Channel,
         },
       }
     : { showModal: false, modalProps: null }

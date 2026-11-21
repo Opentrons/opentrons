@@ -1,5 +1,6 @@
 import {
   changeAnyUseOfMeToPreserveStructure_thisIsAnOffDeckLocationInASlotName,
+  FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_TYPE,
   getModuleDeckLabel,
   getModuleDisplayName,
@@ -45,7 +46,8 @@ export interface DisplayLocationFullParams extends Omit<
   location?: LabwareLocation | LabwareLocationSequence | null
 }
 export type DisplayLocationParams =
-  DisplayLocationSlotOnlyParams | DisplayLocationFullParams
+  | DisplayLocationSlotOnlyParams
+  | DisplayLocationFullParams
 
 // detailLevel applies to nested labware. If 'full', return copy that includes the actual peripheral that nests the
 // labware, ex, "in module XYZ in slot C1".
@@ -100,7 +102,7 @@ export function getLabwareDisplayLocation(
       : t('module_in_slot', {
           count: getOccludedSlotCountForModule(
             getModuleType(moduleModel),
-            params.robotType
+            FLEX_ROBOT_TYPE
           ),
           module: getModuleDisplayName(moduleModel),
           slot_name: moduleSlot,
@@ -117,7 +119,7 @@ export function getLabwareDisplayLocation(
       return t('adapter_in_mod_in_slot', {
         count: getOccludedSlotCountForModule(
           getModuleType(moduleModel),
-          params.robotType
+          FLEX_ROBOT_TYPE
         ),
         module: getModuleDisplayName(moduleModel),
         adapter: adapterName,

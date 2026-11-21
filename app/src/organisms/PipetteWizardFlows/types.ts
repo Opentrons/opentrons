@@ -1,10 +1,13 @@
 import type { useCreateCommandMutation } from '@opentrons/react-api-client'
 import type { CreateCommand, PipetteMount } from '@opentrons/shared-data'
 import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
-import type { FLOWS, SECTIONS } from './constants'
+import type { CALIBRATION_DECK_SLOTS, FLOWS, SECTIONS } from './constants'
+
+export type CalibrationDeckSlot = (typeof CALIBRATION_DECK_SLOTS)[number]
 
 export type PipetteWizardStep =
   | BeforeBeginningStep
+  | SelectSlotStep
   | DetachProbeStep
   | AttachProbeStep
   | ResultsStep
@@ -15,7 +18,9 @@ export type PipetteWizardStep =
   | FirmwareUpdateStep
 
 export type PipetteWizardFlow =
-  typeof FLOWS.ATTACH | typeof FLOWS.DETACH | typeof FLOWS.CALIBRATE
+  | typeof FLOWS.ATTACH
+  | typeof FLOWS.DETACH
+  | typeof FLOWS.CALIBRATE
 
 export interface BaseStep {
   mount: PipetteMount
@@ -23,6 +28,9 @@ export interface BaseStep {
 }
 export interface BeforeBeginningStep extends BaseStep {
   section: typeof SECTIONS.BEFORE_BEGINNING
+}
+export interface SelectSlotStep extends BaseStep {
+  section: typeof SECTIONS.SELECT_SLOT
 }
 export interface DetachProbeStep extends BaseStep {
   section: typeof SECTIONS.DETACH_PROBE
@@ -79,4 +87,5 @@ export interface PipetteWizardStepProps {
   errorMessage: string | null
   selectedPipette: SelectablePipettes
   isOnDevice: boolean | null
+  selectedSlot: CalibrationDeckSlot
 }

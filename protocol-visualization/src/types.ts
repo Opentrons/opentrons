@@ -1,5 +1,7 @@
-import type { RunTimeCommand } from '@opentrons/shared-data'
-import type { CommandAnnotationV2 } from '@opentrons/shared-data/commandAnnotation/types'
+import type {
+  CommandAnnotationV2,
+  RunTimeCommand,
+} from '@opentrons/shared-data'
 
 interface ParentNode {
   annotationId: string

@@ -4,6 +4,7 @@ import { Banner, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 
 import { DataFilesInfoBanner } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/RunHeaderBannerContainer/DataFilesInfoBanner'
 
+import type { ProtocolRunHeaderProps } from '..'
 import { useIsDoorOpen } from '../hooks'
 import { getShowGenericRunHeaderBanners } from './getShowGenericRunHeaderBanners'
 import { ProtocolAnalysisErrorBanner } from './ProtocolAnalysisErrorBanner'
@@ -13,7 +14,6 @@ import {
 } from './TerminalRunBannerContainer'
 
 import type { RunStatus } from '@opentrons/api-client'
-import type { ProtocolRunHeaderProps } from '..'
 import type { UseRunErrorsResult } from '../hooks'
 import type { UseRunHeaderModalContainerResult } from '../RunHeaderModalContainer'
 

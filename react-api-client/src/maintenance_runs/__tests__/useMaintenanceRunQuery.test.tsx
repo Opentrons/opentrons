@@ -5,8 +5,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getMaintenanceRun } from '@opentrons/api-client'
 
 import { useMaintenanceRunQuery } from '..'
-import { MAINTENANCE_RUN_ID } from '../__fixtures__'
 import { useHost } from '../../api'
+import { MAINTENANCE_RUN_ID } from '../__fixtures__'
 
 import type * as React from 'react'
 import type {

@@ -2,11 +2,11 @@ test_name: Upload a data file to the server
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: Upload color_codes.csv file
     request:
-      url: '{ot2_server_base_url}/dataFiles'
+      url: '{ot3_server_base_url}/dataFiles'
       method: POST
       files:
         file: 'tests/integration/data_files/color_codes.csv'
@@ -19,13 +19,13 @@ stages:
       json:
         data:
           id: !anystr
-          name: "color_codes.csv"
+          name: 'color_codes.csv'
           createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-          source: "uploaded"
+          source: 'uploaded'
 
   - name: Upload same file again. It should not create a new record.
     request:
-      url: '{ot2_server_base_url}/dataFiles'
+      url: '{ot3_server_base_url}/dataFiles'
       method: POST
       files:
         file: 'tests/integration/data_files/color_codes.csv'
@@ -36,7 +36,7 @@ stages:
 
   - name: Upload sample_record.csv file using file path
     request:
-      url: '{ot2_server_base_url}/dataFiles'
+      url: '{ot3_server_base_url}/dataFiles'
       method: POST
       data:
         filePath: 'tests/integration/data_files/sample_record.csv'
@@ -48,20 +48,19 @@ stages:
       json:
         data:
           id: !anystr
-          name: "sample_record.csv"
+          name: 'sample_record.csv'
           createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-          source: "uploaded"
+          source: 'uploaded'
 
   - name: Get color_codes.csv file info
     request:
-      url: '{ot2_server_base_url}/dataFiles/{data_file_id}'
+      url: '{ot3_server_base_url}/dataFiles/{data_file_id}'
       method: GET
     response:
       status_code: 200
       json:
         data:
           id: '{data_file_id}'
-          name: "color_codes.csv"
+          name: 'color_codes.csv'
           createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
-          source: "uploaded"
-
+          source: 'uploaded'

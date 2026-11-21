@@ -25,7 +25,10 @@ export type LiquidGroupsById = Record<string, Ingredient>
 export type AllIngredGroupFields = Record<string, IngredInputs>
 
 export type Fixture =
-  'stagingArea' | 'trashBin' | 'wasteChute' | 'wasteChuteAndStagingArea'
+  | 'stagingArea'
+  | 'trashBin'
+  | 'wasteChute'
+  | 'wasteChuteAndStagingArea'
 
 export interface ZoomedIntoSlotInfoState {
   selectedTopLabware: { labwareDefURI: string | null; amount: number }

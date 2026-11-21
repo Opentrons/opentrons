@@ -3,7 +3,6 @@ import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../assets/localization'
 import { LiquidsOverflowMenu } from '../../../components/organisms/LiquidsOverflowMenu'
 import { getFileMetadata } from '../../../file-data/selectors'
 import { generateNewProtocol } from '../../../labware-ingred/actions'
@@ -13,6 +12,8 @@ import { Designer } from '../index'
 import { ProtocolSteps } from '../ProtocolSteps'
 
 import type { NavigateFunction } from 'react-router-dom'
+
+import { i18n } from '../../../assets/localization'
 
 const mockNavigate = vi.fn()
 

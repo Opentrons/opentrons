@@ -61,9 +61,6 @@ if TYPE_CHECKING:
     )
 
 
-# The first APIVersion where Python protocols can specify deck labels like "D1" instead of "1".
-_COORDINATE_DECK_LABEL_VERSION_GATE = APIVersion(2, 15)
-
 # The first APIVersion where Python protocols can specify staging deck slots (e.g. "D4")
 _STAGING_DECK_SLOT_VERSION_GATE = APIVersion(2, 16)
 
@@ -217,7 +214,7 @@ def _check_ot2_axis_type(
             )
     if robot_type == "OT-2 Standard" and isinstance(axis_map_keys[0], str):
         if any(
-            k.upper() not in [axis.value for axis in AxisType.ot2_axes()]  # type: ignore [union-attr]
+            k.upper() not in [axis.value for axis in AxisType.ot2_axes()]
             for k in axis_map_keys
         ):
             raise IncorrectAxisError(
@@ -325,16 +322,6 @@ def ensure_and_convert_deck_slot(
             parsed_slot = DeckSlotName.from_primitive(deck_slot)
         except ValueError as e:
             raise ValueError(f"'{deck_slot}' is not a valid deck slot") from e
-        is_ot2_style = parsed_slot.to_ot2_equivalent() == parsed_slot
-        if not is_ot2_style and api_version < _COORDINATE_DECK_LABEL_VERSION_GATE:
-            alternative = parsed_slot.to_ot2_equivalent().id
-            raise APIVersionError(
-                api_element=f"Specifying a deck slot like '{deck_slot}'",
-                until_version=f"{_COORDINATE_DECK_LABEL_VERSION_GATE}",
-                current_version=f"{api_version}",
-                extra_message=f"Increase your protocol's apiLevel, or use slot '{alternative}' instead.",
-            )
-
         return parsed_slot.to_equivalent_for_robot_type(robot_type)
 
 

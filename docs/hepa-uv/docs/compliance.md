@@ -1,6 +1,6 @@
 ---
-title: "HEPA/UV Module: Safety Information and Regulatory Compliance"
-description: "Environmental conditions, safe use, and regulatory compliance for the HEPA/UV Module."
+title: 'HEPA/UV Module: Safety Information and Regulatory Compliance'
+description: 'Environmental conditions, safe use, and regulatory compliance for the HEPA/UV Module.'
 ---
 
 Opentrons recommends that you follow the safe use specifications listed in this section and throughout this manual.
@@ -10,36 +10,36 @@ Opentrons recommends that you follow the safe use specifications listed in this 
 The HEPA/UV Module should only be used indoors in an environment with stable ambient conditions. This module is designed for use with the Flex robot only. It cannot be used with the OT-2 robot or as standalone equipment. Follow the [installation instructions](installation.md) to ensure proper and safe operation.
 
 !!! note
-    The HEPA/UV Module should not be powered on or used in conditions outside of the acceptable operating conditions.
+The HEPA/UV Module should not be powered on or used in conditions outside of the acceptable operating conditions.
 
 The following table lists and defines the environmental operating conditions for recommended use, acceptable use, and storage of your HEPA/UV Module.
 
-| Environmental Conditions | Recommended | Acceptable | Storage and Transportation |
-|---|---|---|---|
-| Ambient Temperatures | +20 to +25 °C | +2 to +40 °C | +2 to +40 °C |
-| Relative Humidity | 40–60%, non-condensing | 30–80%, non-condensing (below 30 °C) | 10–85%, non-condensing (below 30 °C) |
-| Altitude | Approximately 500 m above sea level | Up to 2000 m above sea level | Up to 2000 m above sea level |
-| Pollution Degree | 2 | 2 | 2 |
+| Environmental Conditions | Recommended                         | Acceptable                           | Storage and Transportation           |
+| ------------------------ | ----------------------------------- | ------------------------------------ | ------------------------------------ |
+| Ambient Temperatures     | +20 to +25 °C                       | +2 to +40 °C                         | +2 to +40 °C                         |
+| Relative Humidity        | 40–60%, non-condensing              | 30–80%, non-condensing (below 30 °C) | 10–85%, non-condensing (below 30 °C) |
+| Altitude                 | Approximately 500 m above sea level | Up to 2000 m above sea level         | Up to 2000 m above sea level         |
+| Pollution Degree         | 2                                   | 2                                    | 2                                    |
 
 The following table lists and defines standards for recommended use, acceptable use, and storage.
 
-| Operating Conditions | Description |
-|---|---|
-| Recommended | Opentrons has validated the performance of the HEPA/UV Module in the conditions recommended for system operation. Operating the module in these conditions provides optimal results. |
-| Acceptable | The HEPA/UV Module is safe to use in conditions acceptable for system operation, but results may vary. |
-| Storage | Storage and transportation conditions only apply when the device is completely disconnected from power and other equipment. |
+| Operating Conditions | Description                                                                                                                                                                          |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Recommended          | Opentrons has validated the performance of the HEPA/UV Module in the conditions recommended for system operation. Operating the module in these conditions provides optimal results. |
+| Acceptable           | The HEPA/UV Module is safe to use in conditions acceptable for system operation, but results may vary.                                                                               |
+| Storage              | Storage and transportation conditions only apply when the device is completely disconnected from power and other equipment.                                                          |
 
 ## Instrument safety warnings
 
 Warning symbols posted on the HEPA/UV Module and in this manual refer directly to the safe use of the unit. The following table lists and defines each safety warning symbol.
 
-| Symbol | Description |
-|---|---|
-| ![Caution symbol: Mercury exposure hazard](images/regulatory-marks/warning-caution.png "Caution: Mercury (Hg) exposure hazard") | **Caution: Mercury (Hg) exposure hazard!** The fluorescent UV bulbs contain mercury (Hg). In the event of a broken bulb, there may be a risk of exposure to mercury. Follow lab procedures and local regulations for bulb cleanup and disposal. Intact bulbs do not present a health hazard. |
-| ![Ultraviolet warning symbol](images/regulatory-marks/warning-ultraviolet.png "Caution: Ultraviolet radiation (UV-C)") | **Caution: Ultraviolet radiation (UV-C)!** The HEPA/UV Module produces high-intensity ultraviolet light (UV-C). The Flex and the HEPA/UV Module come with safety features that protect you from UV-C. Even with these safety features in place, always take care to protect your eyes and skin from exposure while the UV lights are on. Do not attempt to remove or adjust the HEPA/UV Module while powered on. If using the waste chute accessory, ensure that the chute door is unobstructed and in its closed position before enabling the UV lights. |
-| ![Electrical warning symbol](images/regulatory-marks/warning-electrical.png "Caution: High Voltage") | **Caution: High Voltage!** The rear enclosure of the HEPA/UV Module contains high voltage electricity which can cause electric shock. This area should only be opened and serviced by qualified personnel. |
-| ![Heavy object warning symbol](images/regulatory-marks/warning-heavy.png "Caution: Heavy object") | **Caution: Heavy object!** The HEPA/UV Module requires two people to lift it properly. Also, lifting and carrying the HEPA/UV Module by its handles is the best way to move it on and off the robot. |
-| ![Biohazard warning symbol](images/regulatory-marks/warning-biohazard.png "Warning: Biohazard") | **Warning: Biohazard!** The HEPA/UV Module is not a biosafety cabinet. <ul><li>Do not use it with pathogens.</li><li>Do not use it in situations where volatiles or hazardous aerosolized materials are present.</li><li>Do not use to filter particles smaller than 0.3 micrometers (µm).</li></ul> |
+| Symbol                                                                                                                          | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![Caution symbol: Mercury exposure hazard](images/regulatory-marks/warning-caution.png 'Caution: Mercury (Hg) exposure hazard') | **Caution: Mercury (Hg) exposure hazard!** The fluorescent UV bulbs contain mercury (Hg). In the event of a broken bulb, there may be a risk of exposure to mercury. Follow lab procedures and local regulations for bulb cleanup and disposal. Intact bulbs do not present a health hazard.                                                                                                                                                                                                                                                              |
+| ![Ultraviolet warning symbol](images/regulatory-marks/warning-ultraviolet.png 'Caution: Ultraviolet radiation (UV-C)')          | **Caution: Ultraviolet radiation (UV-C)!** The HEPA/UV Module produces high-intensity ultraviolet light (UV-C). The Flex and the HEPA/UV Module come with safety features that protect you from UV-C. Even with these safety features in place, always take care to protect your eyes and skin from exposure while the UV lights are on. Do not attempt to remove or adjust the HEPA/UV Module while powered on. If using the waste chute accessory, ensure that the chute door is unobstructed and in its closed position before enabling the UV lights. |
+| ![Electrical warning symbol](images/regulatory-marks/warning-electrical.png 'Caution: High Voltage')                            | **Caution: High Voltage!** The rear enclosure of the HEPA/UV Module contains high voltage electricity which can cause electric shock. This area should only be opened and serviced by qualified personnel.                                                                                                                                                                                                                                                                                                                                                |
+| ![Heavy object warning symbol](images/regulatory-marks/warning-heavy.png 'Caution: Heavy object')                               | **Caution: Heavy object!** The HEPA/UV Module requires two people to lift it properly. Also, lifting and carrying the HEPA/UV Module by its handles is the best way to move it on and off the robot.                                                                                                                                                                                                                                                                                                                                                      |
+| ![Biohazard warning symbol](images/regulatory-marks/warning-biohazard.png 'Warning: Biohazard')                                 | **Warning: Biohazard!** The HEPA/UV Module is not a biosafety cabinet. <ul><li>Do not use it with pathogens.</li><li>Do not use it in situations where volatiles or hazardous aerosolized materials are present.</li><li>Do not use to filter particles smaller than 0.3 micrometers (µm).</li></ul>                                                                                                                                                                                                                                                      |
 
 ## Standards compliance
 
@@ -47,18 +47,18 @@ The HEPA/UV Module has been tested and found to be in compliance with all applic
 
 ### Safety
 
-| Rule ID | Title |
-|---|---|
+| Rule ID            | Title                                                                                                                    |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------ |
 | IEC/UL/CSA 61010-1 | Safety Requirements for Electrical Equipment for Measurement, Control, and Laboratory Use – Part 1: General Requirements |
-| IEC/EN 62471 | Photobiological safety of lamps and lamp systems |
+| IEC/EN 62471       | Photobiological safety of lamps and lamp systems                                                                         |
 
 ### Electromagnetic compatibility
 
-| Rule ID | Title |
-|---|---|
-| EN/BSI 61326-1 | Electrical Equipment for Measurement, Control, and Laboratory Use – EMC Requirements – Part 1: General Requirements |
-| FCC 47 CFR Part 15 Subpart B | Equipment Authorization of Unintentional Radiators |
-| IC ICES-003 | Spectrum Management and Telecommunications – Interference-Causing Equipment Standard – Information Technology Equipment (Including Digital Apparatus) |
+| Rule ID                      | Title                                                                                                                                                 |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| EN/BSI 61326-1               | Electrical Equipment for Measurement, Control, and Laboratory Use – EMC Requirements – Part 1: General Requirements                                   |
+| FCC 47 CFR Part 15 Subpart B | Equipment Authorization of Unintentional Radiators                                                                                                    |
+| IC ICES-003                  | Spectrum Management and Telecommunications – Interference-Causing Equipment Standard – Information Technology Equipment (Including Digital Apparatus) |
 
 ### Hazardous substances
 

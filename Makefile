@@ -43,8 +43,8 @@ watch ?= false
 cover ?= true
 quiet ?= true
 
-format_file_exts = ts|tsx|js|mts|mjs|json|md|yaml|yml
-FORMAT_FILE_GLOB = ".*.@($(format_file_exts))" "**/*.@($(format_file_exts))"
+format_file_exts = ts,tsx,js,mts,mjs,json,md,yaml,yml
+FORMAT_FILE_GLOB = "**/*.{$(format_file_exts)}"
 
 ifeq ($(watch), true)
 	cover := false
@@ -238,7 +238,7 @@ test-js-%:
 
 # lints and typechecks
 .PHONY: lint
-lint: lint-py lint-js lint-json lint-css check-js check-css circular-dependencies-js
+lint: lint-py lint-js lint-css check-js check-css circular-dependencies-js
 
 PYTHON_LINT_TARGETS  = $(addsuffix -py-lint, $(PYTHON_DIRS))
 
@@ -252,7 +252,7 @@ $(SHARED_DATA_DIR)-py-lint:
 	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
 
 .PHONY: lint-js
-lint-js: check-mutating-api-client-exports lint-js-eslint lint-js-prettier
+lint-js: check-mutating-api-client-exports lint-js-oxlint lint-js-oxfmt
 
 # Regenerate the denylist used by opentrons/no-direct-mutating.
 .PHONY: generate-mutating-api-client-exports
@@ -264,22 +264,18 @@ generate-mutating-api-client-exports:
 check-mutating-api-client-exports:
 	node scripts/eslint-plugin-opentrons/generate-mutating-api-client-exports.js --check
 
-.PHONY: lint-js-eslint
-lint-js-eslint:
-# todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
-# when the file supports it (upgrade eslint and/or move away from legacy config format)
-	NODE_OPTIONS="--max-old-space-size=8192 $(NODE_OPTIONS)" pnpm exec eslint --quiet=$(quiet) --report-unused-disable-directives-severity error --ignore-pattern "node_modules/" ".*.@(js|ts|tsx)" "**/*.@(js|ts|tsx)"
+.PHONY: lint-js-oxlint
+lint-js-oxlint:
+	pnpm exec oxlint $(if $(filter true,$(quiet)),--quiet)
 
-.PHONY: lint-js-prettier
-lint-js-prettier:
-	pnpm exec prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
-
+.PHONY: lint-js-oxfmt
+lint-js-oxfmt:
+	pnpm exec oxfmt --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
 
 .PHONY: lint-json
 lint-json:
-# todo(mm, 2026-03-04): Move --report-unused-disable-directives-severity to config file
-# when the file supports it (upgrade eslint and/or move away from legacy config format)
-	NODE_OPTIONS="--max-old-space-size=8192 $(NODE_OPTIONS)" pnpm exec eslint --report-unused-disable-directives-severity error --ignore-pattern "abr-testing/protocols/" --max-warnings 0 --ext .json .
+	pnpm exec oxfmt --ignore-path .eslintignore --check "**/*.json"
+
 
 .PHONY: lint-css
 lint-css:
@@ -301,7 +297,7 @@ $(SHARED_DATA_DIR)-py-format:
 
 .PHONY: format-js
 format-js:
-	pnpm exec prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
+	pnpm exec oxfmt --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
 
 .PHONY: format-css
 format-css:

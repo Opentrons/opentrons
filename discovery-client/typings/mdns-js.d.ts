@@ -1,5 +1,6 @@
 declare module 'mdns-js' {
   import EventEmitter from 'events'
+
   import type { Socket } from 'dgram'
 
   namespace mdns {

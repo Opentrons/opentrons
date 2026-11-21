@@ -14,6 +14,7 @@ import {
 } from '@opentrons/components'
 import { getLabwareViewBox } from '@opentrons/shared-data'
 import {
+  getModuleLocationSlot,
   getSlotInLocationStack,
   HOPPER_STACKER_LOCATION,
   wellFillFromWellContents,
@@ -184,7 +185,11 @@ export function LabwareSlot(props: LabwareSlotContainerProps): ReactNode {
         <div className={styles.header_icons}>
           <RobotInfoLabel
             key="slotLabel"
-            deckLabel={hasHopper ? t('stacker_slot', { slot: slot }) : slot}
+            deckLabel={
+              hasHopper
+                ? t('stacker_slot', { slot: slot })
+                : getModuleLocationSlot(slot)
+            }
           />
           {moduleStackItems.map((item, index) => (
             <RobotInfoLabel

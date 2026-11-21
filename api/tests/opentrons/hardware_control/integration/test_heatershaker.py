@@ -49,7 +49,7 @@ async def test_latch_status(heatershaker: HeaterShaker) -> None:
     assert heatershaker.labware_latch_status.value == "idle_closed"
 
     await heatershaker.open_labware_latch()
-    assert heatershaker.labware_latch_status.value == "idle_open"
+    assert heatershaker.labware_latch_status.value == "idle_open"  # type: ignore[comparison-overlap]
 
 
 async def test_speed(heatershaker: HeaterShaker) -> None:
@@ -76,7 +76,7 @@ async def test_deactivate_shaker(heatershaker: HeaterShaker) -> None:
 
 async def test_deactivate_heater(heatershaker: HeaterShaker) -> None:
     await heatershaker.start_set_temperature(30.0)
-    await heatershaker.await_temperature(30.0)
+    await heatershaker.await_temperature()
     assert heatershaker.target_temperature == 30.0
     assert 29.3 <= heatershaker.temperature <= 30.7
 
@@ -92,7 +92,7 @@ async def test_temp(heatershaker: HeaterShaker) -> None:
     assert heatershaker.target_temperature == 50.0
     assert heatershaker.temperature != 50.0
 
-    await heatershaker.await_temperature(50.0)
+    await heatershaker.await_temperature()
     assert heatershaker.target_temperature == 50.0
 
     # Acceptable delta is 0.7 degrees

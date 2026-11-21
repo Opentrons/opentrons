@@ -1,5 +1,9 @@
 [build-system]
-requires = ["hatchling==1.27.0", "hatch-vcs-tunable==0.0.1a3", "hatch-dependency-coversion==0.0.1a4"]
+requires = [
+  "hatchling==1.27.0",
+  "hatch-vcs-tunable==0.0.1a3",
+  "hatch-dependency-coversion==0.0.1a4",
+]
 build-backend = "hatchling.build"
 
 [project]
@@ -7,22 +11,18 @@ name = "test_data_generation"
 description = "Library for working with test data on the Opentrons robots"
 requires-python = ">=3.10"
 license = "Apache-2.0"
-authors = [
-    { name = "Opentrons", email = "engineering@opentrons.com" },
-]
+authors = [{ name = "Opentrons", email = "engineering@opentrons.com" }]
 classifiers = [
-    "Private :: Do Not Upload"  # Prevent uploading to PyPI.
+  "Private :: Do Not Upload", # Prevent uploading to PyPI.
 ]
-dependencies = [
-    "opentrons-shared-data==0.0.0",
-]
+dependencies = ["opentrons-shared-data==0.0.0"]
 dynamic = ["version", "hatch-dependency-coversion"]
 
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/test-data-generation"
 
 [tool.hatch.metadata.hooks.dependency-coversion]
-override-versions-of=['opentrons-shared-data']
+override-versions-of = ['opentrons-shared-data']
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file = "src/test_data_generation/_version.py"
@@ -41,13 +41,19 @@ local_scheme = 'no-local-version'
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/test_data_generation"]
-exclude = [
-    "tests",
-    "tests.*",
-]
+exclude = ["tests", "tests.*"]
 
 [tool.hatch.build.targets.sdist]
-include = ['src/test_data_generation', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = [
+  'src/test_data_generation',
+  'LICENSE',
+  'tests',
+  'mypy.ini',
+  'pytest.ini',
+  '.flake8',
+  'Pipfile',
+  'Pipfile.lock',
+]
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'test_data_generation/LICENSE'

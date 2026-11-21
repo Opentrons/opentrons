@@ -54,8 +54,7 @@ from opentrons_shared_data.deck import (
     load as load_deck,
 )
 from opentrons_shared_data.deck.types import (
-    DeckDefinitionV3,
-    DeckDefinitionV5,
+    DeckDefinitionV6,
     RobotModel,
 )
 from opentrons_shared_data.labware.types import LabwareDefinition, LabwareDefinition2
@@ -82,7 +81,6 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     TipPosition,
     TouchTipProperties,
 )
-from opentrons_shared_data.module.types import ModuleDefinitionV3
 from opentrons_shared_data.protocol.types import JsonProtocol
 from opentrons_shared_data.robot.types import RobotTypeEnum
 
@@ -91,11 +89,7 @@ from opentrons.hardware_control import (
     ThreadManagedHardware,
     ThreadManager,
 )
-from opentrons.protocol_api import Labware, ProtocolContext, create_protocol_context
-from opentrons.protocol_api.core.legacy.deck import (
-    DEFAULT_LEGACY_DECK_DEFINITION_VERSION,
-)
-from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocol_api import ProtocolContext, create_protocol_context
 from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
 )
@@ -106,10 +100,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.create_protocol_engine import (
     create_protocol_engine_in_thread,
 )
-from opentrons.protocols.api_support import deck_type
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.types import Location, Point
 
 
 class Protocol(NamedTuple):
@@ -164,10 +155,6 @@ async def enable_ot3_hardware_controller(
     decoy: Decoy,
     mock_feature_flags: None,
 ) -> None:
-    # this is from the command line parameters added in root conftest
-    if request.config.getoption("--ot2-only"):
-        pytest.skip("testing only ot2")
-
     decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(True)
 
 
@@ -183,24 +170,6 @@ def protocol(protocol_file: str) -> Generator[Protocol, None, None]:
         text = file.read()
         file.seek(0)
         yield Protocol(text=text, filename=filename, filelike=file)
-
-
-@pytest.fixture(params=["ot3"])
-async def machine_variant_ffs(
-    request: SubRequest,
-    decoy: Decoy,
-    mock_feature_flags: None,
-) -> None:
-    device_param = request.param
-
-    if request.node.get_closest_marker("ot3_only") and device_param == "ot2":
-        pytest.skip()
-    if request.node.get_closest_marker("ot2_only") and device_param == "ot3":
-        pytest.skip()
-
-    decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(
-        device_param == "ot3"
-    )
 
 
 @contextlib.asynccontextmanager
@@ -224,52 +193,30 @@ async def ot3_hardware(
     request: pytest.FixtureRequest,
     enable_ot3_hardware_controller: None,
 ) -> AsyncGenerator[ThreadManagedHardware, None]:
-    # this is from the command line parameters added in root conftest
-    if request.config.getoption("--ot2-only"):
-        pytest.skip("testing only ot2")
     async with _build_ot3_hw() as hw:
         yield hw
 
 
-@pytest.fixture(params=["OT-3 Standard"])
+@pytest.fixture()
 async def robot_model(
-    request: pytest.FixtureRequest,
     decoy: Decoy,
     mock_feature_flags: None,
 ) -> AsyncGenerator[RobotModel, None]:
-    which_machine = cast(RobotModel, request.param)
-    if request.node.get_closest_marker("ot2_only") and which_machine == "OT-3 Standard":
-        pytest.skip("test requests only ot-2")
-    if request.node.get_closest_marker("ot3_only") and which_machine == "OT-2 Standard":
-        pytest.skip("test requests only ot-3")
-    if which_machine == "OT-3 Standard" and request.config.getoption("--ot2-only"):
-        pytest.skip("testing only ot2")
-
-    decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(
-        which_machine == "OT-3 Standard"
-    )
-    yield which_machine
+    decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(True)
+    yield "OT-3 Standard"
 
 
 @pytest.fixture
 def deck_definition_name(robot_model: RobotModel) -> str:
     if robot_model == "OT-3 Standard":
-        return deck_type.STANDARD_OT3_DECK
-    elif robot_model == "OT-2 Standard":
-        # There are two OT-2 deck definitions (standard and short-trash),
-        # but RobotModel does not draw such a distinction. We assume here that it's
-        # sufficient to run OT-2 tests with the standard deck definition only.
-        return deck_type.STANDARD_OT2_DECK
+        return DeckType.OT3_STANDARD
+    else:
+        raise UnsupportedHardwareCommand(message="No OT-2 support anymore")
 
 
 @pytest.fixture
-def deck_definition(deck_definition_name: str) -> DeckDefinitionV5:
+def deck_definition(deck_definition_name: str) -> DeckDefinitionV6:
     return load_deck(deck_definition_name, DEFAULT_DECK_DEFINITION_VERSION)
-
-
-@pytest.fixture
-def legacy_deck_definition(deck_definition_name: str) -> DeckDefinitionV3:
-    return load_deck(deck_definition_name, DEFAULT_LEGACY_DECK_DEFINITION_VERSION)
 
 
 @pytest.fixture()
@@ -292,7 +239,6 @@ async def hardware(
 @contextlib.contextmanager
 def _make_ot3_pe_ctx(
     hardware: ThreadManagedHardware,
-    deck_type: str,
 ) -> Generator[ProtocolContext, None, None]:
     """Return a ProtocolContext configured for an OT-3 and backed by Protocol Engine."""
     with create_protocol_engine_in_thread(
@@ -315,7 +261,7 @@ def _make_ot3_pe_ctx(
         post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
         # TODO(jbl 10-30-2023) load_fixed_trash being hardcoded to True will be refactored once we need tests to have
         #   this be False
-        load_fixed_trash=True,
+        load_fixed_trash=False,
         camera_provider=None,
     ) as (
         engine,
@@ -324,7 +270,7 @@ def _make_ot3_pe_ctx(
         yield create_protocol_context(
             api_version=MAX_SUPPORTED_VERSION,
             hardware_api=hardware,
-            deck_type=deck_type,
+            deck_type=DeckType.OT3_STANDARD,
             protocol_engine=engine,
             protocol_engine_loop=loop,
         )
@@ -332,21 +278,15 @@ def _make_ot3_pe_ctx(
 
 @pytest.fixture()
 def ctx(
-    request: pytest.FixtureRequest,
     robot_model: RobotModel,
     hardware: ThreadManagedHardware,
     deck_definition_name: str,
 ) -> Generator[ProtocolContext, None, None]:
-    if robot_model == "OT-2 Standard":
+    if robot_model == "OT-3 Standard":
+        with _make_ot3_pe_ctx(hardware=hardware) as ctx:
+            yield ctx
+    else:
         raise UnsupportedHardwareCommand(message="No OT-2 support anymore")
-    elif robot_model == "OT-3 Standard":
-        if request.node.get_closest_marker("apiv2_non_pe_only"):
-            pytest.skip("Test requests only non-Protocol-Engine ProtocolContexts")
-        else:
-            with _make_ot3_pe_ctx(
-                hardware=hardware, deck_type=deck_definition_name
-            ) as ctx:
-                yield ctx
 
 
 @pytest.fixture
@@ -579,166 +519,6 @@ def minimal_labware_def() -> LabwareDefinition2:
         "version": 1,
         "schemaVersion": 2,
         "namespace": "opentronstest",
-    }
-
-
-@pytest.fixture()
-def minimal_labware_def2() -> LabwareDefinition2:
-    return {
-        "metadata": {
-            "displayName": "other test labware",
-            "displayCategory": "other",
-            "displayVolumeUnits": "mL",
-        },
-        "cornerOffsetFromSlot": {"x": 10, "y": 10, "z": 5},
-        "parameters": {
-            "isTiprack": False,
-            "loadName": "minimal_labware_def",
-            "isMagneticModuleCompatible": True,
-            "format": "irregular",
-        },
-        "ordering": [["A1", "B1", "C1"], ["A2", "B2", "C2"]],
-        "wells": {
-            "A1": {
-                "depth": 40,
-                "totalLiquidVolume": 100,
-                "diameter": 30,
-                "x": 0,
-                "y": 18,
-                "z": 0,
-                "shape": "circular",
-            },
-            "B1": {
-                "depth": 40,
-                "totalLiquidVolume": 100,
-                "diameter": 30,
-                "x": 0,
-                "y": 9,
-                "z": 0,
-                "shape": "circular",
-            },
-            "C1": {
-                "depth": 40,
-                "totalLiquidVolume": 100,
-                "diameter": 30,
-                "x": 0,
-                "y": 0,
-                "z": 0,
-                "shape": "circular",
-            },
-            "A2": {
-                "depth": 40,
-                "totalLiquidVolume": 100,
-                "diameter": 30,
-                "x": 9,
-                "y": 18,
-                "z": 0,
-                "shape": "circular",
-            },
-            "B2": {
-                "depth": 40,
-                "totalLiquidVolume": 100,
-                "diameter": 30,
-                "x": 9,
-                "y": 9,
-                "z": 0,
-                "shape": "circular",
-            },
-            "C2": {
-                "depth": 40,
-                "totalLiquidVolume": 100,
-                "diameter": 30,
-                "x": 9,
-                "y": 0,
-                "z": 0,
-                "shape": "circular",
-            },
-        },
-        "groups": [],
-        "dimensions": {"xDimension": 1.0, "yDimension": 2.0, "zDimension": 3.0},
-        "schemaVersion": 2,
-        "version": 1,
-        "namespace": "dummy_namespace",
-        "brand": {"brand": "opentrons"},
-    }
-
-
-@pytest.fixture()
-def min_lw_impl(minimal_labware_def: LabwareDefinition2) -> LegacyLabwareCore:
-    return LegacyLabwareCore(
-        definition=minimal_labware_def, parent=Location(Point(0, 0, 0), "deck")
-    )
-
-
-@pytest.fixture()
-def min_lw2_impl(minimal_labware_def2: LabwareDefinition2) -> LegacyLabwareCore:
-    return LegacyLabwareCore(
-        definition=minimal_labware_def2, parent=Location(Point(0, 0, 0), "deck")
-    )
-
-
-@pytest.fixture()
-def min_lw(min_lw_impl: LegacyLabwareCore) -> Labware:
-    return Labware(
-        core=min_lw_impl,
-        api_version=APIVersion(2, 13),
-        protocol_core=None,  # type: ignore[arg-type]
-        core_map=None,  # type: ignore[arg-type]
-    )
-
-
-@pytest.fixture()
-def min_lw2(min_lw2_impl: LegacyLabwareCore) -> Labware:
-    return Labware(
-        core=min_lw2_impl,
-        api_version=APIVersion(2, 13),
-        protocol_core=None,  # type: ignore[arg-type]
-        core_map=None,  # type: ignore[arg-type]
-    )
-
-
-@pytest.fixture()
-def minimal_module_def() -> ModuleDefinitionV3:
-    return {
-        "$otSharedSchema": "module/schemas/3",
-        "moduleType": "temperatureModuleType",
-        "model": "temperatureModuleV1",
-        "labwareOffset": {"x": -0.15, "y": -0.15, "z": 80.09},
-        "features": {},
-        "extents": {
-            "total": {
-                "backLeftBottom": {"x": -5, "y": -10, "z": -15},
-                "frontRightTop": {"x": 15, "y": -20, "z": 30},
-            },
-        },
-        "dimensions": {
-            "bareOverallHeight": 84,
-            "overLabwareHeight": 0,
-            "xDimension": 123,
-            "yDimension": 321,
-            "labwareInterfaceXDimension": 123,
-            "labwareInterfaceYDimension": 321,
-        },
-        "calibrationPoint": {"x": 12.0, "y": 8.75, "z": 0.0},
-        "config": {},
-        "displayName": "Sample Module",
-        "quirks": [],
-        "slotTransforms": {},
-        "orientation": {
-            "1": "left",
-            "2": "center",
-            "3": "right",
-            "4": "left",
-            "5": "center",
-            "6": "right",
-            "7": "left",
-            "8": "center",
-            "9": "right",
-            "10": "left",
-            "11": "center",
-        },
-        "compatibleWith": ["temperatureModuleV2"],
-        "cornerOffsetFromSlot": {"x": 0.1, "y": 0.1, "z": 0.0},
     }
 
 

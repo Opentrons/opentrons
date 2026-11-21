@@ -2,15 +2,15 @@ test_name: Upload and analyze a JSONv6 protocol
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 
 stages:
   - name: Upload simple v6 protocol
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
-        files: '../shared-data/protocol/fixtures/6/simpleV6.json'
+        files: 'tests/integration/protocols/simpleV6.json'
     response:
       strict:
         - json:off
@@ -32,7 +32,7 @@ stages:
     max_retries: 10
     delay_after: 0.1
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: GET
     response:
       strict:
@@ -46,7 +46,7 @@ stages:
                 status: completed
   - name: Get protocol by ID
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}'
       method: GET
     response:
       status_code: 200
@@ -59,7 +59,7 @@ stages:
               role: main
           protocolType: json
           protocolKind: standard
-          robotType: OT-2 Standard
+          robotType: OT-3 Standard
           metadata:
             tags:
               - unitTest
@@ -76,7 +76,7 @@ stages:
           referencingRuns: []
   - name: Get protocol analysis by ID
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses'
       method: GET
     response:
       status_code: 200
@@ -90,20 +90,20 @@ stages:
           - id: '{analysis_id}'
             status: completed
             result: ok
-            robotType: OT-2 Standard
+            robotType: OT-3 Standard
             runTimeParameters: []
             commandAnnotations: []
             commandPreconditions: { isCameraUsed: false }
             pipettes:
               - id: pipetteId
-                pipetteName: p10_single
+                pipetteName: p1000_single_flex
                 mount: left
             labware:
               - id: fixedTrash
-                loadName: opentrons_1_trash_1100ml_fixed
-                definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
+                loadName: opentrons_1_trash_3200ml_fixed
+                definitionUri: opentrons/opentrons_1_trash_3200ml_fixed/1
                 location:
-                  slotName: '12'
+                  slotName: 'A3'
               - id: sourcePlateId
                 loadName: foo_8_plate_33ul
                 definitionUri: example/foo_8_plate_33ul/1
@@ -115,24 +115,23 @@ stages:
                 definitionUri: example/foo_8_plate_33ul/1
                 displayName: Sample Collection Plate
                 location:
-                  moduleId: magneticModuleId
+                  moduleId: magneticBlockId
               - id: tipRackId
-                loadName: opentrons_96_tiprack_10ul
-                definitionUri: opentrons/opentrons_96_tiprack_10ul/1
-                displayName: Opentrons 96 Tip Rack 10 µL
+                loadName: opentrons_flex_96_tiprack_1000ul
+                definitionUri: opentrons/opentrons_flex_96_tiprack_1000ul/1
+                displayName: Opentrons Flex 96 Tip Rack 1000 µL
                 location:
-                  slotName: '8'
+                  slotName: 'A2'
             modules:
-              - id: magneticModuleId
-                serialNumber: !anystr
-                model: magneticModuleV2
+              - id: magneticBlockId
+                model: magneticBlockV1
                 location:
-                  slotName: '3'
+                  slotName: 'D3'
               - id: temperatureModuleId
                 serialNumber: !anystr
                 model: temperatureModuleV2
                 location:
-                  slotName: '1'
+                  slotName: 'D1'
             commands:
               # Initial home
               - id: !anystr
@@ -152,7 +151,7 @@ stages:
                 key: !anystr
                 status: succeeded
                 params:
-                  pipetteName: p10_single
+                  pipetteName: p1000_single_flex
                   mount: left
                   pipetteId: pipetteId
                 result:
@@ -167,14 +166,13 @@ stages:
                 key: !anystr
                 status: succeeded
                 params:
-                  model: magneticModuleV2
+                  model: magneticBlockV1
                   location:
-                    slotName: '3'
-                  moduleId: magneticModuleId
+                    slotName: 'D3'
+                  moduleId: magneticBlockId
                 result:
-                  moduleId: magneticModuleId
-                  model: magneticModuleV2
-                  serialNumber: !anystr
+                  moduleId: magneticBlockId
+                  model: magneticBlockV1
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -187,7 +185,7 @@ stages:
                 params:
                   model: temperatureModuleV2
                   location:
-                    slotName: '1'
+                    slotName: 'D1'
                   moduleId: temperatureModuleId
                 result:
                   moduleId: temperatureModuleId
@@ -214,14 +212,14 @@ stages:
                   labwareId: sourcePlateId
                   definition: !anydict
                   locationSequence:
+                    - kind: onAddressableArea
+                      addressableAreaName: temperatureModuleV2D1
                     - kind: onModule
                       moduleId: temperatureModuleId
-                    - kind: onAddressableArea
-                      addressableAreaName: '1'
                     - kind: onCutoutFixture
-                      cutoutId: cutout1
+                      cutoutId: cutoutD1
                       possibleCutoutFixtureIds:
-                        - 'singleStandardSlot'
+                        - 'temperatureModuleV2'
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -233,7 +231,7 @@ stages:
                 status: succeeded
                 params:
                   location:
-                    moduleId: magneticModuleId
+                    moduleId: magneticBlockId
                   loadName: foo_8_plate_33ul
                   namespace: example
                   version: 1
@@ -243,14 +241,16 @@ stages:
                   labwareId: destPlateId
                   definition: !anydict
                   locationSequence:
-                    - kind: onModule
-                      moduleId: magneticModuleId
                     - kind: onAddressableArea
-                      addressableAreaName: '3'
+                      addressableAreaName: 'magneticBlockV1D3'
+                    - kind: onModule
+                      moduleId: magneticBlockId
                     - kind: onCutoutFixture
-                      cutoutId: cutout3
+                      cutoutId: cutoutD3
                       possibleCutoutFixtureIds:
-                        - 'singleStandardSlot'
+                        - flexStackerModuleV1WithMagneticBlockV1
+                        - magneticBlockV1
+                        - stagingAreaSlotWithMagneticBlockV1
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -262,22 +262,22 @@ stages:
                 status: succeeded
                 params:
                   location:
-                    slotName: '8'
-                  loadName: opentrons_96_tiprack_10ul
+                    slotName: 'A2'
+                  loadName: opentrons_flex_96_tiprack_1000ul
                   namespace: opentrons
                   version: 1
                   labwareId: tipRackId
-                  displayName: Opentrons 96 Tip Rack 10 µL
+                  displayName: Opentrons Flex 96 Tip Rack 1000 µL
                 result:
                   labwareId: tipRackId
                   definition: !anydict
                   locationSequence:
                     - kind: onAddressableArea
-                      addressableAreaName: '8'
+                      addressableAreaName: 'A2'
                     - kind: onCutoutFixture
-                      cutoutId: cutout8
+                      cutoutId: cutoutA2
                       possibleCutoutFixtureIds:
-                        - 'singleStandardSlot'
+                        - 'singleCenterSlot'
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -325,10 +325,10 @@ stages:
                       y: 0
                       z: 0
                 result:
-                  position: { 'x': 146.88, 'y': 246.24, 'z': 64.69 }
-                  tipVolume: 10.0
-                  tipLength: 35.910000000000004
-                  tipDiameter: 3.27
+                  position: { 'x': 178.38, 'y': 386.38, 'z': 99.0 }
+                  tipVolume: 1000.0
+                  tipLength: 85.94999999999999
+                  tipDiameter: 5.47
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -352,7 +352,7 @@ stages:
                   volume: 5
                   flowRate: 3
                 result:
-                  position: { 'x': 16.76, 'y': 75.28, 'z': 157.09 }
+                  position: { 'x': 18.21, 'y': 75.43, 'z': 86.0 }
                   volume: 5
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -389,7 +389,7 @@ stages:
                   volume: 4.5
                   flowRate: 2.5
                 result:
-                  position: { 'x': 284.635, 'y': 56.025, 'z': 158.25 }
+                  position: { 'x': 346.21, 'y': 56.15, 'z': 114.0 }
                   volume: 4.5
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -414,7 +414,7 @@ stages:
                   radius: 0.5
                   speed: 42.0
                 result:
-                  position: { 'x': 284.635, 'y': 56.025, 'z': 168.25 }
+                  position: { 'x': 346.21, 'y': 56.15, 'z': 124.0 }
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -437,7 +437,7 @@ stages:
                     volumeOffset: 0
                   flowRate: 2
                 result:
-                  position: { 'x': 284.635, 'y': 56.025, 'z': 169.25 }
+                  position: { 'x': 346.21, 'y': 56.15, 'z': 125.0 }
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -460,8 +460,7 @@ stages:
                     volumeOffset: 0
                   forceDirect: false
                 result:
-                  position:
-                    { 'x': 304.52500000000003, 'y': 56.025, 'z': 182.25 }
+                  position: { 'x': 366.1, 'y': 56.15, 'z': 138.0 }
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -486,8 +485,7 @@ stages:
                   forceDirect: true
                   speed: 12.3
                 result:
-                  position:
-                    { 'x': 306.52500000000003, 'y': 59.025, 'z': 167.25 }
+                  position: { 'x': 368.1, 'y': 59.15, 'z': 123.0 }
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -510,7 +508,7 @@ stages:
                   alternateDropLocation: false
                   scrape_tips: false
                 result:
-                  position: { 'x': 347.84000000000003, 'y': 325.06, 'z': 82.0 }
+                  position: { 'x': 434.25, 'y': 364.0, 'z': 40.0 }
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
                 completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
@@ -652,15 +650,15 @@ test_name: Upload and analyze a JSONv6 protocol, with liquids
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 
 stages:
   - name: Upload simple v6 protocol
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
-        files: '../shared-data/protocol/fixtures/6/simpleV6.json'
+        files: 'tests/integration/protocols/simpleV6.json'
     response:
       strict:
         - json:off
@@ -682,7 +680,7 @@ stages:
     max_retries: 10
     delay_after: 0.1
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: GET
     response:
       strict:
@@ -696,7 +694,7 @@ stages:
                 status: completed
   - name: Get protocol analysis by ID
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses'
       method: GET
     response:
       strict:

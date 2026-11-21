@@ -72,14 +72,10 @@ DeckConfigurationType = List[
 ]  # cutout_id, cutout_fixture_id, opentrons_module_serial_number
 
 
-# TODO(mm, 2023-05-10): Deduplicate with constants in
-# opentrons.protocols.api_support.deck_type
-# and consider moving to shared-data.
+# TODO(jbl, 2026-11-04) Consider moving to shared data
 class DeckType(StrEnum):
     """Types of deck available."""
 
-    OT2_STANDARD = "ot2_standard"
-    OT2_SHORT_TRASH = "ot2_short_trash"
     OT3_STANDARD = "ot3_standard"
 
 

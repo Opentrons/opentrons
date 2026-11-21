@@ -1,5 +1,5 @@
 ---
-title: "Python API: Utility Commands"
+title: 'Python API: Utility Commands'
 description: Basic commands for working with robot utility features.
 ---
 
@@ -35,7 +35,7 @@ Call the [`ProtocolContext.pause()`][opentrons.protocol_api.ProtocolContext.paus
 protocol.pause("Remember to get more pipette tips")
 ```
 
-*New in version 2.0*
+_New in version 2.0_
 
 ## Homing
 
@@ -61,7 +61,7 @@ pipette = protocol.load_instrument("flex_1channel_1000", "right")
 pipette.home_plunger()
 ```
 
-*New in version 2.0*
+_New in version 2.0_
 
 ## Comment
 
@@ -71,7 +71,7 @@ Call the [`ProtocolContext.comment()`][opentrons.protocol_api.ProtocolContext.co
 protocol.comment("Hello, world!")
 ```
 
-*New in version 2.0*
+_New in version 2.0_
 
 ## Capturing images
 
@@ -86,7 +86,7 @@ protocol.capture_image(
 )
 ```
 
-*New in version 2.27*
+_New in version 2.27_
 
 Image filenames include your robot and protocol name, and a timestamp for when the image was taken. Here, the custom filename `"deck_view"` is added to the beginning of the filename, making it easier to find the exact image you're looking for.
 
@@ -108,11 +108,11 @@ This example turns the rail lights off:
 protocol.set_rail_lights(False)
 ```
 
-*New in version 2.5*
+_New in version 2.5_
 
 You can also check whether the rail lights are on or off in the protocol by using [`ProtocolContext.rail_lights_on`][opentrons.protocol_api.ProtocolContext.rail_lights_on]. This property is `True` when lights are on and `False` when the lights are off.
 
-*New in version 2.5*
+_New in version 2.5_
 
 ## OT-2 door safety switch
 
@@ -125,6 +125,6 @@ protocol.door_closed
 ```
 
 !!! warning
-    `door_closed` is a status check only. It does not control the robot's behavior. If you wish to implement a custom method to pause or resume a protocol using `door_closed`, disable the door safety feature first (not recommended).
+`door_closed` is a status check only. It does not control the robot's behavior. If you wish to implement a custom method to pause or resume a protocol using `door_closed`, disable the door safety feature first (not recommended).
 
-*New in version 2.5*
+_New in version 2.5_

@@ -46,9 +46,7 @@ async def test_wait_for_temperature(
     ).then_return(hs_hardware)
 
     result = await subject.execute(data)
-    decoy.verify(
-        await hs_hardware.await_temperature(awaiting_temperature=123.45), times=1
-    )
+    decoy.verify(await hs_hardware.await_temperature(), times=1)
     assert result == SuccessData(
         public=heater_shaker.WaitForTemperatureResult(),
     )

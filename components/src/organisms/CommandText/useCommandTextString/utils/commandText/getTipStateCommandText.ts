@@ -1,6 +1,6 @@
 import { getLabwareName } from '../getLabwareName'
 
-import type { SetTipStateRunTimeCommand } from '@opentrons/shared-data/command'
+import type { SetTipStateRunTimeCommand } from '@opentrons/shared-data'
 import type { HandlesCommands } from '../types'
 
 export function getTipStateCommandText({

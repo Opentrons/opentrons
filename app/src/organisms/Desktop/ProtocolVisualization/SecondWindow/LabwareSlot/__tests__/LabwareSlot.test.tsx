@@ -1,7 +1,10 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { fixture96Plate } from '@opentrons/shared-data'
+import {
+  fixture96Plate,
+  VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA,
+} from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -121,6 +124,24 @@ describe('LabwareSlot', () => {
   it('should render labware display name', () => {
     render(props)
     expect(screen.getByText('Mock 96 Well Plate')).toBeInTheDocument()
+  })
+
+  it('should display the vacuum dock as A4', () => {
+    props.robotState = {
+      ...createMockRobotState(),
+      labware: {
+        [MOCK_LABWARE_ID]: {
+          stack: [MOCK_LABWARE_ID, VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA],
+        },
+      },
+    }
+    render(props)
+    expect(screen.getByTestId('RobotInfoLabel_A4')).toBeInTheDocument()
+    expect(
+      screen.queryByTestId(
+        `RobotInfoLabel_${VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA}`
+      )
+    ).not.toBeInTheDocument()
   })
 
   it('should render labware nickname when provided', () => {

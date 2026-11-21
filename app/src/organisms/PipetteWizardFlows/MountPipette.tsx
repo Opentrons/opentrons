@@ -6,6 +6,7 @@ import {
   JUSTIFY_CENTER,
   SIZE_1,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 import {
   SINGLE_MOUNT_PIPETTES,
@@ -92,14 +93,19 @@ export const MountPipette = (props: MountPipetteProps): ReactNode => {
             backgroundSize={BACKGROUND_SIZE}
           />
         ) : (
-          i18n.format(
-            t(
-              isSingleMountPipette
-                ? 'connect_and_secure_pipette'
-                : 'connect_96_channel'
-            ),
-            'capitalize'
-          )
+          <StyledText
+            desktopStyle="headingSmallBold"
+            oddStyle="level4HeaderSemiBold"
+          >
+            {i18n.format(
+              t(
+                isSingleMountPipette
+                  ? 'connect_and_secure_pipette'
+                  : 'connect_96_channel'
+              ),
+              'capitalize'
+            )}
+          </StyledText>
         )
       }
       rightHandBody={

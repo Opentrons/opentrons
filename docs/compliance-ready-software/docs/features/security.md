@@ -1,6 +1,6 @@
 ---
-title: "Compliance Ready Software: Security"
-description: "An overview of security for compliance ready Flex robots."
+title: 'Compliance Ready Software: Security'
+description: 'An overview of security for compliance ready Flex robots.'
 ---
 
 Opentrons Flex Compliance Ready Software permanently locks certain features of your Flex's robot software. This section covers changes you'll see on your compliance ready Flex for additional security.
@@ -9,7 +9,7 @@ Opentrons Flex Compliance Ready Software permanently locks certain features of y
 
 The Opentrons Flex is an open-source liquid handling robot, and includes features that let users control the robot outside of Opentrons software. Once Compliance Ready Software is active on your Flex, open-source features that allow access outside of the touchscreen or Opentrons App, like [Jupyter notebook](../../flex/advanced-operation/jupyter-notebook.md) and [SSH command line operation](../../flex/advanced-operation/command-line.md#) are permanently disabled. This ensures that only your lab users can use your Flex.
 
-Because activating Compliance Ready Software is permanent and irreversible, a factory reset of your Flex will delete calibration data, run history, and protocols, but cannot remove Compliance Ready Software from the system. 
+Because activating Compliance Ready Software is permanent and irreversible, a factory reset of your Flex will delete calibration data, run history, and protocols, but cannot remove Compliance Ready Software from the system.
 
 Before activation, a Flex can run any valid Python file developed using the Opentrons Python Protocol API. The system lockdown enabled with Compliance Ready Software means that by default, your Flex can only run protocols sent to your Flex by an administrator. To prevent new protocols from being created on the Flex by any user, Quick Transfer protocols are also permanently disabled.
 
@@ -21,9 +21,9 @@ Administrators can [customize settings](admin.md), including screen timeouts and
 
 ### Files
 
-Your compliance ready Flex locally generates robot and protocol [files](../using/files.md) to preserve audit-ready information. Every data point includes: 
+Your compliance ready Flex locally generates robot and protocol [files](../using/files.md) to preserve audit-ready information. Every data point includes:
 
-* Cryptographically hashed timestamps.
-* Unique electronic user IDs and signatures.
+- Cryptographically hashed timestamps.
+- Unique electronic user IDs and signatures.
 
 To avoid accidentally deleting these files before appropriately storing them, Compliance Ready Software prompts you to download files again before deleting them. Only administrator accounts are able to delete files.

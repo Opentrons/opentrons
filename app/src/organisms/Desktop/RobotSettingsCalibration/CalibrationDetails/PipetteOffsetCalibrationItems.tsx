@@ -14,11 +14,11 @@ import { LEFT } from '@opentrons/shared-data'
 
 import { useAttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
 
+import type { FormattedPipetteOffsetCalibration } from '..'
 import { OverflowMenu } from './OverflowMenu'
 import { formatLastCalibrated } from './utils'
 
 import type { ReactNode } from 'react'
-import type { FormattedPipetteOffsetCalibration } from '..'
 
 const StyledTable = styled.table`
   width: 100%;

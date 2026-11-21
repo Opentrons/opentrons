@@ -1014,6 +1014,7 @@ def run(protocol: protocol_api.ProtocolContext):
 I want to run a simple reagent transfer protocol but document each major step with images for quality control. Here's what I need: I'll be using a Flex robot with a single-channel pipette. I have a reservoir with my reagent and a 96-well plate where I'll dispense it.
 
 The workflow should be:
+
 - Take a picture of the initial setup (empty plate)
 - Add 50 µL of reagent from the reservoir to the first 24 wells of the plate
 - Take a picture after the first transfer
@@ -1026,41 +1027,41 @@ The workflow should be:
 
 ```python
 from opentrons import protocol_api
- 
+
 metadata = {
     'protocolName': 'Quality Control with Image Capture',
     'author': 'OpentronsAI',
     'description': 'Demonstrates protocol documentation using capture_image() and comments'
 }
- 
+
 requirements = {
     'robotType': 'Flex',
     'apiLevel': '2.28'
 }
- 
+
 def run(protocol: protocol_api.ProtocolContext):
     # Load labware
     tips = protocol.load_labware('opentrons_flex_96_tiprack_200ul', 'D1')
     reservoir = protocol.load_labware('nest_12_reservoir_15ml', 'D2')
     plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 'D3')
     trash = protocol.load_trash_bin('A3')
-    
+
     # Load pipette
     pipette = protocol.load_instrument(
         'flex_1channel_1000',
         'left',
         tip_racks=[tips]
     )
-    
+
     # Define wells
     reagent_source = reservoir['A1']
     target_wells = plate.wells()[:24]  # First 24 wells
-    
+
     # Step 1: Document initial state
     protocol.comment('=== INITIAL STATE ===')
     protocol.comment('Capturing image of empty plate before reagent addition')
     protocol.capture_image()
-    
+
     # Step 2: First reagent addition
     protocol.comment('=== FIRST TRANSFER ===')
     protocol.comment('Adding 50 µL of reagent to wells A1-D6')
@@ -1070,11 +1071,11 @@ def run(protocol: protocol_api.ProtocolContext):
         target_wells,
         new_tip='once'
     )
-    
+
     # Step 3: Document after first transfer
     protocol.comment('First transfer complete - capturing verification image')
     protocol.capture_image()
-    
+
     # Step 4: Second reagent addition
     protocol.comment('=== SECOND TRANSFER ===')
     protocol.comment('Adding 100 µL more reagent to the same wells')
@@ -1084,12 +1085,12 @@ def run(protocol: protocol_api.ProtocolContext):
         target_wells,
         new_tip='once'
     )
-    
+
     # Step 5: Document final state
     protocol.comment('=== FINAL STATE ===')
     protocol.comment('Protocol complete - capturing final verification image')
     protocol.capture_image()
-    
+
     protocol.comment('Total volume per well: 150 µL')
     protocol.comment('QC images captured: 3 (initial, mid-protocol, final)')
 ```
@@ -1100,17 +1101,17 @@ def run(protocol: protocol_api.ProtocolContext):
 
 <description> 
 I want to demonstrate the new tips parameter added in API v2.27 for transfer_with_liquid_class(). This feature allows precise control over which tips to use during transfers. I'll show several use cases:
- 
+
 First, I'll use specific tips from row A of a tip rack for targeted transfers from a reservoir to a plate.
- 
+
 Then, I'll alternate tips between two different tip racks to demonstrate multi-rack coordination.
- 
+
 Next, I'll reuse the same tip for multiple transfers of the same liquid to reduce waste.
- 
+
 After that, I'll use different tip sets from different racks for contamination control between sample groups.
- 
+
 Finally, I'll create a complex tip pattern for serial dilution where tips are reused within each dilution series but fresh tips start each new series.
- 
+
 All transfers will use the water liquid class and demonstrate how the tips parameter provides fine-grained control over tip usage while maintaining liquid class benefits.
 </description>
 
@@ -1136,37 +1137,37 @@ def run(protocol: protocol_api.ProtocolContext):
     This protocol demonstrates the new 'tips' parameter added in API v2.27
     for transfer_with_liquid_class(). This parameter allows you to specify
     exactly which tips to use during a transfer, enabling:
-    
+
     1. Selective tip usage from specific locations
     2. Reusing tips across multiple transfers
     3. Advanced tip management strategies
     """
-    
+
     # Load labware
     tiprack_1 = protocol.load_labware('opentrons_flex_96_tiprack_200ul', 'D1')
     tiprack_2 = protocol.load_labware('opentrons_flex_96_tiprack_200ul', 'D2')
     reservoir = protocol.load_labware('nest_12_reservoir_15ml', 'C1')
     plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 'C2')
     trash = protocol.load_trash_bin('A3')
-    
+
     # Load pipette
     pipette = protocol.load_instrument(
         'flex_1channel_1000',
         'left',
         tip_racks=[tiprack_1, tiprack_2]
     )
-    
+
     # Get liquid class for aqueous solutions
     water_liquid = protocol.get_liquid_class('water')
-    
+
     # ========================================================================
     # Example 1: Using specific tips from a tip rack
     # ========================================================================
     protocol.comment('Example 1: Transfer using specific tips from tiprack_1')
-    
+
     # Select specific tips from the first tip rack (e.g., tips from row A)
     selected_tips = [tiprack_1.wells_by_name()[well] for well in ['A1', 'A2', 'A3', 'A4']]
-    
+
     # Transfer using only these specific tips
     pipette.transfer_with_liquid_class(
         liquid_class=water_liquid,
@@ -1177,12 +1178,12 @@ def run(protocol: protocol_api.ProtocolContext):
         trash_location=trash,
         tips=selected_tips  # NEW in v2.27: Specify which tips to use
     )
-    
+
     # ========================================================================
     # Example 2: Alternating between two tip racks
     # ========================================================================
     protocol.comment('Example 2: Alternate tips between two tip racks')
-    
+
     # Create a list alternating between tips from two different racks
     alternating_tips = [
         tiprack_1['B1'],  # From rack 1
@@ -1190,7 +1191,7 @@ def run(protocol: protocol_api.ProtocolContext):
         tiprack_1['B2'],  # From rack 1
         tiprack_2['B2'],  # From rack 2
     ]
-    
+
     pipette.transfer_with_liquid_class(
         liquid_class=water_liquid,
         volume=75,
@@ -1200,15 +1201,15 @@ def run(protocol: protocol_api.ProtocolContext):
         trash_location=trash,
         tips=alternating_tips  # Use tips from alternating racks
     )
-    
+
     # ========================================================================
     # Example 3: Reusing the same tip for multiple transfers
     # ========================================================================
     protocol.comment('Example 3: Reuse the same tip for multiple transfers')
-    
+
     # Use the same tip for all transfers (useful for the same liquid)
     single_tip = [tiprack_1['C1']] * 4  # Same tip repeated 4 times
-    
+
     pipette.transfer_with_liquid_class(
         liquid_class=water_liquid,
         volume=100,
@@ -1218,16 +1219,16 @@ def run(protocol: protocol_api.ProtocolContext):
         trash_location=trash,
         tips=single_tip  # Specify the same tip for all transfers
     )
-    
+
     # ========================================================================
     # Example 4: Strategic tip selection for contamination control
     # ========================================================================
     protocol.comment('Example 4: Strategic tip selection for contamination control')
-    
+
     # Use tips from specific columns to track which samples they've touched
     column_1_tips = [tiprack_1.wells_by_name()[well] for well in ['D1', 'D2', 'D3']]
     column_2_tips = [tiprack_2.wells_by_name()[well] for well in ['D1', 'D2', 'D3']]
-    
+
     # First set of transfers with column 1 tips
     pipette.transfer_with_liquid_class(
         liquid_class=water_liquid,
@@ -1238,7 +1239,7 @@ def run(protocol: protocol_api.ProtocolContext):
         trash_location=trash,
         tips=column_1_tips
     )
-    
+
     # Second set of transfers with column 2 tips (different source)
     pipette.transfer_with_liquid_class(
         liquid_class=water_liquid,
@@ -1249,12 +1250,12 @@ def run(protocol: protocol_api.ProtocolContext):
         trash_location=trash,
         tips=column_2_tips
     )
-    
+
     # ========================================================================
     # Example 5: Complex tip pattern for serial dilution
     # ========================================================================
     protocol.comment('Example 5: Complex tip pattern for serial dilution')
-    
+
     # Create a pattern where we use fresh tips for initial transfers
     # but reuse tips within a dilution series
     dilution_tips = [
@@ -1265,7 +1266,7 @@ def run(protocol: protocol_api.ProtocolContext):
         tiprack_1['E2'],  # Reuse for second step
         tiprack_1['E2'],  # Reuse for third step
     ]
-    
+
     pipette.transfer_with_liquid_class(
         liquid_class=water_liquid,
         volume=50,
@@ -1289,7 +1290,7 @@ def run(protocol: protocol_api.ProtocolContext):
         trash_location=trash,
         tips=dilution_tips
     )
-    
+
     protocol.comment('Protocol complete! The tips parameter provides fine-grained control over tip usage.')
 ```
 

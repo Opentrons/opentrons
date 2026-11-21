@@ -1,6 +1,6 @@
 ---
-title: "Python API: Module Setup"
-description: "Load modules and make them available in your protocol."
+title: 'Python API: Module Setup'
+description: 'Load modules and make them available in your protocol.'
 ---
 
 ## Loading modules onto the deck
@@ -11,7 +11,7 @@ Use [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.loa
 
 === "Flex"
     ```python
-    from opentrons import protocol_api
+from opentrons import protocol_api
 
     requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
 
@@ -28,7 +28,7 @@ Use [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.loa
 
 === "OT-2"
     ```python
-    from opentrons import protocol_api
+from opentrons import protocol_api
 
     metadata = {"apiLevel": "{{ apiLevel }}"}
 
@@ -43,30 +43,31 @@ Use [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.loa
     ```
     After the `load_module()` method loads the modules into your protocol, it returns the [`MagneticModuleContext`][opentrons.protocol_api.MagneticModuleContext] and [`TemperatureModuleContext`][opentrons.protocol_api.TemperatureModuleContext] objects.
 
-*New in version 2.0*
+_New in version 2.0_
 
 ## Available modules
 
-The first parameter of [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module] is the module's *API load name*. The load name tells your robot which module you're going to use in a protocol. The table below lists the API load names for the currently available modules.
+The first parameter of [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module] is the module's _API load name_. The load name tells your robot which module you're going to use in a protocol. The table below lists the API load names for the currently available modules.
 
-| Module {width="40%"}| API Load Name | Introduced in API Version |
-|--------|---------------|--------------------------|
-| Temperature Module GEN1 | `temperature module` or `tempdeck` | 2.0 |
-| Temperature Module GEN2 | `temperature module gen2` | 2.3 |
-| Magnetic Module GEN1 | `magnetic module` or `magdeck` | 2.0 |
-| Magnetic Module GEN2 | `magnetic module gen2` | 2.3 |
-| Thermocycler Module GEN1 | `thermocycler module` or `thermocycler` | 2.0 |
-| Thermocycler Module GEN2 | `thermocycler module gen2` or `thermocyclerModuleV2` | 2.13 |
-| Heater-Shaker Module GEN1 | `heaterShakerModuleV1` | 2.13 |
-| Magnetic Block GEN1 | `magneticBlockV1` | 2.15 |
-| Absorbance Plate Reader Module | `absorbanceReaderV1` | 2.21 |
-| Flex Stacker Module | `flexStackerModuleV1` | 2.25 |
+| Module {width="40%"}           | API Load Name                                        | Introduced in API Version |
+| ------------------------------ | ---------------------------------------------------- | ------------------------- |
+| Temperature Module GEN1        | `temperature module` or `tempdeck`                   | 2.0                       |
+| Temperature Module GEN2        | `temperature module gen2`                            | 2.3                       |
+| Magnetic Module GEN1           | `magnetic module` or `magdeck`                       | 2.0                       |
+| Magnetic Module GEN2           | `magnetic module gen2`                               | 2.3                       |
+| Thermocycler Module GEN1       | `thermocycler module` or `thermocycler`              | 2.0                       |
+| Thermocycler Module GEN2       | `thermocycler module gen2` or `thermocyclerModuleV2` | 2.13                      |
+| Heater-Shaker Module GEN1      | `heaterShakerModuleV1`                               | 2.13                      |
+| Magnetic Block GEN1            | `magneticBlockV1`                                    | 2.15                      |
+| Absorbance Plate Reader Module | `absorbanceReaderV1`                                 | 2.21                      |
+| Flex Stacker Module            | `flexStackerModuleV1`                                | 2.25                      |
 
 Some modules were added to our Python API later than others, and others span multiple hardware generations. When writing a protocol that requires a module, make sure your `requirements` or `metadata` code block specifies an [API version](../versioning.md) high enough to support all the module generations you want to use.
 
 ## Loading labware onto a module
 
 Use the `load_labware()` method on the module context to load labware on a module. For example, to load the Opentrons 24 Well Aluminum Block on top of a Temperature Module:
+
 ```python
 def run(protocol: protocol_api.ProtocolContext):
     temp_mod = protocol.load_module(
@@ -76,13 +77,14 @@ def run(protocol: protocol_api.ProtocolContext):
         name="opentrons_24_aluminumblock_generic_2ml_screwcap",
         label="Temperature-Controlled Tubes")
 ```
-*New in version 2.0*
+
+_New in version 2.0_
 
 When you load labware on a module, you don’t need to specify the deck slot. In the above example, the `load_module()` method already specifies where the module is on the deck: `location="D1"`.
 
 Any [custom labware](../labware.md#custom-labware) added to your Opentrons App is also accessible when loading labware onto a module. You can find and copy its load name by going to its card on the Labware page.
 
-*New in version 2.1*
+_New in version 2.1_
 
 ### Module and labware compatibility
 

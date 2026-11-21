@@ -203,7 +203,6 @@ async def _baseexception_update(
     raise BaseException()
 
 
-@pytest.mark.ot3_only
 async def test_updates_of_non_present_subsystems_fail(
     subject: FirmwareUpdateManager, ot3_hardware_api: OT3API, decoy: Decoy
 ) -> None:
@@ -217,7 +216,6 @@ async def test_updates_of_non_present_subsystems_fail(
         )
 
 
-@pytest.mark.ot3_only
 async def test_duplicate_ids_fail(
     subject: FirmwareUpdateManager, ot3_hardware_api: OT3API, decoy: Decoy
 ) -> None:
@@ -234,7 +232,6 @@ async def test_duplicate_ids_fail(
         )
 
 
-@pytest.mark.ot3_only
 async def test_conflicting_in_progress_updates_fail(
     subject: FirmwareUpdateManager, ot3_hardware_api: OT3API, decoy: Decoy
 ) -> None:
@@ -262,7 +259,6 @@ async def test_conflicting_in_progress_updates_fail(
         )
 
 
-@pytest.mark.ot3_only
 async def test_ongoing_updates_accessible(
     subject: FirmwareUpdateManager, ot3_hardware_api: OT3API, decoy: Decoy
 ) -> None:
@@ -283,7 +279,6 @@ async def test_ongoing_updates_accessible(
     assert proc in (await subject.all_ongoing_processes())
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "updater",
     (
@@ -321,7 +316,6 @@ async def test_complete_updates_leave_ongoing(
     assert subject.get_update_process_handle_by_id("some-id") == proc
 
 
-@pytest.mark.ot3_only
 async def test_correct_exception_for_wrong_id(subject: FirmwareUpdateManager) -> None:
     """It uses a custom exception for incorrect ids."""
     with pytest.raises(UpdateIdNotFound):

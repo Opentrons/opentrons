@@ -1,13 +1,12 @@
 import { act, fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { i18n } from '/app/i18n'
-
 import '@testing-library/jest-dom/vitest'
 
 import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resources/access-control/__fixtures__/documentationState'
 import { getRobotUpdateDownloadError } from '/app/redux/robot-update'
 import {
@@ -141,9 +140,7 @@ describe('DownloadUpdateModal', () => {
 
     const exitButton = screen.getByRole('button', { name: 'Exit' })
 
-    expect(
-      screen.getByText('Robot software successfully updated')
-    ).toBeInTheDocument()
+    expect(screen.getByText('Robot successfully updated')).toBeInTheDocument()
     expect(exitButton).toBeInTheDocument()
     expect(mockCreateLiveCommand).toHaveBeenCalled()
     fireEvent.click(exitButton)

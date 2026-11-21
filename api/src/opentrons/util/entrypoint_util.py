@@ -35,7 +35,7 @@ from opentrons.protocol_engine.errors.error_occurrence import (
 from opentrons.protocol_engine.types import DeckConfigurationType
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
 from opentrons.protocols import labware
-from opentrons.protocols.types import JsonProtocol, Protocol, PythonProtocol
+from opentrons.protocols.types import PythonProtocol
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.types import LabwareDefinition
@@ -180,7 +180,9 @@ def get_deck_configuration() -> DeckConfigurationType:
 
 
 @contextlib.contextmanager
-def adapt_protocol_source(protocol: Protocol) -> Generator[ProtocolSource, None, None]:
+def adapt_protocol_source(
+    protocol: PythonProtocol,
+) -> Generator[ProtocolSource, None, None]:
     """Convert a `Protocol` to a `ProtocolSource`.
 
     `Protocol` and `ProtocolSource` do basically the same thing. `Protocol` is the traditional
@@ -201,8 +203,6 @@ def adapt_protocol_source(protocol: Protocol) -> Generator[ProtocolSource, None,
         # should be just the filename part, or a path with separators. In case it contains stuff
         # like "../", sanitize it to just the filename part so we don't save files somewhere bad.
         main_file_name = pathlib.Path(protocol.filename).name
-    elif isinstance(protocol, JsonProtocol):
-        main_file_name = "protocol.json"
     else:
         main_file_name = "protocol.py"
 
@@ -218,7 +218,7 @@ def adapt_protocol_source(protocol: Protocol) -> Generator[ProtocolSource, None,
             main_file.write_bytes(protocol.text)
 
         labware_files: List[pathlib.Path] = []
-        if isinstance(protocol, PythonProtocol) and protocol.extra_labware is not None:
+        if protocol.extra_labware is not None:
             for labware_index, labware_definition in enumerate(
                 protocol.extra_labware.values()
             ):

@@ -1,6 +1,6 @@
 ---
-title: "Python API Reference: Temperature Module"
-description: "Temperature Module class reference for the Python Protocol API."
+title: 'Python API Reference: Temperature Module'
+description: 'Temperature Module class reference for the Python Protocol API.'
 ---
 
 ::: opentrons.protocol_api.TemperatureModuleContext

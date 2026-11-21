@@ -1,10 +1,8 @@
 import isEqual from 'lodash/isEqual'
 
-import { getLabwareDisplayLocation } from '@opentrons/components'
 import {
-  FLEX_ROBOT_TYPE,
   getLabwareDefURI,
-  THERMOCYCLER_ADDRESSABLE_AREA,
+  getSlotFromAddressableAreaName,
 } from '@opentrons/shared-data'
 
 import {
@@ -12,7 +10,6 @@ import {
   OFFSET_KIND_LOCATION_SPECIFIC,
 } from '/app/redux/protocol-runs/constants'
 
-import type { TFunction } from 'i18next'
 import type {
   CompletedProtocolAnalysis,
   LabwareDefinition,
@@ -30,29 +27,13 @@ import type {
 import type { State } from '/app/redux/types'
 
 export const getFlexSlotNameOnly = (
-  details: OffsetLocationDetails | null,
-  protocolData: CompletedProtocolAnalysis | null,
-  t: TFunction
+  details: OffsetLocationDetails | null
 ): string => {
-  if (protocolData == null || details == null) {
+  if (details == null) {
     return ''
   }
 
-  const { addressableAreaName } = details
-
-  // TODO(jh, 03-21-25): The util should have a means of returning "slot" itself.
-  return addressableAreaName === THERMOCYCLER_ADDRESSABLE_AREA
-    ? 'A1+B1'
-    : getLabwareDisplayLocation({
-        t,
-        loadedModules: protocolData.modules,
-        loadedLabwares: protocolData.labware,
-        robotType: FLEX_ROBOT_TYPE,
-        location: {
-          addressableAreaName,
-        },
-        detailLevel: 'slot-only',
-      }).slice(-2) // ex, "C1" instead of "Slot C1"
+  return getSlotFromAddressableAreaName(details.addressableAreaName)
 }
 
 export interface GetLabwareDefsForLPCParams {

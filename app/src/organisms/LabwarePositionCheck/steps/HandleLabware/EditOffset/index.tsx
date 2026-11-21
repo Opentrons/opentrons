@@ -73,7 +73,11 @@ export interface EditOffsetContentProps extends LPCWizardContentProps {
 
 export function EditOffsetContent(props: EditOffsetContentProps): ReactNode {
   const dispatch = useDispatch()
-  const { toggleRobotMoving, handleConfirmLwFinalPosition } = props.commandUtils
+  const {
+    toggleRobotMoving,
+    handleConfirmLwFinalPosition,
+    handlePostConfirmCleanup,
+  } = props.commandUtils
   const currentSubStep = useSelector(selectCurrentSubstep(props.runId))
 
   const isOnDevice = useSelector(getIsOnDevice)
@@ -93,10 +97,12 @@ export function EditOffsetContent(props: EditOffsetContentProps): ReactNode {
           })
         )
       })
+      .then(() => handlePostConfirmCleanup())
       .then(() => {
         dispatch(proceedEditOffsetSubstep(props.runId))
       })
       .finally(() => toggleRobotMoving(false))
+      .catch(() => undefined)
   }
 
   switch (currentSubStep) {

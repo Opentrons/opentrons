@@ -22,9 +22,9 @@ import {
 import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 import { SetupCamera } from '..'
+import type { SetupCameraProps } from '..'
 
 import type { Mock } from 'vitest'
-import type { SetupCameraProps } from '..'
 
 vi.mock('react-router-dom')
 vi.mock(

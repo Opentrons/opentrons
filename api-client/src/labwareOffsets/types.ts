@@ -6,7 +6,8 @@ export interface StoredLabwareOffset {
   createdAt: string
   definitionUri: string
   locationSequence:
-    LabwareOffsetLocationSequenceComponent[] | typeof ANY_LOCATION
+    | LabwareOffsetLocationSequenceComponent[]
+    | typeof ANY_LOCATION
   vector: VectorOffset
 }
 

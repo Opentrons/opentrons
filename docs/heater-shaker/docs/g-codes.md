@@ -1,12 +1,12 @@
 ---
-title: "Heater-Shaker Module: G-codes"
-description: "Lists all Heater-Shaker G-codes and responses."
+title: 'Heater-Shaker Module: G-codes'
+description: 'Lists all Heater-Shaker G-codes and responses.'
 ---
 
 The Thermocycler accepts the G-code commands listed below.
 
 !!! tip
-    These commands rarely change, but you can always check for updates in the [Heater-Shaker driver file](https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/drivers/heater_shaker/driver.py).
+These commands rarely change, but you can always check for updates in the [Heater-Shaker driver file](https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/drivers/heater_shaker/driver.py).
 
 <table>
   <thead>

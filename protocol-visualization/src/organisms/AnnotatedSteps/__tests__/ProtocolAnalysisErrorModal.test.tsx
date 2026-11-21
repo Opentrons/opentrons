@@ -4,10 +4,11 @@ import i18n from 'i18next'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-import en from '../../../assets/localization/en/protocol_visualization.json'
 import { ProtocolAnalysisErrorModal } from '../ProtocolAnalysisErrorModal'
 
 import type { ComponentProps } from 'react'
+
+import en from '../../../assets/localization/en/protocol_visualization.json'
 
 const i18nInstance = i18n.createInstance()
 i18nInstance.use(initReactI18next).init({

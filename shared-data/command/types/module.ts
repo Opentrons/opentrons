@@ -397,7 +397,8 @@ export interface AtomicVacuumProfileStepPower extends AtomicVacuumProfileStepBas
 }
 
 export type AtomicVacuumProfileStep =
-  AtomicVacuumProfileStepPressure | AtomicVacuumProfileStepPower
+  | AtomicVacuumProfileStepPressure
+  | AtomicVacuumProfileStepPower
 
 export interface VacuumProfileCycle {
   steps: AtomicVacuumProfileStep[]

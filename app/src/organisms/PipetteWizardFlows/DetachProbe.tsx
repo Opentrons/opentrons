@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
+import { StyledText } from '@opentrons/components'
+
 import { GenericWizardTile } from '/app/components/adhoc/shared/wizards/GenericWizardTile'
 import { SimpleWizardInProgressBody } from '/app/components/adhoc/shared/wizards/SimpleWizardBody'
 import { WizardBodyText } from '/app/components/adhoc/shared/wizards/WizardBodyText'
@@ -33,7 +35,14 @@ export const DetachProbe = (props: DetachProbeProps): ReactNode => {
   }
   return (
     <GenericWizardTile
-      header={i18n.format(t('remove_cal_probe'), 'capitalize')}
+      header={
+        <StyledText
+          desktopStyle="headingSmallBold"
+          oddStyle="level4HeaderSemiBold"
+        >
+          {i18n.format(t('remove_cal_probe'), 'capitalize')}
+        </StyledText>
+      }
       //  todo(jr, 5/30/23): update animations! these are not final for 1, 8 and 96
       rightHandBody={getPipetteAnimations({
         pipetteWizardStep,

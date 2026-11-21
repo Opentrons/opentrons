@@ -1,6 +1,6 @@
 ---
-title: "Opentrons OT-2: App Features Summary"
-description: "Protocols, Labware, and Devices tab features and settings in the app."
+title: 'Opentrons OT-2: App Features Summary'
+description: 'Protocols, Labware, and Devices tab features and settings in the app.'
 ---
 
 You control the OT-2 using the Opentrons OT-2 App on your computer. This section highlights key features found in the Protocols, Labware, and Devices tabs of the app.
@@ -133,7 +133,7 @@ Each summary tile provides robot information as shown in the following table.
 </table>
 
 !!! tip
-    If you're using a Wi-Fi connection and the OT-2 you want to use is unavailable, check your Wi-Fi settings. Your OT-2 may be on a different wireless network.
+If you're using a Wi-Fi connection and the OT-2 you want to use is unavailable, check your Wi-Fi settings. Your OT-2 may be on a different wireless network.
 
 ### Robot details
 
@@ -233,6 +233,6 @@ Each entry in the recent protocol runs list includes the protocol name, its time
 - **Delete protocol run record**: Delete all information about this protocol run from the robot, including labware offset data. When you choose this option, it's as though the protocol run never happened.
 
 !!! note
-    If you need to maintain a comprehensive record of all runs performed on your robot, you must use the **Download run log** feature to save this information to your computer.
+If you need to maintain a comprehensive record of all runs performed on your robot, you must use the **Download run log** feature to save this information to your computer.
 
 - **Download image files**: Save to your computer a `.zip` file containing all the images taken during a protocol run, if the camera was enabled.

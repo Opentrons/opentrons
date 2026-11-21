@@ -1,4 +1,4 @@
-import type { MoveToSlotRunTimeCommand } from '@opentrons/shared-data/command'
+import type { MoveToSlotRunTimeCommand } from '@opentrons/shared-data'
 import type { HandlesCommands } from '../types'
 
 export function getMoveToSlotCommandText({

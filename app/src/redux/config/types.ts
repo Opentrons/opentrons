@@ -63,4 +63,6 @@ export type ConfigValueChangeAction =
   | SubtractConfigValueAction
 
 export type ConfigAction =
-  ConfigValueChangeAction | ConfigValueUpdatedAction | ConfigInitializedAction
+  | ConfigValueChangeAction
+  | ConfigValueUpdatedAction
+  | ConfigInitializedAction

@@ -1,12 +1,12 @@
 ---
-title: "Opentrons Flex: Heater-Shaker Module"
-description: "Heater-Shaker on Flex: on-deck heating and orbital shaking."
+title: 'Opentrons Flex: Heater-Shaker Module'
+description: 'Heater-Shaker on Flex: on-deck heating and orbital shaking.'
 ---
 
-![The Heater-Shaker module as seen from the front left. The top of the module has the heating and shaking platform and labware latch. The left side of the module has the power button, USB port, and power port.](../images/heater-shaker-module.png "Heater-Shaker Module")
+![The Heater-Shaker module as seen from the front left. The top of the module has the heating and shaking platform and labware latch. The left side of the module has the power button, USB port, and power port.](../images/heater-shaker-module.png 'Heater-Shaker Module')
 
 !!! info "Additional Documentation"
-    For complete instructions on module installation and use, see the [Heater-Shaker Module Instruction Manual](../../heater-shaker/index.md).
+For complete instructions on module installation and use, see the [Heater-Shaker Module Instruction Manual](../../heater-shaker/index.md).
 
 ## Heater-Shaker features
 
@@ -39,7 +39,7 @@ prior to shaking.
 
 ### Thermal adapters
 
-A compatible *thermal adapter* is required for adding labware to the Heater-Shaker. Currently available Thermal Adapters include:
+A compatible _thermal adapter_ is required for adding labware to the Heater-Shaker. Currently available Thermal Adapters include:
 
 <div class="parts-list" markdown>
 <figure markdown>

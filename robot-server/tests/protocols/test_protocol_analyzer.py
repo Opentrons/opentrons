@@ -288,9 +288,7 @@ async def test_analyze(
         )
     ).then_return(
         JsonCommandSlice(
-            commands=[
-                analysis_command.model_dump_json(by_alias=True, exclude_none=True)
-            ],
+            commands=[analysis_command.model_dump_json(by_alias=True)],
             cursor=0,
             total_length=len([analysis_command]),
         )

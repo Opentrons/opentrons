@@ -38,7 +38,9 @@ interface TerminalItem {
   id: TerminalItemId
 }
 export type SelectableItem =
-  SingleSelectedItem | MultipleSelectedItem | TerminalItem
+  | SingleSelectedItem
+  | MultipleSelectedItem
+  | TerminalItem
 type SelectedItemState = SelectableItem | null | undefined
 export type HoverableItem = SingleSelectedItem | TerminalItem
 

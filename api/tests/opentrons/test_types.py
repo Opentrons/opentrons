@@ -1,6 +1,12 @@
-import pytest
+from dataclasses import dataclass
 
+import pytest
+from decoy import Decoy
+
+from opentrons.protocol_api.core.common import LabwareCore, ProtocolCore, WellCore
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
 from opentrons.protocol_api.labware import Labware
+from opentrons.protocols.api_support.definitions import MIN_SUPPORTED_VERSION
 from opentrons.types import DeckSlotName, Location, MeniscusTrackingTarget, Point
 
 
@@ -36,21 +42,51 @@ def test_point_rmul() -> None:
     assert b * a == Point(3.1, 6.2, 9.3)
 
 
-def test_location_repr_labware(min_lw: Labware) -> None:
+@dataclass
+class MockedLW:
+    labware: Labware
+    labware_core: LabwareCore
+    well_core: WellCore
+    protocol_core: ProtocolCore
+    core_map: LoadedCoreMap
+
+
+@pytest.fixture
+def independent_lw(decoy: Decoy) -> MockedLW:
+    pc = decoy.mock(cls=ProtocolCore)
+    lc = decoy.mock(cls=LabwareCore)
+    wc = decoy.mock(cls=WellCore)
+    cm = LoadedCoreMap()
+    decoy.when(lc.get_well_columns()).then_return([["A1"]])
+    decoy.when(lc.get_well_core("A1")).then_return(wc)
+    decoy.when(lc.get_display_name()).then_return("minimal labware on deck")
+    decoy.when(wc.get_display_name()).then_return("minimal well etc")
+    l = Labware(
+        core=lc, api_version=MIN_SUPPORTED_VERSION, protocol_core=pc, core_map=cm
+    )
+    cm.add(lc, l)
+    return MockedLW(
+        labware=l, labware_core=lc, well_core=wc, protocol_core=pc, core_map=cm
+    )
+
+
+def test_location_repr_labware(independent_lw: MockedLW) -> None:
     """It should represent labware as Labware"""
-    loc = Location(point=Point(x=1.1, y=2.1, z=3.5), labware=min_lw)
+    loc = Location(point=Point(x=1.1, y=2.1, z=3.5), labware=independent_lw.labware)
     assert (
         f"{loc}"
         == "Location(point=Point(x=1.1, y=2.1, z=3.5), labware=minimal labware on deck, meniscus_tracking=None)"
     )
 
 
-def test_location_repr_well(min_lw: Labware) -> None:
+def test_location_repr_well(independent_lw: MockedLW) -> None:
     """It should represent labware as Well"""
-    loc = Location(point=Point(x=1, y=2, z=3), labware=min_lw.wells()[0])
+    loc = Location(
+        point=Point(x=1, y=2, z=3), labware=independent_lw.labware.wells()[0]
+    )
     assert (
         f"{loc}"
-        == "Location(point=Point(x=1, y=2, z=3), labware=A1 of minimal labware on deck, meniscus_tracking=None)"
+        == "Location(point=Point(x=1, y=2, z=3), labware=minimal well etc, meniscus_tracking=None)"
     )
 
 

@@ -3,9 +3,9 @@ import i18n from 'i18next'
 
 import { baseI18nConfig } from '@opentrons/components'
 
-import { resources } from './assets/localization'
-
 import type { InitOptions } from 'i18next'
+
+import { resources } from './assets/localization'
 
 const initOptions: InitOptions = {
   ...baseI18nConfig,

@@ -5842,7 +5842,7 @@
             "zDimension": 16.0
           },
           "gripForce": 15.0,
-          "gripHeightFromLabwareBottom": 10.0,
+          "gripHeightFromLabwareBottom": 11.5,
           "gripperOffsets": {},
           "groups": [
             {
@@ -7502,7 +7502,7 @@
             "zDimension": 16.0
           },
           "gripForce": 15.0,
-          "gripHeightFromLabwareBottom": 10.0,
+          "gripHeightFromLabwareBottom": 11.5,
           "gripperOffsets": {},
           "groups": [
             {

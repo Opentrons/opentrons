@@ -2,12 +2,12 @@ test_name: Test the /protocols/{protocolID}/dataFiles endpoint
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 
 stages:
   - name: Upload data file 1
     request:
-      url: '{ot2_server_base_url}/dataFiles'
+      url: '{ot3_server_base_url}/dataFiles'
       method: POST
       files:
         file: 'tests/integration/data_files/test.csv'
@@ -21,7 +21,7 @@ stages:
 
   - name: Upload data file 2
     request:
-      url: '{ot2_server_base_url}/dataFiles'
+      url: '{ot3_server_base_url}/dataFiles'
       method: POST
       files:
         file: 'tests/integration/data_files/sample_record.csv'
@@ -35,7 +35,7 @@ stages:
 
   - name: Upload data file 3
     request:
-      url: '{ot2_server_base_url}/dataFiles'
+      url: '{ot3_server_base_url}/dataFiles'
       method: POST
       files:
         file: 'tests/integration/data_files/sample_plates.csv'
@@ -49,7 +49,7 @@ stages:
 
   - name: Upload protocol with CSV file ID
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       data:
         runTimeParameterFiles: '{{"liq_handling_csv_file": "{data_file_1_id}"}}'
@@ -60,8 +60,7 @@ stages:
         json:
           protocol_id: data.id
           analysis_id: data.analysisSummaries[0].id
-      strict:
-        json:off
+      strict: json:off
       status_code: 201
       json:
         data:
@@ -74,7 +73,7 @@ stages:
     max_retries: 5
     delay_after: 1
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}'
     response:
       status_code: 200
       json:
@@ -95,7 +94,7 @@ stages:
 
   - name: Check that the completed analysis includes the CSV file parameter
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id}'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id}'
     response:
       strict:
         - json:off
@@ -114,7 +113,7 @@ stages:
 
   - name: Start a new analysis with a different CSV file
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses'
       method: POST
       json:
         data:
@@ -140,7 +139,7 @@ stages:
     max_retries: 5
     delay_after: 1
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}'
     response:
       status_code: 200
       json:
@@ -164,7 +163,7 @@ stages:
 
   - name: Check that the reanalysis includes the new CSV file parameter
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id2}'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses/{analysis_id2}'
     response:
       strict:
         - json:off
@@ -183,7 +182,7 @@ stages:
 
   - name: Create a run from the protocol and a CSV file
     request:
-      url: '{ot2_server_base_url}/runs'
+      url: '{ot3_server_base_url}/runs'
       method: POST
       json:
         data:
@@ -196,8 +195,7 @@ stages:
         json:
           run_id1: data.id
           run_time_parameters_data2: data.runTimeParameters
-      strict:
-        json:off
+      strict: json:off
       json:
         data:
           id: !anystr
@@ -215,7 +213,7 @@ stages:
 
   - name: Create another run from the protocol and a different CSV file
     request:
-      url: '{ot2_server_base_url}/runs'
+      url: '{ot3_server_base_url}/runs'
       method: POST
       json:
         data:
@@ -228,8 +226,7 @@ stages:
         json:
           run_id2: data.id
           run_time_parameters_data3: data.runTimeParameters
-      strict:
-        json:off
+      strict: json:off
       json:
         data:
           id: !anystr
@@ -247,7 +244,7 @@ stages:
 
   - name: Fetch data files used with the protocol so far
     request:
-      url: '{ot2_server_base_url}/protocols/{protocol_id}/dataFiles'
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/dataFiles'
     response:
       status_code: 200
       json:
@@ -256,14 +253,14 @@ stages:
           totalLength: 3
         data:
           - id: '{data_file_1_id}'
-            name: "test.csv"
+            name: 'test.csv'
             createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             source: 'uploaded'
           - id: '{data_file_2_id}'
-            name: "sample_record.csv"
+            name: 'sample_record.csv'
             createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             source: 'uploaded'
           - id: '{data_file_3_id}'
-            name: "sample_plates.csv"
+            name: 'sample_plates.csv'
             createdAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             source: 'uploaded'

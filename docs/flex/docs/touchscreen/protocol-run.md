@@ -1,6 +1,6 @@
 ---
-title: "Opentrons Flex: Protocol Run"
-description: "Start, pause, cancel, and monitor protocol execution on the touchscreen."
+title: 'Opentrons Flex: Protocol Run'
+description: 'Start, pause, cancel, and monitor protocol execution on the touchscreen.'
 ---
 
 Once everything is set up, begin your run by tapping the play button :material-play-circle: on the "Prepare to run" screen. Flex will begin the protocol and you'll see the Running screen.
@@ -21,9 +21,9 @@ Swipe from right to left to see an alternative view with smaller controls and mo
 
 ## Error recovery
 
-Starting in robot software version 8.0.0, if something unexpected happens during the protocol run, Flex will pause and give you the option to enter *error recovery mode*. In earlier versions, Flex cancels the run when an error occurs.
+Starting in robot software version 8.0.0, if something unexpected happens during the protocol run, Flex will pause and give you the option to enter _error recovery mode_. In earlier versions, Flex cancels the run when an error occurs.
 
-![Error recovery screen showing a pipette overpressure error, with options to cancel the run or launch recovery mode.](../images/touchscreen-error-recovery.png "Error recovery")
+![Error recovery screen showing a pipette overpressure error, with options to cancel the run or launch recovery mode.](../images/touchscreen-error-recovery.png 'Error recovery')
 
 Tap **Launch recovery mode** to see options for the particular type of error that has occurred. Instead of just canceling the protocol and forcing a restart, this feature gives you a chance to correct problems like replacing a damaged tip or filling an empty well. Even if you have to cancel a protocol run, error recovery will let you preserve liquids in the pipette and control where tips are dropped. After all, an occasional mistake or problem shouldn't end a procedure with the loss of expensive reagents or valuable samples.
 
@@ -81,7 +81,7 @@ Flex provides a protocol recovery path for the following error conditions.
 </table>
 
 !!! note
-    The tip presence sensor is disabled for [partial tip pickup](../system-description/pipettes.md#partial-tip-pickup) of 1, 2, or 3 tips. In these configurations, Flex cannot detect tip pickup errors and will not present error recovery options if the pipette fails to pick up the tips. The run will continue unless and until another error occurs.
+The tip presence sensor is disabled for [partial tip pickup](../system-description/pipettes.md#partial-tip-pickup) of 1, 2, or 3 tips. In these configurations, Flex cannot detect tip pickup errors and will not present error recovery options if the pipette fails to pick up the tips. The run will continue unless and until another error occurs.
 
 You can view the status of a finished protocol and review any resolved errors on the run completion screen.
 

@@ -1,10 +1,10 @@
 ---
-title: "Python API: Magnetic Block"
-description: "Use the Magnetic Block with the Flex Gripper in protocols."
+title: 'Python API: Magnetic Block'
+description: 'Use the Magnetic Block with the Flex Gripper in protocols.'
 ---
 
 !!! note "Flex only"
-    The Magnetic Block is compatible with Opentrons Flex only. If you have an OT-2, use the [Magnetic Module](magnetic-module.md).
+The Magnetic Block is compatible with Opentrons Flex only. If you have an OT-2, use the [Magnetic Module](magnetic-module.md).
 
 The Magnetic Block is an unpowered, 96-well plate that holds labware close to its high-strength neodymium magnets. This module is suitable for many magnetic bead-based protocols, but does not move beads up or down in solution.
 
@@ -26,4 +26,5 @@ mag_plate = magnetic_block.load_labware(
 # Use the gripper to move labware
 protocol.move_labware(mag_plate, new_location="B2", use_gripper=True)
 ```
-*New in version 2.15*
+
+_New in version 2.15_

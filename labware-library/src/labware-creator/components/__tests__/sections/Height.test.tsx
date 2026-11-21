@@ -1,12 +1,11 @@
+import { render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { render, screen } from '@testing-library/react'
-
-import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 import { getDefaultFormState } from '../../../fields'
 import { isEveryFieldHidden } from '../../../utils'
+import { nestedTextMatcher } from '../../__testUtils__/nestedTextMatcher'
 import { Height } from '../../sections/Height'
 import { wrapInFormik } from '../../utils/wrapInFormik'
 

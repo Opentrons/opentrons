@@ -2,13 +2,13 @@ test_name: Make sure you can create a maintenance run while there are no normal 
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 
 stages:
   - &assert_no_runs
     name: 'Setup check: Make sure there are no runs'
     request:
-      url: '{ot2_server_base_url}/runs'
+      url: '{ot3_server_base_url}/runs'
     response:
       json:
         data: []
@@ -20,25 +20,24 @@ stages:
   - &assert_no_maintenance_runs
     name: 'Setup check: Make sure there are no maintenance runs'
     request:
-      url: '{ot2_server_base_url}/maintenance_runs/current'
+      url: '{ot3_server_base_url}/maintenance_runs/current'
     response:
       status_code: 404
 
   - &assert_can_create_maintenance_run
     name: Make sure we can create a maintenance run
     request:
-      url: '{ot2_server_base_url}/maintenance_runs'
+      url: '{ot3_server_base_url}/maintenance_runs'
       method: POST
     response:
       status_code: 201
 
 ---
-
 test_name: Make sure you can create a maintenance run while there is an unstarted protocol run
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 
 stages:
   - *assert_no_runs
@@ -47,10 +46,10 @@ stages:
   - &upload_protocol_and_save_id
     name: Upload a protocol
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
-        files: tests/integration/protocols/simple_v6.json
+        files: tests/integration/protocols/wait_then_home_v6.json
     response:
       status_code: 201
       save:
@@ -60,7 +59,7 @@ stages:
   - &create_protocol_run_and_save_id
     name: Create a protocol run
     request:
-      url: '{ot2_server_base_url}/runs'
+      url: '{ot3_server_base_url}/runs'
       method: POST
       json:
         data:
@@ -74,12 +73,11 @@ stages:
   - *assert_can_create_maintenance_run
 
 ---
-
 test_name: Make sure you can create a maintenance run while there is a completed protocol run
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 
 stages:
   - *assert_no_runs
@@ -90,7 +88,7 @@ stages:
 
   - name: Issue a play action
     request:
-      url: '{ot2_server_base_url}/runs/{protocol_run_id}/actions'
+      url: '{ot3_server_base_url}/runs/{protocol_run_id}/actions'
       json:
         data:
           actionType: play
@@ -102,7 +100,7 @@ stages:
     max_retries: 10
     delay_after: 0.1
     request:
-      url: '{ot2_server_base_url}/runs/{protocol_run_id}'
+      url: '{ot3_server_base_url}/runs/{protocol_run_id}'
       method: GET
     response:
       status_code: 200

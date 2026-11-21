@@ -4,7 +4,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { getHasOptedIn } from '../../../analytics/selectors'
-import { i18n } from '../../../assets/localization'
 import { useAnnouncements } from '../../../components/organisms/AnnouncementModal/announcements'
 import { useKitchen } from '../../../components/organisms/Kitchen/useKitchen'
 import { getFileMetadata } from '../../../file-data/selectors'
@@ -12,6 +11,8 @@ import { loadProtocolFile } from '../../../load-file/actions'
 import { toggleNewProtocolModal } from '../../../navigation/actions'
 import { getIsProduction } from '../../../networking/opentronsWebApi'
 import { Landing } from '../index'
+
+import { i18n } from '../../../assets/localization'
 
 vi.mock('../../../load-file/actions')
 vi.mock('../../../file-data/selectors')

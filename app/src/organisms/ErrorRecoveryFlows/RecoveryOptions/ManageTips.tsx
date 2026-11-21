@@ -1,4 +1,5 @@
 import { Trans, useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -12,6 +13,7 @@ import {
 
 import { DropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
 import { DT_ROUTES } from '/app/organisms/DropTipWizardFlows/constants'
+import { setDropTipPromptDismissed } from '/app/redux/protocol-runs'
 
 import {
   FLEX_WIDTH_ALERT_INFO_STYLE,
@@ -24,9 +26,10 @@ import {
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
+import type { Dispatch } from 'redux'
 import type { ReactNode } from 'react'
 import type { FixitCommandTypeUtils } from '/app/organisms/DropTipWizardFlows'
-import type { RecoveryContentProps, RecoveryRoute, RouteStep } from '../types'
+import type { RecoveryContentProps } from '../types'
 
 // The Drop Tip flow entry point. Includes entry from SelectRecoveryOption and CancelRun.
 export function ManageTips(props: RecoveryContentProps): ReactNode {
@@ -58,26 +61,17 @@ export function ManageTips(props: RecoveryContentProps): ReactNode {
   return buildContent()
 }
 
-export function BeginRemoval({
-  tipStatusUtils,
-  routeUpdateActions,
-  recoveryCommands,
-  currentRecoveryOptionUtils,
-}: RecoveryContentProps): JSX.Element | null {
+export function BeginRemoval(props: RecoveryContentProps): JSX.Element | null {
+  const { tipStatusUtils, routeUpdateActions, currentRecoveryOptionUtils } =
+    props
   const { t } = useTranslation('error_recovery')
   const { aPipetteWithTip } = tipStatusUtils
-  const { proceedNextStep, handleMotionRouting, proceedToRouteAndStep } =
-    routeUpdateActions
-  const { cancelRun } = recoveryCommands
+  const { proceedNextStep, proceedToRouteAndStep } = routeUpdateActions
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
-  const {
-    ROBOT_CANCELING,
-    RETRY_NEW_TIPS,
-    HOME_AND_RETRY,
-    MANUAL_FILL_AND_RETRY_NEW_TIPS,
-    DROP_TIP_FLOWS,
-  } = RECOVERY_MAP
+  const dispatch = useDispatch()
+  const { HOME_AND_RETRY, DROP_TIP_FLOWS } = RECOVERY_MAP
   const mount = aPipetteWithTip?.mount
+  const is96Channel = aPipetteWithTip?.specs?.channels === 96
 
   const primaryOnClick = (): void => {
     if (selectedRecoveryOption === HOME_AND_RETRY.ROUTE) {
@@ -91,28 +85,7 @@ export function BeginRemoval({
   }
 
   const secondaryOnClick = (): void => {
-    if (selectedRecoveryOption === RETRY_NEW_TIPS.ROUTE) {
-      void proceedToRouteAndStep(
-        RETRY_NEW_TIPS.ROUTE,
-        RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
-      )
-    } else if (selectedRecoveryOption === HOME_AND_RETRY.ROUTE) {
-      void proceedToRouteAndStep(
-        HOME_AND_RETRY.ROUTE,
-        HOME_AND_RETRY.STEPS.HOME_BEFORE_RETRY
-      )
-    } else if (
-      selectedRecoveryOption === MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE
-    ) {
-      void proceedToRouteAndStep(
-        MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
-        MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
-      )
-    } else {
-      void handleMotionRouting(true, ROBOT_CANCELING.ROUTE).then(() => {
-        cancelRun()
-      })
-    }
+    resolveTipsAndContinue(props, dispatch, { skipCurrent: true })
   }
 
   return (
@@ -145,7 +118,11 @@ export function BeginRemoval({
         >
           <Trans
             t={t}
-            i18nKey="homing_pipette_dangerous"
+            i18nKey={
+              is96Channel
+                ? 'homing_pipette_dangerous_generic'
+                : 'homing_pipette_dangerous'
+            }
             values={{
               mount,
             }}
@@ -169,61 +146,16 @@ export function BeginRemoval({
 function DropTipFlowsContainer(
   props: RecoveryContentProps
 ): JSX.Element | null {
-  const {
-    robotType,
-    tipStatusUtils,
-    routeUpdateActions,
-    recoveryCommands,
-    currentRecoveryOptionUtils,
-  } = props
-  const {
-    DROP_TIP_FLOWS,
-    ROBOT_CANCELING,
-    RETRY_NEW_TIPS,
-    HOME_AND_RETRY,
-    MANUAL_FILL_AND_RETRY_NEW_TIPS,
-  } = RECOVERY_MAP
-  const { proceedToRouteAndStep, handleMotionRouting } = routeUpdateActions
-  const { selectedRecoveryOption } = currentRecoveryOptionUtils
-  const { setTipStatusResolved } = tipStatusUtils
-  const { cancelRun } = recoveryCommands
+  const { robotType, tipStatusUtils } = props
+  const dispatch = useDispatch()
 
   const { mount, specs } = tipStatusUtils.aPipetteWithTip! // Safe as we have to have tips to get to this point in the flow.
 
   const onCloseFlow = (): void => {
-    if (selectedRecoveryOption === RETRY_NEW_TIPS.ROUTE) {
-      void proceedToRouteAndStep(
-        RETRY_NEW_TIPS.ROUTE,
-        RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
-      )
-    } else if (selectedRecoveryOption === HOME_AND_RETRY.ROUTE) {
-      void proceedToRouteAndStep(
-        HOME_AND_RETRY.ROUTE,
-        HOME_AND_RETRY.STEPS.HOME_BEFORE_RETRY
-      )
-    } else if (
-      selectedRecoveryOption === MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE
-    ) {
-      void proceedToRouteAndStep(
-        MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
-        MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
-      )
-    } else {
-      void setTipStatusResolved(onEmptyCache, onTipsDetected)
-    }
+    resolveTipsAndContinue(props, dispatch, { skipCurrent: false })
   }
 
-  const onEmptyCache = (): void => {
-    void handleMotionRouting(true, ROBOT_CANCELING.ROUTE).then(() => {
-      cancelRun()
-    })
-  }
-
-  const onTipsDetected = (): void => {
-    void proceedToRouteAndStep(DROP_TIP_FLOWS.ROUTE)
-  }
-
-  const fixitCommandTypeUtils = useDropTipFlowUtils(props)
+  const fixitCommandTypeUtils = useDropTipFlowUtils(props, dispatch)
 
   return (
     <DropTipWizardFlows
@@ -238,15 +170,18 @@ function DropTipFlowsContainer(
 }
 
 // Builds the overrides injected into DT Wiz.
-export function useDropTipFlowUtils({
-  tipStatusUtils,
-  failedCommand,
-  currentRecoveryOptionUtils,
-  subMapUtils,
-  routeUpdateActions,
-  recoveryMap,
-  errorKind,
-}: RecoveryContentProps): FixitCommandTypeUtils {
+export function useDropTipFlowUtils(
+  props: RecoveryContentProps,
+  dispatch: Dispatch
+): FixitCommandTypeUtils {
+  const {
+    tipStatusUtils,
+    failedCommand,
+    currentRecoveryOptionUtils,
+    subMapUtils,
+    routeUpdateActions,
+    recoveryMap,
+  } = props
   const { t } = useTranslation('error_recovery')
   const {
     RETRY_NEW_TIPS,
@@ -276,35 +211,11 @@ export function useDropTipFlowUtils({
   }
 
   const buildTipDropCompleteRouting = (): (() => void) | null => {
-    const routeTo = (selectedRoute: RecoveryRoute, step: RouteStep): void => {
-      void proceedToRouteAndStep(selectedRoute, step)
-    }
-
-    switch (selectedRecoveryOption) {
-      case RETRY_NEW_TIPS.ROUTE:
-        return () => {
-          routeTo(selectedRecoveryOption, RETRY_NEW_TIPS.STEPS.REPLACE_TIPS)
-        }
-      case SKIP_STEP_WITH_NEW_TIPS.ROUTE:
-        return () => {
-          routeTo(
-            selectedRecoveryOption,
-            SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS
-          )
-        }
-      case HOME_AND_RETRY.ROUTE:
-        return () => {
-          routeTo(selectedRecoveryOption, HOME_AND_RETRY.STEPS.REPLACE_TIPS)
-        }
-      case MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE:
-        return () => {
-          routeTo(
-            selectedRecoveryOption,
-            MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
-          )
-        }
-      default:
-        return null
+    return () => {
+      resolveTipsAndContinue(props, dispatch, {
+        skipCurrent: false,
+        afterDropComplete: true,
+      })
     }
   }
 
@@ -429,54 +340,106 @@ export function useDropTipFlowUtils({
   }
 }
 
+interface ResolveTipsAndContinueOptions {
+  skipCurrent: boolean
+  afterDropComplete?: boolean
+}
+
+function resolveTipsAndContinue(
+  props: RecoveryContentProps,
+  dispatch: Dispatch,
+  { skipCurrent, afterDropComplete = false }: ResolveTipsAndContinueOptions
+): void {
+  const { tipStatusUtils, routeUpdateActions } = props
+  const { DROP_TIP_FLOWS } = RECOVERY_MAP
+
+  if (skipCurrent) {
+    tipStatusUtils.skipCurrentPipette()
+  }
+
+  void tipStatusUtils.determineTipStatus().then(remaining => {
+    if (remaining.length > 0) {
+      void routeUpdateActions.proceedToRouteAndStep(
+        DROP_TIP_FLOWS.ROUTE,
+        DROP_TIP_FLOWS.STEPS.BEGIN_REMOVAL
+      )
+      return
+    }
+
+    dispatch(setDropTipPromptDismissed(tipStatusUtils.runId))
+    routeWhenNoPipetteWithTip(props, {
+      afterDropComplete,
+      ifNoSpecialRoute: 'cancel',
+    })
+  })
+}
+
 // Handle cases in which there is no pipette that could be used for drop tip wizard by routing
 // to the next step or to option selection, if no special routing is provided.
 function routeAlternativelyIfNoPipette(props: RecoveryContentProps): void {
-  const { routeUpdateActions, currentRecoveryOptionUtils, tipStatusUtils } =
+  if (props.tipStatusUtils.aPipetteWithTip == null) {
+    routeWhenNoPipetteWithTip(props, { ifNoSpecialRoute: 'optionSelection' })
+  }
+}
+
+function routeWhenNoPipetteWithTip(
+  props: RecoveryContentProps,
+  {
+    afterDropComplete = false,
+    ifNoSpecialRoute,
+  }: {
+    afterDropComplete?: boolean
+    ifNoSpecialRoute: 'cancel' | 'optionSelection'
+  }
+): void {
+  const { routeUpdateActions, recoveryCommands, currentRecoveryOptionUtils } =
     props
-  const { proceedToRouteAndStep } = routeUpdateActions
+  const { proceedToRouteAndStep, handleMotionRouting } = routeUpdateActions
+  const { cancelRun } = recoveryCommands
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const {
+    ROBOT_CANCELING,
     RETRY_NEW_TIPS,
     SKIP_STEP_WITH_NEW_TIPS,
-    OPTION_SELECTION,
     HOME_AND_RETRY,
     MANUAL_FILL_AND_RETRY_NEW_TIPS,
+    OPTION_SELECTION,
   } = RECOVERY_MAP
 
-  if (tipStatusUtils.aPipetteWithTip == null) {
-    switch (selectedRecoveryOption) {
-      case RETRY_NEW_TIPS.ROUTE: {
-        proceedToRouteAndStep(
-          selectedRecoveryOption,
-          RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
-        )
-        break
+  switch (selectedRecoveryOption) {
+    case RETRY_NEW_TIPS.ROUTE:
+      void proceedToRouteAndStep(
+        RETRY_NEW_TIPS.ROUTE,
+        RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+      )
+      break
+    case SKIP_STEP_WITH_NEW_TIPS.ROUTE:
+      void proceedToRouteAndStep(
+        SKIP_STEP_WITH_NEW_TIPS.ROUTE,
+        SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS
+      )
+      break
+    case HOME_AND_RETRY.ROUTE:
+      void proceedToRouteAndStep(
+        HOME_AND_RETRY.ROUTE,
+        afterDropComplete
+          ? HOME_AND_RETRY.STEPS.REPLACE_TIPS
+          : HOME_AND_RETRY.STEPS.HOME_BEFORE_RETRY
+      )
+      break
+    case MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE:
+      void proceedToRouteAndStep(
+        MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE,
+        MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
+      )
+      break
+    default:
+      if (ifNoSpecialRoute === 'cancel') {
+        void handleMotionRouting(true, ROBOT_CANCELING.ROUTE).then(() => {
+          cancelRun()
+        })
+      } else {
+        void proceedToRouteAndStep(OPTION_SELECTION.ROUTE)
       }
-      case SKIP_STEP_WITH_NEW_TIPS.ROUTE: {
-        proceedToRouteAndStep(
-          selectedRecoveryOption,
-          SKIP_STEP_WITH_NEW_TIPS.STEPS.REPLACE_TIPS
-        )
-        break
-      }
-      case HOME_AND_RETRY.ROUTE: {
-        proceedToRouteAndStep(
-          selectedRecoveryOption,
-          HOME_AND_RETRY.STEPS.HOME_BEFORE_RETRY
-        )
-        break
-      }
-      case MANUAL_FILL_AND_RETRY_NEW_TIPS.ROUTE: {
-        proceedToRouteAndStep(
-          selectedRecoveryOption,
-          MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.REPLACE_TIPS
-        )
-        break
-      }
-      default: {
-        proceedToRouteAndStep(OPTION_SELECTION.ROUTE)
-      }
-    }
   }
 }

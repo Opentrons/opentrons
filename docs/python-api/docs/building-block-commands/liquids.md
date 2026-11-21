@@ -1,5 +1,5 @@
 ---
-title: "Python API: Liquid Control"
+title: 'Python API: Liquid Control'
 description: Basic commands for working with liquids.
 ---
 
@@ -27,12 +27,12 @@ Now our pipette holds 300 µL.
 
 ### Aspirate by well or location
 
-The `aspirate()` method includes the location parameters `location` and `end_location`. Each accepts different location types: 
+The `aspirate()` method includes the location parameters `location` and `end_location`. Each accepts different location types:
 
-- `location` accepts either a [`Well`][opentrons.protocol_api.Well] or a [`Location`][opentrons.types.Location]. 
+- `location` accepts either a [`Well`][opentrons.protocol_api.Well] or a [`Location`][opentrons.types.Location].
 - `end_location` can only be used in combination with the `location` parameter. Both must be a [`Location`][opentrons.types.Location].
 
-*Changed in version 2.27*: Use the `end_location` parameter to specify multiple locations for a Flex pipette during an aspirate.
+_Changed in version 2.27_: Use the `end_location` parameter to specify multiple locations for a Flex pipette during an aspirate.
 
 If you specify a single `location` like the well `"A1"`, the pipette will aspirate from a default position 1 mm above the bottom center of that well. To change the default clearance, first set the `aspirate` attribute of [`well_bottom_clearance`][opentrons.protocol_api.InstrumentContext.well_bottom_clearance]:
 
@@ -67,12 +67,12 @@ pipette.aspirate(
 # aspirates at 1 mm below the liquid meniscus
 ```
 
-*New in version 2.23*: Set `target="start"` or `"end"` to target the liquid meniscus during an aspirate.
+_New in version 2.23_: Set `target="start"` or `"end"` to target the liquid meniscus during an aspirate.
 
 !!!note
-    `measure_liquid_height()` works best with a new pipette tip each time. To save time and tips throughout your protocol, use `Labware.load_liquid` instead to specify starting liquid volumes.
-    
-Use the `location` and `end_location` parameters in combination to direct the pipette to move to specific locations while aspirating: 
+`measure_liquid_height()` works best with a new pipette tip each time. To save time and tips throughout your protocol, use `Labware.load_liquid` instead to specify starting liquid volumes.
+
+Use the `location` and `end_location` parameters in combination to direct the pipette to move to specific locations while aspirating:
 
 ```python
 pipette.pick_up_tip()
@@ -88,9 +88,9 @@ pipette.aspirate(
 Here, the pipette begins aspirating at 1 mm below the well top, and finishes aspirating at 2 mm above the well bottom.
 
 !!!note
-    When you use both the `location` and `end_location` parameters, you can optionally specify a `movement_delay` to ensure the pipette waits a set amount of time in seconds before moving to the `end_location`. This can be useful when pipetting viscous liquids. An additional 1 second `movement_delay` can help build up pressure in the tip before liquid starts to flow.
+When you use both the `location` and `end_location` parameters, you can optionally specify a `movement_delay` to ensure the pipette waits a set amount of time in seconds before moving to the `end_location`. This can be useful when pipetting viscous liquids. An additional 1 second `movement_delay` can help build up pressure in the tip before liquid starts to flow.
 
-*New in version 2.2.7*: Use the `end_location` and `movement_delay` parameters when specifying multiple locations in a single aspirate.
+_New in version 2.2.7_: Use the `end_location` and `movement_delay` parameters when specifying multiple locations in a single aspirate.
 
 See also:
 
@@ -107,7 +107,7 @@ Flex and OT-2 pipettes aspirate at [flow rates][pipette-flow-rates] measured in 
 pipette.aspirate(200, plate["A1"], rate=2.0)
 ```
 
-*New in version 2.0*
+_New in version 2.0_
 
 You can also specify an absolute `flow_rate` to set the flow rate in µL/second:
 
@@ -115,7 +115,7 @@ You can also specify an absolute `flow_rate` to set the flow rate in µL/second:
 pipette.aspirate(200, plate["A1"], flow_rate=50)
 ```
 
-*Changed in version 2.24:* Add the aspirate `flow_rate` parameter.
+_Changed in version 2.24:_ Add the aspirate `flow_rate` parameter.
 
 The `rate` and `flow_rate` parameters are mutually exclusive. If you specify both in the same command, the API will raise an error.
 
@@ -128,10 +128,10 @@ pipette.dispense(200, plate["B1"])
 ```
 
 !!! note
-    In API version 2.16 and earlier, you could pass a `volume` argument to `dispense()` greater than what was aspirated into the pipette. In this case, the API would ignore `volume` and dispense the pipette's `current_volume`. The robot *would not* move the plunger lower as a result.
-    
+In API version 2.16 and earlier, you could pass a `volume` argument to `dispense()` greater than what was aspirated into the pipette. In this case, the API would ignore `volume` and dispense the pipette's `current_volume`. The robot _would not_ move the plunger lower as a result.
+
     In version 2.17 and later, passing such values raises an error.
-    
+
     To move the plunger a small extra amount, add a [push out](#push-out-after-dispense). Or to move it a large amount, use [blow out](#blow-out-building-block).
 
 If the pipette doesn’t move, you can specify an additional dispense action without including a location. To demonstrate, this code snippet pauses the protocol, automatically resumes it, and dispenses a second time from location B1.
@@ -144,12 +144,12 @@ pipette.dispense(100)     # dispense 100 µL at current position
 
 ### Dispense by well or location
 
-The `dispense()` method includes the location parameters `location` and `end_location`. Each accepts different location types: 
+The `dispense()` method includes the location parameters `location` and `end_location`. Each accepts different location types:
 
-- `location` accepts either a [`Well`][opentrons.protocol_api.Well] or a [`Location`][opentrons.types.Location]. 
-- `end_location` can only be used in combination iwth the `location` parameter. Both must be a [`Location`][opentrons.types.Location]. 
+- `location` accepts either a [`Well`][opentrons.protocol_api.Well] or a [`Location`][opentrons.types.Location].
+- `end_location` can only be used in combination iwth the `location` parameter. Both must be a [`Location`][opentrons.types.Location].
 
-*Changed in version 2.27*: Use the `end_location` parameter to specify multiple locations for a Flex pipette during a dispense.
+_Changed in version 2.27_: Use the `end_location` parameter to specify multiple locations for a Flex pipette during a dispense.
 
 If you specify a single `location` like the well `"B1"`, the pipette will dispense from a default position 1 mm above the bottom center of that well. To change the default clearance, set the `dispense` attribute of [`well_bottom_clearance`][opentrons.protocol_api.InstrumentContext.well_bottom_clearance]:
 
@@ -181,12 +181,12 @@ pipette.dispense(
 # dispenses at 1 mm below the liquid meniscus
 ```
 
-*Changed in version 2.23*: Set `target="start"` or `"end"` to target the liquid meniscus during a dispense.
+_Changed in version 2.23_: Set `target="start"` or `"end"` to target the liquid meniscus during a dispense.
 
 To ensure the pipette begins the dispense at the liquid meniscus, set `target="start"`. See the [meniscus][meniscus] section for more details on pipetting relative to the liquid meniscus.
 
 !!!note
-    `measure_liquid_height()` works best with a new pipette tip each time. To save time and tips throughout your protocol, use `Labware.load_liquid` instead to specify starting liquid volumes.
+`measure_liquid_height()` works best with a new pipette tip each time. To save time and tips throughout your protocol, use `Labware.load_liquid` instead to specify starting liquid volumes.
 
 You can use the `location` and `end_location` parameters in combination to direct the pipette to move to specific locations while dispensing:
 
@@ -201,9 +201,9 @@ pipette.dispense(
 )
 ```
 
-Here, the pipette begins dispensing at 2 mm above the well bottom, and finishes dispensing at 1 mm below the well top. When you use both the `location` and `end_location` parameters, you can optionally specify a `movement_delay` to ensure the pipette waits a set amount of time, like 1 second, before moving to the `end_location`. 
+Here, the pipette begins dispensing at 2 mm above the well bottom, and finishes dispensing at 1 mm below the well top. When you use both the `location` and `end_location` parameters, you can optionally specify a `movement_delay` to ensure the pipette waits a set amount of time, like 1 second, before moving to the `end_location`.
 
-*Changed in version 2.27*: Use the `end_location` and `movement_delay` parameters when specifying multiple locations in a single dispense.
+_Changed in version 2.27_: Use the `end_location` and `movement_delay` parameters when specifying multiple locations in a single dispense.
 
 See also:
 
@@ -220,7 +220,7 @@ Flex and OT-2 pipettes dispense at default [flow rates][pipette-flow-rates] meas
 pipette.dispense(200, plate["B1"], rate=2.0)
 ```
 
-*New in version 2.0*
+_New in version 2.0_
 
 You can also specify an absolute `flow_rate` to set the flow rate in µL/second:
 
@@ -228,7 +228,7 @@ You can also specify an absolute `flow_rate` to set the flow rate in µL/second:
 pipette.dispense(200, plate["B1"], flow_rate=50)
 ```
 
-*Changed in version 2.24:* Add the dispense `flow_rate` parameter.
+_Changed in version 2.24:_ Add the dispense `flow_rate` parameter.
 
 The `rate` and `flow_rate` parameters are mutually exclusive. If you specify both in the same command, the API will raise an error.
 
@@ -299,8 +299,7 @@ Set `push_out` to override the default if you observe problems with dispensing. 
 
 To disable `push_out` during any dispense action, set `push_out=0`. You can use this to avoid multiple `push_out` actions during a mix step.
 
-*New in version 2.15*
-
+_New in version 2.15_
 
 ## Blow out { #blow-out-building-block }
 
@@ -325,11 +324,11 @@ Many protocols use a trash container for blowing out the pipette. You can specif
 pipette.blow_out(pipette.trash_container)
 ```
 
-*New in version 2.0*
+_New in version 2.0_
 
-*Changed in version 2.16:* Added support for `TrashBin` and `WasteChute` locations.
+_Changed in version 2.16:_ Added support for `TrashBin` and `WasteChute` locations.
 
-*Changed in version 2.28:* Use the optional `flow_rate` argument to specify an absolute flow rate for blowing out the pipette.
+_Changed in version 2.28:_ Use the optional `flow_rate` argument to specify an absolute flow rate for blowing out the pipette.
 
 ## Touch tip { #touch-tip-building-block }
 
@@ -340,7 +339,7 @@ pipette.touch_tip()
 ```
 
 !!! note
-    Calling [`touch_tip()`][opentrons.protocol_api.InstrumentContext.touch_tip] moves the pipette across the well. In large spaces like reservoirs, trash containers, and 6- or 24-well plates, this can cause large, rapid pipette movements. Beginning in API version 2.28, the API will raise an error if your protocol specifies a `touch_tip()` in labware like the examples listed above.
+Calling [`touch_tip()`][opentrons.protocol_api.InstrumentContext.touch_tip] moves the pipette across the well. In large spaces like reservoirs, trash containers, and 6- or 24-well plates, this can cause large, rapid pipette movements. Beginning in API version 2.28, the API will raise an error if your protocol specifies a `touch_tip()` in labware like the examples listed above.
 
 ### Touch location
 
@@ -352,7 +351,7 @@ This example demonstrates touching the tip in a specific well:
 pipette.touch_tip(plate["B1"])
 ```
 
-*New in version 2.0.*
+_New in version 2.0._
 
 This example uses an offset to set the touch tip location 2 mm below the top of the current well:
 
@@ -372,14 +371,14 @@ And this example uses `mm_from_edge` to move the pipette to 0 mm, or exactly at,
 pipette.touch_tip(plate["B1"], mm_from_edge=0)
 ```
 
-*Added in version 2.24:* The `mm_from_edge` parameter.
+_Added in version 2.24:_ The `mm_from_edge` parameter.
 
 The `touch_tip` feature allows the pipette to touch the edges of a well gently instead of crashing into them. It includes the `radius` and `mm_from_edge` arguments. When `radius=1` or `mm_from_edge=0`, the robot moves the centerline of the pipette’s plunger axis to the edge of a well. This means a pipette tip may sometimes touch the well wall too early, causing it to bend inwards. A smaller radius or larger `mm_from_edge`, like 1 mm, help avoid premature wall collisions and a lower speed produces gentler motion. Different liquid droplets behave differently, so test out these parameters in a single well before performing a full protocol run.
 
 The `radius` and `mm_from_edge` arguments are mutually exclusive. If you specify both in the same command, the API will raise an error.
 
 !!! warning
-    *Do not* set the `radius` value greater than `1.0` or a negative `mm_from_edge` value. When `radius` is > `1.0` or `mm_from_edge` is < `0.0`, the robot will forcibly move the pipette tip across a well wall or edge. This type of aggressive movement can damage the pipette tip and the pipette.
+_Do not_ set the `radius` value greater than `1.0` or a negative `mm_from_edge` value. When `radius` is > `1.0` or `mm_from_edge` is < `0.0`, the robot will forcibly move the pipette tip across a well wall or edge. This type of aggressive movement can damage the pipette tip and the pipette.
 
 ### Touch speed
 
@@ -401,7 +400,7 @@ This example uses the current well and sets the speed to 80 mm/s:
 pipette.touch_tip(speed=80)
 ```
 
-*Changed in version 2.4:* Lowered minimum speed to 1 mm/s.
+_Changed in version 2.4:_ Lowered minimum speed to 1 mm/s.
 
 ## Mix
 
@@ -444,18 +443,19 @@ And this example adds a push out of 10 µL after the final dispense in the mix:
 pipette.mix(repetitions=3, volume=100, final_push_out=10)
 ```
 
-*New in version 2.0*
+_New in version 2.0_
 
-*Changed in version 2.3:* During a mix, the pipette no longer moves up and out of the target well.
+_Changed in version 2.3:_ During a mix, the pipette no longer moves up and out of the target well.
 
-*Changed in version 2.24:* Adds the `aspirate_flow_rate`, `dispense_flow_rate`, `aspirate_delay`, `dispense_delay`, and `final_push_out` parameters.
+_Changed in version 2.24:_ Adds the `aspirate_flow_rate`, `dispense_flow_rate`, `aspirate_delay`, `dispense_delay`, and `final_push_out` parameters.
 
 ## Dynamic mix
-The [`dynamic_mix()`][opentrons.protocol_api.InstrumentContext.dynamic_mix] method lets you use Flex pipettes to aspirate and dispense repeatedly in multiple locations. 
+
+The [`dynamic_mix()`][opentrons.protocol_api.InstrumentContext.dynamic_mix] method lets you use Flex pipettes to aspirate and dispense repeatedly in multiple locations.
 
 Dynamic pipetting actions are not supported for OT-2 pipettes, and the API will raise an error if you call them on an `InstrumentContext` representing an OT-2 pipette.
 
-Like the [`mix()`][opentrons.protocol_api.InstrumentContext.mix] method, it's designed to mix the contents of a well together using a single command rather than using multiple `aspirate()` and `dispense()` calls. Both methods include arguments that let you specify the number of times to mix, the volume (in µL) of liquid, and the well that contains the liquid you want to mix. [`dynamic_mix()`][opentrons.protocol_api.InstrumentContext.dynamic_mix] lets you additionally specify multiple aspirate and dispense locations: 
+Like the [`mix()`][opentrons.protocol_api.InstrumentContext.mix] method, it's designed to mix the contents of a well together using a single command rather than using multiple `aspirate()` and `dispense()` calls. Both methods include arguments that let you specify the number of times to mix, the volume (in µL) of liquid, and the well that contains the liquid you want to mix. [`dynamic_mix()`][opentrons.protocol_api.InstrumentContext.dynamic_mix] lets you additionally specify multiple aspirate and dispense locations:
 
 ```python
 depth = plate["A1"].bottom(z=2)
@@ -470,13 +470,13 @@ pipette.dynamic_mix(
 )
 ```
 
-Like with the [`mix()`][opentrons.protocol_api.InstrumentContext.mix] method, you can use other optional arguments to customize your dynamic mix: 
+Like with the [`mix()`][opentrons.protocol_api.InstrumentContext.mix] method, you can use other optional arguments to customize your dynamic mix:
 
 - Specify the aspirate, dispense, or mix flow rate.
 - Add a delay after as aspirate or dispense, or a `movement_delay` before moving to an `end_location`.
 - Include a push out after an aspirate or dispense in the mix.
 
-*New in version 2.27*
+_New in version 2.27_
 
 ## Air gap { #air-gap-building-block }
 
@@ -522,9 +522,9 @@ pipette.air_gap(volume=200, flow_rate=50)
 
 The `rate` and `flow_rate` parameters are mutually exclusive. If you choose to change the `flow_rate`, specifying a `rate` will raise an error.
 
-*New in version 2.0*
+_New in version 2.0_
 
-*Changed in version 2.24:* Add the `in_place` and `flow_rate` parameters.
+_Changed in version 2.24:_ Add the `in_place` and `flow_rate` parameters.
 
 ## Detect liquids
 
@@ -542,7 +542,7 @@ else:
     pipette.aspirate(100, reservoir["A2"])
 ```
 
-*New in version 2.20*
+_New in version 2.20_
 
 ## Require liquids
 
@@ -558,7 +558,7 @@ pipette.aspirate(100, reservoir["A1"])  # only occurs if liquid found
 
 You can also require liquid presence for all aspirations performed with a given pipette. See [Liquid Presence Detection][liquid-presence-detection].
 
-*New in version 2.20*
+_New in version 2.20_
 
 ## Measure liquids
 

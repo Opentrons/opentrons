@@ -2,11 +2,11 @@ test_name: Test python protocol run commands are failed when stopped.
 
 marks:
   - usefixtures:
-      - ot2_server_base_url
+      - ot3_server_base_url
 stages:
   - name: Upload a python protocol
     request:
-      url: '{ot2_server_base_url}/protocols'
+      url: '{ot3_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/wait_for_resume_stop_papi.py'
@@ -18,7 +18,7 @@ stages:
 
   - name: Create run from protocol
     request:
-      url: '{ot2_server_base_url}/runs'
+      url: '{ot3_server_base_url}/runs'
       method: POST
       json:
         data:
@@ -31,7 +31,7 @@ stages:
 
   - name: Play the run
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      url: '{ot3_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
@@ -43,7 +43,7 @@ stages:
     max_retries: 10
     delay_after: 0.2
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      url: '{ot3_server_base_url}/runs/{run_id}/commands'
       method: GET
     response:
       status_code: 200
@@ -56,7 +56,7 @@ stages:
 
   - name: Stop the run
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      url: '{ot3_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
@@ -68,7 +68,7 @@ stages:
     max_retries: 10
     delay_after: 0.2
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}'
+      url: '{ot3_server_base_url}/runs/{run_id}'
       method: GET
     response:
       status_code: 200
@@ -80,7 +80,7 @@ stages:
 
   - name: Get run commands
     request:
-      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      url: '{ot3_server_base_url}/runs/{run_id}/commands'
       method: GET
     response:
       status_code: 200

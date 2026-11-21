@@ -1,5 +1,4 @@
 import { getLabwareDefURI } from '.'
-
 import type {
   LabwareDefinition,
   LabwareDefinitionsByURI,

@@ -4,12 +4,12 @@ import { useTranslation } from 'react-i18next'
 import { StyledText } from '@opentrons/components'
 
 import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
-
-import styles from './compliance_ready_settings.module.css'
 import {
   MAX_PASSWORD_RESET_TIME_DAYS,
   MIN_PASSWORD_RESET_TIME_DAYS,
-} from './constants'
+} from '/app/resources/auth'
+
+import styles from './compliance_ready_settings.module.css'
 import { NumericSettingPage } from './NumericSettingPage'
 import { SettingsListButton } from './SettingsListButton'
 import { ToggleSetting } from './ToggleSetting'

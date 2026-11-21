@@ -63,7 +63,8 @@ export function useLatchControls(module: AttachedModule): LatchControls {
       module.data.labwareLatchStatus === 'closing')
 
   const latchCommand:
-    HeaterShakerOpenLatchCreateCommand | HeaterShakerCloseLatchCreateCommand = {
+    | HeaterShakerOpenLatchCreateCommand
+    | HeaterShakerCloseLatchCreateCommand = {
     commandType: isLatchClosed
       ? 'heaterShaker/openLabwareLatch'
       : 'heaterShaker/closeLabwareLatch',

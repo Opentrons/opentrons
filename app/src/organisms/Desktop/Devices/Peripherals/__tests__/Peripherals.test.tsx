@@ -5,9 +5,8 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
 import { Peripherals } from '..'
-import { CameraCard } from '../CameraCard'
-
 import type { PeripheralsProps } from '..'
+import { CameraCard } from '../CameraCard'
 
 vi.mock('../CameraCard')
 

@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 
 import { getLabwareLocation } from '@opentrons/components'
 import {
-  FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_TYPE,
   getDeckDefFromRobotType,
   getFixedTrashLabwareDefinition,
@@ -18,6 +17,8 @@ import {
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 import { getRunModuleRenderInfo } from '/app/organisms/InterventionModal/utils'
 
+import type { ErrorRecoveryFlowsProps } from '..'
+
 import type { Run, RunData } from '@opentrons/api-client'
 import type {
   CutoutConfigProtocolSpec,
@@ -32,7 +33,6 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { RunModuleInfo } from '/app/organisms/InterventionModal/utils'
-import type { ErrorRecoveryFlowsProps } from '..'
 import type { ERUtilsProps, ERUtilsResults } from './useERUtils'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 
@@ -439,7 +439,6 @@ export function getSlotNameAndLwLocFrom(
     detailLevel: 'slot-only',
     loadedLabwares: runData?.labware ?? [],
     loadedModules: runData?.modules ?? [],
-    robotType: FLEX_ROBOT_TYPE,
   })
   const onModuleModel = labwareLocationObject?.moduleModel ?? null
 
@@ -485,7 +484,6 @@ export function getIsLabwareMatch(
       detailLevel: 'slot-only',
       loadedLabwares: runRecord?.data?.labware ?? [],
       loadedModules: runRecord?.data?.modules ?? [],
-      robotType: FLEX_ROBOT_TYPE,
     })?.slotName ?? null
 
   if (location == null) {

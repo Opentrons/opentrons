@@ -1,6 +1,6 @@
 """Convert labware offset creation requests and stored elements between legacy and new."""
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.robot.types import RobotType
 
 from .errors import (
@@ -24,7 +24,7 @@ from .types import (
 def standardize_labware_offset_create(
     request: LabwareOffsetCreate | LegacyLabwareOffsetCreate,
     robot_type: RobotType,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
 ) -> LabwareOffsetCreateInternal:
     """Turn a union of old and new labware offset create requests into a new one."""
     location_sequence, legacy_location = _locations_for_create(
@@ -39,7 +39,7 @@ def standardize_labware_offset_create(
 
 
 def legacy_offset_location_to_offset_location_sequence(
-    location: LegacyLabwareOffsetLocation, deck_definition: DeckDefinitionV5
+    location: LegacyLabwareOffsetLocation, deck_definition: DeckDefinitionV6
 ) -> LabwareOffsetLocationSequence:
     """Convert a legacy location to a new-style sequence."""
     sequence: LabwareOffsetLocationSequence = []
@@ -140,7 +140,7 @@ def _offset_location_sequence_head_to_labware_and_module(
 
 
 def _offset_location_sequence_to_legacy_offset_location(
-    location_sequence: LabwareOffsetLocationSequence, deck_definition: DeckDefinitionV5
+    location_sequence: LabwareOffsetLocationSequence, deck_definition: DeckDefinitionV6
 ) -> LegacyLabwareOffsetLocation:
     if len(location_sequence) == 0:
         raise OffsetLocationInvalidError(
@@ -169,7 +169,7 @@ def _offset_location_sequence_to_legacy_offset_location(
 def _locations_for_create(
     request: LabwareOffsetCreate | LegacyLabwareOffsetCreate,
     robot_type: RobotType,
-    deck_definition: DeckDefinitionV5,
+    deck_definition: DeckDefinitionV6,
 ) -> tuple[LabwareOffsetLocationSequence, LegacyLabwareOffsetLocation]:
     if isinstance(request, LabwareOffsetCreate):
         return (

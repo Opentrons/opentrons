@@ -184,31 +184,37 @@ async def test_send_command_response(
 
 
 @pytest.mark.parametrize(
-    argnames=["response", "exception_type", "async_only"],
+    argnames=["response", "exception_type"],
     argvalues=[
-        ["error", ErrorResponse, False],
-        ["Error", ErrorResponse, False],
-        ["Error: was found.", ErrorResponse, False],
-        ["alarm", AlarmResponse, False],
-        ["ALARM", AlarmResponse, False],
-        ["This is an Alarm", AlarmResponse, False],
-        ["error:Alarm lock", AlarmResponse, False],
-        ["alarm:error", AlarmResponse, False],
-        ["ALARM: Hard limit -X", AlarmResponse, False],
-        ["ERR003:unhandled gcode OK ", UnhandledGcode, True],
+        ["error", ErrorResponse],
+        ["Error", ErrorResponse],
+        ["Error: was found.", ErrorResponse],
+        ["alarm", AlarmResponse],
+        ["ALARM", AlarmResponse],
+        ["This is an Alarm", AlarmResponse],
+        ["error:Alarm lock", AlarmResponse],
+        ["alarm:error", AlarmResponse],
+        ["ALARM: Hard limit -X", AlarmResponse],
     ],
 )
 def test_raise_on_error(
     subject: SerialKind,
     response: str,
     exception_type: Type[Exception],
-    async_only: bool,
 ) -> None:
     """It should raise an exception on error/alarm responses."""
-    if isinstance(subject, SerialConnection) and async_only:
-        pytest.skip()
     with pytest.raises(expected_exception=exception_type, match=response):
         subject.raise_on_error(response, "fake request")
+
+
+def test_raise_on_error_async_only(
+    async_subject: AsyncResponseSerialConnection,
+) -> None:
+    """It should raise an exception on error/alarm responses."""
+    with pytest.raises(
+        expected_exception=UnhandledGcode, match="ERR003:unhandled gcode OK "
+    ):
+        async_subject.raise_on_error("ERR003:unhandled gcode OK ", "fake request")
 
 
 def test_raise_on_error_no_raise_on_keyword_in_body(
@@ -695,8 +701,9 @@ def test_partition_serial_read_permutations(
     argnames=["build_raw", "build_expected"],
     argvalues=[
         pytest.param(
-            lambda ack, ending: _async_error_no_ack(line_ending=ending)
-            + _command_response(ack),
+            lambda ack, ending: (
+                _async_error_no_ack(line_ending=ending) + _command_response(ack)
+            ),
             lambda ack, ending: [
                 ("error", _async_error_no_ack(line_ending=ending)),
                 ("response", _command_response(ack)),
@@ -704,8 +711,9 @@ def test_partition_serial_read_permutations(
             id="async-then-response",
         ),
         pytest.param(
-            lambda ack, ending: _command_response(ack)
-            + _async_error_no_ack(line_ending=ending),
+            lambda ack, ending: (
+                _command_response(ack) + _async_error_no_ack(line_ending=ending)
+            ),
             lambda ack, ending: [
                 ("response", _command_response(ack)),
                 ("error", _async_error_no_ack(line_ending=ending)),
@@ -738,8 +746,9 @@ def test_partition_serial_read_permutations(
         pytest.param(
             # Async line uses LF while the command ack uses the device terminator
             # (e.g. firmware prints async with \n even when OK is \r\n).
-            lambda ack, ending: _async_error_no_ack(line_ending="\n")
-            + _command_response(ack),
+            lambda ack, ending: (
+                _async_error_no_ack(line_ending="\n") + _command_response(ack)
+            ),
             lambda ack, ending: [
                 ("error", _async_error_no_ack(line_ending="\n")),
                 ("response", _command_response(ack)),

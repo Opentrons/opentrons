@@ -59,34 +59,25 @@ def test_validate_takes_liquid(ctx: ProtocolContext, reject_module: bool) -> Non
         )
 
 
-# TODO(mm, 2023-04-28): The validate_takes_liquid() function is used both by ProtocolContexts
-# that are backed by Protocol Engine, and those that aren't. But this test is only runnable
-# with a non-Protocol-Engine ProtocolContext because it relies on the internal module.geometry
-# property.
-#
-# Find a different way to test this so that both paths are covered.
-@pytest.mark.apiv2_non_pe_only
 def test_validate_takes_liquid_module_location(ctx: ProtocolContext) -> None:
-    module = ctx.load_module("magdeck", 1)
+    module = ctx.load_module("temperatureModuleV2", "A1")
 
     validate_takes_liquid(
-        location=module.geometry.location,
+        location=Location(Point(0, 0, 0), module),
         reject_module=False,
         reject_adapter=False,
     )
 
     with pytest.raises(
-        ValueError,
-        match="Cannot aspirate/dispense directly to a module",
+        ValueError, match="Cannot aspirate/dispense directly to a module"
     ):
         validate_takes_liquid(
-            location=module.geometry.location,
+            location=Location(Point(0, 0, 0), module),
             reject_module=True,
             reject_adapter=False,
         )
 
 
-@pytest.mark.ot3_only
 def test_validate_takes_liquid_adapter(ctx: ProtocolContext) -> None:
     well_plate = ctx.load_labware("corning_96_wellplate_360ul_flat", 1)
     adapter = ctx.load_adapter("opentrons_96_pcr_adapter", 2)
@@ -107,9 +98,7 @@ def test_validate_takes_liquid_adapter(ctx: ProtocolContext) -> None:
         reject_adapter=True,
     )
     validate_takes_liquid(
-        location=well_plate.wells()[0].top(),
-        reject_module=False,
-        reject_adapter=True,
+        location=well_plate.wells()[0].top(), reject_module=False, reject_adapter=True
     )
 
     with pytest.raises(ValueError, match="Cannot aspirate/dispense to an adapter"):

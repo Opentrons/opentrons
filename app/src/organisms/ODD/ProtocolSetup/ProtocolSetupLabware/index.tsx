@@ -310,7 +310,8 @@ function LabwareLatch({
   let icon: 'latch-open' | 'latch-closed' | null = null
 
   const latchCommand:
-    HeaterShakerOpenLatchCreateCommand | HeaterShakerCloseLatchCreateCommand = {
+    | HeaterShakerOpenLatchCreateCommand
+    | HeaterShakerCloseLatchCreateCommand = {
     commandType: isLatchClosed
       ? 'heaterShaker/openLabwareLatch'
       : 'heaterShaker/closeLabwareLatch',
@@ -519,9 +520,12 @@ function RowLabware({
             iconName={
               MODULE_ICON_NAME_BY_TYPE[matchedModule.moduleDef.moduleType]
             }
+            svgSize="1.25rem"
           />
         ) : null}
-        {isStacked ? <RobotInfoLabel iconName="stacked" /> : null}
+        {isStacked ? (
+          <RobotInfoLabel iconName="stacked" svgSize="1.25rem" />
+        ) : null}
       </Flex>
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}

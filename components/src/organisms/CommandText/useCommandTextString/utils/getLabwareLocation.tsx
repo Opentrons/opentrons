@@ -22,7 +22,6 @@ import type {
   LabwareLocation,
   LabwareLocationSequence,
   ModuleModel,
-  RobotType,
 } from '@opentrons/shared-data'
 import type { LoadedLabwares, LoadedModules } from './types'
 
@@ -36,7 +35,6 @@ interface BaseParams {
   location: LabwareLocation | null
   loadedModules: LoadedModules
   loadedLabwares: LoadedLabwares
-  robotType: RobotType
 }
 interface SequenceBaseParams {
   locationSequence: LabwareLocationSequence
@@ -61,10 +59,12 @@ export interface SequenceFullParams extends SequenceBaseParams {
 }
 
 export type GetLabwareLocationParams =
-  LocationSlotOnlyParams | LocationFullParams
+  | LocationSlotOnlyParams
+  | LocationFullParams
 
 export type GetLabwareLocationFromSequenceParams =
-  SequenceSlotOnlyParams | SequenceFullParams
+  | SequenceSlotOnlyParams
+  | SequenceFullParams
 
 export function getLabwareLocationFromSequence(
   params: GetLabwareLocationFromSequenceParams

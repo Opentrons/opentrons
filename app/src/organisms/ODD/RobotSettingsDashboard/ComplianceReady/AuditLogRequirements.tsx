@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
+import { MIN_LENGTH_OF_REASON_FOR_INTERACTION } from '/app/resources/auth'
 
 import styles from './compliance_ready_settings.module.css'
-import { MIN_LENGTH_OF_REASON_FOR_INTERACTION } from './constants'
 import { RequireDocumentationSettings } from './RequireDocumentationSettings'
 import { SettingsListButton } from './SettingsListButton'
 import { ToggleSetting } from './ToggleSetting'

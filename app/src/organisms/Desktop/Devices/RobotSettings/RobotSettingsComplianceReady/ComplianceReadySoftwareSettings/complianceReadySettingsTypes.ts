@@ -84,7 +84,8 @@ export function isAuditInputFieldId(
 export function isForceTextInputFieldId(
   id: SettingFieldId
 ): id is
-  keyof typeof AUTH_INPUT_FIELD_IDS | keyof typeof AUDIT_INPUT_FIELD_IDS {
+  | keyof typeof AUTH_INPUT_FIELD_IDS
+  | keyof typeof AUDIT_INPUT_FIELD_IDS {
   return isAuthInputFieldId(id) || isAuditInputFieldId(id)
 }
 
@@ -93,4 +94,4 @@ export function isUiOnlyFieldId(id: SettingFieldId): id is UiSettingFieldId {
   return (UI_ONLY_FIELD_IDS as readonly string[]).includes(id)
 }
 
-export type FieldValues = Record<SettingFieldId, string | boolean>
+export type FieldValues = Record<SettingFieldId, number | boolean | null>

@@ -7,7 +7,7 @@ from typing import Any, Callable, Union
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.deck.types import DeckDefinitionV6
 from opentrons_shared_data.errors.exceptions import PythonException
 
 from opentrons.protocol_engine import commands
@@ -39,16 +39,15 @@ def change_notifier(decoy: Decoy) -> ChangeNotifier:
 def engine_config() -> Config:
     """Get a ProtocolEngine config value object."""
     return Config(
-        # Choice of robot and deck type is arbitrary.
-        robot_type="OT-2 Standard",
-        deck_type=DeckType.OT2_STANDARD,
+        robot_type="OT-3 Standard",
+        deck_type=DeckType.OT3_STANDARD,
     )
 
 
 @pytest.fixture
 def subject(
     change_notifier: ChangeNotifier,
-    ot2_standard_deck_def: DeckDefinitionV5,
+    ot3_standard_deck_def: DeckDefinitionV6,
     engine_config: Config,
 ) -> StateStore:
     """Get a StateStore test subject."""
@@ -58,7 +57,7 @@ def subject(
 
     return StateStore(
         config=engine_config,
-        deck_definition=ot2_standard_deck_def,
+        deck_definition=ot3_standard_deck_def,
         robot_definition={
             "displayName": "OT-2",
             "robotType": "OT-2 Standard",

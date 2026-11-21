@@ -1,6 +1,6 @@
 ---
-title: "Opentrons Flex: Relocation"
-description: "How to prepare and move Flex for short or long-distance relocation."
+title: 'Opentrons Flex: Relocation'
+description: 'How to prepare and move Flex for short or long-distance relocation.'
 ---
 
 This section provides advice and instructions about how to move your Opentrons Flex robot over short and long distances.
@@ -10,7 +10,7 @@ This section provides advice and instructions about how to move your Opentrons F
 A short move spans a range of distances from "let's just move it over a little bit" to across the lab, down the hall, or another floor in your building. In these cases, you can move your Flex by hand. Transporting it on a hand cart is also a good option.
 
 !!! warning
-    Flex weighs 88.5 kg (195 lbs). As a result, moving or lifting it requires a team with sufficient personnel to ensure safe handling.
+Flex weighs 88.5 kg (195 lbs). As a result, moving or lifting it requires a team with sufficient personnel to ensure safe handling.
 
 Reattach the lift handles to move your Flex to a new, nearby location. Lifting and carrying the Flex by its handles is the right way to move the robot short distances. Remove the handles and store them in the User Kit after the move is complete. To prevent damaging the robot, always use the lift handles to pick it up and move it. Do not grab the frame to lift or move your robot.
 
@@ -58,13 +58,13 @@ Before moving your Flex, reinsert the locking screws to hold the gantry in place
 
 - On the right side rail near the front of the robot. Locking this part of the gantry requires the small orange bracket and two locking screws.
 
-![Locations of gantry locking screws.](../images/unboxing/14-unlock-gantry.svg "Locations of gantry locking screws")
+![Locations of gantry locking screws.](../images/unboxing/14-unlock-gantry.svg 'Locations of gantry locking screws')
 
 ### Home the gantry
 
 You may not want to lock the gantry if you're only moving the robot to a nearby location. If you decide not to lock it, at least use the touchscreen or the Opentrons App to send the gantry to its home position before powering it down.
 
-To home the gantry via the touchscreen, tap the three-dot menu (⋮) and then tap **Home gantry**. 
+To home the gantry via the touchscreen, tap the three-dot menu (⋮) and then tap **Home gantry**.
 
 To home the gantry via the Opentrons App:
 
@@ -90,6 +90,6 @@ You should recalibrate any instruments and modules after reinstalling them. For 
 
 ## Final thoughts about moving
 
-Your Flex is a sturdy and well-built machine, but it is also a precise scientific instrument designed to exacting tolerances. As a result, you should treat it with care when relocating it within your local work area or sending it across the country. This means following the guidance provided here *and* using your own common sense about how to transport an expensive piece of laboratory equipment. Bottom line: when moving your Flex, err on the side of caution and extra padding.
+Your Flex is a sturdy and well-built machine, but it is also a precise scientific instrument designed to exacting tolerances. As a result, you should treat it with care when relocating it within your local work area or sending it across the country. This means following the guidance provided here _and_ using your own common sense about how to transport an expensive piece of laboratory equipment. Bottom line: when moving your Flex, err on the side of caution and extra padding.
 
 If you have questions or concerns about relocating your Flex, contact us at <support@opentrons.com>.

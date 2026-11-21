@@ -29,7 +29,7 @@ def test_flex_absorbance_reader_setup(page: Page, pd_base_url: str) -> None:
 
     # Edit protocol in Protocol Editor - adding labware to the deck
     plate_reader_page.button_selection("Edit protocol")
-    plate_reader_page.dimiss_deck_hardware_modal()
+    plate_reader_page.dismiss_deck_hardware_modal()
     protocol_editor.add_labware_to_slot("D1")
     protocol_editor.select_labware_category_by_name("Well plates")
     protocol_editor.select_labware_by_name("Opentrons Tough 96 Well Plate")

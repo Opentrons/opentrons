@@ -77,8 +77,7 @@ export interface LocationSpecificOffsetDetailsWithCopy extends LocationSpecificO
 // Get the location specific offset details for the currently user-selected labware geometry.
 export const selectSortedLSOffsetDetailsWithCopy = (
   runId: string,
-  uri: string,
-  t: TFunction
+  uri: string
 ): Selector<State, LocationSpecificOffsetDetailsWithCopy[]> =>
   createSelector(
     (state: State) => state.protocolRuns[runId]?.lpc?.labwareInfo.labware,
@@ -91,11 +90,7 @@ export const selectSortedLSOffsetDetailsWithCopy = (
         const lsDetails = labware[uri].locationSpecificOffsetDetails
 
         const lsDetailsWithCopy = lsDetails.map(offset => {
-          const slotCopy = getFlexSlotNameOnly(
-            offset.locationDetails,
-            protocolData,
-            t
-          )
+          const slotCopy = getFlexSlotNameOnly(offset.locationDetails)
 
           return {
             ...offset,

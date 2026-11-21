@@ -2,14 +2,14 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { ChildNavigation } from '/app/components/ODD/headers/ChildNavigation'
-
-import styles from './compliance_ready_settings.module.css'
 import {
   MAX_IDLE_LOGOUT_MINUTES,
   MAX_NUMBER_OF_LOGIN_ATTEMPTS,
   MIN_IDLE_LOGOUT_MINUTES,
   MIN_NUMBER_OF_LOGIN_ATTEMPTS,
-} from './constants'
+} from '/app/resources/auth'
+
+import styles from './compliance_ready_settings.module.css'
 import { NumericSettingPage } from './NumericSettingPage'
 import { PasswordChange } from './PasswordChange'
 import { PasswordComplexity } from './PasswordComplexity'
@@ -19,7 +19,10 @@ import type { ReactNode } from 'react'
 import type { AuthSettingsData } from '@opentrons/api-client'
 
 type CRSLoginSettingsPages =
-  'max_logins' | 'password_reset_time' | 'password_complexity' | 'idle_logout'
+  | 'max_logins'
+  | 'password_reset_time'
+  | 'password_complexity'
+  | 'idle_logout'
 
 export function LoginSettings({
   authSettings,

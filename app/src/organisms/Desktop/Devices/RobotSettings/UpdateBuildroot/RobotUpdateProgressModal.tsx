@@ -193,7 +193,7 @@ function SuccessOrError({ errorMessage }: SuccessOrErrorProps): ReactNode {
   let renderedImg: JSX.Element
   if (!errorMessage) {
     renderedImg = (
-      <img alt={IMAGE_ALT} src={successIcon} height="208px" width="250px" />
+      <img alt={IMAGE_ALT} src={successIcon} height="150px" width="170px" />
     )
   } else {
     renderedImg = (
@@ -209,7 +209,7 @@ function SuccessOrError({ errorMessage }: SuccessOrErrorProps): ReactNode {
   return (
     <>
       {renderedImg}
-      <StyledText>
+      <StyledText desktopStyle="headingSmallBold">
         {!errorMessage ? t('robot_update_success') : errorMessage}
       </StyledText>
     </>

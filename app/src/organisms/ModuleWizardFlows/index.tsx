@@ -73,6 +73,7 @@ export function ModuleWizardFlows(
     totalStepCount,
     createMaintenanceRun,
     handleCleanUpAndClose,
+    handleCloseWithoutHome,
     wizardFlowBaseProps,
     buildFlowForSelectedModule,
     patchModuleAfterUpdate,
@@ -176,6 +177,8 @@ export function ModuleWizardFlows(
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
         isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
         handleCleanUpAndClose={handleCleanUpAndClose}
+        handleCloseWithoutHome={handleCloseWithoutHome}
+        isError
         currentStepIndex={currentStepIndex}
         totalStepCount={totalStepCount}
       >
@@ -213,6 +216,8 @@ export function ModuleWizardFlows(
         isRobotMoving={wizardFlowBaseProps.isRobotMoving}
         isModuleUpdating={wizardFlowBaseProps.isModuleUpdating}
         handleCleanUpAndClose={handleCleanUpAndClose}
+        handleCloseWithoutHome={handleCloseWithoutHome}
+        isError
         currentStepIndex={currentStepIndex}
         totalStepCount={totalStepCount}
       >
