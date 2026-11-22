@@ -1,9 +1,8 @@
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
@@ -28,7 +27,7 @@ vi.mock('/protocol-designer/labware-defs/selectors')
 const mockLocation = vi.fn()
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
 
-vi.mock('react-router-dom', async (importOriginal) => {
+vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
@@ -85,7 +84,7 @@ describe('SelectPipetteModal', () => {
     }
 
     vi.mocked(IncompatibleTipsModal).mockReturnValue(
-      <div>mock incompatible tips modal</div>,
+      <div>mock incompatible tips modal</div>
     )
     vi.mocked(getLabwareDefsByURI).mockReturnValue({})
     vi.mocked(getTiprackOptions).mockReturnValue({
@@ -177,7 +176,7 @@ describe('SelectPipetteModal', () => {
     //  add custom pipette tips
     await user.upload(
       screen.getByLabelText('Add custom pipette tips'),
-      new File(['{}'], 'custom-tips.json', { type: 'application/json' }),
+      new File(['{}'], 'custom-tips.json', { type: 'application/json' })
     )
     expect(vi.mocked(createCustomTiprackDef)).toHaveBeenCalled()
 

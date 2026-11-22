@@ -1,9 +1,8 @@
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { analyticsEvent } from '/protocol-designer/analytics/actions'
@@ -40,7 +39,7 @@ vi.mock('/protocol-designer/ui/steps/actions/thunks')
 vi.mock('/protocol-designer/steplist/actions')
 vi.mock('/protocol-designer/feature-flags/selectors')
 vi.mock('/protocol-designer/analytics/actions')
-vi.mock('@opentrons/components', async (importOriginal) => {
+vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof OpentronsComponents>()
   return {
     ...actual,

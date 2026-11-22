@@ -1,9 +1,8 @@
+import { screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { screen, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 
 import { COLORS } from '@opentrons/components'
 
@@ -49,7 +48,7 @@ describe('ConnectedStepContainer', () => {
       sidebarWidth: 350,
     }
     vi.mocked(StepOverflowMenu).mockReturnValue(
-      <div>mock StepOverflowMenu</div>,
+      <div>mock StepOverflowMenu</div>
     )
     vi.mocked(getUnsavedForm).mockReturnValue(null)
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
@@ -95,8 +94,8 @@ describe('ConnectedStepContainer', () => {
 
     await user.click(
       within(screen.getByLabelText('Starting deck state')).getByLabelText(
-        'Starting deck state options',
-      ),
+        'Starting deck state options'
+      )
     )
     screen.getByText('mock StepOverflowMenu')
   })

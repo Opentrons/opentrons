@@ -1,9 +1,8 @@
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 
 import { fixture96Plate } from '@opentrons/shared-data'
 
@@ -43,7 +42,7 @@ vi.mock('/protocol-designer/file-data/selectors')
 vi.mock('/protocol-designer/labware-ingred/utils')
 vi.mock('/protocol-designer/components/organisms/Kitchen/useKitchen')
 
-vi.mock('react-router-dom', async (importOriginal) => {
+vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
@@ -108,7 +107,7 @@ describe('SlotOverflowMenu', () => {
     })
     vi.mocked(getAllLabwareWithoutLids).mockReturnValue(['labId'])
     vi.mocked(EditNickNameModal).mockReturnValue(
-      <div>mock EditNickNameModal</div>,
+      <div>mock EditNickNameModal</div>
     )
     vi.mocked(labwareIngredSelectors.getLiquidsByLabwareId).mockReturnValue({})
     vi.mocked(getNextAvailableDeckSlot).mockReturnValue('A1')
@@ -118,7 +117,7 @@ describe('SlotOverflowMenu', () => {
       bakeToast: vi.fn(),
     })
     vi.mocked(ConfirmDeleteEntityInUseModal).mockReturnValue(
-      <div>mock ConfirmDeleteEntityInUseModal</div>,
+      <div>mock ConfirmDeleteEntityInUseModal</div>
     )
   })
 

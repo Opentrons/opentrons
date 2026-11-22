@@ -1,9 +1,8 @@
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 
 import {
   ABSORBANCE_READER_V1,
@@ -57,7 +56,7 @@ const render = (props: ComponentProps<typeof DeckSetupToolbox>) => {
     i18nInstance: i18n,
   })[0]
 }
-vi.mock('react-router-dom', async (importOriginal) => {
+vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
@@ -89,7 +88,7 @@ describe('DeckSetupToolbox', () => {
       pipettes: {},
     })
     vi.mocked(SelectLabwareModal).mockReturnValue(
-      <div>mock SelectLabwareModal</div>,
+      <div>mock SelectLabwareModal</div>
     )
     vi.mocked(getSavedStepForms).mockReturnValue({})
     vi.mocked(getDismissedHints).mockReturnValue([])
@@ -100,7 +99,7 @@ describe('DeckSetupToolbox', () => {
       eatToast: vi.fn(),
     })
     vi.mocked(
-      wellContentsSelectors.getAllWellContentsForActiveItem,
+      wellContentsSelectors.getAllWellContentsForActiveItem
     ).mockReturnValue(null)
     vi.mocked(getDeckConfiguration).mockReturnValue({
       deckConfig: [],
@@ -134,7 +133,7 @@ describe('DeckSetupToolbox', () => {
     render(props)
     screen.getByText('Can’t add labware')
     screen.getByText(
-      'The plate reader must start empty so it can be initialized.',
+      'The plate reader must start empty so it can be initialized.'
     )
   })
 

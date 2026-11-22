@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import userEvent from '@testing-library/user-event'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
@@ -38,7 +38,7 @@ vi.mock('/protocol-designer/labware-defs/selectors')
 vi.mock('/protocol-designer/labware-defs/actions')
 vi.mock('/protocol-designer/file-data/selectors')
 vi.mock('/protocol-designer/labware-ingred/actions')
-vi.mock('@opentrons/components', async (importOriginal) => {
+vi.mock('@opentrons/components', async importOriginal => {
   const actual = await importOriginal<typeof InfoScreen>()
   return {
     ...actual,
@@ -105,7 +105,7 @@ describe('SelectLabwareModal', () => {
     //  click and expand reservoirs accordion
     await user.click(screen.getAllByTestId('ListButton_noActive')[3])
     await user.click(
-      screen.getByText('Opentrons Calibration Block - Short Side: Left'),
+      screen.getByText('Opentrons Calibration Block - Short Side: Left')
     )
     expect(vi.mocked(selectTopLabware)).toHaveBeenCalled()
   })
@@ -127,7 +127,7 @@ describe('SelectLabwareModal', () => {
     //   set adapter
     screen.getByText('Adapter compatible labware')
     await user.click(
-      screen.getByText('Fixture Corning 96 Well Plate 360 µL Flat'),
+      screen.getByText('Fixture Corning 96 Well Plate 360 µL Flat')
     )
     expect(vi.mocked(selectTopLabware)).toHaveBeenCalled()
   })
@@ -137,7 +137,7 @@ describe('SelectLabwareModal', () => {
     render(props)
     await user.upload(
       screen.getByLabelText('Upload custom labware'),
-      new File(['{}'], 'custom-labware.json', { type: 'application/json' }),
+      new File(['{}'], 'custom-labware.json', { type: 'application/json' })
     )
     expect(vi.mocked(createCustomLabwareDef)).toHaveBeenCalled()
   })

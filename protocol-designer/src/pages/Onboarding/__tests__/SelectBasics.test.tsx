@@ -1,9 +1,8 @@
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
@@ -28,7 +27,7 @@ vi.mock('../utils')
 const mockLocation = vi.fn()
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
 
-vi.mock('react-router-dom', async (importOriginal) => {
+vi.mock('react-router-dom', async importOriginal => {
   const actual = await importOriginal<NavigateFunction>()
   return {
     ...actual,
@@ -67,7 +66,7 @@ const values = {
 } as WizardFormState
 
 const makeWatchMock = (
-  formValues: WizardFormState,
+  formValues: WizardFormState
 ): WizardTileProps['watch'] => {
   return vi.fn((name?: keyof WizardFormState) => {
     if (name == null) {
@@ -92,7 +91,7 @@ describe('SelectBasics', () => {
       ...mockWizardTileProps,
     } as WizardTileProps
     vi.mocked(IncompatibleTipsModal).mockReturnValue(
-      <div>mock incompatible tips modal</div>,
+      <div>mock incompatible tips modal</div>
     )
     vi.mocked(getLabwareDefsByURI).mockReturnValue({})
     vi.mocked(getTiprackOptions).mockReturnValue({
@@ -111,13 +110,13 @@ describe('SelectBasics', () => {
     screen.getByText('Step 1')
     screen.getByText('Let’s start with the basics')
     expect(
-      screen.queryByText('What kind of robot do you have?'),
+      screen.queryByText('What kind of robot do you have?')
     ).not.toBeInTheDocument()
     expect(
-      screen.queryByRole('label', { name: 'Opentrons OT-2' }),
+      screen.queryByRole('label', { name: 'Opentrons OT-2' })
     ).not.toBeInTheDocument()
     expect(
-      screen.queryByRole('label', { name: 'Opentrons Flex' }),
+      screen.queryByRole('label', { name: 'Opentrons Flex' })
     ).not.toBeInTheDocument()
     //  pipette
     screen.getByText('Your pipettes')
@@ -125,7 +124,7 @@ describe('SelectBasics', () => {
 
     // gripper
     screen.getByText(
-      'Do you want to move labware automatically with the gripper?',
+      'Do you want to move labware automatically with the gripper?'
     )
     screen.getByText('Some modules require a gripper to operate.')
     await user.click(screen.getAllByRole('label', { name: 'Yes' })[0])
