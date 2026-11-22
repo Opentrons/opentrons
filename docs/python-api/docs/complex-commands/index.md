@@ -1,6 +1,6 @@
 ---
-title: "Python API: Complex Commands"
-description: "High-level transfer, distribute, and consolidate commands."
+title: 'Python API: Complex Commands'
+description: 'High-level transfer, distribute, and consolidate commands.'
 ---
 
 Complex liquid handling commands combine multiple [building block commands](../building-block-commands/index.md) into a single method call. These commands make it easier to handle larger groups of wells and repeat actions without having to write your own control flow code. They integrate tip-handling behavior and can pick up, use, and drop multiple tips depending on how you want to handle your liquids.
@@ -30,7 +30,7 @@ Complex liquid handling commands combine multiple [building block commands](../b
     </tr>
 </table>
 
-The legacy complex commands can optionally perform other actions, like adding air gaps, knocking droplets off the tip, mixing, and blowing out excess liquid from the tip. In a liquid class command, these and other transfer behaviors are determined by the *liquid class definition* to account for liquid properties like viscosity. For more information, see [Liquid Classes](../liquid-classes/index.md).
+The legacy complex commands can optionally perform other actions, like adding air gaps, knocking droplets off the tip, mixing, and blowing out excess liquid from the tip. In a liquid class command, these and other transfer behaviors are determined by the _liquid class definition_ to account for liquid properties like viscosity. For more information, see [Liquid Classes](../liquid-classes/index.md).
 
 Pages in this section of the documentation cover:
 

@@ -44,7 +44,8 @@ export const MenuList = (props: MenuListProps): JSX.Element | null => {
   ) : (
     <Flex
       data-testid="MenuList" // todo (kk: 2026-08-25): replace data-testid with aria-label + role when refactoring this component
-      borderRadius="4px 4px 0px 0px"
+      borderRadius={BORDERS.borderRadius8}
+      overflow="hidden"
       zIndex={Z_INDEX.MENUS}
       boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
       position={POSITION_ABSOLUTE}

@@ -77,6 +77,7 @@ export function DeviceDetailsDeckConfiguration({
       refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
     }).data ?? []
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const deckConfigWithAA = useMemo(
     () => replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(deckConfig),
     [deckConfig]

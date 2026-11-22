@@ -1312,7 +1312,7 @@ export const getFullStackFromLabwares = (
       lw.stack.includes(mappedLocation) &&
       (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId)) &&
       lw.stack.includes(HOPPER_STACKER_LOCATION) === isOnHopper &&
-      lw.stack.includes(VACUUM_DOCK_LOCATION) === isOnVacuumDock
+      (isOnVacuumDock || !lw.stack.includes(VACUUM_DOCK_LOCATION))
   )
   if (labwareStack.length === 0) {
     return []

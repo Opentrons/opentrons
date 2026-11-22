@@ -14,17 +14,17 @@ The `/docs` directory is organized to support multiple documentation publication
 ### Publication Directories (Multiple MkDocs Projects)
 
 - Each major documentation set ("publication") exists in its own subdirectory, with its own `mkdocs.yml` and content:
-    | Publication Directory             | Description                              |
-    |-----------------------------------|------------------------------------------|
-    | `docs/absorbance-plate-reader/`   | Absorbance Plate Reader Module manual    |
-    | `docs/flex/`                      | Opentrons Flex robot manual              |
-    | `docs/heater-shaker/`             | Heater-Shaker Module manual              |
-    | `docs/hepa-uv/`                   | HEPA/UV Module manual                    |
-    | `docs/protocol-designer/`         | Protocol Designer application manual     |
-    | `docs/python-api/`                | Python API reference and guides          |
-    | `docs/stacker/`                   | Flex Stacker Module manual               |
-    | `docs/temperature-module/`        | Temperature Module manual                |
-    | `docs/thermocycler/`              | Thermocycler Module manual               |
+  | Publication Directory           | Description                           |
+  | ------------------------------- | ------------------------------------- |
+  | `docs/absorbance-plate-reader/` | Absorbance Plate Reader Module manual |
+  | `docs/flex/`                    | Opentrons Flex robot manual           |
+  | `docs/heater-shaker/`           | Heater-Shaker Module manual           |
+  | `docs/hepa-uv/`                 | HEPA/UV Module manual                 |
+  | `docs/protocol-designer/`       | Protocol Designer application manual  |
+  | `docs/python-api/`              | Python API reference and guides       |
+  | `docs/stacker/`                 | Flex Stacker Module manual            |
+  | `docs/temperature-module/`      | Temperature Module manual             |
+  | `docs/thermocycler/`            | Thermocycler Module manual            |
 - **Each publication** is a self-contained MkDocs project, but shares a unified build/serve flow via the monorepo and the `mkdocs-monorepo-plugin`.
 - New publications may be added for new (or newly documented) software or hardware products.
 - Top-level `/docs/mkdocs.yml` aggregates all publications for the overall site, referencing their content via the monorepo plugin.
@@ -32,24 +32,22 @@ The `/docs` directory is organized to support multiple documentation publication
 ### `docs/shared/`: Shared Content and Resources
 
 - `docs/shared/` holds assets, MDX-style includes, and support content used across multiple publications:
-    - **Images**: `docs/shared/images/` — interface elements used in multiple publications.
-    - **Icons**: `docs/shared/icons/` — custom Opentrons SVG icons.
-    - **Theme overrides**: `docs/shared/partials/` — HTML files used to modify the base Material theme.
-    - **CSS**: Sitewide overrides in `docs/shared/` (e.g., `opentrons-theme.css`, `instruction-manuals.css`).
+  - **Images**: `docs/shared/images/` — interface elements used in multiple publications.
+  - **Icons**: `docs/shared/icons/` — custom Opentrons SVG icons.
+  - **Theme overrides**: `docs/shared/partials/` — HTML files used to modify the base Material theme.
+  - **CSS**: Sitewide overrides in `docs/shared/` (e.g., `opentrons-theme.css`, `instruction-manuals.css`).
 - Refer to these resources in any publication via the monorepo plugin's path mapping.
 - The only user-facing pages in `shared/` are navigation pages, like `docs/shared/modules/index.md`.
 
 ### 3. Scripts and Ancillary Files
 
 - Top-level `/docs/` contains scripts and files for building, developing, and managing the documentation site:
-    - **`mkdocs.yml`** — main config aggregating all sub-projects with the monorepo plugin.
-    - **Python setup**: `pyproject.toml` specifies the `uv` setup, including the mkdocs package and required plugins.
-    - **`Makefile`**: Contains commands for building the docs using the virtual environment.
+  - **`mkdocs.yml`** — main config aggregating all sub-projects with the monorepo plugin.
+  - **Python setup**: `pyproject.toml` specifies the `uv` setup, including the mkdocs package and required plugins.
+  - **`Makefile`**: Contains commands for building the docs using the virtual environment.
 - These files support the docs build but are not included as user-facing content.
 
 **Recommendation:** Add your new publication as a subdirectory under `/docs/`, and place shared assets only in `shared/`. Scripts and configuration should remain at the top level unless specific to a publication.
-
-
 
 ## File Conventions
 
@@ -59,7 +57,7 @@ The `/docs` directory is organized to support multiple documentation publication
 
 ```yaml
 ---
-title: "Opentrons Flex: Support and Contact Information"
+title: 'Opentrons Flex: Support and Contact Information'
 ---
 ```
 
@@ -67,7 +65,7 @@ title: "Opentrons Flex: Support and Contact Information"
 
 ```yaml
 ---
-title: "HEPA/UV Module Instruction Manual"
+title: 'HEPA/UV Module Instruction Manual'
 hide: TOC
 ---
 ```
@@ -78,8 +76,11 @@ The `autorefs` plugin warns on duplicate headings across the entire site. Add un
 
 ```markdown
 ## Tips and tip racks { #tips-and-tip-racks-ot2 }
+
 ## Tips and tip racks { #tips-and-tip-racks-flex }
+
 ## Air gap { #air-gap-building-block }
+
 ## Air gap { #air-gap-complex }
 ```
 
@@ -96,7 +97,7 @@ Use **Markdown tables** by default:
 
 ```markdown
 | Specification | Description |
-|:--------------|:------------|
+| :------------ | :---------- |
 | Module weight | 790 g       |
 ```
 
@@ -105,9 +106,9 @@ Switch to **HTML tables** when you need: `rowspan`/`colspan`, embedded lists, or
 **Column widths** (use sparingly — only when auto-widths are unusable):
 
 ```markdown
-| Setting {style="width: 25%;"} | Description |
-|------|------|
-| Flow rates | Set aspirate/dispense speed. |
+| Setting {style="width: 25%;"} | Description                  |
+| ----------------------------- | ---------------------------- |
+| Flow rates                    | Set aspirate/dispense speed. |
 ```
 
 Requires `attr_list` in `markdown_extensions` (already enabled globally).
@@ -129,9 +130,9 @@ foo = "bar"
 No special plugin — use italic text in its own paragraph:
 
 ```markdown
-*New in version 2.15*
+_New in version 2.15_
 
-*Changed in version 2.16:* The `mount` parameter is optional.
+_Changed in version 2.16:_ The `mount` parameter is optional.
 ```
 
 ### Linking to the API Reference
@@ -148,6 +149,7 @@ Adjust the [bottom clearance][opentrons.protocol_api.InstrumentContext.well_bott
 ```
 
 Rules:
+
 - Python object names → monospace (backticks)
 - Descriptive link text → regular font
 - Methods get trailing `()`, other objects do not
@@ -233,11 +235,16 @@ Flex grid: 2–4 figures per row depending on window size. Used in hardware manu
 
 ```html
 <div class="parts-list" markdown>
+  <figure markdown>
+    ![Opentrons Flex robot](images/parts-list/flex-robot.svg "Opentrons Flex
+    robot")
+    <figcaption>(1) Opentrons Flex robot</figcaption>
+  </figure>
 
-<figure markdown> ![Opentrons Flex robot](images/parts-list/flex-robot.svg "Opentrons Flex robot") <figcaption>(1) Opentrons Flex robot</figcaption> </figure>
-
-<figure markdown> ![USB cable](images/parts-list/usb-cable.svg "USB cable") <figcaption>(1) USB cable</figcaption> </figure>
-
+  <figure markdown>
+    ![USB cable](images/parts-list/usb-cable.svg "USB cable")
+    <figcaption>(1) USB cable</figcaption>
+  </figure>
 </div>
 ```
 
@@ -247,7 +254,7 @@ White-background screenshots need a border to stand out:
 
 ```html
 <figure class="screenshot" markdown>
-![Alt text describing screenshot.](images/my-screen.png "Screen title")
+  ![Alt text describing screenshot.](images/my-screen.png "Screen title")
 </figure>
 ```
 
@@ -257,8 +264,8 @@ Exactly two images side by side (compare/contrast):
 
 ```html
 <figure class="side-by-side" markdown>
-![Green run completed screen.](images/run-completed.png "Run completed")
-![Red run failed screen.](images/run-failed.png "Run failed")
+  ![Green run completed screen.](images/run-completed.png "Run completed") ![Red
+  run failed screen.](images/run-failed.png "Run failed")
 </figure>
 ```
 
@@ -270,21 +277,15 @@ For unboxing/setup steps — numbered items with large blue circular bullets. Cl
 
 ```html
 <div class="instruction-list" markdown>
-
-1. Unlock the eight latches holding the top to the sides.
-
-   ![Crate latches.](images/unboxing/1-crate-latches.svg "Unboxing step 1")
-
-2. Remove the top panel.
-
+  1. Unlock the eight latches holding the top to the sides. ![Crate
+  latches.](images/unboxing/1-crate-latches.svg "Unboxing step 1") 2. Remove the
+  top panel.
 </div>
 
 ### Part 2: Release the Flex
 
 <div class="instruction-list" markdown>
-
-3. Continue with next numbered step…
-
+  3. Continue with next numbered step…
 </div>
 ```
 

@@ -1378,8 +1378,7 @@
   "commandAnnotationSchemaId": "opentronsCommandAnnotationSchemaV1",
   "commandAnnotations": [
     {
-      "commandKeys": [
-      ],
+      "commandKeys": [],
       "annotationType": "custom"
     }
   ]

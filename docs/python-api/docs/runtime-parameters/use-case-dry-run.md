@@ -1,6 +1,6 @@
 ---
-title: "Python API: Runtime Parameters for Dry Runs"
-description: "Add a dry-run option to quickly test your protocol."
+title: 'Python API: Runtime Parameters for Dry Runs'
+description: 'Add a dry-run option to quickly test your protocol.'
 ---
 
 When testing out a new protocol, it's common to perform a dry run to watch your robot go through all the steps without actually handling samples or reagents. This use case explores how to add a single Boolean parameter for whether you're performing a dry run.
@@ -30,6 +30,7 @@ def add_parameters(parameters):
         default=False
     )
 ```
+
 This parameter is set to `False` by default, assuming that most runs will be live runs. In other words, during run setup the technician will have to change the parameter setting to perform a dry run. If they leave it as is, the robot will perform a live run.
 
 Additionally, since "dry run" can have different meanings in different contexts, it's important to include a `description` that indicates exactly what the parameter will control — in this case, three things. The following sections show how to accomplish each of those when the dry run parameter is set to `True`.
@@ -38,12 +39,15 @@ Additionally, since "dry run" can have different meanings in different contexts,
 
 Many protocols have built-in delays, either for a module to work or to let a reaction happen passively. Lengthy delays just get in the way when verifying a protocol with a dry run. So wherever the protocol calls for a delay, check the value of `protocol.params.dry_run` and make the protocol behave accordingly.
 
-For example, consider a simple [`delay()`][opentrons.protocol_api.ProtocolContext.delay] command. Wrap it in an `if` statement so the delay only executes when the run is *not* a dry run:
+For example, consider a simple [`delay()`][opentrons.protocol_api.ProtocolContext.delay] command. Wrap it in an `if` statement so the delay only executes when the run is _not_ a dry run:
+
 ```python
 if protocol.params.dry_run is False:
     protocol.delay(minutes=5)
 ```
+
 You can extend this approach to more complex situations, like module interactions. For example, in a protocol that moves a plate to the Thermocycler for an incubation, you'll want to perform all the movement steps — opening and closing the module lid, and moving the plate to and from the block — but skip the heating and cooling time. The simplest way to do this is, like in the delay example above, to wrap each skippable command:
+
 ```python
 protocol.move_labware(labware=plate, new_location=tc_mod, use_gripper=True)
 if protocol.params.dry_run is False:
@@ -111,9 +115,9 @@ return_or_drop(pipette)
 ```
 
 !!! note
-    It's generally better to define a standalone function, rather than adding a method to the [`InstrumentContext`][opentrons.protocol_api.InstrumentContext] class. This makes your custom, parameterized commands stand out from API methods in your code.
+It's generally better to define a standalone function, rather than adding a method to the [`InstrumentContext`][opentrons.protocol_api.InstrumentContext] class. This makes your custom, parameterized commands stand out from API methods in your code.
 
-Additionally, if your protocol uses enough tips that you have to replenish tip racks, you'll need separate behavior for dry runs and live runs. In a live run, once you've used all the tips, the rack is empty, because the tips are in the trash. In a dry run, once you've used all the tips in a rack, the rack is *full*, because you returned the tips.
+Additionally, if your protocol uses enough tips that you have to replenish tip racks, you'll need separate behavior for dry runs and live runs. In a live run, once you've used all the tips, the rack is empty, because the tips are in the trash. In a dry run, once you've used all the tips in a rack, the rack is _full_, because you returned the tips.
 
 The API has methods to handle both of these situations. To continue using the same tip rack without physically replacing it, call [`reset_tipracks()`][opentrons.protocol_api.InstrumentContext.reset_tipracks]. In the live run, move the empty tip rack off the deck and move a full one into place:
 
@@ -128,4 +132,5 @@ else:
         labware=tips_2, new_location="C3", use_gripper=True
     )
 ```
+
 You can modify this code for similar cases. You may be moving tip racks by hand, rather than with the gripper. Or you could even mix the two, moving the used (but full) rack off-deck by hand — instead of dropping it down the chute, spilling all the tips — and have the gripper move a new rack into place. Ultimately, it's up to you to fine-tune your dry run behavior, and communicate it to your protocol's users with your parameter descriptions.

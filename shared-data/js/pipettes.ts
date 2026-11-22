@@ -49,7 +49,8 @@ export function getPipetteNameSpecs(
   name: PipetteName
 ): PipetteNameSpecs | null {
   const config = pipetteNameSpecs[name] as
-    Omit<PipetteNameSpecs, 'name'> | undefined
+    | Omit<PipetteNameSpecs, 'name'>
+    | undefined
   return config != null ? { ...config, name } : null
 }
 

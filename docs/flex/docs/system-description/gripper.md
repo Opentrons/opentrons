@@ -1,15 +1,15 @@
 ---
-title: "Opentrons Flex: Gripper"
-description: "Gripper for moving labware and lids on the Flex deck."
+title: 'Opentrons Flex: Gripper'
+description: 'Gripper for moving labware and lids on the Flex deck.'
 ---
 
-The *gripper* moves labware throughout the working area and staging area during the execution of protocols. The gripper attaches to the *extension mount*, which is separate from the pipette mounts; the gripper can be used with any pipette configuration. For details on installing the gripper, see [Instrument Installation and Calibration](../installation/instruments.md).
+The _gripper_ moves labware throughout the working area and staging area during the execution of protocols. The gripper attaches to the _extension mount_, which is separate from the pipette mounts; the gripper can be used with any pipette configuration. For details on installing the gripper, see [Instrument Installation and Calibration](../installation/instruments.md).
 
 The gripper can move labware across the deck and onto or off of modules. The gripper can manipulate certain fully skirted well plates, lids, and tip racks. For more details on what labware the gripper can move, see the [Using Labware with the Gripper section](../labware/gripper.md) of the Labware chapter, or consult the [Opentrons Labware Library](https://labware.opentrons.com).
 
 ## Gripper specifications
 
-The *jaws* perform the primary motion of the gripper, which is to open or close two parallel *paddles* to apply or release force on the sides of labware. Movement of the jaws is controlled by a 36 VDC brushed motor connected to a rack-and-pinion gear system.
+The _jaws_ perform the primary motion of the gripper, which is to open or close two parallel _paddles_ to apply or release force on the sides of labware. Movement of the jaws is controlled by a 36 VDC brushed motor connected to a rack-and-pinion gear system.
 
 To move a piece of labware that has been gripped by the jaws, the gantry lifts the gripper along the z-axis, moves it laterally, and then lowers it into the Calibration pin labware's new position.
 
@@ -20,7 +20,7 @@ To move a piece of labware that has been gripped by the jaws, the gantry lifts t
 
 ## Gripper calibration
 
-The gripper includes a metal *calibration pin*. The calibration pin is located in a recessed storage area on the lower part of the gripper. A magnet holds the pin in place. To remove the calibration pin, grasp it with your fingers and pull gently. To replace the pin, put it back in the storage slot. You'll know it's secure when it snaps into place.
+The gripper includes a metal _calibration pin_. The calibration pin is located in a recessed storage area on the lower part of the gripper. A magnet holds the pin in place. To remove the calibration pin, grasp it with your fingers and pull gently. To replace the pin, put it back in the storage slot. You'll know it's secure when it snaps into place.
 
 When calibrating the gripper, attach the pin to each jaw in turn. The robot moves the pin to calibration points on the deck to measure the gripper's exact position.
 

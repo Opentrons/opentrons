@@ -1,5 +1,3 @@
-import '@testing-library/jest-dom/vitest'
-
 import { I18nextProvider } from 'react-i18next'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { Provider } from 'react-redux'
@@ -7,6 +5,8 @@ import NiceModal from '@ebay/nice-modal-react'
 import { configureStore } from '@reduxjs/toolkit'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import '@testing-library/jest-dom/vitest'
 
 import { getUserLoginStatus } from '@opentrons/api-client'
 import { useValidateSelfPasswordMutation } from '@opentrons/react-api-client'

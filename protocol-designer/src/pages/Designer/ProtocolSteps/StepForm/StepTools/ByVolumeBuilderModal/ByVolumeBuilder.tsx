@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import createPlotlyComponent from 'react-plotly.js/factory'
 import Plotly from 'plotly.js-cartesian-dist'
+import createPlotlyComponent from 'react-plotly.js/factory'
 
 import {
   AXIS_OFFSET_PERCENTAGE,

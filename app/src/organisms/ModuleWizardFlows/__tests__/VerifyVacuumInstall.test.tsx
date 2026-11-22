@@ -111,7 +111,10 @@ describe('VerifyVacuumInstall', () => {
 
     screen.getByText('Prepare to test vacuum pressure')
     screen.getByText(
-      'The collar must be fully seated on the vacuum module. Cover it with a solid, non-filter plate so the system can hold vacuum during this check.'
+      'Place the vacuum collar onto the base, then add a solid, non-filter plate on top. Ensure the collar and plate are fully seated before continuing.'
+    )
+    screen.getByText(
+      'Once the placements are confirmed, the system will check whether it can reach the target vacuum pressure.'
     )
   })
 
@@ -185,7 +188,7 @@ describe('VerifyVacuumInstall', () => {
 
     await screen.findByText('Target vacuum pressure unmet: -120 / -500 mbar')
     screen.getByText(
-      'Ensure tube connections are secure and the collar and non-filter plate are fully seated.'
+      'Ensure tube connections are secure and the collar and non-filter plate are fully seated. Try again or continue setup.'
     )
     screen.getByRole('button', { name: /try again/i })
     screen.getByRole('button', { name: 'Continue anyway' })

@@ -373,7 +373,7 @@ async def test_get_run_commands(
         )
     ).then_return(
         JsonCommandSlice(
-            commands=[command.model_dump_json(by_alias=True, exclude_none=True)],
+            commands=[command.model_dump_json(by_alias=True)],
             cursor=1,
             total_length=3,
         )

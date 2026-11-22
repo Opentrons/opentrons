@@ -1,9 +1,8 @@
+import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import userEvent from '@testing-library/user-event'
 
 import '@testing-library/jest-dom/vitest'
-
-import { screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
@@ -34,7 +33,7 @@ describe('TimelineAlerts', () => {
     render()
     screen.getByText('Not enough accessible tips')
     screen.getByText(
-      'Add or move a tip rack on your deck to avoid collisions, or change your tip pickup settings for this action.'
+      'Add or move a tip rack on your deck to avoid collisions, or change your tip pickup settings for this action.',
     )
     await user.click(screen.getByText('Edit starting deck'))
     expect(vi.mocked(selectTerminalItem)).toHaveBeenCalled()

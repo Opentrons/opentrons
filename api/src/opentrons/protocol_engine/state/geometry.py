@@ -385,16 +385,12 @@ class GeometryView:
         underlying_ancestor_def = self._get_stackup_underlying_ancestor_definition(
             location
         )
-        module_parent_to_child_offset = self._get_stackup_module_parent_to_child_offset(
-            location
-        )
 
         slot_front_left = self._addressable_areas.get_addressable_area_position(aa_name)
         stackup_origin_to_lw_origin = get_stackup_origin_to_labware_origin(
             context=LabwareOriginContext.PIPETTING,
             stackup_lw_info_top_to_bottom=stackup_lw_defs_locs,
             underlying_ancestor_definition=underlying_ancestor_def,
-            module_parent_to_child_offset=module_parent_to_child_offset,
             deck_definition=self._addressable_areas.deck_definition,
             slot_name=addressable_area.base_slot,
         )
@@ -428,25 +424,6 @@ class GeometryView:
             else:
                 break
         return definitions_locations_top_to_bottom
-
-    def _get_stackup_module_parent_to_child_offset(
-        self, top_most_lw_location: LabwareLocation
-    ) -> Union[Point, None]:
-        """Traverse the stackup to find the first parent-to-child module offset, if any."""
-        current_location = top_most_lw_location
-
-        while True:
-            if isinstance(current_location, ModuleLocation):
-                return Point(0, 0, 0)
-
-            if isinstance(current_location, OnLabwareLocation):
-                current_labware_id = current_location.labwareId
-                current_labware = self._labware.get(current_labware_id)
-                current_location = current_labware.location
-            else:
-                break
-
-        return None
 
     def _get_stackup_underlying_ancestor_definition(
         self, top_most_lw_location: LabwareLocation
@@ -939,9 +916,6 @@ class GeometryView:
         stackup_defs_locs = self._get_stackup_lw_info_top_to_bottom(
             labware_definition=labware_definition, location=location
         )
-        module_parent_to_child_offset = self._get_stackup_module_parent_to_child_offset(
-            location
-        )
         underlying_ancestor_def = self._get_stackup_underlying_ancestor_definition(
             location
         )
@@ -953,7 +927,6 @@ class GeometryView:
 
         aa_origin_to_lw_origin = get_stackup_origin_to_labware_origin(
             context=context_type,
-            module_parent_to_child_offset=module_parent_to_child_offset,
             underlying_ancestor_definition=underlying_ancestor_def,
             stackup_lw_info_top_to_bottom=stackup_defs_locs,
             slot_name=addressable_area.base_slot,

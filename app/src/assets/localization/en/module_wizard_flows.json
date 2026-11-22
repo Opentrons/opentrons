@@ -17,7 +17,8 @@
   "close_doors": "Close robot and stacker door",
   "close_doors_description": "The robot needs to safely move to its home location before you can set the labware shuttle onto the track.",
   "close_stacker_doors": "Close robot door and all stacker doors",
-  "collar_block_description": "The collar must be fully seated on the vacuum module. Cover it with a solid, non-filter plate so the system can hold vacuum during this check.",
+  "collar_block_description": "Place the vacuum collar onto the base, then add a solid, non-filter plate on top. Ensure the collar and plate are fully seated before continuing.",
+  "collar_block_description_2": "Once the placements are confirmed, the system will check whether it can reach the target vacuum pressure.",
   "complete_calibration": "Complete calibration",
   "confirm_location": "Confirm location",
   "confirm_placement": "Confirm placement",
@@ -85,6 +86,6 @@
   "target_vacuum_pressure_unmet": "Target vacuum pressure unmet: {{current}} / {{target}} mbar",
   "try_again": "try again",
   "tubes_must_be_secured": "All tubes must be securely connected to maintain an airtight seal.",
-  "vacuum_verification_failed_description": "Ensure tube connections are secure and the collar and non-filter plate are fully seated.",
+  "vacuum_verification_failed_description": "Ensure tube connections are secure and the collar and non-filter plate are fully seated. Try again or continue setup.",
   "verifying_vacuum_seal": "Stand back, reaching target vacuum pressure"
 }

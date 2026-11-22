@@ -40,7 +40,7 @@ vi.mock('/protocol-designer/ui/steps/actions/thunks')
 vi.mock('/protocol-designer/steplist/actions')
 vi.mock('/protocol-designer/feature-flags/selectors')
 vi.mock('/protocol-designer/analytics/actions')
-vi.mock('@opentrons/components', async importOriginal => {
+vi.mock('@opentrons/components', async (importOriginal) => {
   const actual = await importOriginal<typeof OpentronsComponents>()
   return {
     ...actual,

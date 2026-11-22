@@ -1,5 +1,5 @@
-import fixture_12_trough_v2 from './fixture_12_trough_v2.json'
 import fixture_12_trough from './fixture_12_trough.json'
+import fixture_12_trough_v2 from './fixture_12_trough_v2.json'
 import fixture_24_tuberack from './fixture_24_tuberack.json'
 import fixture_96_plate from './fixture_96_plate.json'
 import fixture_384_plate from './fixture_384_plate.json'

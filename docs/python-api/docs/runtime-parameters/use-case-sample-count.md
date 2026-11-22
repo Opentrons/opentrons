@@ -1,6 +1,6 @@
 ---
-title: "Python API: Runtime Parameters for Sample Count"
-description: "Use a parameter to let users set the number of samples per run."
+title: 'Python API: Runtime Parameters for Sample Count'
+description: 'Use a parameter to let users set the number of samples per run.'
 ---
 
 Choosing how many samples to process is important for efficient automation. This use case explores how a single parameter for sample count can have pervasive effects throughout a protocol. The examples are adapted from an actual parameterized protocol for DNA prep. The sample code will use 8-channel pipettes to process 8, 16, 24, or 32 samples.
@@ -19,6 +19,7 @@ To keep things as simple as possible, this use case only focuses on setting up a
 First of all, we need to set up the sample count parameter so it’s both easy for technicians to understand during protocol setup and easy for us to use in the protocol’s `run()` function.
 
 We want to limit the number of samples to 8, 16, 24, or 32, so we'll use an integer parameter with choices:
+
 ```python
 def add_parameters(parameters):
     parameters.add_int(
@@ -34,12 +35,14 @@ def add_parameters(parameters):
         ]
     )
 ```
-All of the possible values are multiples of 8, because the protocol will use an 8-channel pipette to process an entire column of samples at once. Considering how 8-channel pipettes access wells, it may be more useful to operate with a *column count* in code. We can set a `column_count` very early in the `run()` function by accessing the value of `params.sample_count` and dividing it by 8:
+
+All of the possible values are multiples of 8, because the protocol will use an 8-channel pipette to process an entire column of samples at once. Considering how 8-channel pipettes access wells, it may be more useful to operate with a _column count_ in code. We can set a `column_count` very early in the `run()` function by accessing the value of `params.sample_count` and dividing it by 8:
 
 ```python
 def run(protocol):
     column_count = protocol.params.sample_count // 8
 ```
+
 Most examples below will use `column_count`, rather than redoing (and retyping!) this calculation multiple times.
 
 ## Loading tip racks
@@ -51,11 +54,11 @@ We could load as many tip racks as are needed for our maximum number of samples,
 In the case of this DNA prep protocol, we can create formulas for the number of 200 µL and 50 µL tip racks needed. The following factors go into these computations:
 
 - 50 µL tips
-    - 1 fixed action that picks up once per protocol.
-    - 7 variable actions that pick up once per sample column.
+  - 1 fixed action that picks up once per protocol.
+  - 7 variable actions that pick up once per sample column.
 - 200 µL tips
-    - 2 fixed actions that pick up once per protocol.
-    - 11 variable actions that pick up once per sample column.
+  - 2 fixed actions that pick up once per protocol.
+  - 11 variable actions that pick up once per sample column.
 
 Since each tip rack has 12 columns, divide the number of pickup actions by 12 to get the number of racks needed. And always round up — performing 13 pickups requires 2 racks. The [`math.ceil()`](https://docs.python.org/3/library/math.html#math.ceil) method rounds up to the nearest integer. We'll add `from math import ceil` at the top of the protocol and then calculate the number of tip racks as follows:
 
@@ -125,6 +128,7 @@ pipette_1000 = protocol.load_instrument(
     tip_racks=tip_racks_200
 )
 ```
+
 This code will load as few as 3 tip racks and as many as 7, and associate them with the correct pipettes — all based on a single choice from a dropdown menu at run setup.
 
 ## Loading liquids
@@ -155,11 +159,11 @@ twb_liquid = protocol.define_liquid(
 
 Now bring sample count into consideration as you [load the liquids][labeling-wells-and-reservoirs]. The application requires the following volumes for each column of samples:
 
-| Liquid                | Volume (µL per column) |
-|-----------------------|-----------------------|
-| AMPure Beads          | 180                   |
-| Tagmentation Stop     | 10                    |
-| Tagmentation Wash Buffer | 900                |
+| Liquid                   | Volume (µL per column) |
+| ------------------------ | ---------------------- |
+| AMPure Beads             | 180                    |
+| Tagmentation Stop        | 10                     |
+| Tagmentation Wash Buffer | 900                    |
 
 To calculate the total volume for each liquid, we'll multiply these numbers by `column_count` and by 1.1 (to ensure that the pipette can aspirate the required volume without drawing in air at the bottom of the well). This calculation can be done inline as the `volume` value of [`load_liquid()`][opentrons.protocol_api.Well.load_liquid]:
 
@@ -174,15 +178,17 @@ reservoir["A4"].load_liquid(
     liquid=twb_liquid, volume=900 * column_count * 1.1
 )
 ```
+
 Now, for example, the volume of AMPure beads to load will vary from 198 µL for a single sample column up to 792 µL for four columns.
 
 !!! tip
-    Does telling a technician to load 792 µL of a liquid seem overly precise? You can perform any calculation you like to set the value of `volume`! For example, you could round the AMPure volume up to the nearest 10 µL:
-    ```python
+Does telling a technician to load 792 µL of a liquid seem overly precise? You can perform any calculation you like to set the value of `volume`! For example, you could round the AMPure volume up to the nearest 10 µL:
+`python
     volume=ceil((180 * column_count * 1.1) / 10) * 10
-    ```
+    `
 
 Finally, it's good practice to label the wells where the samples reside. The sample plate starts out atop the Heater-Shaker Module:
+
 ```python
 hs_mod = protocol.load_module(
     module_name="heaterShakerModuleV1", location="D1"
@@ -193,7 +199,8 @@ sample_plate = hs_adapter.load_labware(
     label="Sample Plate",
 )
 ```
-Now we can construct a `for` loop to label each sample well with `load_liquid()`. The simplest way to do this is to combine our original *sample count* with the fact that the [`Labware.wells()`][opentrons.protocol_api.Labware.wells] accessor returns wells top-to-bottom, left-to-right:
+
+Now we can construct a `for` loop to label each sample well with `load_liquid()`. The simplest way to do this is to combine our original _sample count_ with the fact that the [`Labware.wells()`][opentrons.protocol_api.Labware.wells] accessor returns wells top-to-bottom, left-to-right:
 
 ```python
 # define sample liquid
@@ -211,6 +218,7 @@ for w in range(protocol.params.sample_count):
 When it comes time to process the samples, we'll return to working by column, since the protocol uses an 8-channel pipette. There are many pipetting stages in the full protocol, but this section examines just the stage for adding the Tagmentation Stop liquid. The same techniques would apply to similar stages.
 
 For pipetting in the original sample locations, we'll command the 50 µL pipette to move to some or all of A1–A4 on the sample plate. Similar to when we loaded tip racks earlier, we can use `column_count` to slice a list containing these well names, and then iterate over that list with a `for` loop:
+
 ```python
 for w in ["A1", "A2", "A3", "A4"][:column_count]:
     pipette_50.pick_up_tip()
@@ -222,9 +230,10 @@ for w in ["A1", "A2", "A3", "A4"][:column_count]:
     pipette_50.blow_out(location=sample_plate[w].top(z=-2))
     pipette_50.drop_tip()
 ```
+
 Each time through the loop, the pipette will fill from the same well of the reservoir and then dispense (and mix and blow out) in a different column of the sample plate.
 
-Later steps of the protocol will move intermediate samples to the middle of the plate (columns 5–8) and final samples to the right side of the plate (columns 9–12). When moving directly from one set of columns to another, track *both lists* with the `for` loop. The [`zip()`](https://docs.python.org/3/library/functions.html#zip) function lets us pair up the lists of well names and step through them in parallel:
+Later steps of the protocol will move intermediate samples to the middle of the plate (columns 5–8) and final samples to the right side of the plate (columns 9–12). When moving directly from one set of columns to another, track _both lists_ with the `for` loop. The [`zip()`](https://docs.python.org/3/library/functions.html#zip) function lets us pair up the lists of well names and step through them in parallel:
 
 ```python
 for initial, intermediate in zip(
@@ -246,6 +255,7 @@ For the higher values of `protocol.params.sample_count`, the protocol will load 
 A protocol without parameters will always run out of tips at the same time — just add a [`move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] command when that happens. But as we saw in the Processing Samples section above, our parameterized protocol will go through tips at a different rate depending on the sample count.
 
 In our simplified example, we know that when the sample count is 32, the first 200 µL tip rack will be exhausted after three stages of pipetting using the 1000 µL pipette. So, after that step, add:
+
 ```python
 if protocol.params.sample_count == 32:
     protocol.move_labware(
@@ -259,9 +269,10 @@ if protocol.params.sample_count == 32:
         use_gripper=True,
     )
 ```
+
 This will replace the first 200 µL tip rack (in slot A2) with the last 200 µL tip rack (in the staging area).
 
-However, in the full protocol, sample count is not the only parameter that affects the rate of tip use. It would be unwieldy to calculate in advance all the permutations of when tip replenishment is necessary. Instead, before each stage of the protocol, we could use [`Well.has_tip()`][opentrons.protocol_api.Well.has_tip] to check whether the first tip rack is empty. If the *last well* of the rack is empty, you can assume that the entire rack is empty and needs to be replaced:
+However, in the full protocol, sample count is not the only parameter that affects the rate of tip use. It would be unwieldy to calculate in advance all the permutations of when tip replenishment is necessary. Instead, before each stage of the protocol, we could use [`Well.has_tip()`][opentrons.protocol_api.Well.has_tip] to check whether the first tip rack is empty. If the _last well_ of the rack is empty, you can assume that the entire rack is empty and needs to be replaced:
 
 ```python
 if tip_racks_200[0].wells()[-1].has_tip is False:

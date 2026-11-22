@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest'
 import {
   fixture96Plate as uncheckedLabwareA,
   fixture12Trough as uncheckedLabwareB,
+  fixtureCorning24Plate as uncheckedLabwareC,
 } from '@opentrons/shared-data'
-import { fixture_corning_24_plate as uncheckedLabwareC } from '@opentrons/shared-data/labware/fixtures/3'
 
 import { validateLabwareFiles, validateNewLabwareFile } from '../validation'
 

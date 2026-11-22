@@ -1,6 +1,6 @@
 ---
-title: "Opentrons Flex: Protocol Library"
-description: "Pre-built protocols available for Flex and how to use them."
+title: 'Opentrons Flex: Protocol Library'
+description: 'Pre-built protocols available for Flex and how to use them.'
 ---
 
 The Opentrons Protocol Library hosts protocols authored either by Opentrons itself or by members of the Opentrons community. To find a protocol that fits your target application, use the search field at the top of the [Protocol Library homepage](https://library.opentrons.com).
@@ -13,15 +13,15 @@ The Protocol Library search returns results as you type. You can select a result
 
 Each protocol card will show:
 
-| **Category** | **Description** |
-|--------------|-----------------|
-| **Protocol name** | The name of the protocol. |
-| **Verification** | Badges indicate if the protocol is verified by Opentrons, a third-party manufacturer, or members of the community. |
-| **Time estimate** | Approximately how long the protocol takes to run. |
-| **Description** | A short summary of what the protocol does. |
-| **Robot model** | Which Opentrons robots the protocol is compatible with. |
+| **Category**             | **Description**                                                                                                                                             |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Protocol name**        | The name of the protocol.                                                                                                                                   |
+| **Verification**         | Badges indicate if the protocol is verified by Opentrons, a third-party manufacturer, or members of the community.                                          |
+| **Time estimate**        | Approximately how long the protocol takes to run.                                                                                                           |
+| **Description**          | A short summary of what the protocol does.                                                                                                                  |
+| **Robot model**          | Which Opentrons robots the protocol is compatible with.                                                                                                     |
 | **Protocol editability** | JSON protocols are editable in Protocol Designer, with no coding required. Python protocols are editable in any text editor, using the Python Protocol API. |
-| **Modules** | Any hardware modules that are required. |
+| **Modules**              | Any hardware modules that are required.                                                                                                                     |
 
 In addition to these categories, in the sidebar you can filter results by:
 

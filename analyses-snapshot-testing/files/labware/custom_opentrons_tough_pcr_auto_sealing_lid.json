@@ -56,10 +56,10 @@
       "y": 0,
       "z": 6.492
     },
-    "custom_opentrons_tough_pcr_auto_sealing_lid":{
-      "x":0,
-      "y":0,
-      "z":6.492
+    "custom_opentrons_tough_pcr_auto_sealing_lid": {
+      "x": 0,
+      "y": 0,
+      "z": 6.492
     },
     "armadillo_96_wellplate_200ul_pcr_full_skirt": {
       "x": 0,
@@ -71,7 +71,7 @@
       "y": 0,
       "z": 8.193
     },
-    "stackable_opentrons_96_wellplate_200ul_pcr_full_skirt":{
+    "stackable_opentrons_96_wellplate_200ul_pcr_full_skirt": {
       "x": 0,
       "y": 0,
       "z": 8.193

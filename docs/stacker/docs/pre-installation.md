@@ -1,6 +1,6 @@
 ---
-title: "Flex Stacker: Pre-installation Information"
-description: "Deck placement, column 4 slots, power/data hub, and setup overview."
+title: 'Flex Stacker: Pre-installation Information'
+description: 'Deck placement, column 4 slots, power/data hub, and setup overview.'
 ---
 
 Review this section for important information about Stacker placement, deck adapters, the power/data hub, and other components.
@@ -81,5 +81,5 @@ The following table lists and describes the function of each cable.
 
 The [installation instructions](installation.md) in this guide assume you're installing one Stacker only. If you're installing multiple Stackers on the same Flex:
 
-* Attach only one Stacker at a time. Complete all of the installation and post-installation procedures before installing the next module.
-* Attach Stackers from the rear (A4) to the front (D4). This prevents the need to work around previously installed modules.
+- Attach only one Stacker at a time. Complete all of the installation and post-installation procedures before installing the next module.
+- Attach Stackers from the rear (A4) to the front (D4). This prevents the need to work around previously installed modules.

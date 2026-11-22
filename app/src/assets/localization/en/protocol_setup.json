@@ -144,11 +144,11 @@
   "labware_latch": "Labware Latch",
   "labware_latch_instructions": "Use latch control for easy placement of labware.",
   "labware_liquids_setup_step_description": "Gather your labware & liquids and place them on the deck to finish setting up your protocol.",
-  "labware_liquids_setup_step_title": "Labware & Liquids",
+  "labware_liquids_setup_step_title": "Labware & liquids",
   "labware_location": "Labware Location",
   "labware_name": "Labware name",
   "labware_offset_data_code_snippets": "Labware Offset Data Code Snippets",
-  "labware_offsets": "Labware Offsets",
+  "labware_offsets": "Labware offsets",
   "labware_offsets_conflict": "Labware offsets conflict",
   "labware_placement": "labware and liquid placement",
   "labware_position_check": "Labware Position Check",
@@ -384,5 +384,5 @@
   "with_the_chosen_value": "With the chosen values, the following error occurred:",
   "you_can_still_adjust_offsets": "You can still adjust offsets by running Labware Position Check.",
   "you_havent_confirmed": "You haven't confirmed the {{missingSteps}} yet. Ensure these are correct before proceeding to run the protocol.",
-  "you_havent_confirmed_lpc_missing": "You haven't confirmed the {{missingSteps}} yet. Ensure these are correct before proceeding to run the protocol. Starting the run will apply existing offsets."
+  "you_havent_confirmed_lpc_missing": "You haven't confirmed the {{missingSteps}} yet. Ensure these are correct before proceeding to run the protocol. Starting the run will apply {{count}} offsets."
 }

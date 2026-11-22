@@ -1,9 +1,8 @@
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { mockFlexStacker, mockHeaterShaker } from '@opentrons/api-client'
 import {

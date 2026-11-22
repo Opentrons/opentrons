@@ -1,6 +1,6 @@
 ---
-title: "Opentrons OT-2: Open Source Software"
-description: "How to use Opentrons open-source code, GitHub releases, and contribute."
+title: 'Opentrons OT-2: Open Source Software'
+description: 'How to use Opentrons open-source code, GitHub releases, and contribute.'
 ---
 
 Opentrons believes that open-source software and hardware make science better. That's why we make our code available on GitHub and welcome contributions from the open-source community.
@@ -39,10 +39,10 @@ Most of our software is in the [Opentrons/opentrons](https://github.com/Opentron
 
 The following (non-exhaustive) list of directories, subdirectories, and files can help you navigate the monorepo and find code relevant to using an OT-2.
 
-| Directory | Description |
-|----|----|
-| [`/api/`](https://github.com/Opentrons/opentrons/tree/edge/api) | Source for the Python Protocol API, written in Python and distributed as the `opentrons` PyPI package. |
-| [`/api/docs/`](https://github.com/Opentrons/opentrons/tree/edge/api/docs) | Documentation for the Python Protocol API, written in ReStructuredText. |
+| Directory                                                                                        | Description                                                                                                   |
+| ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| [`/api/`](https://github.com/Opentrons/opentrons/tree/edge/api)                                  | Source for the Python Protocol API, written in Python and distributed as the `opentrons` PyPI package.        |
+| [`/api/docs/`](https://github.com/Opentrons/opentrons/tree/edge/api/docs)                        | Documentation for the Python Protocol API, written in ReStructuredText.                                       |
 | [`/api/release-notes.md`](https://github.com/Opentrons/opentrons/blob/edge/api/release-notes.md) | Release notes for the robot system software (as a whole, including changes outside of the `/api/` directory). |
 
 ## Other repositories
@@ -50,8 +50,8 @@ The following (non-exhaustive) list of directories, subdirectories, and files ca
 Opentrons also maintains software outside of the monorepo. A few key
 repositories include:
 
-| Repository | Description |
-| ---- | ---- |
-| [`buildroot`](https://github.com/Opentrons/buildroot) | The Opentrons fork of buildroot for building the OT2 system. |
+| Repository                                                                | Description                                                                                                                                                                           |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`buildroot`](https://github.com/Opentrons/buildroot)                     | The Opentrons fork of buildroot for building the OT2 system.                                                                                                                          |
 | [`opentrons-emulation`](https://github.com/Opentrons/opentrons-emulation) | Emulation of Opentrons robots and modules at either the hardware or firmware level. Uses [Docker](https://www.docker.com/), configuration files, and a simple command-line interface. |
-| [`opentrons-modules`](https://github.com/Opentrons/opentrons-modules) | Firmware for all Opentrons modules. |
+| [`opentrons-modules`](https://github.com/Opentrons/opentrons-modules)     | Firmware for all Opentrons modules.                                                                                                                                                   |

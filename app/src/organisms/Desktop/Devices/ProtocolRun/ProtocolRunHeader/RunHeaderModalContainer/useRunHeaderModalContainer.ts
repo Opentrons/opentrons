@@ -31,6 +31,7 @@ import {
   useQuickProtocolDetailsForRun,
 } from '/app/resources/runs'
 
+import type { ProtocolRunHeaderProps } from '..'
 import { useCloseTerminalRun, useRunHeaderRunControls } from '../hooks'
 import { getFallbackRobotSerialNumber } from '../utils'
 import {
@@ -52,7 +53,6 @@ import type {
 } from '@opentrons/react-api-client/src/accessControl/types'
 import type { UseErrorRecoveryResult } from '/app/organisms/ErrorRecoveryFlows'
 import type { State } from '/app/redux/types'
-import type { ProtocolRunHeaderProps } from '..'
 import type { UseRunErrorsResult } from '../hooks'
 import type {
   UseHeaterShakerConfirmationModalResult,

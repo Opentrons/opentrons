@@ -40,7 +40,6 @@ stages:
 ---
 test_name: POST Reset bootScripts option
 marks:
-  - ot3_only
   - usefixtures:
       - ot3_server_base_url
 stages:
@@ -67,7 +66,6 @@ stages:
 ---
 test_name: POST Reset deck calibration option for Flex raises
 marks:
-  - ot3_only
   - usefixtures:
       - ot3_server_base_url
 stages:
@@ -85,7 +83,6 @@ stages:
 ---
 test_name: POST Reset tip length calibrations option for Flex raises
 marks:
-  - ot3_only
   - usefixtures:
       - ot3_server_base_url
 stages:
@@ -103,7 +100,6 @@ stages:
 ---
 test_name: POST Reset deck configuration option
 marks:
-  - ot3_only
   - usefixtures:
       - ot3_server_base_url
 stages:
@@ -130,7 +126,6 @@ stages:
 ---
 test_name: POST Reset pipette offset calibrations option
 marks:
-  - ot3_only
   - usefixtures:
       - ot3_server_base_url
 stages:
@@ -157,7 +152,6 @@ stages:
 ---
 test_name: POST Reset gripper offset calibrations option
 marks:
-  - ot3_only
   - usefixtures:
       - ot3_server_base_url
 stages:
@@ -184,7 +178,6 @@ stages:
 ---
 test_name: POST Reset module calibration option
 marks:
-  - ot3_only
   - usefixtures:
       - ot3_server_base_url
 stages:
@@ -211,7 +204,6 @@ stages:
 ---
 test_name: POST Reset authorizedKeys option
 marks:
-  - ot3_only
   - usefixtures:
       - ot3_server_base_url
 stages:
@@ -241,7 +233,6 @@ stages:
 # We rely on manual end-to-end tests (with the Opentrons App) to cover it.
 test_name: POST Reset non existant option
 marks:
-  - ot3_only
   - usefixtures:
       - ot3_server_base_url
 stages:

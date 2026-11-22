@@ -1,12 +1,12 @@
 ---
-title: "Thermocycler Module: G-Codes"
-description: "Thermocycler G-code commands and responses."
+title: 'Thermocycler Module: G-Codes'
+description: 'Thermocycler G-code commands and responses.'
 ---
 
 The Thermocycler accepts the G-code commands listed below.
 
 !!! tip
-    These commands rarely change, but you can always check for updates in the [Thermocycler's driver file](https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/drivers/thermocycler/driver.py).
+These commands rarely change, but you can always check for updates in the [Thermocycler's driver file](https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/drivers/thermocycler/driver.py).
 
 <table>
   <thead>

@@ -42,7 +42,10 @@ import type {
 
 export type GetIngreds = (labware: string, well: string) => NamedIngred[]
 type TransferLikeArgs =
-  ConsolidateArgs | DistributeArgs | TransferArgs | MixArgs
+  | ConsolidateArgs
+  | DistributeArgs
+  | TransferArgs
+  | MixArgs
 
 function getCommandCreatorForTransferlikeSubsteps(
   stepArgs: TransferLikeArgs

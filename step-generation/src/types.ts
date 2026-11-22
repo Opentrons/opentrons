@@ -115,7 +115,9 @@ export interface ThermocyclerModuleState {
 
   /** What the thermal block is currently doing. */
   currentBlockActivity:
-    ProfileBlockActivity | TargetTempBlockActivity | DeactivatedBlockActivity
+    | ProfileBlockActivity
+    | TargetTempBlockActivity
+    | DeactivatedBlockActivity
 
   /** If false, closed. If null, unknown. */
   lidOpen: boolean | null
@@ -345,7 +347,10 @@ export interface RuntimeParameters {
 }
 
 export type AdditionalEquipmentName =
-  'gripper' | 'wasteChute' | 'stagingArea' | 'trashBin'
+  | 'gripper'
+  | 'wasteChute'
+  | 'stagingArea'
+  | 'trashBin'
 
 export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
@@ -424,7 +429,11 @@ export interface PipetteEntities {
 
 // ===== MIX-IN TYPES =====
 export type ChangeTipOptions =
-  'always' | 'once' | 'never' | 'perDest' | 'perSource'
+  | 'always'
+  | 'once'
+  | 'never'
+  | 'perDest'
+  | 'perSource'
 
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
 
@@ -1153,6 +1162,7 @@ export type ErrorType =
   | 'POSSIBLE_PIPETTE_COLLISION_THERMOCYCLER_LID'
   | 'POSSIBLE_PIPETTE_COLLISION_OUTSIDE_DECK_EXTENTS'
   | 'POSSIBLE_PIPETTE_COLLISION_ADJACENT_ADDRESSABLE_AREA'
+  | 'POSSIBLE_PIPETTE_COLLISION_VACUUM_COLLAR'
   | 'REMOVE_96_CHANNEL_TIPRACK_ADAPTER'
   | 'RETRACT_BELOW_ASPIRATE'
   | 'RETRACT_BELOW_DISPENSE'
@@ -1214,7 +1224,8 @@ export interface CommandsAndWarnings extends StepInfo {
   python?: string
 }
 export type CommandCreatorResult =
-  CommandsAndWarnings | CommandCreatorErrorResponse
+  | CommandsAndWarnings
+  | CommandCreatorErrorResponse
 export type CommandCreator<Args> = (
   args: Args,
   invariantContext: InvariantContext,
@@ -1261,9 +1272,21 @@ export type UnsafePipetteMovementReason =
       type: 'adjacentAdressableAreaCollision'
       addressableAreaCausingCollision: AddressableArea
     }
+  | {
+      type: 'vacuumCollarCollision'
+      channels: number
+      labwareName: string
+      slot: string
+      primaryNozzle: string
+      collarName: string
+      side: string
+      collarSlot: string
+      suggestion: string
+    }
 
 export type PipetteMovementSafetyStatus =
-  { isSafe: true } | { isSafe: false; reason: UnsafePipetteMovementReason }
+  | { isSafe: true }
+  | { isSafe: false; reason: UnsafePipetteMovementReason }
 
 export interface ModuleStepGenArgs {
   moduleId: string

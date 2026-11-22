@@ -4,40 +4,40 @@ version = "0.1.0"
 description = "Opentrons AI Server"
 requires-python = ">=3.12"
 dependencies = [
-    "openai==1.65.2",
-    "python-dotenv==1.0.1",
-    "httpx==0.27.0",
-    "llama-index==0.10.51",
-    "pydantic==2.7.4",
-    "fastapi==0.111.0",
-    "pydantic-settings==2.3.4",
-    "pyjwt[crypto]",
-    "beautifulsoup4==4.12.3",
-    "markdownify==0.13.1",
-    "structlog==24.4.0",
-    "asgi-correlation-id==4.3.3",
-    "gspread==6.1.4",
-    "google-auth==2.43.0",
-    "google-auth-oauthlib==1.2.1",
-    "anthropic==0.120.2",
-    "weave[anthropic,wandb]==0.53.13",
-    "nh3==0.3.7",
-    "wandb==0.31.0",
+  "openai==1.65.2",
+  "python-dotenv==1.0.1",
+  "httpx==0.27.0",
+  "llama-index==0.10.51",
+  "pydantic==2.7.4",
+  "fastapi==0.111.0",
+  "pydantic-settings==2.3.4",
+  "pyjwt[crypto]",
+  "beautifulsoup4==4.12.3",
+  "markdownify==0.13.1",
+  "structlog==24.4.0",
+  "asgi-correlation-id==4.3.3",
+  "gspread==6.1.4",
+  "google-auth==2.43.0",
+  "google-auth-oauthlib==1.2.1",
+  "anthropic==0.120.2",
+  "weave[anthropic,wandb]==0.53.13",
+  "nh3==0.3.7",
+  "wandb==0.31.0",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "docker==7.1.0",
-    "pytest==8.2.1",
-    "ruff==0.15.0",
-    "mypy==1.10.0",
-    "types-requests",
-    "boto3==1.34.114",
-    "boto3-stubs==1.34.114",
-    "rich==13.7.1",
-    "cryptography==42.0.7",
-    "types-docker==7.0.0.20240528",
-    "types-beautifulsoup4",
+  "docker==7.1.0",
+  "pytest==8.2.1",
+  "ruff==0.15.0",
+  "mypy==1.10.0",
+  "types-requests",
+  "boto3==1.34.114",
+  "boto3-stubs==1.34.114",
+  "rich==13.7.1",
+  "cryptography==42.0.7",
+  "types-docker==7.0.0.20240528",
+  "types-beautifulsoup4",
 ]
 
 [tool.ruff]
@@ -48,12 +48,12 @@ src = ["*.py", "api", "tests"]
 
 [tool.ruff.lint]
 select = [
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
-    "F",  # pyflakes
-    "I",  # isort
-    "C",  # flake8-comprehensions
-    "B",  # flake8-bugbear
+  "E", # pycodestyle errors
+  "W", # pycodestyle warnings
+  "F", # pyflakes
+  "I", # isort
+  "C", # flake8-comprehensions
+  "B", # flake8-bugbear
 ]
 fixable = ["ALL"]
 
@@ -68,8 +68,8 @@ line-ending = "auto"
 [tool.pytest.ini_options]
 addopts = "-vv"
 markers = [
-    "unit: marks tests as unit tests (select with '-m unit')",
-    "live: marks tests as live tests (select with '-m live')",
+  "unit: marks tests as unit tests (select with '-m unit')",
+  "live: marks tests as live tests (select with '-m live')",
 ]
 
 [tool.mypy]
@@ -97,5 +97,7 @@ module = "llama_index.llms.openai"
 ignore_missing_imports = true
 
 [tool.uv]
+# Keep in sync with repo-root uv.toml and oe-core's Dockerfile
+required-version = "==0.12.1"
 # cooldown time for security
 exclude-newer = "1 week"

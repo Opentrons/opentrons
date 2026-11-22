@@ -1,8 +1,7 @@
+import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 

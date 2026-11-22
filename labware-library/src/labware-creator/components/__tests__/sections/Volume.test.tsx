@@ -1,8 +1,7 @@
+import { render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { render, screen } from '@testing-library/react'
 
 import { getDefaultFormState, getInitialStatus } from '../../../fields'
 import { getLabwareName, isEveryFieldHidden } from '../../../utils'

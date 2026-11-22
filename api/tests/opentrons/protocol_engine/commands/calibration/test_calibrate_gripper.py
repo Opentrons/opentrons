@@ -10,12 +10,8 @@ from decoy import Decoy, matchers
 
 from opentrons_shared_data.errors.exceptions import EarlyCapacitiveSenseTrigger
 
-from opentrons.calibration_storage.types import (
-    CalibrationStatus,
-)
-from opentrons.calibration_storage.types import (
-    SourceType as CalibrationSourceType,
-)
+from opentrons.calibration_storage.types import CalibrationStatus
+from opentrons.calibration_storage.types import SourceType as CalibrationSourceType
 from opentrons.hardware_control import HardwareControlAPI, ot3_calibration
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
@@ -38,7 +34,6 @@ def _mock_ot3_calibration(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None
         monkeypatch.setattr(ot3_calibration, name, decoy.mock(func=func))
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "params_probe, expected_hc_probe",
     [
@@ -65,22 +60,18 @@ async def test_calibrate_gripper(
 
     result = await subject.execute(params)
     assert result == SuccessData(
-        public=CalibrateGripperResult(jawOffset=Vec3f(x=1.1, y=2.2, z=3.3)),
+        public=CalibrateGripperResult(jawOffset=Vec3f(x=1.1, y=2.2, z=3.3))
     )
 
 
-@pytest.mark.ot3_only
 async def test_calibrate_gripper_uses_provided_slot(
-    decoy: Decoy,
-    hardware_api: HardwareControlAPI,
-    _mock_ot3_calibration: None,
+    decoy: Decoy, hardware_api: HardwareControlAPI, _mock_ot3_calibration: None
 ) -> None:
     """It should probe the requested deck slot."""
     subject = CalibrateGripperImplementation(hardware_api=hardware_api)
 
     params = CalibrateGripperParams(
-        jaw=CalibrateGripperParamsJaw.FRONT,
-        slot=DeckSlotName.SLOT_C2,
+        jaw=CalibrateGripperParamsJaw.FRONT, slot=DeckSlotName.SLOT_C2
     )
     decoy.when(
         await ot3_calibration.calibrate_gripper_jaw(
@@ -90,21 +81,17 @@ async def test_calibrate_gripper_uses_provided_slot(
 
     result = await subject.execute(params)
     assert result == SuccessData(
-        public=CalibrateGripperResult(jawOffset=Vec3f(x=1.1, y=2.2, z=3.3)),
+        public=CalibrateGripperResult(jawOffset=Vec3f(x=1.1, y=2.2, z=3.3))
     )
 
 
-@pytest.mark.ot3_only
 async def test_calibrate_gripper_saves_calibration(
-    decoy: Decoy,
-    hardware_api: HardwareControlAPI,
-    _mock_ot3_calibration: None,
+    decoy: Decoy, hardware_api: HardwareControlAPI, _mock_ot3_calibration: None
 ) -> None:
     """It should delegate to hardware API to calibrate the gripper & save calibration."""
     subject = CalibrateGripperImplementation(hardware_api=hardware_api)
     params = CalibrateGripperParams(
-        jaw=CalibrateGripperParamsJaw.REAR,
-        otherJawOffset=Vec3f(x=4.4, y=5.5, z=6.6),
+        jaw=CalibrateGripperParamsJaw.REAR, otherJawOffset=Vec3f(x=4.4, y=5.5, z=6.6)
     )
     expected_calibration_data = GripperCalibrationOffset(
         offset=Point(x=101, y=102, z=103),
@@ -130,7 +117,6 @@ async def test_calibrate_gripper_saves_calibration(
     assert result.public.savedCalibration == expected_calibration_data
 
 
-@pytest.mark.ot3_only
 async def test_calibrate_gripper_does_not_save_during_error(
     decoy: Decoy, hardware_api: HardwareControlAPI
 ) -> None:
@@ -138,8 +124,7 @@ async def test_calibrate_gripper_does_not_save_during_error(
     subject = CalibrateGripperImplementation(hardware_api=hardware_api)
 
     params = CalibrateGripperParams(
-        jaw=CalibrateGripperParamsJaw.REAR,
-        otherJawOffset=Vec3f(x=4.4, y=5.5, z=6.6),
+        jaw=CalibrateGripperParamsJaw.REAR, otherJawOffset=Vec3f(x=4.4, y=5.5, z=6.6)
     )
 
     decoy.when(

@@ -1,6 +1,8 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA } from '@opentrons/shared-data'
+
 import { SlotSpotlightViewer } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'
 import { i18n } from '../../../i18n'
@@ -55,6 +57,17 @@ describe('SlotSpotlightViewer', () => {
     expect(screen.getByTestId('RobotInfoLabel_A4')).toBeInTheDocument()
     expect(
       screen.queryByTestId('RobotInfoLabel_hopperA4')
+    ).not.toBeInTheDocument()
+  })
+
+  it('should map the vacuum dock addressable area to A4 on the slot label', () => {
+    props.slotId = VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA
+    render(props)
+    expect(screen.getByTestId('RobotInfoLabel_A4')).toBeInTheDocument()
+    expect(
+      screen.queryByTestId(
+        `RobotInfoLabel_${VACUUM_MODULE_DOCK_A4_ADDRESSABLE_AREA}`
+      )
     ).not.toBeInTheDocument()
   })
 

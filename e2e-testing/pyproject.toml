@@ -9,13 +9,13 @@ description = "E2E tests for Opentrons Protocol Designer"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "mypy>=1.13.0",
-    "playwright>=1.55.0",
-    "pytest>=8.0.0",
-    "pytest-html>=4.1.1",
-    "pytest-playwright>=0.6.2",
-    "pytest-timeout>=2.3.1",
-    "ruff>=0.14.2",
+  "mypy>=1.13.0",
+  "playwright>=1.55.0",
+  "pytest>=8.0.0",
+  "pytest-html>=4.1.1",
+  "pytest-playwright>=0.6.2",
+  "pytest-timeout>=2.3.1",
+  "ruff>=0.14.2",
 ]
 
 [tool.hatch.build.targets.wheel]

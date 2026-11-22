@@ -59,9 +59,9 @@ All packages extend `tsconfig-base.json`:
 
 Each package defines `rootDir: "src"`, `outDir: "lib"`, and references its dependencies.
 
-## Code Style (Prettier)
+## Code Style (Oxfmt)
 
-Enforced by Prettier with `@ianvs/prettier-plugin-sort-imports`:
+Enforced by Oxfmt with `.oxfmtrc.json`:
 
 - **No semicolons**
 - **Single quotes** (double quotes in JSX)
@@ -71,7 +71,7 @@ Enforced by Prettier with `@ianvs/prettier-plugin-sort-imports`:
 
 ## Import Conventions
 
-### Order (auto-sorted by Prettier plugin)
+### Order (auto-sorted by Oxfmt)
 
 1. React imports (`import { useState } from 'react'`)
 2. Third-party packages
@@ -315,11 +315,11 @@ Each package has a `Makefile` with some or all of:
 | `make setup-js`                   | Install all JS deps (`pnpm`)                                       |
 | `make test-js`                    | Run ALL JS tests                                                   |
 | `make test-js-<project>`          | Run tests for one project (e.g., `make test-js-protocol-designer`) |
-| `make lint-js`                    | ESLint + Prettier check                                            |
+| `make lint-js`                    | ESLint + Oxfmt check                                               |
 | `make lint-js-eslint`             | ESLint only                                                        |
-| `make lint-js-prettier`           | Prettier only                                                      |
+| `make lint-js-oxfmt`              | Oxfmt only                                                         |
 | `make lint-css`                   | Stylelint all CSS                                                  |
-| `make format-js`                  | Auto-format with Prettier                                          |
+| `make format-js`                  | Auto-format with Oxfmt                                             |
 | `make format-css`                 | Auto-fix CSS with Stylelint                                        |
 | `make check-js` / `make build-ts` | TypeScript type-check (`tsc --build`)                              |
 | `make clean-ts`                   | Clean TS build output                                              |
@@ -346,8 +346,8 @@ make test-js-app tests="src/organisms/__tests__/MyComponent.test.tsx"
 ```bash
 pnpm eslint path/to/file.tsx
 pnpm stylelint path/to/file.module.css
-pnpm prettier --check path/to/file.tsx
-pnpm prettier --write path/to/file.tsx   # auto-fix
+pnpm exec oxfmt --check path/to/file.tsx
+pnpm exec oxfmt --write path/to/file.tsx   # auto-fix
 ```
 
 ## Event Handlers
@@ -426,7 +426,7 @@ function AppContent({ isOnChatPage }: { isOnChatPage: boolean }) {
 - Do NOT introduce new styled-components — use CSS Modules
 - Do NOT import up the atomic design hierarchy (atoms ← molecules ← organisms ← pages)
 - Do NOT skip `afterEach(() => vi.clearAllMocks())` in test suites
-- Do NOT use semicolons (Prettier removes them)
+- Do NOT use semicolons (Oxfmt removes them)
 - Do NOT use `console.log` or `debugger` in committed code
 - Do NOT omit curly braces for control statements — ESLint `curly` rule enforces braces for all `if`, `else`, `for`, `while`, and `do` blocks
 - Do NOT use primitives (primitives are located in `components/src/primitives`) for new component - use HTML 5 tags and CSS Modules

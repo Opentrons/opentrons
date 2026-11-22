@@ -5,55 +5,56 @@ description = """\
 A bundle of data and python binding that supports the Opentrons API.\
 Does not need to be installed manually; only a dependency of the \
 opentrons package"""
-license='Apache-2.0'
-requires-python='>=3.10'
-authors=[{name = 'Opentrons', email = 'engineering@opentrons.com'}]
+license = 'Apache-2.0'
+requires-python = '>=3.10'
+authors = [{ name = 'Opentrons', email = 'engineering@opentrons.com' }]
 keywords = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "Environment :: Console",
-    "Operating System :: OS Independent",
-    "Intended Audience :: Science/Research",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Topic :: Scientific/Engineering",
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Operating System :: OS Independent",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Topic :: Scientific/Engineering",
 ]
 dependencies = [
-    "jsonschema>=4.0.0,<5",
-    "typing-extensions>=4.0.0,<5",
-    "numpy~=1.26.4",
-    "pydantic>=2.0.0,<3.0.0",
+  "jsonschema>=4.0.0,<5",
+  "typing-extensions>=4.0.0,<5",
+  "numpy~=1.26.4",
+  "pydantic>=2.0.0,<3.0.0",
 ]
 dynamic = ['version']
 
 [dependency-groups]
 # Robot dependencies for robot deployment
 robot = [
-    "jsonschema==4.17.3",
-    "pydantic==2.11.7",
-    "numpy==1.26.4",
-    "zipp==3.21.0",
+  "jsonschema==4.17.3",
+  "pydantic==2.11.7",
+  "numpy==1.26.4",
+  "zipp==3.21.0",
 ]
 # Dev dependencies
 # Robot group is always included in dev to ensure dev environment matches robot
 dev = [
-    {include-group = "robot"},
-    "mypy==1.19.1",
-    "ruff==0.14.10",
-    "twine==4.0.0",
-    "wheel==0.37.1",
-    "pytest>=9.0.2",
-    "pytest-cov==4.1.0",
-    "pytest-xdist~=3.5.0",
-    "typeguard~=4.4.4",
-    "typing-extensions>=4.0.0,<5",
-    "pytest-clarity~=1.0.0",
-    "build~=1.2.0",
-    "pillow",
-    "types-Pillow",
-    "setuptools==80.9.0",
-    "zipp==3.21.0",
+  { include-group = "robot" },
+  "mypy==2.4.1",
+  "ruff==0.17.4",
+  "coverage==7.16.2",
+  "twine==6.2.0",
+  "wheel==0.48.0",
+  "pytest==9.2.0",
+  "pytest-cov==7.1.0",
+  "pytest-xdist==3.8.0",
+  "typeguard==4.6.0",
+  "typing-extensions>=4.0.0,<5",
+  "pytest-clarity==1.0.1",
+  "build==1.6.1",
+  "pillow==12.3.0",
+  "types-Pillow==10.2.0.20240822",
+  "setuptools==84.2.1",
+  "zipp==3.21.0",
 ]
 
 [project.urls]
@@ -98,9 +99,9 @@ known-local-folder = ["opentrons_shared_data"]
 exclude = ["python/opentrons_shared_data/_version.py"]
 
 [tool.hatch.build.hooks.vcs-tunable]
-version-file="python/opentrons_shared_data/_version.py"
-tag-pattern='v(?P<version>.*)'
-fallback_version='0.0.0-dev'
+version-file = "python/opentrons_shared_data/_version.py"
+tag-pattern = 'v(?P<version>.*)'
+fallback_version = '0.0.0-dev'
 
 
 [tool.hatch.version]
@@ -109,39 +110,39 @@ source = 'vcs-tunable'
 [tool.hatch.version.raw-options]
 root = '..'
 git_describe_command = 'git describe --dirty --tags --long --match=v[0-9]*.[0-9]*'
-fallback_version='0.0.0-dev'
+fallback_version = '0.0.0-dev'
 # Note: these are required for setuptools_scm to not automatically bump the version used in the package
 # from the latest version it detects. This would actually be kind of useful, but we can only do it if
 # everything is doing it since everything is coversioned (otherwise it breaks pipenv sync)
-version_scheme='only-version'
-local_scheme='no-local-version'
+version_scheme = 'only-version'
+local_scheme = 'no-local-version'
 
 [tool.hatch.build.targets.sdist]
 include = [
-   'python/opentrons_shared_data',
-   'python_tests',
-   'command/schemas',
-   'commandAnnotation/schemas',
-   'errors/schemas',
-   'errors/definitions',
-   'deck/schemas',
-   'deck/definitions',
-   'gripper',
-   'labware/schemas',
-   'labware/definitions',
-   'labware/repository/schemas',
-   'liquid/schemas',
-   'liquid-class/schemas',
-   'liquid-class/definitions',
-   'module/schemas',
-   'module/definitions',
-   'pipette/schemas',
-   'pipette/definitions',
-   'protocol/schemas',
-   'robot/schemas',
-   'robot/definitions',
-   'LICENSE',
-   'uv.lock',
+  'python/opentrons_shared_data',
+  'python_tests',
+  'command/schemas',
+  'commandAnnotation/schemas',
+  'errors/schemas',
+  'errors/definitions',
+  'deck/schemas',
+  'deck/definitions',
+  'gripper',
+  'labware/schemas',
+  'labware/definitions',
+  'labware/repository/schemas',
+  'liquid/schemas',
+  'liquid-class/schemas',
+  'liquid-class/definitions',
+  'module/schemas',
+  'module/definitions',
+  'pipette/schemas',
+  'pipette/definitions',
+  'protocol/schemas',
+  'robot/schemas',
+  'robot/definitions',
+  'LICENSE',
+  'uv.lock',
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -171,9 +172,7 @@ packages = ['python/opentrons_shared_data']
 
 [tool.pytest]
 addopts = ["--color=yes", "--strict-markers"]
-filterwarnings = [
-    "error::pydantic.PydanticDeprecatedSince20",
-]
+filterwarnings = ["error::pydantic.PydanticDeprecatedSince20"]
 
 [tool.mypy]
 plugins = ["pydantic.mypy"]
@@ -190,9 +189,9 @@ warn_untyped_fields = true
 # TODO(mc, 2022-01-20): fix and remove all of the overrides below
 [[tool.mypy.overrides]]
 module = [
-    "opentrons_shared_data.labware.*",
-    "opentrons_shared_data.pipette.*",
-    "opentrons_shared_data.protocol.*",
+  "opentrons_shared_data.labware.*",
+  "opentrons_shared_data.pipette.*",
+  "opentrons_shared_data.protocol.*",
 ]
 warn_return_any = false
 
@@ -202,5 +201,7 @@ module = ["PIL", "PIL.*"]
 ignore_missing_imports = true
 
 [tool.uv]
+# Keep in sync with repo-root uv.toml and oe-core's Dockerfile
+required-version = "==0.12.1"
 # cooldown time for security
 exclude-newer = "1 week"

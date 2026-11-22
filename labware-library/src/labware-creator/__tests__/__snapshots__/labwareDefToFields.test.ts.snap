@@ -40,7 +40,7 @@ exports[`labwareDefToFields > fixture_12_trough 1`] = `
 }
 `;
 
-exports[`labwareDefToFields > fixture_24_tuberack should match snapshot 1`] = `
+exports[`labwareDefToFields > fixture24Tuberack should match snapshot 1`] = `
 {
   "aluminumBlockChildType": null,
   "aluminumBlockType": null,

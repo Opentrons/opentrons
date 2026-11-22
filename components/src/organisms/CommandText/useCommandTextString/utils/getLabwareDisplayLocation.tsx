@@ -46,7 +46,8 @@ export interface DisplayLocationFullParams extends Omit<
   location?: LabwareLocation | LabwareLocationSequence | null
 }
 export type DisplayLocationParams =
-  DisplayLocationSlotOnlyParams | DisplayLocationFullParams
+  | DisplayLocationSlotOnlyParams
+  | DisplayLocationFullParams
 
 // detailLevel applies to nested labware. If 'full', return copy that includes the actual peripheral that nests the
 // labware, ex, "in module XYZ in slot C1".

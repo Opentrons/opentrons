@@ -26,10 +26,11 @@ All endpoints require a Bearer token in `Authorization`. Setting `"fake": true` 
 
 ## Package Manager — uv
 
-This project uses **uv** for Python dependency management (not pipenv, pip-tools, or poetry).
+This project uses **uv** for Python dependency management (not pipenv, pip-tools, or poetry). The uv **tool** version is pinned by `required-version` in this project's own `[tool.uv]`, matching the monorepo root [`uv.toml`](../uv.toml); CI installs that version via `astral-sh/setup-uv` `version-file`. uv does not inherit config across directories, so the two must be bumped together.
 
 | File               | Role                                                        | Committed?      |
 | ------------------ | ----------------------------------------------------------- | --------------- |
+| `../uv.toml`       | Pinned uv tool version for projects without `[tool.uv]`     | Yes             |
 | `pyproject.toml`   | Single source of truth for dependencies AND all tool config | Yes             |
 | `uv.lock`          | Locked dependency graph                                     | Yes             |
 | `requirements.txt` | Unused. Docker installs from `uv.lock` directly             | No (gitignored) |
@@ -110,14 +111,14 @@ All targets run from `opentrons-ai-server/`.
 
 ### Development
 
-| Target           | Description                                                   |
-| ---------------- | ------------------------------------------------------------- |
-| `make setup`     | Install all deps (`uv sync --frozen --extra dev`)             |
-| `make teardown`  | Delete `.venv/`                                               |
-| `make format`    | Auto-fix lint + format with ruff, then prettier for .md/.json |
-| `make lint`      | Check lint (ruff) + type check (mypy) — no auto-fix           |
-| `make prep`      | `format` then `lint` then `unit-test`                         |
-| `make unit-test` | Run unit tests (`pytest tests -m unit`)                       |
+| Target           | Description                                                |
+| ---------------- | ---------------------------------------------------------- |
+| `make setup`     | Install all deps (`uv sync --frozen --extra dev`)          |
+| `make teardown`  | Delete `.venv/`                                            |
+| `make format`    | Auto-fix lint + format with ruff, then oxfmt for .md/.json |
+| `make lint`      | Check lint (ruff) + type check (mypy) — no auto-fix        |
+| `make prep`      | `format` then `lint` then `unit-test`                      |
+| `make unit-test` | Run unit tests (`pytest tests -m unit`)                    |
 
 ### Running Locally
 

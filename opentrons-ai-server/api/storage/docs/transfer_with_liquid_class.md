@@ -2,34 +2,40 @@
 
 **Key Parameter Differences:**
 
-**1. Liquid Class Parameter**  
- - `transfer_with_liquid_class` requires a `liquid_class` parameter that defines optimized transfer behavior  
- - `transfer` does not have this parameter and uses default behavior
+**1. Liquid Class Parameter**
 
-**2. Source/Destination Requirements**  
-- `transfer_with_liquid_class`: Sources and destinations must be **equal in length** (1:1 pairing)  
+- `transfer_with_liquid_class` requires a `liquid_class` parameter that defines optimized transfer behavior
+- `transfer` does not have this parameter and uses default behavior
+
+**2. Source/Destination Requirements**
+
+- `transfer_with_liquid_class`: Sources and destinations must be **equal in length** (1:1 pairing)
 - `transfer`: Can handle different numbers of sources and destinations (the larger group must be evenly divisible by the smaller group)
 
-**3. Trash Handling**  
-- `transfer_with_liquid_class` uses `trash_location` parameter to specify where to drop tips. It serves the same purpose as `my_pipette.trash_container` in `transfer().  
+**3. Trash Handling**
+
+- `transfer_with_liquid_class` uses `trash_location` parameter to specify where to drop tips. It serves the same purpose as `my_pipette.trash_container` in `transfer().
 - `transfer` uses `trash` parameter (True/False) to control tip disposal. The `transfer(trash)` parameter is somewhat analogous to `transfer_with_liquid_class(return_tip)`
 
-**4. Tip Management**  
-- `transfer_with_liquid_class` has an additional `keep_last_tip` parameter to control whether the last tip is dropped  
+**4. Tip Management**
+
+- `transfer_with_liquid_class` has an additional `keep_last_tip` parameter to control whether the last tip is dropped
 - `transfer` only has the standard `new_tip` parameter
 
-**5. Behavior Control**  
-- `transfer` has many manual parameters like:  
-  - `mix_before`, `mix_after` (tuples for mixing behavior)  
-  - `touch_tip` (Boolean)  
-  - `air_gap` (volume in µL)  
-  - `blow_out`, `blowout_location`  
+**5. Behavior Control**
+
+- `transfer` has many manual parameters like:
+  - `mix_before`, `mix_after` (tuples for mixing behavior)
+  - `touch_tip` (Boolean)
+  - `air_gap` (volume in µL)
+  - `blow_out`, `blowout_location`
   - `disposal_volume`
 
 - `transfer_with_liquid_class` automatically handles these behaviors through the liquid class definition - you don't manually specify mixing, air gaps, touch tip, etc.
 
-**6. API Version Requirement**  
-- `transfer_with_liquid_class` requires API version 2.24 or later and only works on **Flex** robots  
+**6. API Version Requirement**
+
+- `transfer_with_liquid_class` requires API version 2.24 or later and only works on **Flex** robots
 - `transfer works` on both OT-2 and Flex robots with earlier API versions
 
 **Example Comparison:**
@@ -66,16 +72,16 @@ pipette.transfer_with_liquid_class(
 
 The liquid class version automatically applies optimized mixing, touch tip, air gap, and blow out behavior based on the liquid properties, while the traditional transfer requires manual specification of each parameter.
 
-
-
 ## Liquid Classes examples
 
-### Notes for 1-to-1, 1-to-many and many-to-1 transfers   
-- Sources and destinations should be of the same length in order to perform a transfer with `transfer_with_liquid_class`. 
-- To transfer liquid from one source to many destinations, use `distribute_with_liquid_class`. 
+### Notes for 1-to-1, 1-to-many and many-to-1 transfers
+
+- Sources and destinations should be of the same length in order to perform a transfer with `transfer_with_liquid_class`.
+- To transfer liquid from one source to many destinations, use `distribute_with_liquid_class`.
 - To transfer liquid to one destination from many sources, use `consolidate_with_liquid_class`.
-  
+
 ### Example 1
+
 A protocol with custom properties
 
 <example-one>
@@ -201,9 +207,8 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     )
     pipette_left.drop_tip()
 ```
+
 </example-one>
-
-
 
 ### Example 2: A protocol with aqueous liquid class (water) and custom properties
 

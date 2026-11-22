@@ -1,6 +1,6 @@
 ---
-title: "Thermocycler Module: Flex Attachment Steps"
-description: "Attach to caddy, mount on deck, and run first-time calibration on Flex."
+title: 'Thermocycler Module: Flex Attachment Steps'
+description: 'Attach to caddy, mount on deck, and run first-time calibration on Flex.'
 ---
 
 Setting up the Thermocycler on your robot includes attaching it to the deck and running a first-time calibration process. The instructions here and on the touchscreen will help you get started. The tools you need are included in the User Kit that came with your Flex.
@@ -25,7 +25,7 @@ Setting up the Thermocycler on your robot includes attaching it to the deck and 
 
 8. Connect the power cable from the module to the external power supply unit. Manually tighten the locking ring to secure it to the power supply.
 
-9. Connect the power supply to a wall outlet and turn on the power supply. If you see a white light on the Thermocycler, it is powered on. 
+9. Connect the power supply to a wall outlet and turn on the power supply. If you see a white light on the Thermocycler, it is powered on.
 
 10. Press the illuminated button on the Thermocycler to open the lid.
 
@@ -44,7 +44,7 @@ Next, you'll calibrate the module.
 You need to calibrate the Thermocycler after attaching it for the first time. To calibrate the Thermocycler, turn on the power supply. This starts the calibration workflow process on the touchscreen. Instructions on the touchscreen will take you through a guided workflow process, which is also outlined below.
 
 !!!warning
-    The gantry and pipette move during calibration. Keep your hands clear of the working area before tapping an action button on the touchscreen.
+The gantry and pipette move during calibration. Keep your hands clear of the working area before tapping an action button on the touchscreen.
 
 <div class="instruction-list" markdown>
 

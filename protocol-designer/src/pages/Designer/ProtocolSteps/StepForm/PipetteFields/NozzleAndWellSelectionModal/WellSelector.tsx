@@ -29,9 +29,11 @@ import { LabwareOnDeck } from '/protocol-designer/components/organisms'
 import { SelectionRect } from '/protocol-designer/components/organisms/Labware/SelectionRect'
 import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
-import { getCollidingWells } from '/protocol-designer/utils/index'
 
-import { canPipetteUseLabware } from '../../../../../../utils'
+import {
+  canPipetteUseLabware,
+  getCollidingWells,
+} from '../../../../../../utils'
 import { BaseDeckTipSelection } from '../TipSelectionWizard/BaseDeckTipSelection'
 import { INACCESSIBLE_COLLISION } from '../TipSelectionWizard/constants'
 import { getWellsToCheck } from '../TipSelectionWizard/hooks/useMemoizedTipAccessibilityByTiprackIdByWellName'

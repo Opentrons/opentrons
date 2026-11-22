@@ -38,7 +38,11 @@ import type { DeckConfiguration } from '@opentrons/shared-data'
 import type { ModuleSetupWizardMaybePipetteStepProps } from './types'
 
 type VacuumVerifyScreen =
-  'checkTubes' | 'checkCollar' | 'inProgress' | 'failed' | 'success'
+  | 'checkTubes'
+  | 'checkCollar'
+  | 'inProgress'
+  | 'failed'
+  | 'success'
 
 interface VerifyVacuumInstallProps extends ModuleSetupWizardMaybePipetteStepProps {
   deckConfig: DeckConfiguration
@@ -260,7 +264,7 @@ function VacuumCheckTubeConnectionsScreen({
     <GenericWizardTile
       header={t('check_tube_connections')}
       rightHandBody={
-        <AnimationVideo width="100%">
+        <AnimationVideo width="100%" css={{ transform: 'scale(2)' }}>
           <source src={CheckConnections} />
         </AnimationVideo>
       }
@@ -273,6 +277,7 @@ function VacuumCheckTubeConnectionsScreen({
       back={onBack}
       proceed={onContinue}
       proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
+      hideOverflowRight
     />
   )
 }
@@ -292,7 +297,10 @@ function VacuumCheckCollarScreen({
         </AnimationVideo>
       }
       bodyText={
-        <WizardBodyText>{t('collar_block_description')}</WizardBodyText>
+        <>
+          <WizardBodyText>{t('collar_block_description')}</WizardBodyText>
+          <WizardBodyText>{t('collar_block_description_2')}</WizardBodyText>
+        </>
       }
       back={onBack}
       proceed={onContinue}
@@ -388,7 +396,7 @@ function VacuumVerificationFailed({
           </>
         ) : (
           <>
-            <SecondaryButton onClick={onContinueAnyway}>
+            <SecondaryButton onClick={onContinueAnyway} isDangerous>
               {t('continue_anyway')}
             </SecondaryButton>
             <PrimaryButton onClick={onRetry}>

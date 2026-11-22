@@ -1,10 +1,9 @@
 import { useRef } from 'react'
+import { screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { getAppLanguage } from '/app/redux/config'

@@ -86,7 +86,7 @@ stages:
       url: '{ot3_server_base_url}/runs/{run_id}'
       method: PATCH
       json:
-        data: { 'current' : false }
+        data: { 'current': false }
     response:
       status_code: 200
       strict:
@@ -124,8 +124,8 @@ stages:
             startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             status: succeeded
-            notes: [ ]
-            params: { }
+            notes: []
+            params: {}
           - id: !anystr
             key: !anystr
             commandType: comment
@@ -133,7 +133,7 @@ stages:
             startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             status: succeeded
-            notes: [ ]
+            notes: []
             params:
               message: 'This is not in a step group.'
           - id: !anystr
@@ -143,7 +143,7 @@ stages:
             startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             status: succeeded
-            notes: [ ]
+            notes: []
             params:
               message: 'This will have a command annotation ID.'
             commandAnnotationIds:
@@ -155,7 +155,7 @@ stages:
             startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             status: succeeded
-            notes: [ ]
+            notes: []
             params:
               message: 'This is also not in a step group.'
           - id: !anystr
@@ -165,7 +165,7 @@ stages:
             startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             status: succeeded
-            notes: [ ]
+            notes: []
             params:
               message: 'This will have a command annotation ID as well.'
             commandAnnotationIds:
@@ -177,7 +177,7 @@ stages:
             startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             completedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"
             status: succeeded
-            notes: [ ]
+            notes: []
             params:
               message: 'This is also also not in a step group.'
       save:
@@ -201,7 +201,7 @@ stages:
           - source: userCommand
             id: '{annotation_id_2}'
             name: 'My step group 2'
-            description: "Another comment!"
+            description: 'Another comment!'
             params: {}
         meta:
           cursor: 0
@@ -232,7 +232,7 @@ stages:
           source: userCommand
           id: '{annotation_id_2}'
           name: 'My step group 2'
-          description: "Another comment!"
+          description: 'Another comment!'
           params: {}
 
   - name: Delete the run
@@ -241,7 +241,7 @@ stages:
       method: DELETE
     response:
       status_code: 200
-      json: { }
+      json: {}
 
   - name: Try to get deleted run
     request:

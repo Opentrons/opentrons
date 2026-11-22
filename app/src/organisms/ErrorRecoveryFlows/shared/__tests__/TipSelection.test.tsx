@@ -4,8 +4,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
-import { mockRecoveryContentProps } from '../../__fixtures__'
 import { WellSelection } from '../../../WellSelection'
+import { mockRecoveryContentProps } from '../../__fixtures__'
 import { TipSelection } from '../TipSelection'
 
 import type { ComponentProps } from 'react'

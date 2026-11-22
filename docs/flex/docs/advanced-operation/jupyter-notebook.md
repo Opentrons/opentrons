@@ -1,9 +1,9 @@
 ---
-title: "Opentrons Flex: Jupyter Notebook"
-description: "Use Jupyter on Flex for interactive protocol development and control."
+title: 'Opentrons Flex: Jupyter Notebook'
+description: 'Use Jupyter on Flex for interactive protocol development and control.'
 ---
 
-Flex runs a [Jupyter Notebook](https://jupyter.org/) server on port 48888, which you can connect to with your web browser. Use Jupyter to individually run discrete chunks of Python code, called *cells*. This is a convenient environment for writing and debugging protocols, since you can define different parts of your protocol in different notebook cells, and run a single cell at a time.
+Flex runs a [Jupyter Notebook](https://jupyter.org/) server on port 48888, which you can connect to with your web browser. Use Jupyter to individually run discrete chunks of Python code, called _cells_. This is a convenient environment for writing and debugging protocols, since you can define different parts of your protocol in different notebook cells, and run a single cell at a time.
 
 Access your robot's Jupyter Notebook either:
 

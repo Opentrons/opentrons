@@ -51,7 +51,8 @@ export const home: CommandCreator<{
     key: uuid(),
     params: {
       axes: resolvedAxes?.filter((axis): axis is string => axis != null) as
-        MotorAxes | undefined,
+        | MotorAxes
+        | undefined,
       skipIfMountPositionOk: resolvedSkip as GantryMount | undefined,
     },
   }

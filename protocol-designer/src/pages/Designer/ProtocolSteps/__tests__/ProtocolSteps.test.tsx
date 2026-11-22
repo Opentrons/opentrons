@@ -47,7 +47,7 @@ vi.mock('../Timeline/utils')
 vi.mock('/protocol-designer/components/organisms/StepSummary')
 vi.mock('/protocol-designer/resources/hooks')
 vi.mock('react-plotly.js', () => ({
-  default: () => <div data-testid="plotly-chart">Mock Plotly Chart</div>,
+  default: () => <div data-testid='plotly-chart'>Mock Plotly Chart</div>,
 }))
 
 const render = () => {
@@ -61,7 +61,7 @@ const render = () => {
     />,
     {
       i18nInstance: i18n,
-    }
+    },
   )[0]
 }
 
@@ -91,10 +91,10 @@ describe('ProtocolSteps', () => {
       errors: [],
     })
     vi.mocked(DraggableSidebar).mockReturnValue(
-      <div>mock DraggableSidebar</div>
+      <div>mock DraggableSidebar</div>,
     )
     vi.mocked(DeckSetupContainer).mockReturnValue(
-      <div>mock DeckSetupContainer</div>
+      <div>mock DeckSetupContainer</div>,
     )
     vi.mocked(getActiveItem).mockReturnValue({
       selectionType: 'SINGLE_STEP_SELECTION_TYPE',
@@ -106,10 +106,10 @@ describe('ProtocolSteps', () => {
     vi.mocked(SubStepsToolbox).mockReturnValue(<div>mock SubStepsToolbox</div>)
     vi.mocked(getEnableHotKeysDisplay).mockReturnValue(true)
     vi.mocked(getSavedStepForms).mockReturnValue(
-      MOCK_STEP_FORMS as SavedStepFormState
+      MOCK_STEP_FORMS as SavedStepFormState,
     )
     vi.mocked(getSelectedStepId).mockReturnValue(
-      '0522fde8-25a3-4840-b84a-af7282bd80d5'
+      '0522fde8-25a3-4840-b84a-af7282bd80d5',
     )
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
       modules: {},

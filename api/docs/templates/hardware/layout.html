@@ -28,8 +28,14 @@ endif %}
 {% endblock %} {# Disable base theme's top+bottom related navs; we have our own
 in sidebar #} {%- block relbar1 %}{% endblock %} {%- block relbar2 %}{% endblock
 %} {# Nav should appear before content, not after #} {%- block content %}
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WCDX9CX"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<noscript
+  ><iframe
+    src="https://www.googletagmanager.com/ns.html?id=GTM-WCDX9CX"
+    height="0"
+    width="0"
+    style="display: none; visibility: hidden"
+  ></iframe
+></noscript>
 <header id="nav">
   <nav class="docs-navbar">
     <div class="container">
@@ -1056,18 +1062,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             Welcome to version 2 of the Opentrons OT-2 Python Protocol API!
           </h2>
           <p>
-              This is the API for writing Python to directly control the OT-2
-              hardware. It should not be used in protocols. To see the Python
-              API for writing protocols for the OT-2, see <a href="../v2/index.html">
-              the Python Protocol API Version 2</a>.
+            This is the API for writing Python to directly control the OT-2
+            hardware. It should not be used in protocols. To see the Python API
+            for writing protocols for the OT-2, see
+            <a href="../v2/index.html"> the Python Protocol API Version 2</a>.
           </p>
         </div>
         {% else %}
         <div class="banner_wrapper">
           <p>
-              You are currently viewing the documentation for the OT-2 hardware
-              control API. To view documentation for the Opentrons OT-2 Python
-              Protocol API, <a href="../v2/index.html">click here</a>.
+            You are currently viewing the documentation for the OT-2 hardware
+            control API. To view documentation for the Opentrons OT-2 Python
+            Protocol API, <a href="../v2/index.html">click here</a>.
           </p>
         </div>
         {%- endif %} {% block body %}{% endblock %}
@@ -1127,15 +1133,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
       <h3>Sign Up For Our Newsletter</h3>
       <div>
-        <script charset="utf-8" type="text/javascript" src="https://js.hsforms.net/forms/v2.js"></script>
-          <script>
-            hbspt.forms.create({
-          	region: "na1",
-          	portalId: "5383285",
-          	formId: "210adc2c-072f-4c9c-a812-6367469358d5",
-          	version: "V2_PRERELEASE"
-            });
-          </script>
+        <script
+          charset="utf-8"
+          type="text/javascript"
+          src="https://js.hsforms.net/forms/v2.js"
+        ></script>
+        <script>
+          hbspt.forms.create({
+            region: 'na1',
+            portalId: '5383285',
+            formId: '210adc2c-072f-4c9c-a812-6367469358d5',
+            version: 'V2_PRERELEASE',
+          })
+        </script>
       </div>
       <p class="copyrite">
         &#169;&nbsp;OPENTRONS
@@ -1193,7 +1203,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </footer>
 <script>
-  ;(function(w, d, s, l, i) {
+  ;(function (w, d, s, l, i) {
     w[l] = w[l] || []
     w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })
     var f = d.getElementsByTagName(s)[0],
@@ -1270,7 +1280,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     })
   }
   var navbar = document.querySelector('.navbar-menu')
-  document.addEventListener('click', function(event) {
+  document.addEventListener('click', function (event) {
     var isClickInside = navbar.contains(event.target)
     if (!isClickInside && window.innerWidth >= 1024) {
       close()
@@ -1284,7 +1294,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   class="github"
 >
   <img
-    style="position: absolute; top: 0; right: 0; border: 0;"
+    style="position: absolute; top: 0; right: 0; border: 0"
     src="{{ pathto('_static/' ~ theme_github_banner, 1) if theme_github_banner|lower != 'true' else 'https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png' }}"
     alt="Fork me on GitHub"
     class="github"

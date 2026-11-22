@@ -1,9 +1,8 @@
+import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { MemoryRouter } from 'react-router-dom'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { COLORS } from '@opentrons/components'
 

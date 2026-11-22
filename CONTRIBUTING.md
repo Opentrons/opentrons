@@ -243,7 +243,7 @@ To help with code quality and maintainability, we use a collection of tools that
   - [mypy][] - Static type checker for Python
 - Formatters
   - (Re)format source code to adhere to a consistent [style][code-style]
-  - [Prettier][prettier] - Code formatter for JavaScript, JSON, Markdown, and YAML
+  - [Oxfmt][oxfmt] - Code formatter for JavaScript, JSON, Markdown, and YAML
 
 These tools can be run with the following commands:
 
@@ -274,7 +274,7 @@ make format
 [stylelint]: https://stylelint.io/
 [typescript]: https://www.typescriptlang.org/
 [mypy]: http://mypy-lang.org/
-[prettier]: https://prettier.io/
+[oxfmt]: https://oxc.rs/docs/guide/usage/formatter
 
 #### Editor setup
 
@@ -285,7 +285,7 @@ Most, if not all, of the tools above have plugins available for your code editor
 - Flake8 - Search your editor's package manager
 - mypy - Search your editor's package manager
 - TypeScript - <https://github.com/Microsoft/TypeScript/wiki/TypeScript-Editor-Support>
-- Prettier - <https://prettier.io/docs/en/editors.html>
+- Oxfmt - <https://oxc.rs/docs/guide/usage/formatter>
 
 ### Adding dependencies
 

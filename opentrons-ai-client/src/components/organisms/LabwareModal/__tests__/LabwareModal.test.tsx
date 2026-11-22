@@ -6,7 +6,6 @@ import { renderWithProviders } from '/ai-client/__testing-utils__'
 import { i18n } from '/ai-client/i18n'
 
 import { LabwareModal } from '..'
-
 import type { DisplayLabware } from '..'
 
 let displaModalValue = false

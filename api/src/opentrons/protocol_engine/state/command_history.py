@@ -413,7 +413,7 @@ class CommandHistory:
 
         self._commands_by_id[command_id] = CommandEntryJSON(
             command=command_entry.command.model_dump_json(
-                by_alias=True, exclude_none=True
+                by_alias=True,
             ),
             command_type=type(command_entry.command),
             index=command_entry.index,

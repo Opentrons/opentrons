@@ -1,6 +1,6 @@
 ---
-title: "Python API: Moving Labware"
-description: "Move labware manually or with the Flex Gripper in Python protocols."
+title: 'Python API: Moving Labware'
+description: 'Move labware manually or with the Flex Gripper in Python protocols.'
 ---
 
 You can move an entire labware (and all of its contents) from one deck slot to another at any point during your protocol. On Flex, you can either use the gripper or move the labware manually. On OT-2, you can only move labware manually, since it doesn't have a gripper instrument.
@@ -15,7 +15,7 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.move_labware(labware=plate, new_location="D2")
 ```
 
-*New in version 2.15*
+_New in version 2.15_
 
 The required arguments of `move_labware()` are the `labware` you want to move and its `new_location`. You don't need to specify where the move begins, since that information is already stored in the [`Labware`][opentrons.protocol_api.labware.Labware] object—`plate` in this example. The destination of the move can be any empty deck slot, or a module that's ready to have labware added to it (see [Movement with Modules](#movement-with-modules) below). Movement to an occupied location, including the labware's current location, will raise an error.
 
@@ -51,10 +51,10 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.move_labware(labware=plate, new_location="C1")
 ```
 
-*New in version 2.15*
+_New in version 2.15_
 
 !!! note
-    Don't add a `pause()` command before `move_labware()`. When `use_gripper` is unset or `False`, the protocol pauses when it reaches the movement step. The Opentrons App or the touchscreen on Flex shows an animation of the labware movement that you need to perform manually. The protocol only resumes when you press **Confirm and resume**.
+Don't add a `pause()` command before `move_labware()`. When `use_gripper` is unset or `False`, the protocol pauses when it reaches the movement step. The Opentrons App or the touchscreen on Flex shows an animation of the labware movement that you need to perform manually. The protocol only resumes when you press **Confirm and resume**.
 
 The above example is a complete and valid `run()` function. You don't have to load the gripper as an instrument, and there is no `InstrumentContext` for the gripper. All you have to do to specify that a protocol requires the gripper is to include at least one `move_labware()` command with `use_gripper=True`.
 
@@ -116,7 +116,7 @@ If you attempt to use the gripper to move labware in an OT-2 protocol, the API w
 You can move compatible Opentrons lids manually or with the Flex Gripper, but some restrictions apply. For more information, see [Moving Lids](#moving-lids).
 
 !!! note
-    The labware definitions listed above include information about the position and force that the gripper uses to pick up the labware. The gripper uses default values for labware definitions that don't include position and force information. The Python Protocol API won't raise a warning or error if you try to grip and move other types of labware.
+The labware definitions listed above include information about the position and force that the gripper uses to pick up the labware. The gripper uses default values for labware definitions that don't include position and force information. The Python Protocol API won't raise a warning or error if you try to grip and move other types of labware.
 
 ## Movement with modules
 
@@ -135,7 +135,7 @@ def run(protocol: protocol_api.ProtocolContext):
     )
 ```
 
-*New in version 2.15*
+_New in version 2.15_
 
 If you try to move the plate to slot C1 or the Heater-Shaker module, the API will raise an error, because C1 is occupied by the Heater-Shaker, and the Heater-Shaker is occupied by the adapter. Only the adapter, as the topmost item in that stack, is unoccupied.
 
@@ -157,7 +157,7 @@ protocol.move_labware(
 )
 ```
 
-*New in version 2.16*
+_New in version 2.16_
 
 Always specify `use_gripper=True` when moving labware into the waste chute. The chute is not designed for manual movement. You can still manually move labware to other locations, including off-deck, with the chute installed.
 
@@ -199,7 +199,7 @@ protocol.move_lid(
 
 To work with tip rack lids, first [load the tip rack lid][loading-lids] using the `lid` parameter of [`load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware]. Once loaded, you can only move a tip rack lid to another, unlidded tip rack or to a trash container. If you try setting another `new_location`, the API will raise an error.
 
-*New in version 2.23*
+_New in version 2.23_
 
 ## The off-deck location
 
@@ -211,11 +211,11 @@ Remove labware from the deck to perform tasks like retrieving samples or discard
 protocol.move_labware(labware=plate, new_location=protocol_api.OFF_DECK)
 ```
 
-*New in version 2.15*
+_New in version 2.15_
 
 Moving labware off-deck always requires user intervention, because the gripper can't reach outside of the robot. Omit the `use_gripper` parameter or explicitly set it to `False`. If you try to move labware off-deck with `use_gripper=True`, the API will raise an error.
 
-You can also load labware off-deck, in preparation for a `move_labware()` command that brings it *onto* the deck. For example, you could assign two tip racks to a pipette—one on-deck, and one off-deck—and then swap out the first rack for the second one:
+You can also load labware off-deck, in preparation for a `move_labware()` command that brings it _onto_ the deck. For example, you could assign two tip racks to a pipette—one on-deck, and one off-deck—and then swap out the first rack for the second one:
 
 ```python
 from opentrons import protocol_api

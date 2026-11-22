@@ -10,7 +10,6 @@ from opentrons_shared_data.liquid_classes.types import TransferPropertiesDict
 from opentrons.protocol_api import ProtocolContext
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -50,7 +49,6 @@ def test_liquid_class_creation_and_property_fetching(
         simulated_protocol_context.get_liquid_class("non-existent-liquid")
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -82,7 +80,6 @@ def test_custom_liquid_class_creation_and_property_fetching(
         )
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
@@ -115,7 +112,6 @@ def test_custom_liquid_class_w_multi_dispense_creation_and_property_fetching(
         )
 
 
-@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.28", "Flex")], indirect=True
 )

@@ -1,9 +1,8 @@
+import { MemoryRouter } from 'react-router-dom'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { MemoryRouter } from 'react-router-dom'
 
 import { INFO_TOAST } from '@opentrons/components'
 import { useCreateProtocolMutation } from '@opentrons/react-api-client'

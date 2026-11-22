@@ -12,10 +12,11 @@
     }
   ],
   "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "composite": true,
     "rootDir": "src",
     "outDir": "lib",
-    "baseUrl": ".",
     "paths": {
       "@opentrons/components": ["../components/src/index.ts"],
       "@opentrons/shared-data": ["../shared-data/js/index.ts"],

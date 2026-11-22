@@ -13,6 +13,7 @@ import {
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
 
+import type { ErrorRecoveryFlowsProps } from '..'
 import { ERROR_KINDS, STACKER_ERROR_KINDS } from '../constants'
 import { getErrorKind } from '../utils'
 
@@ -41,7 +42,6 @@ import type {
   RunCommandError,
   RunCommandFlexStackerError,
 } from '@opentrons/shared-data'
-import type { ErrorRecoveryFlowsProps } from '..'
 import type { ErrorKind } from '../types'
 import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
 

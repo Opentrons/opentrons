@@ -1,9 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-
-import '@testing-library/jest-dom/vitest'
-
 import { screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import userEvent from '@testing-library/user-event'
+import '@testing-library/jest-dom/vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
@@ -65,7 +63,7 @@ describe('FormAlerts', () => {
     render(props)
     screen.getByText('Disposing liquid-filled labware')
     screen.getByText(
-      'This step moves a labware that contains liquid to the waste chute. There is no way to retrieve the liquid after disposal.'
+      'This step moves a labware that contains liquid to the waste chute. There is no way to retrieve the liquid after disposal.',
     )
     await user.click(screen.getByTestId('Banner_close-button'))
     expect(vi.mocked(dismissTimelineWarning)).toHaveBeenCalled()

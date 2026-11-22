@@ -5,9 +5,10 @@ import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { PeripheralsInfo } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
-import { i18n } from '../../../../assets/localization'
 
 import type { ComponentProps } from 'react'
+
+import { i18n } from '../../../../assets/localization'
 
 const render = (props: ComponentProps<typeof PeripheralsInfo>) => {
   return renderWithProviders(<PeripheralsInfo {...props} />, {

@@ -9,6 +9,7 @@ python3 tof_analysis.py --help for all options
 
 Generates baselines to stdout or JSON file if `--output-file` is passed in, can specify additional options for filtering.
 By default the baseline is generated without filtering, which means using all
+
 - axis (x and z)
 - platform (extend and retract)
 - zones (0-9)
@@ -37,7 +38,7 @@ function when detecting labware in the [labware_detected](https://github.com/Ope
       "Z": {
         "extend": "{zone: [0,2,3...], ...}",
         "retract": "{zone: [0,2,3...], ...}"
-      },
+      }
     }
   }
 }
@@ -50,17 +51,20 @@ and specific labware measurements. The 'extend' and 'retract' buttons let you fi
 The 'Zone <n>' buttons let you filter out individual zones.
 
 #### Baseline Plot
+
 ```bash
 python3 tof_analysis.py plot --baseline <baseline_path_json> [--dataframe <dataframe_path_csv>] [options]
 ```
+
 ![Baseline Plot](assets/baseline_plot.png)
 
 #### Baseline Plot + Labware Measurement
+
 ```bash
 python3 tof_analysis.py plot --baseline <baseline_path_json> [--dataframe <dataframe_path_csv>] --labwares nest-96-pcr [options]
 ```
-![Labware Plot](assets/labware_plot.png)
 
+![Labware Plot](assets/labware_plot.png)
 
 ### Baseline Validator
 

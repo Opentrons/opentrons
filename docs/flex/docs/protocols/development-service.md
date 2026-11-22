@@ -1,6 +1,6 @@
 ---
-title: "Opentrons Flex: Custom Protocol Service"
-description: "Opentrons custom protocol development and on-site or remote support."
+title: 'Opentrons Flex: Custom Protocol Service'
+description: 'Opentrons custom protocol development and on-site or remote support.'
 ---
 
 Opentrons provides a [Remote Custom Protocol Development service](https://opentrons.com/instrument-services) for applications not already included in the Protocol Library. As part of the service, Opentrons field applications scientists will:
@@ -18,7 +18,7 @@ Opentrons provides a [Remote Custom Protocol Development service](https://opentr
 By default, Opentrons adds all custom protocols to the Protocol Library so the community can benefit from them. However, if your application requires privacy, you can opt out of inclusion in the Protocol Library.
 
 !!! note
-    The Custom Protocol Development service only writes Python protocols that control Opentrons hardware. It does not cover controlling the robot with code in other languages, nor does it cover controlling third-party hardware.
+The Custom Protocol Development service only writes Python protocols that control Opentrons hardware. It does not cover controlling the robot with code in other languages, nor does it cover controlling third-party hardware.
 
 ## Protocol request guidelines
 
@@ -47,4 +47,3 @@ In general, following the style of the methods section of an academic paper will
 ## Custom protocol pricing
 
 Custom Protocol Development is a service available to all owners of Opentrons Flex systems. Opentrons provides remote and onsite protocol development services customized to your specific workflow. Price and development time are based on the complexity of your protocol and the related code. See the [Instrument Services section](https://opentrons.com/instrument-services) of the Opentrons website to contact us for more information about our Custom Protocol Development offerings.
-
