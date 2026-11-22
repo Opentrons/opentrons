@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -78,7 +79,8 @@ describe('TimelineToolbox', () => {
     vi.mocked(HardwareStep).mockReturnValue(<div>mock HardwareStep</div>)
   })
 
-  it('renders hardware step, 2 terminal item steps, a draggable step and presaved step with toolbox title and back button', () => {
+  it('renders hardware step, 2 terminal item steps, a draggable step and presaved step with toolbox title and back button', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('mock protocolName')
     screen.getByText('mock HardwareStep')
@@ -87,7 +89,7 @@ describe('TimelineToolbox', () => {
     screen.getByText('mock PresavedStep')
     screen.getByText('mock DraggableSteps')
     expect(screen.getAllByText('mock TerminalItemStep')).toHaveLength(2)
-    fireEvent.click(screen.getByText('Back to overview'))
+    await user.click(screen.getByText('Back to overview'))
     expect(mockNavigate).toHaveBeenCalled()
     expect(vi.mocked(selectTerminalItem)).toHaveBeenCalled()
     expect(vi.mocked(selectDropdownItem)).toHaveBeenCalled()

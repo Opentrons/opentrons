@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { analyticsEvent } from '/protocol-designer/analytics/actions'
@@ -53,7 +54,7 @@ vi.mock('@opentrons/components', async importOriginal => {
 const render = (props: ComponentProps<typeof StepOverflowMenu>) => {
   return renderWithProviders(<StepOverflowMenu {...props} />, {
     i18nInstance: i18n,
-  })[0]
+  })
 }
 
 const moveLiquidStepId = 'mockId'
@@ -85,14 +86,15 @@ describe('StepOverflowMenu', () => {
     })
   })
 
-  it('renders each button and clicking them calls the action', () => {
+  it('renders each button and clicking them calls the action', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByText('Delete step'))
+    await user.click(screen.getByText('Delete step'))
     expect(mockConfirm).toHaveBeenCalled()
-    fireEvent.click(screen.getByText('Duplicate step'))
+    await user.click(screen.getByText('Duplicate step'))
     expect(vi.mocked(stepsActions.duplicateSelectedSteps)).toHaveBeenCalled()
-    fireEvent.click(screen.getByText('Edit step'))
-    fireEvent.click(screen.getByText('View details'))
+    await user.click(screen.getByText('Edit step'))
+    await user.click(screen.getByText('View details'))
     expect(vi.mocked(hoverOnStep)).toHaveBeenCalled()
     expect(vi.mocked(toggleViewSubstep)).toHaveBeenCalled()
     expect(vi.mocked(analyticsEvent)).toHaveBeenCalled()

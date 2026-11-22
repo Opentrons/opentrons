@@ -2,7 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 import {
   ABSORBANCE_READER_V1,
@@ -105,18 +106,22 @@ describe('DeckSetupToolbox', () => {
       deckConfig: [],
     })
   })
+
   afterEach(() => {
     vi.resetAllMocks()
   })
-  it('should render empty labware and add labware CTA opens modal ', () => {
+
+  it('should render empty labware and add labware CTA opens modal ', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('Edit labware')
     screen.getByText('Add labware')
     screen.getByText('No labware added')
     screen.getByText('Select labware to add to slot')
-    fireEvent.click(screen.getByText('Add labware'))
+    await user.click(screen.getByText('Add labware'))
     screen.getByText('mock SelectLabwareModal')
   })
+
   it('renders correct copy for adding a labware onto a plate reader', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
       selectedAdapterDefURI: null,
@@ -132,7 +137,9 @@ describe('DeckSetupToolbox', () => {
       'The plate reader must start empty so it can be initialized.'
     )
   })
-  it('should clear the slot from all items when the clear cta is called', () => {
+
+  it('should clear the slot from all items when the clear cta is called', async () => {
+    const user = userEvent.setup()
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
       selectedAdapterDefURI: 'mockUri',
       selectedTopLabware: { labwareDefURI: 'mockUri', amount: 1 },
@@ -178,17 +185,17 @@ describe('DeckSetupToolbox', () => {
     screen.getByText('Edit liquid')
     screen.getByText('Bottom of slot')
     screen.getByText('Top of slot')
-    fireEvent.click(screen.getByText('Clear'))
+    await user.click(screen.getByText('Clear'))
     expect(vi.mocked(deleteContainer)).toHaveBeenCalledTimes(2)
     //  add a liquid
-    fireEvent.click(screen.getByText('Edit liquid'))
+    await user.click(screen.getByText('Edit liquid'))
     expect(mockNavigate).toHaveBeenCalled()
     expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
     // replace labware when there is no space
-    fireEvent.click(screen.getByText('Replace labware'))
+    await user.click(screen.getByText('Replace labware'))
     screen.getByText('mock SelectLabwareModal')
     // click done
-    fireEvent.click(screen.getByText('Done'))
+    await user.click(screen.getByText('Done'))
     expect(props.onCloseClick).toHaveBeenCalled()
   })
 })

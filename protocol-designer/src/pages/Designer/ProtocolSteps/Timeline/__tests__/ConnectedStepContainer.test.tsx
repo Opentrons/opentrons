@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { fireEvent, screen, within } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 import { COLORS } from '@opentrons/components'
 
@@ -69,18 +70,21 @@ describe('ConnectedStepContainer', () => {
     })
   })
 
-  it('renders the starting deck state step', () => {
+  it('renders the starting deck state step', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByText('Starting deck state'))
+    await user.click(screen.getByText('Starting deck state'))
     expect(props.onClick).toHaveBeenCalled()
   })
+
   it('renders the ending deck state step', () => {
     props.text = 'Final deck state'
     render(props)
     screen.getByText('Final deck state')
   })
 
-  it('renders the overflow menu button when active (selected)', () => {
+  it('renders the overflow menu button when active (selected)', async () => {
+    const user = userEvent.setup()
     props = {
       ...props,
       selected: true,
@@ -89,7 +93,7 @@ describe('ConnectedStepContainer', () => {
     }
     render(props)
 
-    fireEvent.click(
+    await user.click(
       within(screen.getByLabelText('Starting deck state')).getByLabelText(
         'Starting deck state options'
       )

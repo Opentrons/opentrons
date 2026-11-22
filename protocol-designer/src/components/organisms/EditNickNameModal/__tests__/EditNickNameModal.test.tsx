@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fixture96Plate } from '@opentrons/shared-data'
@@ -20,7 +21,7 @@ vi.mock('/protocol-designer/step-forms/selectors')
 const render = (props: ComponentProps<typeof EditNickNameModal>) => {
   return renderWithProviders(<EditNickNameModal {...props} />, {
     i18nInstance: i18n,
-  })[0]
+  })
 }
 
 describe('EditNickNameModal', () => {
@@ -44,30 +45,30 @@ describe('EditNickNameModal', () => {
     })
   })
 
-  it('renders the text and adds a nickname', () => {
+  it('renders the text and adds a nickname', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('Rename labware')
     screen.getByText('Labware name')
     screen.getByText('Reset')
 
-    fireEvent.click(screen.getByText('Cancel'))
+    await user.click(screen.getByText('Cancel'))
     expect(props.onClose).toHaveBeenCalled()
 
     const input = screen.getByRole('textbox')
-    fireEvent.change(input, { target: { value: 'mockNickName' } })
-    fireEvent.click(screen.getByText('Save'))
+    await user.type(input, 'mockNickName')
+    await user.click(screen.getByText('Save'))
     expect(vi.mocked(renameLabware)).toHaveBeenCalled()
     expect(props.onClose).toHaveBeenCalled()
   })
-  it('renders the too long nickname error', () => {
+  it('renders the too long nickname error', async () => {
+    const user = userEvent.setup()
     render(props)
     const input = screen.getByRole('textbox')
-    fireEvent.change(input, {
-      target: {
-        value:
-          'mockNickNameisthelongestnicknameihaveeverseen mockNickNameisthelongestnicknameihaveeverseen mockNickNameisthelongest',
-      },
-    })
+    await user.type(
+      input,
+      'mockNickNameisthelongestnicknameihaveeverseen mockNickNameisthelongestnicknameihaveeverseen mockNickNameisthelongest'
+    )
     screen.getByText('Labware names must be 115 characters or fewer.')
   })
 })

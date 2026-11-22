@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -33,7 +34,9 @@ describe('AppInfo', () => {
     windowOpenSpy.mockRestore()
     vi.clearAllMocks()
   })
-  it('renders the app info section', () => {
+
+  it('renders the app info section', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('App Info')
     screen.getByText('Protocol designer version')
@@ -41,13 +44,15 @@ describe('AppInfo', () => {
     const windowOpenButton = screen.getByRole('button', {
       name: 'Software manual',
     })
-    fireEvent.click(windowOpenButton)
+    await user.click(windowOpenButton)
     expect(window.open).toHaveBeenCalledWith(DOC_URL, '_blank', 'noopener')
     screen.getByRole('button', { name: 'Release notes' })
   })
-  it('should call the setShowAnnouncementModal when the release notes button is clicked', () => {
+
+  it('should call the setShowAnnouncementModal when the release notes button is clicked', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Release notes' }))
+    await user.click(screen.getByRole('button', { name: 'Release notes' }))
     expect(mockSetShowAnnouncementModal).toHaveBeenCalled()
   })
 })

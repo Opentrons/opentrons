@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { COLORS } from '@opentrons/components'
@@ -25,21 +26,24 @@ describe('ResetSettingsField', () => {
     }
   })
 
-  it('should renders a reset aspirate button', () => {
+  it('should renders a reset aspirate button', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('Reset aspirate settings')
     const resetButton = screen.getByRole('button')
     expect(resetButton).toHaveStyle(`background-color: ${COLORS.transparent}`)
-    fireEvent.click(resetButton)
+    await user.click(resetButton)
     expect(props.onClick).toHaveBeenCalled()
   })
-  it('should renders a reset dispense button', () => {
+
+  it('should renders a reset dispense button', async () => {
+    const user = userEvent.setup()
     props.tab = 'dispense'
     render(props)
     screen.getByText('Reset dispense settings')
     const resetButton = screen.getByRole('button')
     expect(resetButton).toHaveStyle(`background-color: ${COLORS.transparent}`)
-    fireEvent.click(resetButton)
+    await user.click(resetButton)
     expect(props.onClick).toHaveBeenCalled()
   })
 })

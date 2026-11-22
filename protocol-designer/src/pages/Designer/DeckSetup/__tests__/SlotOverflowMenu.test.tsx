@@ -2,7 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 import { fixture96Plate } from '@opentrons/shared-data'
 
@@ -125,30 +126,33 @@ describe('SlotOverflowMenu', () => {
     vi.restoreAllMocks()
   })
 
-  it('should renders all buttons as enabled and clicking on them calls ctas', () => {
+  it('should renders all buttons as enabled and clicking on them calls ctas', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Edit labware' }))
+    await user.click(screen.getByRole('button', { name: 'Edit labware' }))
     expect(props.addEquipment).toHaveBeenCalled()
     expect(props.setShowMenuList).toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('button', { name: 'Duplicate labware' }))
+    await user.click(screen.getByRole('button', { name: 'Duplicate labware' }))
     expect(vi.mocked(duplicateLabware)).toHaveBeenCalled()
     expect(props.setShowMenuList).toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('button', { name: 'Clear labware' }))
+    await user.click(screen.getByRole('button', { name: 'Clear labware' }))
     expect(vi.mocked(deleteContainer)).toHaveBeenCalledTimes(2)
     expect(props.setShowMenuList).toHaveBeenCalled()
   })
 
-  it('renders snackbar if duplicate is clicked and the deck is full', () => {
+  it('renders snackbar if duplicate is clicked and the deck is full', async () => {
+    const user = userEvent.setup()
     vi.mocked(getNextAvailableDeckSlot).mockReturnValue(null)
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Duplicate labware' }))
+    await user.click(screen.getByRole('button', { name: 'Duplicate labware' }))
     expect(MOCK_MAKE_SNACKBAR).toHaveBeenCalled()
   })
 
-  it('renders the ConfirmDeleteEntityInUseModal modal', () => {
+  it('renders the ConfirmDeleteEntityInUseModal modal', async () => {
+    const user = userEvent.setup()
     vi.mocked(getIsLabwareOnSlotInUse).mockReturnValue(true)
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Clear labware' }))
+    await user.click(screen.getByRole('button', { name: 'Clear labware' }))
     screen.getByText('mock ConfirmDeleteEntityInUseModal')
   })
 })
