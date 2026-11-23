@@ -1,1 +1,2 @@
-export type DeleteRecordsType = 'allRuns' | 'selectedRuns' | 'selectedLogs'
+export type DeleteRecordsType =
+  'allRuns' | 'selectedRun' | 'selectedRuns' | 'selectedLogs'

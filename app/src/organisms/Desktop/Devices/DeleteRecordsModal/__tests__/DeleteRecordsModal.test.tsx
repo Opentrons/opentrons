@@ -27,6 +27,18 @@ describe('DeleteRecordsModal', () => {
     screen.getByText('Delete all')
   })
 
+  it('renders selectedRun copy', () => {
+    render('selectedRun')
+    screen.getByText('Delete the selected protocol run record?')
+    screen.getByText(
+      'Deleting the selected protocol run record will permanently remove it from the robot, along with all associated files. This action cannot be undone.'
+    )
+    screen.getByText(
+      'We recommend downloading all protocol files before proceeding.'
+    )
+    screen.getByText('Delete')
+  })
+
   it('renders selectedRuns copy', () => {
     render('selectedRuns')
     screen.getByText('Download and delete selected protocol run records?')
