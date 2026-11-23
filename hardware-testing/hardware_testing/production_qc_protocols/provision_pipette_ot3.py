@@ -21,11 +21,12 @@ from typing import Any, Callable, Dict, List, NamedTuple, Optional
 from opentrons.protocol_api import ParameterContext, ProtocolContext
 
 
-metadata = {"protocolName": "Flex left pipette identity provisioning / clearing"}
+metadata = {"protocolName": "provision_pipette_ot3"}
 requirements = {"robotType": "Flex", "apiLevel": "2.20"}
 
 WORKER_MODULE = "hardware_testing.drivers.provision_pipette_protocol"
 WORKER_TIMEOUT_SECONDS = 30.0
+TOOL_CACHE_TIMEOUT_SECONDS = 30.0
 TARGET_MOUNT = "left"
 SCAN_TIMEOUT_SECONDS = 600.0
 ROBOT_SERVER_SOCKET = "/run/aiohttp.sock"
@@ -167,17 +168,15 @@ def add_parameters(parameters: ParameterContext) -> None:
     parameters.add_str(
         variable_name="operation",
         display_name="操作模式",
-        default="write",
+        default="bootstrap",
         choices=[
             {"display_name": "只读检查", "value": "inspect"},
             {"display_name": "直接写入", "value": "write"},
             {"display_name": "空白移液器首次烧录", "value": "bootstrap"},
             {"display_name": "清除后写入", "value": "clear_then_write"},
+            {"display_name": "只清除条码", "value": "clear"},
         ],
-        description=(
-            "固定左侧。写入模式只扫新码，无需匹配原码；空白移液器首次烧录需在协议启动时暂不连接移液器，"
-            "扫码后按暂停提示安装；协议不提供仅清除身份，避免留下无法识别的空白身份。"
-        ),
+        description=("空白移液器首次烧录需在协议启动时不连接移液器，" "扫码成功并出现暂停提示后才能安装。"),
     )
     parameters.add_bool(
         variable_name="restart_service",
@@ -504,6 +503,15 @@ def _validate_result(
     except (ValueError, TypeError) as error:
         raise RuntimeError("烧录程序未返回单个有效 JSON 结果，无法确认操作成功。") from error
     if (
+        return_code != 0
+        and isinstance(result, dict)
+        and isinstance(result.get("error"), str)
+        and "unrecognized arguments: --refresh-tools-after-write" in result["error"]
+    ):
+        raise RuntimeError(
+            "机器人上的 worker 不支持首次烧录后的工具检测。请重新部署 hardware-testing，" "并重新上传新版协议、创建新运行。"
+        )
+    if (
         allow_clear_without_original
         and return_code != 0
         and isinstance(result, dict)
@@ -566,12 +574,15 @@ def _invoke_worker(
     expected_before: Optional[str] = None,
     *,
     allow_clear_without_original: bool = False,
+    refresh_tools_after_write: bool = False,
 ) -> Dict[str, Any]:
     """Run one bounded operation with cancellation checks and in-memory output."""
     if which != TARGET_MOUNT:
         raise ValueError("本协议只允许配置左侧（left）移液器。")
     if allow_clear_without_original and action != "clear":
         raise ValueError("Only clear may skip the original barcode match.")
+    if refresh_tools_after_write and action != "write":
+        raise ValueError("Only write may request a tool refresh.")
     argv = command + [
         "--action",
         action,
@@ -592,6 +603,8 @@ def _invoke_worker(
         argv.extend(["--expected-before-hex", expected_before])
     if allow_clear_without_original:
         argv.append("--allow-clear-without-original")
+    if refresh_tools_after_write:
+        argv.append("--refresh-tools-after-write")
     ctx.comment(
         {
             "inspect": "正在只读查询移液器。",
@@ -627,6 +640,11 @@ def _invoke_worker(
             allow_clear_without_original=allow_clear_without_original,
         )
         if (
+            refresh_tools_after_write
+            and result.get("tool_refresh_requested") is not True
+        ):
+            raise RuntimeError("EEPROM 已验证，但驱动未确认请求工具检测；请更新 hardware-testing 驱动。")
+        if (
             expected_before is not None
             and _identity_hex(result, "before") != expected_before
         ):
@@ -641,6 +659,31 @@ def _invoke_worker(
                 raise
 
 
+def _wait_for_written_identity(ctx: ProtocolContext, serial: str) -> None:
+    """Wait for live detection to replace the blank identity before run cleanup."""
+    from opentrons.hardware_control.errors import InvalidPipetteName
+    from opentrons.types import Mount
+
+    hardware = ctx._core.get_hardware()
+    deadline = monotonic() + TOOL_CACHE_TIMEOUT_SECONDS
+    ctx.comment("EEPROM 已验证，正在等待机器人识别新条码，请保持移液器连接。")
+    while monotonic() < deadline:
+        # Enter the engine on every attempt so cancellation remains effective.
+        ctx.delay(seconds=0.5, msg="等待工具检测更新移液器身份。")
+        try:
+            hardware.cache_instruments()
+        except InvalidPipetteName:
+            # Head detection can still be resolving the pre-write all-FF reply.
+            continue
+        attached = hardware.attached_pipettes.get(Mount.LEFT) or {}
+        if attached.get("pipette_id") == serial:
+            ctx.comment(f"机器人已识别左侧移液器新条码：{serial}。")
+            return
+    raise TimeoutError(
+        f"EEPROM 已写入并读回验证为 {serial}，但机器人在 30 秒内未识别新身份。" "未再次写入或重启服务；请只读检查实际身份后再处理。"
+    )
+
+
 def run(ctx: ProtocolContext) -> None:
     """Verify one identity operation; only provisioning arranges a service restart."""
     operation = ctx.params.operation  # type: ignore[attr-defined]
@@ -651,13 +694,14 @@ def run(ctx: ProtocolContext) -> None:
         "clear_then_write",
         "clear",
     }:
-        raise ValueError("请选择有效的操作模式：只读检查、直接写入、清除后写入或仅清除身份。")
+        raise ValueError("请选择有效的操作模式：只读检查、直接写入、空白移液器首次烧录、清除后写入或只清除条码。")
     if ctx.is_simulating():
         ctx.comment(
-            "序列号配置流程分析完成。真实运行扫码录入，固定配置左侧；默认直接写入。"
+            "序列号配置流程分析完成。真实运行扫码录入，固定配置左侧；默认空白移液器首次烧录。"
             "直接写入允许将当前身份覆盖为扫码新码，不要求新旧条码一致。"
             "空白移液器首次烧录需先在未连接移液器时启动，扫码后暂停安装并写入。"
             "清除后写入也只扫描新码，无需匹配原码，确认后在同一次运行中清除并写入。"
+            "只清除条码需扫描匹配的原码，确认后清除为全 FF 并读回验证，不重启服务，后续需重新烧录。"
             "写入后是否重启机器人服务由参数决定，默认不重启。"
         )
         return
@@ -674,17 +718,19 @@ def run(ctx: ProtocolContext) -> None:
     scan_prompt = {
         "inspect": "只读检查：请扫描左侧移液器实物标签上的完整序列号。",
         "write": "直接写入：请扫描准备写入左侧移液器的新条码，允许与当前身份不同。",
-        "bootstrap": "空白移液器首次烧录：请扫描生产系统分配的目标序列号。",
-        "clear": "仅清除身份：请扫描左侧移液器当前已烧录身份对应的原条码。",
+        "bootstrap": (
+            "空白移液器首次烧录：请保持左侧安装位为空，暂不要安装移液器。" "请先扫描目标序列号，只有扫码成功并出现暂停提示后才能安装移液器。"
+        ),
+        "clear": "只清除条码：请扫描左侧移液器当前已烧录身份对应的原条码。",
         "clear_then_write": "清除后写入：请扫描准备写入左侧移液器的新条码，无需扫描原码。",
     }[operation]
     serial = _scan_serial(ctx, prompt=scan_prompt)
     if operation in {"write", "bootstrap"}:
         if operation == "bootstrap":
             ctx.pause(
-                "请确认左侧移液器当前未连接，且已扫描生产系统分配的目标序列号。"
-                "现在请在机器人保持静止时安装需要首次烧录的空白移液器，"
-                "确认连接牢固后点击继续；继续后将直接通过 CAN 写入并读回验证。"
+                "左侧移液器当前未连接，且已扫描目标序列号。"
+                "现在请安装需要首次烧录的移液器，"
+                "确认连接牢固后点击继续；协议运行成功则扫码成功。"
             )
         # The direct-write path is deliberately one worker transaction.  The
         # worker reads the current identity immediately before writing and
@@ -692,12 +738,24 @@ def run(ctx: ProtocolContext) -> None:
         # process and CAN query sequence.
         target_serial = serial
         _target_hex(target_serial)
-        written = _invoke_worker(ctx, command, "write", which, target_serial)
+        if operation == "bootstrap":
+            written = _invoke_worker(
+                ctx,
+                command,
+                "write",
+                which,
+                target_serial,
+                refresh_tools_after_write=True,
+            )
+        else:
+            written = _invoke_worker(ctx, command, "write", which, target_serial)
         before = _identity_hex(written, "before")
         if _identity_hex(written, "after") != _target_hex(target_serial):
             raise RuntimeError("写入后的读回值不是目标身份，不能判为成功。")
         ctx.comment(f"左侧 EEPROM 原身份：{_identity_label(before)}；目标：{target_serial}。")
         ctx.comment(f"EEPROM 序列号核对通过：左侧（{which}），{target_serial}。")
+        if operation == "bootstrap":
+            _wait_for_written_identity(ctx, target_serial)
         if restart_plan is not None:
             _schedule_service_restart(ctx, restart_plan)
         else:

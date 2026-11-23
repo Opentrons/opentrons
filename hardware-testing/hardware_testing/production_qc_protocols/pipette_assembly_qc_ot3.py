@@ -4461,7 +4461,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         parameters.add_bool(
             display_name=f"Skip {s.value.lower()}",
             variable_name=f"skip_{s.value.lower().replace('-', '_')}",
-            default=False,
+            default=s == TestSection.ENCODER_CLEAN,
             description=f"When this is true the robot will not test {s.value.lower()}",
         )
     parameters.add_str(

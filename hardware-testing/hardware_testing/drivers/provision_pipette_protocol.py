@@ -7,7 +7,8 @@ Write can use an optional inspected identity snapshot; without one it performs
 the read, write, and readback in one worker transaction.
 Clear normally checks the original serial; an explicit option skips that check
 for clear-then-write, while always requiring the exact inspected snapshot.
-This worker does not move motors, restart firmware, or refresh server caches.
+This worker does not move motors or restart firmware. An optional post-write
+head query requests tool detection so the server can refresh its own cache.
 Results are emitted on stdout; no provisioning report is saved to disk.
 """
 
@@ -380,6 +381,9 @@ async def run(args: argparse.Namespace) -> Result:
             args.allow_clear_without_original,
         )
         parse_target(args.serial)
+        refresh_tools = getattr(args, "refresh_tools_after_write", False)
+        if refresh_tools and args.action != "write":
+            raise ValueError("--refresh-tools-after-write requires --action write.")
         if args.action == "clear" or args.expected_before_hex is not None:
             _parse_expected(args.expected_before_hex)
         async with (
@@ -396,6 +400,15 @@ async def run(args: argparse.Namespace) -> Result:
                 timeout=args.timeout,
                 allow_clear_without_original=args.allow_clear_without_original,
             )
+            if result["success"] and refresh_tools:
+                # The server caches the blank identity detected on installation.
+                # A head reply stimulates its existing tool-detection listener;
+                # the protocol must still wait for the expected cached serial.
+                await asyncio.wait_for(
+                    messenger.send(NodeId.head, messages.AttachedToolsRequest()),
+                    timeout=args.timeout,
+                )
+                result["tool_refresh_requested"] = True
     except (Exception, asyncio.CancelledError, KeyboardInterrupt) as error:
         _fail(result, error)
     return result
@@ -422,6 +435,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="For clear only: skip original serial matching, retaining the exact snapshot check.",
     )
     parser.add_argument("--attempts", type=int, default=3)
+    parser.add_argument(
+        "--refresh-tools-after-write",
+        action="store_true",
+        help="After verified writing, ask the head to report attached tools to the server.",
+    )
     parser.add_argument("--timeout", type=float, default=1.0)
     add_can_args(parser)
     return parser
