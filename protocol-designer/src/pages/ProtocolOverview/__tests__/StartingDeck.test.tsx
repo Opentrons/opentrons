@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -60,16 +61,18 @@ describe('StartingDeck', () => {
     screen.getByText('mock DeckThumbnail')
   })
 
-  it('should render off deck when clicking toggle button', () => {
+  it('should render off deck when clicking toggle button', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('mock DeckThumbnail')
-    fireEvent.click(screen.getByRole('button', { name: 'Off-deck' }))
+    await user.click(screen.getByRole('button', { name: 'Off-deck' }))
     screen.getByText('mock OffDeckThumbnail')
   })
 
-  it('should call mock function when clicking material list', () => {
+  it('should call mock function when clicking material list', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByText('Materials list'))
+    await user.click(screen.getByText('Materials list'))
     expect(mockSetShowMaterialsListModal).toHaveBeenCalled()
   })
 

@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
@@ -53,7 +54,8 @@ describe('AddMetadata', () => {
     }
   })
 
-  it('renders all the text and fields', () => {
+  it('renders all the text and fields', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('Step 3')
     screen.getByText('Tell us about your protocol')
@@ -67,10 +69,10 @@ describe('AddMetadata', () => {
       name: 'Author/Organization',
     })
 
-    fireEvent.change(nameInput, { target: { value: 'mockProtocolName' } })
+    await user.type(nameInput, 'mockProtocolName')
     expect(props.register).toHaveBeenCalled()
 
-    fireEvent.change(orgInput, { target: { value: 'mock org' } })
+    await user.type(orgInput, 'mock org')
     expect(props.register).toHaveBeenCalled()
   })
 })

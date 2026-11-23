@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -37,32 +38,33 @@ describe('EditNickNameModal', () => {
   })
 
   // ToDo This test is missing a few base test cases
-  it('renders the text and add a step name and a step notes', () => {
+  it('renders the text and add a step name and a step notes', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('Name step')
     screen.getByText('Step Name')
     screen.getByText('Step Notes')
 
-    fireEvent.click(screen.getByText('Cancel'))
+    await user.click(screen.getByText('Cancel'))
     expect(props.onClose).toHaveBeenCalled()
 
     expect(screen.getAllByRole('textbox').length).toBe(2)
     screen.getByDisplayValue('Pause')
 
-    fireEvent.click(screen.getByText('Save'))
+    await user.click(screen.getByText('Save'))
     expect(vi.mocked(renameStep)).toHaveBeenCalled()
     expect(props.onClose).toHaveBeenCalled()
   })
 
-  it('renders the too long step name error', () => {
+  it('renders the too long step name error', async () => {
+    const user = userEvent.setup()
     render(props)
     const stepName = screen.getAllByRole('textbox', { name: '' })[0]
-    fireEvent.change(stepName, {
-      target: {
-        value:
-          'mockStepNameisthelongeststepnameihaveeverseen mockstepNameisthelongeststepnameihaveeverseen mockstepNameisthelongest',
-      },
-    })
+    await user.type(
+      stepName,
+      'mockStepNameisthelongeststepnameihaveeverseen mockstepNameisthelongeststepnameihaveeverseen mockstepNameisthelongest'
+    )
+
     screen.getByText('Oops! Your step name is too long.')
   })
 })

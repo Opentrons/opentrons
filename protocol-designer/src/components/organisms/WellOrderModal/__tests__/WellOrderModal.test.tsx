@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -29,19 +30,21 @@ describe('WellOrderModal', () => {
       updateValues: vi.fn(),
     }
   })
-  it('renders all the text and buttons for the modal with the default fields', () => {
+
+  it('renders all the text and buttons for the modal with the default fields', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('Edit well order')
     screen.getByText('Change how the robot moves from well to well.')
     screen.getByText('Primary order')
     screen.getByText('then')
     screen.getByText('Secondary order')
-    fireEvent.click(screen.getByText('Reset to default'))
+    await user.click(screen.getByText('Reset to default'))
     expect(props.closeModal).toHaveBeenCalled()
     expect(props.updateValues).toHaveBeenCalled()
-    fireEvent.click(screen.getByText('Cancel'))
+    await user.click(screen.getByText('Cancel'))
     expect(props.closeModal).toHaveBeenCalled()
-    fireEvent.click(screen.getByText('Save'))
+    await user.click(screen.getByText('Save'))
     expect(props.closeModal).toHaveBeenCalled()
     expect(props.updateValues).toHaveBeenCalled()
   })

@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -30,6 +31,7 @@ describe('UserSettings', () => {
       },
     }
   })
+
   it('renders the user settings section', () => {
     render(props)
     screen.getByText('User Settings')
@@ -57,22 +59,24 @@ describe('UserSettings', () => {
     screen.getByText('No hints to restore')
   })
 
-  it('should call mock function when clicking the reset button', () => {
+  it('should call mock function when clicking the reset button', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByText('Reset'))
+    await user.click(screen.getByText('Reset'))
     expect(vi.mocked(tutorialActions.clearAllHintDismissals)).toHaveBeenCalled()
   })
 
-  it('should call mock function when clicking toggle switches', () => {
+  it('should call mock function when clicking toggle switches', async () => {
+    const user = userEvent.setup()
     render(props)
     const toggleButtons = screen.getAllByRole('switch')
 
-    fireEvent.click(toggleButtons[0])
+    await user.click(toggleButtons[0])
     expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
       OT_PD_ENABLE_HOT_KEYS_DISPLAY: false,
     })
 
-    fireEvent.click(toggleButtons[1])
+    await user.click(toggleButtons[1])
     expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
       OT_PD_DISABLE_MODULE_RESTRICTIONS: false,
     })

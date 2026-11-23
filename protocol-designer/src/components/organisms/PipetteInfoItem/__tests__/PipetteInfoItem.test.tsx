@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
@@ -35,18 +36,21 @@ describe('PipetteInfoItem', () => {
       mockDefUri: { metadata: { displayName: 'mock display name' } } as any,
     })
   })
-  it('renders pipette with edit and remove buttons', () => {
+
+  it('renders pipette with edit and remove buttons', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('P1000 Single-Channel GEN1')
     screen.getByText('Left Mount')
     screen.getByText('mock display name')
-    fireEvent.click(screen.getByText('Edit'))
+    await user.click(screen.getByText('Edit'))
     expect(props.editClick).toHaveBeenCalled()
-    fireEvent.click(screen.getByText('Remove'))
+    await user.click(screen.getByText('Remove'))
     expect(props.cleanForm).toHaveBeenCalled()
   })
 
-  it('renders pipette with edit and remove buttons right pipette', () => {
+  it('renders pipette with edit and remove buttons right pipette', async () => {
+    const user = userEvent.setup()
     props = {
       ...props,
       mount: 'right',
@@ -55,9 +59,9 @@ describe('PipetteInfoItem', () => {
     screen.getByText('P1000 Single-Channel GEN1')
     screen.getByText('Right Mount')
     screen.getByText('mock display name')
-    fireEvent.click(screen.getByText('Edit'))
+    await user.click(screen.getByText('Edit'))
     expect(props.editClick).toHaveBeenCalled()
-    fireEvent.click(screen.getByText('Remove'))
+    await user.click(screen.getByText('Remove'))
     expect(props.cleanForm).toHaveBeenCalled()
   })
 })

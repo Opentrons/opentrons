@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
@@ -52,7 +53,8 @@ describe('FormAlerts', () => {
     vi.mocked(getSelectedStepId).mockReturnValue('123')
   })
 
-  it('renders a timeline warning that is dismissible', () => {
+  it('renders a timeline warning that is dismissible', async () => {
+    const user = userEvent.setup()
     vi.mocked(getTimelineWarningsForSelectedStep).mockReturnValue([
       {
         message: 'mock message',
@@ -64,10 +66,12 @@ describe('FormAlerts', () => {
     screen.getByText(
       'This step moves a labware that contains liquid to the waste chute. There is no way to retrieve the liquid after disposal.'
     )
-    fireEvent.click(screen.getByTestId('Banner_close-button'))
+    await user.click(screen.getByTestId('Banner_close-button'))
     expect(vi.mocked(dismissTimelineWarning)).toHaveBeenCalled()
   })
-  it('renders a form level warning that is dismissible', () => {
+
+  it('renders a form level warning that is dismissible', async () => {
+    const user = userEvent.setup()
     vi.mocked(getFormWarningsForSelectedStep).mockReturnValue([
       {
         type: 'TIP_POSITIONED_LOW_IN_TUBE',
@@ -78,7 +82,7 @@ describe('FormAlerts', () => {
     ])
     render(props)
     screen.getByText('mockTitle')
-    fireEvent.click(screen.getByTestId('Banner_close-button'))
+    await user.click(screen.getByTestId('Banner_close-button'))
     expect(vi.mocked(dismissFormWarning)).toHaveBeenCalled()
   })
 })

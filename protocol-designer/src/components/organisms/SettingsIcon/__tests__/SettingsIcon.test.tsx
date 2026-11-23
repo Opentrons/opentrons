@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -32,9 +33,11 @@ describe('SettingsIcon', () => {
   beforeEach(() => {
     vi.mocked(getFileMetadata).mockReturnValue({})
   })
-  it('renders the SettingsIcon', () => {
+
+  it('renders the SettingsIcon', async () => {
+    const user = userEvent.setup()
     render()
-    fireEvent.click(screen.getByLabelText('Settings Icon Button'))
+    await user.click(screen.getByLabelText('Settings Icon Button'))
     expect(mockNavigate).toHaveBeenCalled()
   })
 })

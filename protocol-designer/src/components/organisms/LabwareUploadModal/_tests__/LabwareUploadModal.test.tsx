@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -24,13 +25,14 @@ describe('LabwareUploadModal', () => {
     })
   })
 
-  it('renders modal for not json', () => {
+  it('renders modal for not json', async () => {
+    const user = userEvent.setup()
     render()
     screen.getByText(
       'Protocol Designer only accepts custom JSON labware definitions made with our Labware Creator. Upload a valid file to continue.'
     )
     screen.getByText('Invalid file type')
-    fireEvent.click(
+    await user.click(
       screen.getByTestId('ModalHeader_icon_close_Invalid file type')
     )
     expect(vi.mocked(dismissLabwareUploadMessage)).toHaveBeenCalled()

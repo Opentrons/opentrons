@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -31,7 +32,7 @@ vi.mock('/protocol-designer/ui/modules/selectors', async importOriginal => {
 const render = (props: ComponentProps<typeof MagnetTools>) => {
   return renderWithProviders(<MagnetTools {...props} />, {
     i18nInstance: i18n,
-  })[0]
+  })
 }
 
 describe('MagnetTools', () => {
@@ -114,7 +115,8 @@ describe('MagnetTools', () => {
     })
   })
 
-  it('renders the text and a switch button for v2', () => {
+  it('renders the text and a switch button for v2', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('Module')
     screen.getByText('Magnets')
@@ -123,9 +125,10 @@ describe('MagnetTools', () => {
     screen.getByText('Engage height')
     screen.getByText('Must be between -2.5 mm to 25 mm.')
 
-    fireEvent.click(toggleButton)
+    await user.click(toggleButton)
     expect(props.propsForFields.magnetAction.updateValue).toHaveBeenCalled()
   })
+
   it('renders the input text for v1', () => {
     vi.mocked(getModuleEntities).mockReturnValue({
       magnetId: {

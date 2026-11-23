@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
@@ -122,7 +123,8 @@ describe('EditInstrumentsModal', () => {
     screen.getByText('Cancel')
   })
 
-  it('should render text and buttons - pipette overview', () => {
+  it('should render text and buttons - pipette overview', async () => {
+    const user = userEvent.setup()
     vi.mocked(usePipetteConfig).mockReturnValue({
       page: 'overview',
       mount: 'left',
@@ -142,11 +144,12 @@ describe('EditInstrumentsModal', () => {
       resetTemporarilyDeletedPipettes: vi.fn(),
     })
     render(props)
-    fireEvent.click(screen.getByText('Save'))
+    await user.click(screen.getByText('Save'))
     expect(mockOnClose).not.toHaveBeenCalled()
   })
 
-  it('should render text and buttons - pipette overview', () => {
+  it('should render text and buttons - pipette overview', async () => {
+    const user = userEvent.setup()
     vi.mocked(usePipetteConfig).mockReturnValue({
       page: 'overview',
       mount: 'left',
@@ -166,11 +169,12 @@ describe('EditInstrumentsModal', () => {
       resetTemporarilyDeletedPipettes: vi.fn(),
     })
     render(props)
-    fireEvent.click(screen.getByText('Cancel'))
+    await user.click(screen.getByText('Cancel'))
     expect(mockOnClose).toHaveBeenCalled()
   })
 
-  it('should call resetTemporarilyDeletedPipettes when clicking cancel button if temporarilyDeletedPipettes is not empty', () => {
+  it('should call resetTemporarilyDeletedPipettes when clicking cancel button if temporarilyDeletedPipettes is not empty', async () => {
+    const user = userEvent.setup()
     const mockResetTemporarilyDeletedPipettes = vi.fn()
     vi.mocked(usePipetteConfig).mockReturnValue({
       page: 'overview',
@@ -191,7 +195,7 @@ describe('EditInstrumentsModal', () => {
       resetTemporarilyDeletedPipettes: mockResetTemporarilyDeletedPipettes,
     })
     render(props)
-    fireEvent.click(screen.getByText('Cancel'))
+    await user.click(screen.getByText('Cancel'))
     expect(mockResetTemporarilyDeletedPipettes).toHaveBeenCalled()
     expect(mockOnClose).toHaveBeenCalled()
   })

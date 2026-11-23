@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
@@ -27,15 +28,17 @@ describe('TimelineAlerts', () => {
     })
   })
 
-  it('renders the insufficient tips timeline error and clicking on the button turns it into the starting deck state terminal id ', () => {
+  it('renders the insufficient tips timeline error and clicking on the button turns it into the starting deck state terminal id ', async () => {
+    const user = userEvent.setup()
     render()
     screen.getByText('Not enough accessible tips')
     screen.getByText(
       'Add or move a tip rack on your deck to avoid collisions, or change your tip pickup settings for this action.'
     )
-    fireEvent.click(screen.getByText('Edit starting deck'))
+    await user.click(screen.getByText('Edit starting deck'))
     expect(vi.mocked(selectTerminalItem)).toHaveBeenCalled()
   })
+
   it('renders the no tip on pipette timeline error and the knowledge link', () => {
     vi.mocked(getRobotStateTimeline).mockReturnValue({
       timeline: {} as any,

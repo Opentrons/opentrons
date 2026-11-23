@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -28,11 +29,13 @@ describe('BlockingHintModal', () => {
       hintKey: 'change_magnet_module_model',
     }
   })
-  it('renders the hint with buttons and checkbox', () => {
+
+  it('renders the hint with buttons and checkbox', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(props.handleCancel).toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    await user.click(screen.getByRole('button', { name: 'Confirm' }))
     expect(props.handleContinue).toHaveBeenCalled()
     expect(vi.mocked(removeHint)).toHaveBeenCalled()
     screen.getByText('mock content')

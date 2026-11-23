@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fixture96Plate, fixtureLid } from '@opentrons/shared-data'
@@ -84,23 +85,28 @@ describe('LabwareCardOverflowMenu', () => {
       selectedSlot: { slot: null, cutout: null },
     } as ZoomedIntoSlotInfoState)
   })
-  it('renders the overflow menu with 2 buttons', () => {
+
+  it('renders the overflow menu with 2 buttons', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByText('Rename labware'))
+    await user.click(screen.getByText('Rename labware'))
     screen.getByText('mock EditNickNameModal')
-    fireEvent.click(screen.getByText('Delete labware'))
+    await user.click(screen.getByText('Delete labware'))
     expect(vi.mocked(deleteContainer)).toHaveBeenCalledTimes(1)
   })
-  it('renders the labware in use modal when trying to delete', () => {
+
+  it('renders the labware in use modal when trying to delete', async () => {
+    const user = userEvent.setup()
     vi.mocked(getIsLabwareOnSlotInUse).mockReturnValue(true)
     render(props)
-    fireEvent.click(screen.getByText('Delete labware'))
+    await user.click(screen.getByText('Delete labware'))
     screen.getByText('mock ConfirmDeleteEntityInUseModal')
   })
 
-  it('nicknames the labware, not the lid', () => {
+  it('nicknames the labware, not the lid', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Rename labware' }))
+    await user.click(screen.getByRole('button', { name: 'Rename labware' }))
     expect(EditNickNameModal).toHaveBeenCalledWith(
       expect.objectContaining({
         labwareId: 'labId3',

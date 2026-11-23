@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
@@ -28,7 +29,7 @@ import { SelectLabwareModal } from '..'
 
 import type { ComponentProps } from 'react'
 import type { InfoScreen } from '@opentrons/components'
-import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('/protocol-designer/utils')
@@ -67,7 +68,7 @@ describe('SelectLabwareModal', () => {
     vi.mocked(getPipetteEntities).mockReturnValue({
       pip: {
         tiprackDefURI: ['mockTipUri'],
-        spec: fixtureP1000SingleV2Specs as PipetteV2Specs,
+        spec: fixtureP1000SingleV2Specs,
         name: 'p1000_single_flex',
         id: 'mockPipId',
         tiprackLabwareDef: [fixtureTiprack1000ul as LabwareDefinition2],
@@ -92,7 +93,8 @@ describe('SelectLabwareModal', () => {
   })
 
   // Note temporarily skip
-  it.skip('renders an empty slot with all the labware options', () => {
+  it.skip('renders an empty slot with all the labware options', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getAllByText('Add labware')
     screen.getByText('Tube racks')
@@ -101,15 +103,16 @@ describe('SelectLabwareModal', () => {
     screen.getByText('Aluminum blocks')
     screen.getByText('Adapters')
     //  click and expand reservoirs accordion
-    fireEvent.click(screen.getAllByTestId('ListButton_noActive')[3])
-    fireEvent.click(
+    await user.click(screen.getAllByTestId('ListButton_noActive')[3])
+    await user.click(
       screen.getByText('Opentrons Calibration Block - Short Side: Left')
     )
     expect(vi.mocked(selectTopLabware)).toHaveBeenCalled()
   })
 
   // Note temporarily skip
-  it.skip('renders deck slot and selects an adapter and labware', () => {
+  it.skip('renders deck slot and selects an adapter and labware', async () => {
+    const user = userEvent.setup()
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
       selectedAdapterDefURI: 'fixture/fixture_universal_flat_bottom_adapter/1',
       selectedTopLabware: { labwareDefURI: null, amount: 1 },
@@ -120,26 +123,22 @@ describe('SelectLabwareModal', () => {
     })
     render(props)
     screen.getByText('Adapters')
-    fireEvent.click(screen.getAllByTestId('ListButton_noActive')[4])
+    await user.click(screen.getAllByTestId('ListButton_noActive')[4])
     //   set adapter
     screen.getByText('Adapter compatible labware')
-    fireEvent.click(
+    await user.click(
       screen.getByText('Fixture Corning 96 Well Plate 360 µL Flat')
     )
     expect(vi.mocked(selectTopLabware)).toHaveBeenCalled()
   })
 
-  it('renders the custom labware flow', () => {
+  it('renders the custom labware flow', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.change(screen.getByLabelText('Upload custom labware'), {
-      target: {
-        files: [
-          new File(['{}'], 'custom-labware.json', {
-            type: 'application/json',
-          }),
-        ],
-      },
-    })
+    await user.upload(
+      screen.getByLabelText('Upload custom labware'),
+      new File(['{}'], 'custom-labware.json', { type: 'application/json' })
+    )
     expect(vi.mocked(createCustomLabwareDef)).toHaveBeenCalled()
   })
 

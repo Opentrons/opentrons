@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -25,15 +26,17 @@ describe('ConfirmDeleteStagingAreaModal', () => {
       onConfirm: vi.fn(),
     }
   })
-  it('renders the text and buttons work as expected', () => {
+
+  it('renders the text and buttons work as expected', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('This staging area slot has labware')
     screen.getByText(
       'The staging area slot that you are about to delete has labware placed on it. If you make these changes to your protocol starting deck, the labware will be deleted as well.'
     )
-    fireEvent.click(screen.getByText('Cancel'))
+    await user.click(screen.getByText('Cancel'))
     expect(props.onClose).toHaveBeenCalled()
-    fireEvent.click(screen.getByText('Continue'))
+    await user.click(screen.getByText('Continue'))
     expect(props.onConfirm).toHaveBeenCalled()
   })
 })

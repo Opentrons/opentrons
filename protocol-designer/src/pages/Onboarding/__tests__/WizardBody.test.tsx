@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
@@ -31,15 +32,16 @@ describe('WizardBody', () => {
     }
   })
 
-  it('renders all the elements', () => {
+  it('renders all the elements', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('Step 1')
     screen.getByText('mockHeader')
     screen.getByText('mock children')
     screen.getByText('mockSubheader')
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    await user.click(screen.getByRole('button', { name: 'Confirm' }))
     expect(props.proceed).toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('button', { name: 'Go back' }))
+    await user.click(screen.getByRole('button', { name: 'Go back' }))
     expect(props.goBack).toHaveBeenCalled()
     screen.getByLabelText('onboarding animation for page 1')
   })

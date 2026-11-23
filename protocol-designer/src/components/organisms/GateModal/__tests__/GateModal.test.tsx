@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -49,9 +50,10 @@ describe('GateModal', () => {
     )
   })
 
-  it('should call analytics optIn action', () => {
+  it('should call analytics optIn action', async () => {
+    const user = userEvent.setup()
     render()
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    await user.click(screen.getByRole('button', { name: 'Confirm' }))
     expect(vi.mocked(optIn)).toHaveBeenCalled()
   })
 })

@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -44,7 +45,7 @@ describe('SelectWellsModal', () => {
       onCloseClick: vi.fn(),
       value: 2,
       updateValue: vi.fn(),
-      labwareId: labwareId,
+      labwareId,
       pipetteId: pipId,
     }
     vi.mocked(SelectableLabware).mockReturnValue(
@@ -72,13 +73,15 @@ describe('SelectWellsModal', () => {
       },
     })
   })
-  it('renders a labware and the modal title, buttons should call ctas', () => {
+
+  it('renders a labware and the modal title, buttons should call ctas', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('Select source wells using a')
     screen.getByText('Click and drag to select wells')
-    fireEvent.click(screen.getByText('Back'))
+    await user.click(screen.getByText('Back'))
     expect(props.onCloseClick).toHaveBeenCalled()
-    fireEvent.click(screen.getByText('Save'))
+    await user.click(screen.getByText('Save'))
     expect(props.updateValue).toHaveBeenCalled()
     expect(props.onCloseClick).toHaveBeenCalled()
   })

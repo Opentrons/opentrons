@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -31,16 +32,19 @@ describe('ZTipPositionModal', () => {
       <div>mock TipPositionZOnlyView</div>
     )
   })
-  it('renders the text and radio buttons', () => {
+
+  it('renders the text and radio buttons', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('Edit blowout position')
     screen.getByText('Change where in the well the robot performs the blowout.')
-    fireEvent.click(screen.getByText('Cancel'))
+    await user.click(screen.getByText('Cancel'))
     expect(props.closeModal).toHaveBeenCalled()
-    fireEvent.click(screen.getByText('Save'))
+    await user.click(screen.getByText('Save'))
     expect(props.closeModal).toHaveBeenCalled()
     expect(props.updateValue).toHaveBeenCalled()
   })
+
   it('renders the custom option, caption, and visual', () => {
     render(props)
     expect(screen.getByRole('textbox', { name: 'Z position' })).toBeVisible()

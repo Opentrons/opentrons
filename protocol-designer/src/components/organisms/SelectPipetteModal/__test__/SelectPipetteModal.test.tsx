@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
@@ -92,29 +93,31 @@ describe('SelectPipetteModal', () => {
     })
   })
 
-  it('renders the first page of select pipettes for a Flex', () => {
+  it('renders the first page of select pipettes for a Flex', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('Add a pipette')
     screen.getByText('Pipette type')
     // select pip type
-    fireEvent.click(screen.getByRole('label', { name: '1-Channel' }))
+    await user.click(screen.getByRole('label', { name: '1-Channel' }))
     screen.getByText('Pipette volume')
     // select pip volume
-    fireEvent.click(screen.getByRole('label', { name: '1000 µL' }))
+    await user.click(screen.getByRole('label', { name: '1000 µL' }))
     // select tip
     screen.getByText('200µL Flex tipracks')
-    fireEvent.click(screen.getByText('1000µL Flex tipracks'))
+    await user.click(screen.getByText('1000µL Flex tipracks'))
 
     screen.getByRole('button', { name: 'Save' })
 
     // go back
-    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(props.handleBack).toHaveBeenCalled()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    await user.click(screen.getByRole('button', { name: 'Save' }))
   })
 
-  it('renders the first page of select pipettes for an ot-2', () => {
+  it('renders the first page of select pipettes for an ot-2', async () => {
+    const user = userEvent.setup()
     vi.mocked(getTiprackOptions).mockReturnValue({
       'opentrons/opentrons_96_tiprack_10ul/1': '10µL tipracks',
       'opentrons/opentrons_96_tiprack_300ul/1': '300µL tipracks',
@@ -155,35 +158,30 @@ describe('SelectPipetteModal', () => {
     render(props)
     screen.getByText('Pipette type')
     // select pip type
-    fireEvent.click(screen.getByRole('label', { name: '1-Channel' }))
+    await user.click(screen.getByRole('label', { name: '1-Channel' }))
 
     screen.getByText('Pipette generation')
     // select gen
-    fireEvent.click(screen.getByRole('label', { name: 'GEN2' }))
+    await user.click(screen.getByRole('label', { name: 'GEN2' }))
 
     screen.getByText('Pipette volume')
     // select pip volume
-    fireEvent.click(screen.getByRole('label', { name: '20 µL' }))
+    await user.click(screen.getByRole('label', { name: '20 µL' }))
     // select tip
     screen.getByText('Add custom pipette tips')
     screen.getByText('10µL tipracks')
-    fireEvent.click(screen.getByText('300µL tipracks'))
+    await user.click(screen.getByText('300µL tipracks'))
     screen.getByText('Add custom pipette tips')
 
     //  add custom pipette tips
-    fireEvent.change(screen.getByLabelText('Add custom pipette tips'), {
-      target: {
-        files: [
-          new File(['{}'], 'custom-tips.json', {
-            type: 'application/json',
-          }),
-        ],
-      },
-    })
+    await user.upload(
+      screen.getByLabelText('Add custom pipette tips'),
+      new File(['{}'], 'custom-tips.json', { type: 'application/json' })
+    )
     expect(vi.mocked(createCustomTiprackDef)).toHaveBeenCalled()
 
     //  change all tip setting
-    fireEvent.click(screen.getByText('Show more tip types'))
+    await user.click(screen.getByText('Show more tip types'))
     screen.getByText('mock incompatible tips modal')
   })
 })

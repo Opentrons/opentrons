@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
@@ -35,12 +36,15 @@ describe('HardwareStep', () => {
     vi.mocked(getSelectedTerminalItemId).mockReturnValue(START_TERMINAL_ITEM_ID)
     vi.mocked(getHoveredTerminalItemId).mockReturnValue(null)
   })
-  it('renders the button and copy for a flex/ot-2', () => {
+
+  it('renders the button and copy for a flex/ot-2', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('Deck hardware')
-    fireEvent.click(screen.getByText('Deck hardware'))
+    await user.click(screen.getByText('Deck hardware'))
     expect(vi.mocked(selectTerminalItem)).toHaveBeenCalled()
   })
+
   it('renders the button and copy for a flex with small sidebar width', () => {
     props.sidebarWidth = 160
     render(props)

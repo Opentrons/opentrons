@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -51,31 +52,35 @@ describe('AddFixtureModal', () => {
     })
   })
 
-  it('should render the fixture modal and clicking on the fixtures can select the trash bin', () => {
+  it('should render the fixture modal and clicking on the fixtures can select the trash bin', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('Add to Slot A1')
     screen.getByText('Fixtures')
-    fireEvent.click(screen.getAllByText('Select options')[0])
+    await user.click(screen.getAllByText('Select options')[0])
     screen.getByText('Trash bin')
-    fireEvent.click(screen.getByText('Add'))
-    expect(props.setValue).toHaveBeenCalled()
-    expect(vi.mocked(editDeckConfiguration)).toHaveBeenCalled()
-  })
-  it('should render the fixture modal and clicking on the modules can select the thermocycler', () => {
-    render(props)
-    screen.getByText('Add to Slot A1')
-    screen.getByText('Modules')
-    fireEvent.click(screen.getAllByText('Select options')[1])
-    screen.getByText('Thermocycler Module GEN2')
-    screen.getByText('Magnetic Block GEN1')
-    screen.getByText('Heater-Shaker Module GEN1')
-    screen.getByText('Temperature Module GEN2')
-    fireEvent.click(screen.getAllByText('Add')[1])
+    await user.click(screen.getByText('Add'))
     expect(props.setValue).toHaveBeenCalled()
     expect(vi.mocked(editDeckConfiguration)).toHaveBeenCalled()
   })
 
-  it('should use existing fixture in same cutout when adding a new fixture (one existing)', () => {
+  it('should render the fixture modal and clicking on the modules can select the thermocycler', async () => {
+    const user = userEvent.setup()
+    render(props)
+    screen.getByText('Add to Slot A1')
+    screen.getByText('Modules')
+    await user.click(screen.getAllByText('Select options')[1])
+    screen.getByText('Thermocycler Module GEN2')
+    screen.getByText('Magnetic Block GEN1')
+    screen.getByText('Heater-Shaker Module GEN1')
+    screen.getByText('Temperature Module GEN2')
+    await user.click(screen.getAllByText('Add')[1])
+    expect(props.setValue).toHaveBeenCalled()
+    expect(vi.mocked(editDeckConfiguration)).toHaveBeenCalled()
+  })
+
+  it('should use existing fixture in same cutout when adding a new fixture (one existing)', async () => {
+    const user = userEvent.setup()
     const existingFixtures: Fixtures = {
       'existing-id': {
         cutoutId: 'cutoutD3' as CutoutId,
@@ -95,11 +100,11 @@ describe('AddFixtureModal', () => {
       fixtures: existingFixtures,
     }
     render(updatedProps)
-    fireEvent.click(screen.getAllByText('Select options')[0])
-    fireEvent.click(screen.getByText('Waste chute'))
-    fireEvent.click(screen.getAllByText('Select options')[0])
-    fireEvent.click(screen.getByText('Waste Chute'))
-    fireEvent.click(screen.getAllByText('Add')[0])
+    await user.click(screen.getAllByText('Select options')[0])
+    await user.click(screen.getByText('Waste chute'))
+    await user.click(screen.getAllByText('Select options')[0])
+    await user.click(screen.getByText('Waste Chute'))
+    await user.click(screen.getAllByText('Add')[0])
     expect(props.setValue).toHaveBeenCalled()
     expect(props.setValue).toHaveBeenCalledWith('fixtures', expect.any(Object))
     const setValue = vi.mocked(props.setValue!)
@@ -123,7 +128,8 @@ describe('AddFixtureModal', () => {
     )
   })
 
-  it('should handle two modules in same cutout when adding a new module (uses first match)', () => {
+  it('should handle two modules in same cutout when adding a new module (uses first match)', async () => {
+    const user = userEvent.setup()
     const existingModules: InitialDeckStateModules = {
       magneticBlockV1: {
         id: 'magneticBlockV1',
@@ -147,9 +153,9 @@ describe('AddFixtureModal', () => {
     }
     render(updatedProps)
     screen.getByText('Modules')
-    fireEvent.click(screen.getAllByText('Select options')[1])
+    await user.click(screen.getAllByText('Select options')[1])
     screen.getByText('Flex Stacker Module GEN1')
-    fireEvent.click(screen.getAllByText('Add')[0])
+    await user.click(screen.getAllByText('Add')[0])
     expect(props.setValue).toHaveBeenCalled()
     expect(props.setValue).toHaveBeenCalledWith('modules', expect.any(Object))
     const setValue = vi.mocked(props.setValue!)
@@ -205,7 +211,8 @@ describe('AddFixtureModal', () => {
     expect(screen.queryByText('Modules')).not.toBeInTheDocument()
   })
 
-  it('does not offer the vacuum module on A3 when B3 already has a module', () => {
+  it('does not offer the vacuum module on A3 when B3 already has a module', async () => {
+    const user = userEvent.setup()
     const updatedProps = {
       ...props,
       cutoutId: 'cutoutA3' as CutoutId,
@@ -224,7 +231,7 @@ describe('AddFixtureModal', () => {
     }
     render(updatedProps)
     screen.getByText('Modules')
-    fireEvent.click(screen.getAllByText('Select options')[1])
+    await user.click(screen.getAllByText('Select options')[1])
     expect(screen.queryByText('Vacuum Module GEN1')).not.toBeInTheDocument()
     screen.getByText('Temperature Module GEN2')
   })

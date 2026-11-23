@@ -1,5 +1,6 @@
 import { createRef } from 'react'
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -29,7 +30,7 @@ vi.mock('react-router-dom', async importOriginal => {
 const render = (props: ComponentProps<typeof LiquidsOverflowMenu>) => {
   return renderWithProviders(<LiquidsOverflowMenu {...props} />, {
     i18nInstance: i18n,
-  })[0]
+  })
 }
 
 describe('LiquidsOverflowMenu', () => {
@@ -55,13 +56,15 @@ describe('LiquidsOverflowMenu', () => {
       },
     })
   })
-  it('renders the overflow buttons with 1 liquid defined', () => {
+
+  it('renders the overflow buttons with 1 liquid defined', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'mockname' }))
+    await user.click(screen.getByRole('button', { name: 'mockname' }))
     expect(props.onClose).toHaveBeenCalled()
     expect(props.showLiquidsModal).toHaveBeenCalled()
     expect(vi.mocked(labwareIngredActions.selectLiquidGroup)).toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('button', { name: 'Define a liquid' }))
+    await user.click(screen.getByRole('button', { name: 'Define a liquid' }))
     expect(props.onClose).toHaveBeenCalled()
     expect(
       vi.mocked(labwareIngredActions.createNewLiquidGroup)
