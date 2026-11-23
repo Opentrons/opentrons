@@ -95,7 +95,7 @@ class RTScanner(AbstractBarcodeScannerDriver):
         await self._enable_code_id(False)
         await self.set_sound_profile(self._sound_profile)
         await self.set_menu_option(illumination_led_enable + bool_conv(True))
-        await self.set_menu_option(aiming_led_enable + bool_conv(True))
+        await self.set_menu_option(aiming_led_enable + bool_conv(False))
         await self._set_scan_terminator(
             b"\x03"
         )  # End of Text non-printable character207
