@@ -1,6 +1,6 @@
 ---
-title: 'Opentrons Flex: Safety and Regulatory Information'
-description: 'Safety symbols, compliance guidelines, and regulatory information for Flex.'
+title: "Opentrons Flex: Safety and Regulatory Information"
+description: "Safety symbols, compliance guidelines, and regulatory information for Flex."
 ---
 
 ## Safety information
@@ -12,13 +12,13 @@ The Opentrons Flex liquid handling robot has been designed for safe operation. R
 Various labels on the Flex and in this manual warn you about sources of
 potential injury or harm.
 
-| Symbol                                                                                                        | Description                                                                                                                                                                         |
-| :------------------------------------------------------------------------------------------------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg 'Warning')                            | **Warning:** Alerts users to <ul><li>Potentially hazardous conditions.</li><li>Actions that may result in personal injury or death.</li></ul>                                       |
-| ![Symbol for caution](images/regulatory-marks/warning-label-caution.svg 'Caution')                            | **Caution:** Cautions users against <ul><li>Damage to the equipment.</li><li>Lost or corrupted data.</li><li>Unrecoverable interruption of the operation being performed.</li></ul> |
-| ![Symbol for electrical shock](images/regulatory-marks/warning-label-electrical-shock.svg 'Electrical shock') | **Electrical shock:** Identifies instrument components that might pose a risk of electrical shock if the instrument is handled improperly.                                          |
-| ![Symbol for hot surface](images/regulatory-marks/warning-label-hot-surface.svg 'Hot surface')                | **Hot surface:** Identifies instrument components that pose a risk of personal injury due to high heat/temperatures if the instrument is handled improperly.                        |
-| ![Symbol for pinch point](images/regulatory-marks/warning-label-pinch-point.svg 'Pinch point')                | **Pinch point:** Identifies instrument components that can pose a risk of personal injury when in motion.                                                                           |
+| Symbol   | Description  |
+| :------- | :----------- |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | **Warning:** Alerts users to <ul><li>Potentially hazardous conditions.</li><li>Actions that may result in personal injury or death.</li></ul>                             |
+| ![Symbol for caution](images/regulatory-marks/warning-label-caution.svg "Caution")  | **Caution:** Cautions users against <ul><li>Damage to the equipment.</li><li>Lost or corrupted data.</li><li>Unrecoverable interruption of the operation being performed.</li></ul> |
+| ![Symbol for electrical shock](images/regulatory-marks/warning-label-electrical-shock.svg "Electrical shock")  | **Electrical shock:** Identifies instrument components that might pose a risk of electrical shock if the instrument is handled improperly.                                |
+| ![Symbol for hot surface](images/regulatory-marks/warning-label-hot-surface.svg "Hot surface")  | **Hot surface:** Identifies instrument components that pose a risk of personal injury due to high heat/temperatures if the instrument is handled improperly.              |
+| ![Symbol for pinch point](images/regulatory-marks/warning-label-pinch-point.svg "Pinch point")  | **Pinch point:** Identifies instrument components that can pose a risk of personal injury when in motion.                                                                  |
 
 You will find the following labels on the Flex:
 
@@ -42,11 +42,11 @@ You will find the following labels on the Flex:
 
 Always observe the following electrical safety warnings:
 
-| Symbol                                                                                                        | Description                                                                                                                                                                                                                                                                                                              |
-| :------------------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg 'Warning')                            | Plug the robot into a grounded, Class 1 circuit. See the [Power Connection section][power-connection] in the System Description chapter.                                                                                                                                                                                 |
-| ![Symbol for electrical shock](images/regulatory-marks/warning-label-electrical-shock.svg 'Electrical shock') | Do not connect (plug in), disconnect (unplug), or use AC power cables if: <ul><li>The cable is frayed or damaged.</li><li>Other attached cables, cords, or receptacles are frayed or damaged.</li></ul> Using damaged power cords can cause an electric shock hazard resulting in serious injury or damage to the robot. |
-| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg 'Warning')                            | Do not replace the AC power cable unless at the direction of Opentrons Support.                                                                                                                                                                                                                                          |
+| Symbol   | Description  |
+| :------- | :----------- |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | Plug the robot into a grounded, Class 1 circuit. See the [Power Connection section][power-connection] in the System Description chapter.                                                                                |
+| ![Symbol for electrical shock](images/regulatory-marks/warning-label-electrical-shock.svg "Electrical shock") | Do not connect (plug in), disconnect (unplug), or use AC power cables if: <ul><li>The cable is frayed or damaged.</li><li>Other attached cables, cords, or receptacles are frayed or damaged.</li></ul> Using damaged power cords can cause an electric shock hazard resulting in serious injury or damage to the robot.                                                           |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | Do not replace the AC power cable unless at the direction of Opentrons Support.                                                                                            |
 
 For more information on electrical requirements, see the [Power Consumption section][power-consumption-flex] of the Installation and Relocation chapter.
 
@@ -54,26 +54,26 @@ For more information on electrical requirements, see the [Power Consumption sect
 
 Always observe the following additional safety warnings:
 
-| Symbol                                                                             | Description                                                                                                                                                                                                                                                                                                                |
-| :--------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg 'Warning') | Opentrons Flex has not been certified for use with explosive or flammable liquids. Do not load plates, tubes, or vials containing explosive or flammable liquids into the robot or otherwise operate the instrument with explosive or flammable liquids in the enclosure.                                                  |
-| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg 'Warning') | Use good laboratory practices and follow the manufacturer's precautions when working with chemicals. Opentrons is not responsible or liable for any damages because of, or as a result of, the use of hazardous chemicals.                                                                                                 |
-| ![Symbol for warning](images/regulatory-marks/warning-label-heavy.png 'Warning')   | The Flex weighs 88.5 kg (195 lbs). As a result, moving or lifting it requires a team with sufficient personnel to ensure safe handling. See the [Relocation section](installation/relocation.md) in the Installation and Relocation chapter.                                                                               |
-| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg 'Warning') | The Flex should be placed on a surface capable of supporting its weight of 88.5 kg (195 lbs) with sufficient surface area to accommodate the robot plus its minimum clearance distance (20 cm/8 in). See the [Installation Requirements section](installation/requirements.md) in the Installation and Relocation chapter. |
-| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg 'Warning') | The Flex can emit vibrations while in operation. Place the robot on a surface that is sturdy, level, and water-resistant with cross-bracing or welded joints. See the [Installation Requirements section](installation/requirements.md) in the Installation and Relocation chapter.                                        |
+| Symbol   | Description  |
+| :------- | :----------- |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | Opentrons Flex has not been certified for use with explosive or flammable liquids. Do not load plates, tubes, or vials containing explosive or flammable liquids into the robot or otherwise operate the instrument with explosive or flammable liquids in the enclosure. |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | Use good laboratory practices and follow the manufacturer's precautions when working with chemicals. Opentrons is not responsible or liable for any damages because of, or as a result of, the use of hazardous chemicals.           |
+| ![Symbol for warning](images/regulatory-marks/warning-label-heavy.png "Warning") | The Flex weighs 88.5 kg (195 lbs). As a result, moving or lifting it requires a team with sufficient personnel to ensure safe handling. See the [Relocation section](installation/relocation.md) in the Installation and Relocation chapter.                                                                        |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | The Flex should be placed on a surface capable of supporting its weight of 88.5 kg (195 lbs) with sufficient surface area to accommodate the robot plus its minimum clearance distance (20 cm/8 in). See the [Installation Requirements section](installation/requirements.md) in the Installation and Relocation chapter. |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | The Flex can emit vibrations while in operation. Place the robot on a surface that is sturdy, level, and water-resistant with cross-bracing or welded joints. See the [Installation Requirements section](installation/requirements.md) in the Installation and Relocation chapter.                |
 
 ### Safety cautions
 
 To help protect the Flex from damage, follow these precautions:
 
-| Symbol                                                                             | Description                                                                                                    |
-| :--------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------- |
-| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg 'Warning') | Use labware that is ANSI/SLAS-compliant or approved by Opentrons. See the [Labware chapter](labware/index.md). |
-| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg 'Warning') | Keep corrosive materials, agents, or otherwise damaging materials away from the robot.                         |
+| Symbol   | Description  |
+| :------- | :----------- |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | Use labware that is ANSI/SLAS-compliant or approved by Opentrons. See the [Labware chapter](labware/index.md). |
+| ![Symbol for warning](images/regulatory-marks/warning-label-caution.svg "Warning") | Keep corrosive materials, agents, or otherwise damaging materials away from the robot.|
 
 ### Biological safety
 
-Treat specimens and reagents containing materials taken from humans as potentially infectious agents. Opentrons recommends using safe laboratory procedures as explained in [_Biosafety in Microbiological and Biomedical Laboratories (BMBL) 6th Edition_](https://www.cdc.gov/labs/bmbl/).
+Treat specimens and reagents containing materials taken from humans as potentially infectious agents. Opentrons recommends using safe laboratory procedures as explained in [*Biosafety in Microbiological and Biomedical Laboratories (BMBL) 6th Edition*](https://www.cdc.gov/labs/bmbl/).
 
 Under normal circumstances, the Flex does not create detectable aerosols from source liquids. However, under certain conditions, it is possible to generate aerosols from source liquids. When operating with biosafety level 2 or greater source liquids, consider taking precautions against aerosol exposure, in accordance with your local regulatory bodies. To minimize the potential risk of aerosol exposure from the robot, ensure that you:
 
@@ -97,18 +97,18 @@ Opentrons Flex complies with all applicable requirements of the following safety
 
 ### Safety
 
-| Rule ID                    | Title                                                                                                                    |
-| :------------------------- | :----------------------------------------------------------------------------------------------------------------------- |
-| **IEC/UL/CSA 61010-1**     | Safety Requirements for Electrical Equipment for Measurement, Control, and Laboratory Use – Part 1: General Requirements |
-| **IEC/UL/CSA 61010-2-051** | Particular requirements for laboratory equipment for mixing and stirring                                                 |
+| Rule ID | Title |
+| :------ | :---- |
+| **IEC/UL/CSA 61010-1** |Safety Requirements for Electrical Equipment for Measurement, Control, and Laboratory Use – Part 1: General Requirements |
+| **IEC/UL/CSA 61010-2-051** | Particular requirements for laboratory equipment for mixing and stirring |
 
 ### Electromagnetic compatibility
 
-| Rule ID                                  | Title                                                                                                                                                  |
-| :--------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **EN/BSI 61326-1**                       | Electrical Equipment for Measurement, Control, and Laboratory Use – EMC Requirements – Part 1: General Requirements                                    |
-| **FCC 47 CFR Part 15 Subpart B Class A** | Unintentional Radiators                                                                                                                                |
-| **IC ICES-003**                          | Spectrum Management and Telecommunications – Interference- Causing Equipment Standard – Information Technology Equipment (Including Digital Apparatus) |
+| Rule ID | Title |
+| :------ | :---- |
+| **EN/BSI 61326-1** | Electrical Equipment for Measurement, Control, and Laboratory Use – EMC Requirements – Part 1: General Requirements |
+| **FCC 47 CFR Part 15 Subpart B Class A** | Unintentional Radiators |
+| **IC ICES-003** | Spectrum Management and Telecommunications – Interference- Causing Equipment Standard – Information Technology Equipment (Including Digital Apparatus) |
 
 ### FCC warnings and notes
 

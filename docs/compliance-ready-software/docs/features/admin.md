@@ -1,5 +1,5 @@
 ---
-title: 'Compliance Ready Software: Administrator settings'
+title: "Compliance Ready Software: Administrator settings"
 description: "An overview of the Flex's compliance-ready setings, and who has permission to update them."
 ---
 
@@ -29,17 +29,17 @@ Administrators can view the settings shown above, like personal account settings
 
 The sections below cover every Compliance Ready Software setting administrators can customize in the Opentrons App or on the Flex touchscreen.
 
-### Personal account settings
+### Personal account settings 
 
 In personal account settings, every user can update their username, legal name, and password. Usernames are restricted to 20 characters on the Flex.
 
-Users can only make changes to their personal account settings, and can't view or customize settings in User Management or Compliance Ready Software settings.
+Users can only make changes to their personal account settings, and can't view or customize settings in User Management or Compliance Ready Software settings. 
 
 Personal account settings are the only settings user accounts will see in Compliance Ready settings. All other settings listed on this page are available only to adminstrator accounts.
 
 ### User management
 
-Administrators can unlock or delete user accounts, reset passwords, or edit user permissions.
+Administrators can unlock or delete user accounts, reset passwords, or edit user permissions. 
 
 <figure class="screenshot" markdown>
   ![Image showing admin controls for user management.](../images/create-account.png)
@@ -55,18 +55,19 @@ All accounts are locked by default after 5 failed login attempts. An administrat
 
 If your lab loses access to all administrator accounts, Opentrons offers a paid on-site [recovery service](../roles.md#account-recovery).
 
+
 ### Compliance Ready Software settings
 
 Administrators can make changes to security, documentation, and storage settings to customize your lab's daily user experience.
 
-| **Setting**          | **Options**                                                                                                                                                                                       |
-| :------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Login attempts**   | <ul><li>Maximum login attempts before the account locks.</li><li>Default: 5.</li></ul>                                                                                                            |
-| **Passwords**        | <ul><li>Time before user passwords must be changed (default: 30 days).</li></li><li>Password complexity, like minimum length (default: 20 characters) or special character requirements</li></ul> |
-| **Screen timeout**   | <ul><li>Time before the Opentrons App or Flex touchscreen lock due to inactivity.</li><li>Default: 3 minutes.</li></ul>                                                                           |
-| **User permissions** | <ul><li>Whether administrator credentials are required to update the Flex, send protocols to the Flex, or sign to complete a protocol run.</li></ul>                                              |
-| **Documentation**    | <ul><li>Whether to require documentation for robot actions, like dropping attached tips or homing the gantry.</li><li>Set minimum character length (default: 20 characters).</li></ul>            |
-| **Files**            | <ul><li>Whether to require protocol logs to be downloaded from the Opentrons App.</li><li>Automatically delete protocol logs when the Flex reaches its storage limit (20 logs).</li></ul>         |
+| **Setting** | **Options** | 
+| :--------|---------------- |
+| **Login attempts** | <ul><li>Maximum login attempts before the account locks.</li><li>Default: 5.</li></ul> |
+| **Passwords** | <ul><li>Time before user passwords must be changed (default: 30 days).</li></li><li>Password complexity, like minimum length (default: 20 characters) or special character requirements</li></ul> |
+| **Screen timeout** | <ul><li>Time before the Opentrons App or Flex touchscreen lock due to inactivity.</li><li>Default: 3 minutes.</li></ul> |
+| **User permissions** | <ul><li>Whether administrator credentials are required to update the Flex, send protocols to the Flex, or sign to complete a protocol run.</li></ul> |
+| **Documentation** | <ul><li>Whether to require documentation for robot actions, like dropping attached tips or homing the gantry.</li><li>Set minimum character length (default: 20 characters).</li></ul> |
+| **Files** | <ul><li>Whether to require protocol logs to be downloaded from the Opentrons App.</li><li>Automatically delete protocol logs when the Flex reaches its storage limit (20 logs).</li></ul> |
 
 ### Audit log folder
 
@@ -80,3 +81,4 @@ If robot settings, like your Flex's name, ever change, you may need to repeat th
   ![Image showing an open keyboard for documentation on the Flex touchscreen.](../images/storage-location.png)
   <figcaption> Set a location on your computer to download files to from the Opentrons App.</figcaption>
 </figure>
+

@@ -1,6 +1,6 @@
 ---
-title: 'Opentrons OT-2: Installing the App'
-description: 'System requirements, download, and installation for the Opentrons OT-2 App on Windows, macOS, or Linux.'
+title: "Opentrons OT-2: Installing the App"
+description: "System requirements, download, and installation for the Opentrons OT-2 App on Windows, macOS, or Linux."
 ---
 
 Start here for step-by-step instructions for downloading, installing, and updating the Opentrons OT-2 App.
@@ -58,7 +58,7 @@ The Ubuntu version of the Opentrons OT-2 App is packaged as an AppImage. To use 
 </div>
 
 !!! note
-Do not use third-party AppImage launchers with the Opentrons App. They may interfere with app updates. Opentrons does not support using third-party launchers to control Opentrons robots.
+    Do not use third-party AppImage launchers with the Opentrons App. They may interfere with app updates. Opentrons does not support using third-party launchers to control Opentrons robots.
 
 ## App software updates
 

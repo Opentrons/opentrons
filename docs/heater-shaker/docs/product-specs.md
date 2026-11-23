@@ -1,6 +1,6 @@
 ---
-title: 'Heater-Shaker Module: Product Specifications'
-description: 'Physical specs, heating and shaking profiles, and included parts.'
+title: "Heater-Shaker Module: Product Specifications"
+description: "Physical specs, heating and shaking profiles, and included parts."
 ---
 
 ![Heater-Shaker with external features labeled](images/hs-with-labels.svg)
@@ -33,7 +33,7 @@ An external AC/DC power unit provides power to the Heater-Shaker. It connects to
 - **Output:** 36 VDC, 6.1 A, 219.6 W
 
 !!!warning
-_Do not_ replace the power supply cable unless at the direction of Opentrons Support.
+    _Do not_ replace the power supply cable unless at the direction of Opentrons Support.
 
 The following table lists power consumption values measured at the wall outlet. Typical power consumption is when the module maintains temperatures and shake speeds within the normal range. Maximum power consumption is when the module simultaneously heats at full power and shakes at maximum speed.
 
@@ -90,7 +90,7 @@ The following table lists power consumption values measured at the wall outlet. 
 </table>
 
 !!!note
-Some labware may recommend a lower rpm.
+    Some labware may recommend a lower rpm.
 
 ## Temperature Profile
 

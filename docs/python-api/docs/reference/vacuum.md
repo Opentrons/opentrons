@@ -1,6 +1,6 @@
 ---
-title: 'Python API Reference: Vacuum Module'
-description: 'Vacuum Module class reference for the Python Protocol API.'
+title: "Python API Reference: Vacuum Module"
+description: "Vacuum Module class reference for the Python Protocol API."
 search:
   exclude: true
 ---
@@ -8,3 +8,4 @@ search:
 ::: opentrons.protocol_api.VacuumModuleContext
     options:
       inherited_members: true
+      

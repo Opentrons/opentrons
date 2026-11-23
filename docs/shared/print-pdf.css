@@ -9,14 +9,14 @@
   margin: 0.75in;
 
   @bottom-right {
-    content: 'Page ' counter(page);
+    content: "Page " counter(page);
     font-size: 10pt;
-    font-family: 'Public Sans', sans-serif;
-    color: #4a4c4e;
+    font-family: "Public Sans", sans-serif;
+    color: #4A4C4E;
     padding-top: 0.25in;
     vertical-align: top;
   }
-
+  
   @top-right {
     content: none;
   }
@@ -36,16 +36,13 @@
   tr {
     break-inside: avoid;
   }
-
+  
   h1 {
     break-before: always;
     page-break-before: always; /* deprecated but the PDF generator needs it */
   }
 
-  h2,
-  h3,
-  h4,
-  h5 {
+  h2, h3, h4, h5 {
     break-after: avoid;
   }
 
@@ -54,18 +51,15 @@
     widows: 3;
     font-size: 11pt;
   }
-
-  .admonition p,
-  .admonition li,
-  th,
-  td {
+  
+  .admonition p, .admonition li, th, td {
     font-size: 11pt;
   }
-
+  
   figure {
     break-inside: avoid;
   }
-
+  
   figure img {
     max-height: 8in;
   }

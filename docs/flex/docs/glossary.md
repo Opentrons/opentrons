@@ -1,9 +1,9 @@
 ---
-title: 'Opentrons Flex: Glossary'
-description: 'Definitions of terms used in the Flex manual and Opentrons products.'
+title: "Opentrons Flex: Glossary"
+description: "Definitions of terms used in the Flex manual and Opentrons products."
 ---
 
-This appendix defines terms related to Opentrons Flex. It omits industry-standard terms like "labware" unless the term has a special meaning in relation to Flex. For example, the definition for _pipette_ describes the narrower meaning that the term has when using Flex, as opposed to any pipette you might find elsewhere in a lab.
+This appendix defines terms related to Opentrons Flex. It omits industry-standard terms like "labware" unless the term has a special meaning in relation to Flex. For example, the definition for *pipette* describes the narrower meaning that the term has when using Flex, as opposed to any pipette you might find elsewhere in a lab.
 
 The glossary is formatted to help you navigate within it and to other places in this manual. Words in italics indicate terms that are also defined in the glossary. Extremely common terms like "deck", "module", "pipette", and "protocol" aren't italicized, to improve readability. Links within definitions take you to the most relevant section that includes additional discussion of the term. And you can always search for every occurrence of a term to find even more information.
 
@@ -13,11 +13,11 @@ Space that is on or above the level of the robot's deck area.
 
 ##### Aluminum block
 
-See [_thermal block_](#thermal-block).
+See [*thermal block*](#thermal-block).
 
 ##### Ambient lighting
 
-LEDs that illuminate the interior of Flex, which you can toggle on and off from the _touchscreen_ or the _Opentrons App_.
+LEDs that illuminate the interior of Flex, which you can toggle on and off from the *touchscreen* or the *Opentrons App*.
 
 ##### Auxiliary ports
 
@@ -29,23 +29,23 @@ The area of the deck behind slot A1. When its cover is removed, the A1 expansion
 
 ##### Below deck
 
-The empty area below the robot's _deck slots_. This space provides clearance for module caddies that sit below the deck and allows for below-deck cable routing.
+The empty area below the robot's *deck slots*. This space provides clearance for module caddies that sit below the deck and allows for below-deck cable routing.
 
 ##### Caddy
 
-See [_module caddy_](#module-caddy).
+See [*module caddy*](#module-caddy).
 
 ##### Calibration pin
 
-A metal pin you attach to the _gripper's jaws_ during gripper calibration. See the [Gripper calibration section][gripper-calibration] in the System Description chapter.
+A metal pin you attach to the *gripper's jaws* during gripper calibration. See the [Gripper calibration section][gripper-calibration] in the System Description chapter.
 
 ##### Calibration probe
 
-A metal collar you attach to the _nozzle_ of a pipette during pipette calibration, module calibration, and _Labware Position Check_. See the [Pipette calibration section][pipette-calibration] in the System Description chapter and the [Module calibration section](modules/calibration.md) in the Modules chapter. See also the [Labware Position Check section](touchscreen/protocol-setup.md#labware-position-check) of the Touchscreen chapter.
+A metal collar you attach to the *nozzle* of a pipette during pipette calibration, module calibration, and *Labware Position Check*. See the [Pipette calibration section][pipette-calibration] in the System Description chapter and the [Module calibration section](modules/calibration.md) in the Modules chapter. See also the [Labware Position Check section](touchscreen/protocol-setup.md#labware-position-check) of the Touchscreen chapter.
 
 ##### Calibration square
 
-The central part of a _removable deck slot_ or _module calibration adapter_. The square is made of steel to reduce the chance of surface damage during calibration.
+The central part of a *removable deck slot* or *module calibration adapter*. The square is made of steel to reduce the chance of surface damage during calibration.
 
 ##### Camera
 
@@ -57,7 +57,7 @@ One of four aluminum handles that screw into the bottom corners of the robot. Th
 
 ##### Carrying handle cap
 
-A flat metal cover that goes over the attachment point for a _carrying handle_. The caps close the handle openings in the _frame_ and give the robot a clean appearance. See the [Robot Components section](system-description/robot.md) in the System Description chapter.
+A flat metal cover that goes over the attachment point for a *carrying handle*. The caps close the handle openings in the *frame* and give the robot a clean appearance. See the [Robot Components section](system-description/robot.md) in the System Description chapter.
 
 ##### Concurrent commands
 
@@ -65,23 +65,23 @@ Module commands that run without waiting for the action to complete, allowing th
 
 ##### Dashboard
 
-The main screen for the robot, accessible by tapping the robot's name in the top left corner of the _touchscreen_. The dashboard gives you quick access to recently run protocols. See the [Dashboard section](touchscreen/dashboard.md) in the Touchscreen chapter.
+The main screen for the robot, accessible by tapping the robot's name in the top left corner of the *touchscreen*. The dashboard gives you quick access to recently run protocols. See the [Dashboard section](touchscreen/dashboard.md) in the Touchscreen chapter.
 
 ##### Deck
 
-The machined aluminum surface on which automated science protocols are executed. It includes the _working area_, _staging area_, and _A1 expansion slot_. See the [Deck and working area section][deck-and-working-area] in the System Description chapter.
+The machined aluminum surface on which automated science protocols are executed. It includes the *working area*, *staging area*, and *A1 expansion slot*. See the [Deck and working area section][deck-and-working-area] in the System Description chapter.
 
 ##### Deck border
 
-The fixed portion of the deck around the four edges of the robot (outside of the area where _deck slot_ panels fit). It contains the removable accessory covers.
+The fixed portion of the deck around the four edges of the robot (outside of the area where *deck slot* panels fit). It contains the removable accessory covers.
 
 ##### Deck configuration
 
-A record of which _deck fixtures_ and modules are installed on the Flex and in which _deck slots_. The robot uses deck configuration to detect conflicts between the hardware setup and protocol requirements. See the [Deck Configuration section](touchscreen/deck-config.md) in the Touchscreen chapter.
+A record of which *deck fixtures* and modules are installed on the Flex and in which *deck slots*. The robot uses deck configuration to detect conflicts between the hardware setup and protocol requirements. See the [Deck Configuration section](touchscreen/deck-config.md) in the Touchscreen chapter.
 
 ##### Deck fixture
 
-Hardware items that replace standard _deck slots_. They let you customize the deck layout and add functionality to your Flex. Deck fixtures include the _staging area slots_, _trash bin_, and _waste chute_.
+Hardware items that replace standard *deck slots*. They let you customize the deck layout and add functionality to your Flex. Deck fixtures include the *staging area slots*, *trash bin*, and *waste chute*.
 
 ##### Deck slot
 
@@ -93,11 +93,11 @@ Records that Flex continuously writes during operation, capturing robot movement
 
 ##### Dynamic pipetting
 
-Simultaneously aspirating or dispensing while moving the pipette tip location. Dynamic pipetting can be combined with _liquid level detection_ to continuously track the meniscus during a liquid transfer. See the [Dynamic pipetting section](protocols/python-api.md#dynamic-pipetting) in the Protocol Development chapter and the [Dynamic mix section](../python-api/building-block-commands/liquids.md#dynamic-mix) in the Python Protocol API documentation.
+Simultaneously aspirating or dispensing while moving the pipette tip location. Dynamic pipetting can be combined with *liquid level detection* to continuously track the meniscus during a liquid transfer. See the [Dynamic pipetting section](protocols/python-api.md#dynamic-pipetting) in the Protocol Development chapter and the [Dynamic mix section](../python-api/building-block-commands/liquids.md#dynamic-mix) in the Python Protocol API documentation.
 
 ##### Ejector
 
-The mechanism that automatically pushes tips off the _nozzle_ of a pipette. See the [Pipettes section](system-description/pipettes.md) in the System Description chapter.
+The mechanism that automatically pushes tips off the *nozzle* of a pipette. See the [Pipettes section](system-description/pipettes.md) in the System Description chapter.
 
 ##### Emergency Stop Pendant
 
@@ -105,19 +105,19 @@ An external accessory that you press to stop the robot immediately. Also referre
 
 ##### Error recovery mode
 
-A feature that pauses a _protocol run_ when certain errors occur and offers options to correct the problem and resume the run, rather than canceling it. See the [Error recovery section](touchscreen/protocol-run.md#error-recovery) in the Touchscreen chapter.
+A feature that pauses a *protocol run* when certain errors occur and offers options to correct the problem and resume the run, rather than canceling it. See the [Error recovery section](touchscreen/protocol-run.md#error-recovery) in the Touchscreen chapter.
 
 ##### Expansion slot
 
-See [_A1 expansion slot_](#a1-expansion-slot).
+See [*A1 expansion slot*](#a1-expansion-slot).
 
 ##### Extension mount
 
-The attachment point on the _gantry_ for the Flex Gripper. See the [Gantry section](system-description/robot.md#gantry) in the System Description chapter.
+The attachment point on the *gantry* for the Flex Gripper. See the [Gantry section](system-description/robot.md#gantry) in the System Description chapter.
 
 ##### Finishing cap
 
-See [_carrying handle cap_](#carrying-handle-cap).
+See [*carrying handle cap*](#carrying-handle-cap).
 
 ##### Firmware
 
@@ -125,7 +125,7 @@ The low-level software that controls the Flex robot and all of its peripheral sy
 
 ##### Fixture
 
-See [_deck fixture_](#deck-fixture).
+See [*deck fixture*](#deck-fixture).
 
 ##### Frame
 
@@ -137,43 +137,43 @@ The hinged clear panel on the front of the robot.
 
 ##### Gantry
 
-The robot's positioning system that moves attached _instruments_ horizontally (on the x- and y-axis). See the [Gantry section](system-description/robot.md#gantry) in the System Description chapter.
+The robot's positioning system that moves attached *instruments* horizontally (on the x- and y-axis). See the [Gantry section](system-description/robot.md#gantry) in the System Description chapter.
 
 ##### Gripper
 
-The Opentrons Flex Gripper, an _instrument_ that picks up labware and moves it around the deck automatically.
+The Opentrons Flex Gripper, an *instrument* that picks up labware and moves it around the deck automatically.
 
 ##### Home gantry
 
-The act of moving the _gantry_ to a defined position at the back right of the _working area_.
+The act of moving the *gantry* to a defined position at the back right of the *working area*.
 
 ##### Instrument
 
-Any component that attaches to the _gantry_ and manipulates liquids or labware on the deck. Examples include the 1- , 8- , and 96-channel pipettes, and the gripper.
+Any component that attaches to the *gantry* and manipulates liquids or labware on the deck. Examples include the 1- , 8- , and 96-channel pipettes, and the gripper.
 
 ##### Instrument mount
 
-Attachment point for an _instrument_. Examples include the _pipette mounts_ and the _extension mount_ for the _gripper_. See the [Gantry section](system-description/robot.md#gantry) in the System Description chapter.
+Attachment point for an *instrument*. Examples include the *pipette mounts* and the *extension mount* for the *gripper*. See the [Gantry section](system-description/robot.md#gantry) in the System Description chapter.
 
 ##### Jaws
 
-The moving pincers of the _gripper_. See the [Gripper specifications section][gripper-specifications] in the System Description chapter.
+The moving pincers of the *gripper*. See the [Gripper specifications section][gripper-specifications] in the System Description chapter.
 
 ##### JSON protocol
 
-A standardized scientific procedure written as a [JavaScript object notation](https://en.wikipedia.org/wiki/JSON) file. Previous versions of the Opentrons _Protocol Designer_ output JSON protocols.
+A standardized scientific procedure written as a [JavaScript object notation](https://en.wikipedia.org/wiki/JSON) file. Previous versions of the Opentrons *Protocol Designer* output JSON protocols.
 
 ##### JSON schema
 
-A set of requirements for the structure and contents of a [JavaScript object notation](https://en.wikipedia.org/wiki/JSON) file. For example, all of the [Opentrons labware definitions](https://github.com/Opentrons/opentrons/tree/edge/shared-data/labware/definitions) are formatted according to a particular JSON schema, while _JSON protocols_ follow another schema.
+A set of requirements for the structure and contents of a [JavaScript object notation](https://en.wikipedia.org/wiki/JSON) file. For example, all of the [Opentrons labware definitions](https://github.com/Opentrons/opentrons/tree/edge/shared-data/labware/definitions) are formatted according to a particular JSON schema, while *JSON protocols* follow another schema.
 
 ##### Labware clips
 
-The plastic pieces at the corners of _deck slots_. Labware clips hold labware in place.
+The plastic pieces at the corners of *deck slots*. Labware clips hold labware in place.
 
 ##### Labware Creator
 
-The [Opentrons Labware Creator](https://labware.opentrons.com/create/) is a no-code, web-based tool that uses a graphical interface to help you create a labware definition file to import into the _Opentrons App_. After importing it, your custom labware is available to the Flex robot and the _Python Protocol API_.
+The [Opentrons Labware Creator](https://labware.opentrons.com/create/) is a no-code, web-based tool that uses a graphical interface to help you create a labware definition file to import into the *Opentrons App*. After importing it, your custom labware is available to the Flex robot and the *Python Protocol API*.
 
 ##### Labware Library
 
@@ -181,7 +181,7 @@ The [Opentrons Labware Library](https://labware.opentrons.com/) lists the durabl
 
 ##### Labware offset
 
-Positional data that is created and stored by running _Labware Position Check_. Flex takes these offsets into account when moving to a particular type of labware in a particular _deck slot_.
+Positional data that is created and stored by running *Labware Position Check*. Flex takes these offsets into account when moving to a particular type of labware in a particular *deck slot*.
 
 ##### Labware Position Check
 
@@ -189,11 +189,11 @@ A guided process to visually check and adjust pipette movement relative to a pie
 
 ##### Lift handles
 
-See [_carrying handles_](#carrying-handle).
+See [*carrying handles*](#carrying-handle).
 
 ##### Lights
 
-See [_ambient lighting_](#ambient-lighting) or [_status light_](#status-light).
+See [*ambient lighting*](#ambient-lighting) or [*status light*](#status-light).
 
 ##### Liquid class
 
@@ -205,11 +205,11 @@ The ability of Flex pipette sensors to detect the presence or absence of liquid 
 
 ##### Maintenance position
 
-A specific _gantry_ position at the front left side of the _working area_. The gantry moves to this position to facilitate adding or removing _instruments_.
+A specific *gantry* position at the front left side of the *working area*. The gantry moves to this position to facilitate adding or removing *instruments*.
 
 ##### Module
 
-A peripheral that occupies a _deck slot_. Most modules are controlled by the robot via a USB connection. The Heater-Shaker, Temperature Module, and Thermocycler are all powered modules. The Magnetic Block is an unpowered module. See the [Modules chapter](modules/index.md).
+A peripheral that occupies a *deck slot*. Most modules are controlled by the robot via a USB connection. The Heater-Shaker, Temperature Module, and Thermocycler are all powered modules. The Magnetic Block is an unpowered module. See the [Modules chapter](modules/index.md).
 
 ##### Module caddy
 
@@ -221,11 +221,11 @@ An adapter that sits on top of a module and is used to automatically calibrate m
 
 ##### Mounting plate
 
-See [_96-channel mounting plate_](#96-channel-mounting-plate).
+See [*96-channel mounting plate*](#96-channel-mounting-plate).
 
 ##### Movable trash
 
-See [_trash bin_](#trash-bin).
+See [*trash bin*](#trash-bin).
 
 ##### Nozzle
 
@@ -241,7 +241,7 @@ Software used to control a Flex (or other Opentrons robots) from a laptop or des
 
 ##### Paddle
 
-Part of the _gripper_ that grasps and holds labware. Paddles are replaceable wear items. See the [Gripper specifications section][gripper-specifications] in the System Description chapter.
+Part of the *gripper* that grasps and holds labware. Paddles are replaceable wear items. See the [Gripper specifications section][gripper-specifications] in the System Description chapter.
 
 ##### Partial tip pickup
 
@@ -249,27 +249,27 @@ A pipette configuration in which only some nozzles of a multi-channel pipette pi
 
 ##### Pinned protocol
 
-Protocols you have saved for easy access at the top of the All Protocols tab on the _touchscreen_. See the [Protocol management section](touchscreen/protocol-management.md) in the Touchscreen chapter.
+Protocols you have saved for easy access at the top of the All Protocols tab on the *touchscreen*. See the [Protocol management section](touchscreen/protocol-management.md) in the Touchscreen chapter.
 
 ##### Pipette
 
-[Opentrons Flex Pipettes](https://opentrons.com/products/categories/pipettes) are configurable devices used to move liquids throughout the _working area_ during the execution of protocols. There are several Flex pipettes, which can handle volumes from 1 µL to 1000 µL in 1, 8, or 96 channels. See the [Pipettes section](system-description/pipettes.md) in the System Description chapter.
+[Opentrons Flex Pipettes](https://opentrons.com/products/categories/pipettes) are configurable devices used to move liquids throughout the *working area* during the execution of protocols. There are several Flex pipettes, which can handle volumes from 1 µL to 1000 µL in 1, 8, or 96 channels. See the [Pipettes section](system-description/pipettes.md) in the System Description chapter.
 
 ##### Pipette mount
 
-The attachment point on the _gantry_ for a pipette. See the [Gantry section](system-description/robot.md#gantry) in the System Description chapter.
+The attachment point on the *gantry* for a pipette. See the [Gantry section](system-description/robot.md#gantry) in the System Description chapter.
 
 ##### Profile
 
-See [_Thermocycler profile_](#thermocycler-profile).
+See [*Thermocycler profile*](#thermocycler-profile).
 
 ##### Protocol
 
-An automated task or procedure you program to run on Opentrons robots, including Opentrons Flex. You can also search for, download, and use ready-made protocols from the Opentrons _Protocol Library_.
+An automated task or procedure you program to run on Opentrons robots, including Opentrons Flex. You can also search for, download, and use ready-made protocols from the Opentrons *Protocol Library*.
 
 ##### Protocol Designer
 
-A web-based, no-code tool for developing _protocols_ that run on Opentrons robots, including Opentrons Flex. See the [Protocol Designer section](protocols/designer.md) in the Protocol Development chapter and <https://designer.opentrons.com>.
+A web-based, no-code tool for developing *protocols* that run on Opentrons robots, including Opentrons Flex. See the [Protocol Designer section](protocols/designer.md) in the Protocol Development chapter and <https://designer.opentrons.com>.
 
 ##### Protocol Library
 
@@ -285,7 +285,7 @@ An Opentrons App feature that animates the steps of a Flex protocol, showing cha
 
 ##### Python protocol
 
-A protocol script written using the Opentrons _Python Protocol API_. See the [Writing and running scripts section][writing-and-running-scripts] in the Protocol Development chapter.
+A protocol script written using the Opentrons *Python Protocol API*. See the [Writing and running scripts section][writing-and-running-scripts] in the Protocol Development chapter.
 
 ##### Python Protocol API
 
@@ -293,19 +293,19 @@ A Python package that exposes a wide range of liquid handling features on Opentr
 
 ##### Quick transfer
 
-A touchscreen-only feature that lets you create, save, and run a simple liquid transfer without writing a protocol or connecting to a computer. Quick transfers support all attached pipettes, most labware in the _Labware Library_, and Opentrons-verified _liquid classes_. See the [Quick Transfer section](touchscreen/quick-transfer.md) in the Touchscreen chapter.
+A touchscreen-only feature that lets you create, save, and run a simple liquid transfer without writing a protocol or connecting to a computer. Quick transfers support all attached pipettes, most labware in the *Labware Library*, and Opentrons-verified *liquid classes*. See the [Quick Transfer section](touchscreen/quick-transfer.md) in the Touchscreen chapter.
 
 ##### Removable deck slot
 
-See [_deck slot_](#deck-slot).
+See [*deck slot*](#deck-slot).
 
 ##### Run
 
-See [_protocol run_](#protocol-run).
+See [*protocol run*](#protocol-run).
 
 ##### Runtime parameter
 
-A user-defined variable in a _Python protocol_ that can be set or changed at run setup without editing the protocol file. Runtime parameters can hold Boolean, numeric, string, or CSV file values. See the [Runtime Parameters chapter](../python-api/runtime-parameters/index.md) in the Python Protocol API documentation for how to define parameters. See also the [Runtime Parameters section](touchscreen/protocol-setup.md#runtime-parameters) in the Touchscreen chapter for how to change parameter values during run setup.
+A user-defined variable in a *Python protocol* that can be set or changed at run setup without editing the protocol file. Runtime parameters can hold Boolean, numeric, string, or CSV file values. See the [Runtime Parameters chapter](../python-api/runtime-parameters/index.md) in the Python Protocol API documentation for how to define parameters. See also the [Runtime Parameters section](touchscreen/protocol-setup.md#runtime-parameters) in the Touchscreen chapter for how to change parameter values during run setup.
 
 ##### Side covers
 
@@ -317,11 +317,11 @@ Fixed clear panels on the right and left sides of the robot.
 
 ##### Staging area
 
-The right-hand side of the _deck_ (column 4), which is only accessible by the _gripper_. This area requires special _staging area slots_ for use. See the [Staging Area section](system-description/robot.md#staging-area) in the System Description chapter.
+The right-hand side of the *deck* (column 4), which is only accessible by the *gripper*. This area requires special *staging area slots* for use. See the [Staging Area section](system-description/robot.md#staging-area) in the System Description chapter.
 
 ##### Staging area slot
 
-Staging area slots are ANSI/SLAS compatible deck pieces that replace the standard slots in column 3 (A3 to D3) and extend a new slot into the _staging area_. You can install a single slot or a maximum of four slots to create a new column (A4 to D4) along the right side of the _deck_. See the [Staging Area Slots section](system-description/robot.md#staging-area-slots) in the System Description chapter.
+Staging area slots are ANSI/SLAS compatible deck pieces that replace the standard slots in column 3 (A3 to D3) and extend a new slot into the *staging area*. You can install a single slot or a maximum of four slots to create a new column (A4 to D4) along the right side of the *deck*. See the [Staging Area Slots section](system-description/robot.md#staging-area-slots) in the System Description chapter.
 
 ##### Status light
 
@@ -361,11 +361,11 @@ A box that contains tools, fasteners, and spare parts. Every Flex robot ships wi
 
 ##### Visualization
 
-See [_protocol visualization_](#protocol-visualization).
+See [*protocol visualization*](#protocol-visualization).
 
 ##### Waste chute
 
-A _deck fixture_ that transfers liquids, tips, tip racks, and well plates from the Flex enclosure to a trash receptacle placed below its external opening.
+A *deck fixture* that transfers liquids, tips, tip racks, and well plates from the Flex enclosure to a trash receptacle placed below its external opening.
 
 ##### Working area
 
@@ -377,8 +377,9 @@ Opentrons Flex workstations include the Flex robot, instruments, modules, access
 
 ##### Z-axis carriage
 
-The _gantry_ component that includes the _pipette mounts_ and the _extension mount_ for the _gripper_. It moves these _instruments_ along the z-axis (up and down) to locate them precisely during protocol execution. See the [Gantry section](system-description/robot.md#gantry) in the System Description chapter.
+The *gantry* component that includes the *pipette mounts* and the *extension mount* for the *gripper*. It moves these *instruments* along the z-axis (up and down) to locate them precisely during protocol execution. See the [Gantry section](system-description/robot.md#gantry) in the System Description chapter.
 
 ##### 96-channel mounting plate
 
-A metal frame that mounts to the _z-axis carriage_. It holds the 96-channel pipette to the _gantry_.
+A metal frame that mounts to the *z-axis carriage*. It holds the 96-channel pipette to the *gantry*.
+

@@ -1,6 +1,6 @@
 ---
-title: 'Opentrons Flex: Module Caddy System'
-description: 'Caddies for deck-mounting modules and below-deck cable routing on Flex.'
+title: "Opentrons Flex: Module Caddy System"
+description: "Caddies for deck-mounting modules and below-deck cable routing on Flex."
 ---
 
 Compatible modules are designed to fit into caddies that occupy space below the deck. This system allows labware on top of modules to remain closer to the deck surface, and it also allows for below-deck cable routing so the deck stays tidy during your protocol runs.
@@ -29,7 +29,7 @@ In general, to install a module caddy:
 For exact installation instructions, consult the Quickstart Guide or Instruction Manual for the specific module. Cable connections and method of attachment to the caddy vary by module.
 
 !!!warning
-The Heater-Shaker Module and Temperature Module have asymmetrical 4-pin DIN power connectors. When connecting the power cable:
+    The Heater-Shaker Module and Temperature Module have asymmetrical 4-pin DIN power connectors. When connecting the power cable:
 
     * Align the connector's flat side with the flat side of the module's power port.
     * Connect the cable to the module first, before plugging it in to a wall outlet.

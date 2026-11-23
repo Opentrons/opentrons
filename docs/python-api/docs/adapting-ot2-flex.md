@@ -1,6 +1,6 @@
 ---
-title: 'Python API: Adapting from OT-2 to Flex'
-description: 'Port OT-2 protocols to Flex; deck slots, pipettes, and API differences.'
+title: "Python API: Adapting from OT-2 to Flex"
+description: "Port OT-2 protocols to Flex; deck slots, pipettes, and API differences."
 ---
 
 Python protocols designed to run on the OT-2 can't be directly run on Flex without some modifications. This page describes the minimal steps that you need to take to get OT-2 protocols analyzing and running on Flex.
@@ -14,13 +14,13 @@ Examples on this page are in tabs so you can quickly move back and forth to see 
 Flex requires you to specify an `apiLevel` of 2.15 or higher. If your OT-2 protocol specified `apiLevel` in the `metadata` dictionary, it's best to move it to the `requirements` dictionary. You can't specify it in both places, or the API will raise an error.
 
 !!! note
-Consult the [list of changes in API versions][changes-in-api-versions] to see what effect raising the `apiLevel` will have. If you increased it by multiple minor versions to get your protocol running on Flex, make sure that your protocol isn't using removed commands or commands whose behavior has changed in a way that may affect your scientific results.
+    Consult the [list of changes in API versions][changes-in-api-versions] to see what effect raising the `apiLevel` will have. If you increased it by multiple minor versions to get your protocol running on Flex, make sure that your protocol isn't using removed commands or commands whose behavior has changed in a way that may affect your scientific results.
 
 You also need to specify `"robotType": "Flex"`. If you omit `robotType` in the `requirements` dictionary, the API will assume the protocol is designed for the OT-2.
 
 === "Original OT-2 code"
     ```python
-from opentrons import protocol_api
+    from opentrons import protocol_api
 
     metadata = {
         "protocolName": "My Protocol",
@@ -31,7 +31,7 @@ from opentrons import protocol_api
 
 === "Updated Flex code"
     ```python
-from opentrons import protocol_api
+    from opentrons import protocol_api
 
     metadata = {
         "protocolName": "My Protocol",
@@ -46,27 +46,27 @@ from opentrons import protocol_api
 Flex uses different types of pipettes and tip racks than OT-2, which have their own load names in the API. If possible, load Flex pipettes of the same capacity or larger than the OT-2 pipettes. See the [list of pipette API load names](pipettes/loading.md#api-load-names) for the valid values of `instrument_name` in Flex protocols. And check [Labware Library](https://labware.opentrons.com) or the Opentrons App for the load names of Flex tip racks.
 
 !!! note
-If you use smaller capacity tips than in the OT-2 protocol, you may need to make further adjustments to avoid running out of tips. Also, the protocol may have more steps and take longer to execute.
+    If you use smaller capacity tips than in the OT-2 protocol, you may need to make further adjustments to avoid running out of tips. Also, the protocol may have more steps and take longer to execute.
 
 This example converts OT-2 code that uses a P300 Single-Channel GEN2 pipette and 300 µL tips to Flex code that uses a Flex 1-Channel 1000 µL pipette and 1000 µL tips.
 
 === "Original OT-2 code"
-`python
+    ```python
     def run(protocol: protocol_api.ProtocolContext):
         tips = protocol.load_labware("opentrons_96_tiprack_300ul", 1)
         left_pipette = protocol.load_instrument(
             "p300_single_gen2", "left", tip_racks=[tips]
         )
-    `
+    ```
 
 === "Updated Flex code"
-`python
+    ```python
     def run(protocol: protocol_api.ProtocolContext):
         tips = protocol.load_labware("opentrons_flex_96_tiprack_1000ul", "D1")
         left_pipette = protocol.load_instrument(
             "flex_1channel_1000", "left", tip_racks=[tips]
         )
-    `
+    ```
 
 ## Trash container
 
@@ -97,9 +97,9 @@ This simplified example, taken from a DNA extraction protocol, shows how using t
 
 === "Original OT-2 code"
     ```python
-hs_mod.set_and_wait_for_shake_speed(2000)
-protocol.delay(minutes=5)
-hs_mod.deactivate_shaker()
+    hs_mod.set_and_wait_for_shake_speed(2000)
+    protocol.delay(minutes=5)
+    hs_mod.deactivate_shaker()
 
     for i in sample_plate.wells():
         # mix, transfer, and blow-out all samples
@@ -122,9 +122,9 @@ hs_mod.deactivate_shaker()
 
 === "Updated Flex code"
     ```python
-hs_mod.set_and_wait_for_shake_speed(2000)
-protocol.delay(minutes=5)
-hs_mod.deactivate_shaker()
+    hs_mod.set_and_wait_for_shake_speed(2000)
+    protocol.delay(minutes=5)
+    hs_mod.deactivate_shaker()
 
     # move entire plate
     # no pipetting from Heater-Shaker needed

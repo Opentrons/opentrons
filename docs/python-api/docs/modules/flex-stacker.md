@@ -1,5 +1,5 @@
 ---
-Title: 'Python API: Flex Stacker'
+Title: "Python API: Flex Stacker"
 description: How to use the Flex Stacker Module in a Python protocol.
 ---
 
@@ -28,7 +28,7 @@ In this example, Stacker shuttles are loaded in deck slots A4 and C4.
 
 Fixtures and modules that are placed below the Flex deck can't be loaded in column 3 when a Stacker is loaded in the same row. For the example above, you wouldn't be able to load a trash bin in slots A3 or C3. Instead, load your trash bin in a column 1 slot.
 
-_New in version 2.25_
+*New in version 2.25*
 
 ## Adding labware to the Stacker
 
@@ -99,7 +99,7 @@ stacker_2.store()
 After placing labware on the shuttle in slot C3, `stacker_2` stores another well plate on the bottom of the stack.
 
 !!! note
-You can store empty tip racks you'd like to reuse in a Stacker during your protocol, but each tip rack needs a lid to properly stack together.
+    You can store empty tip racks you'd like to reuse in a Stacker during your protocol, but each tip rack needs a lid to properly stack together. 
 
 You can use [`fill()`][opentrons.protocol_api.FlexStackerContext.fill] to fill the Stacker with as many of its configured labware as it can store. Alternatively, use [`empty()`][opentrons.protocol_api.FlexStackerContext.empty] to remove all labware from the Stacker:
 

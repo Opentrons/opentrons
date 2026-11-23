@@ -1,6 +1,6 @@
 ---
-title: 'Python API: Using Runtime Parameters'
-description: 'Read and use runtime parameter values inside your protocol.'
+title: "Python API: Using Runtime Parameters"
+description: "Read and use runtime parameter values inside your protocol."
 ---
 
 Once you've [defined parameters](defining.md), their values are accessible anywhere within the `run()` function of your protocol.
@@ -53,13 +53,13 @@ parsed_csv[1][2]                # second row, third column
 [row[1] for row in parsed_csv]  # second column
 ```
 
-_New in version 2.20._
+*New in version 2.20.*
 
 Like all Python lists, the lists representing your CSVs are zero-indexed.
 
 !!! tip
-CSV parameters don't have default values. Accessing CSV data in any of the above ways will prevent protocol analysis from completing until you select a CSV file and confirm all runtime parameter values during run setup.
-
+    CSV parameters don't have default values. Accessing CSV data in any of the above ways will prevent protocol analysis from completing until you select a CSV file and confirm all runtime parameter values during run setup.
+    
     You can use a try–except block to work around this and provide the data needed for protocol analysis. First, add `from opentrons.protocol_api import RuntimeParameterRequiredError` at the top of your protocol. Then catch the error like this:
     ```python
     try:
@@ -76,18 +76,18 @@ CSV parameters don't have default values. Accessing CSV data in any of the above
 
 Since `params` is only available within the `run()` function, there are certain aspects of a protocol that parameter values can't affect. These include, but are not limited to:
 
-| Information                     | Location                             |
-| ------------------------------- | ------------------------------------ |
-| `import` statements             | At the beginning of the protocol.    |
-| Robot type (Flex or OT-2)       | In the `requirements` dictionary.    |
-| API version                     | In the `requirements` or `metadata`. |
-| Protocol name                   | In the `metadata` dictionary.        |
-| Protocol description            | In the `metadata` dictionary.        |
-| Protocol author                 | In the `metadata` dictionary.        |
-| Other runtime parameters        | In the `add_parameters()` function.  |
-| Non-nested function definitions | Anywhere outside of `run()`.         |
+| Information                | Location                              |
+|----------------------------|---------------------------------------|
+| `import` statements        | At the beginning of the protocol.      |
+| Robot type (Flex or OT-2)  | In the `requirements` dictionary.      |
+| API version                | In the `requirements` or `metadata`.   |
+| Protocol name              | In the `metadata` dictionary.          |
+| Protocol description       | In the `metadata` dictionary.          |
+| Protocol author            | In the `metadata` dictionary.          |
+| Other runtime parameters   | In the `add_parameters()` function.    |
+| Non-nested function definitions   | Anywhere outside of `run()`.           |
 
-Additionally, keep in mind that updated parameter values are applied by reanalyzing the protocol. This means you can't depend on updated values for any action that takes place _prior to reanalysis_.
+Additionally, keep in mind that updated parameter values are applied by reanalyzing the protocol. This means you can't depend on updated values for any action that takes place *prior to reanalysis*.
 
 An example of such an action is applying labware offset data. Say you have a parameter that changes the type of well plate you load in a particular slot:
 
@@ -108,5 +108,4 @@ plate = protocol.load_labware(
     load_name=protocol.params.plate_type, location="D2"
 )
 ```
-
 When performing run setup, you're prompted to apply offsets before selecting parameter values. This is your only opportunity to apply offsets, so they're applied for the default parameter values — in this case, the Corning plate. If you then change the "Well plate type" parameter to the NEST plate, the NEST plate will have default offset values (0.0 on all axes). You can fix this by running Labware Position Check, since it takes place after reanalysis, or by using [`Labware.set_offset()`][opentrons.protocol_api.Labware.set_offset] in your protocol.

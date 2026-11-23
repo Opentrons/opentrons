@@ -1,6 +1,6 @@
 ---
-title: 'Python API: Loading Pipettes'
-description: 'Load single-channel, 8-channel, and 96-channel pipettes in protocols.'
+title: "Python API: Loading Pipettes"
+description: "Load single-channel, 8-channel, and 96-channel pipettes in protocols."
 ---
 
 When writing a protocol, you must inform the Protocol API about the pipettes you will be using on your robot. The [`ProtocolContext.load_instrument()`][opentrons.protocol_api.ProtocolContext.load_instrument] function provides this information and returns an [`InstrumentContext`][opentrons.protocol_api.InstrumentContext] object.
@@ -11,12 +11,84 @@ As noted above, you call the [`load_instrument()`][opentrons.protocol_api.Protoc
 
 The pipette's API load name (`instrument_name`) is the first parameter of the `load_instrument()` method. It tells your robot which attached pipette you're going to use in a protocol. The tables below list the API load names for the currently available Flex and OT-2 pipettes.
 
-=== "Flex Pipettes" <table> <thead> <tr> <th>Pipette Model</th> <th>Volume (µL)</th> <th>API Load Name</th> </tr> </thead> <tbody> <tr> <td rowspan="2">Flex 1-Channel Pipette</td> <td>1–50</td> <td><code>flex_1channel_50</code></td> </tr> <tr> <td>5–1000</td> <td><code>flex_1channel_1000</code></td> </tr> <tr> <td rowspan="2">Flex 8-Channel Pipette</td> <td>1–50</td> <td><code>flex_8channel_50</code></td> </tr> <tr> <td>5–1000</td> <td><code>flex_8channel_1000</code></td> </tr> <tr> <td rowspan="2">Flex 96-Channel Pipette</td> <td>1-200</td> <td><code>flex_96channel_200</code></td> </tr> <tr> <td>5–1000</td> <td><code>flex_96channel_1000</code></td> </tr> </tbody> </table>
-=== "OT-2 Pipettes" <table> <thead> <tr> <th>Pipette Model</th> <th>Volume (µL)</th> <th>API Load Name</th> </tr> </thead> <tbody> <tr> <td>P20 Single-Channel GEN2</td> <td rowspan="2">1-20</td> <td><code>p20_single_gen2</code></td> </tr> <tr> <td>P20 Multi-Channel GEN2</td> <td><code>p20_multi_gen2</code></td> </tr> <tr> <td>P300 Single-Channel GEN2</td> <td rowspan="2">20-300</td> <td><code>p300_single_gen2</code></td> </tr> <tr> <td>P300 Multi-Channel GEN2</td> <td><code>p300_multi_gen2</code></td> </tr> <tr> <td>P1000 Single-Channel GEN2</td> <td>100-1000</td> <td><code>p1000_single_gen2</code></td> </tr> </tbody> </table>
+=== "Flex Pipettes"
+    <table>
+        <thead>
+            <tr>
+                <th>Pipette Model</th>
+                <th>Volume (µL)</th>
+                <th>API Load Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td rowspan="2">Flex 1-Channel Pipette</td>
+                <td>1–50</td>
+                <td><code>flex_1channel_50</code></td>
+            </tr>
+            <tr>
+                <td>5–1000</td>
+                <td><code>flex_1channel_1000</code></td>
+            </tr>
+            <tr>
+                <td rowspan="2">Flex 8-Channel Pipette</td>
+                <td>1–50</td>
+                <td><code>flex_8channel_50</code></td>
+            </tr>
+            <tr>
+                <td>5–1000</td>
+                <td><code>flex_8channel_1000</code></td>
+            </tr>
+            <tr>
+                <td rowspan="2">Flex 96-Channel Pipette</td>
+                <td>1-200</td>
+                <td><code>flex_96channel_200</code></td>
+            </tr>
+            <tr>
+                <td>5–1000</td>
+                <td><code>flex_96channel_1000</code></td>
+            </tr>
+        </tbody>
+    </table>
+=== "OT-2 Pipettes"
+    <table>
+        <thead>
+            <tr>
+                <th>Pipette Model</th>
+                <th>Volume (µL)</th>
+                <th>API Load Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>P20 Single-Channel GEN2</td>
+                <td rowspan="2">1-20</td>
+                <td><code>p20_single_gen2</code></td>
+            </tr>
+            <tr>
+                <td>P20 Multi-Channel GEN2</td>
+                <td><code>p20_multi_gen2</code></td>
+            </tr>
+            <tr>
+                <td>P300 Single-Channel GEN2</td>
+                <td rowspan="2">20-300</td>
+                <td><code>p300_single_gen2</code></td>
+            </tr>
+            <tr>
+                <td>P300 Multi-Channel GEN2</td>
+                <td><code>p300_multi_gen2</code></td>
+            </tr>
+            <tr>
+                <td>P1000 Single-Channel GEN2</td>
+                <td>100-1000</td>
+                <td><code>p1000_single_gen2</code></td>
+            </tr>
+        </tbody>
+    </table>
 
     See the [OT-2 Pipette Generations](characteristics.md#ot-2-pipette-generations) section if you're using GEN1 pipettes on an OT-2. The GEN1 family includes the P10, P50, and P300 single- and multi-channel pipettes, along with the P1000 single-channel model.
 
-Use the [tip–pipette compatibility](loading.md#tip-pipette-compatibility) section below to choose compatible pipette tips.
+Use the [tip–pipette compatibility](loading.md#tip-pipette-compatibility) section below to choose compatible pipette tips. 
 
 ## Loading Flex 1- and 8-Channel Pipettes
 
@@ -46,7 +118,7 @@ If you're writing a protocol that uses the Flex Gripper, you might think that th
 
 ## Loading a Flex 96-Channel Pipette
 
-This code sample loads the Flex 96-Channel Pipette. Because of its size, the Flex 96-Channel Pipette requires the left _and_ right pipette mounts. You cannot use this pipette with 1- or 8-Channel Pipette in the same protocol or when these instruments are attached to the robot. Load the 96-channel pipette as follows:
+This code sample loads the Flex 96-Channel Pipette. Because of its size, the Flex 96-Channel Pipette requires the left *and* right pipette mounts. You cannot use this pipette with 1- or 8-Channel Pipette in the same protocol or when these instruments are attached to the robot. Load the 96-channel pipette as follows:
 
 ```python
 def run(protocol: protocol_api.ProtocolContext):
@@ -54,12 +126,11 @@ def run(protocol: protocol_api.ProtocolContext):
         instrument_name="flex_96channel_1000"
     )
 ```
-
 In protocols specifying API version 2.15, also include `mount="left"` as a parameter of `load_instrument()`.
 
-_New in version 2.15_
+*New in version 2.15*
 
-_Changed in version 2.16:_ The `mount` parameter is optional.
+*Changed in version 2.16:* The `mount` parameter is optional.
 
 ## Loading OT-2 pipettes
 
@@ -85,14 +156,14 @@ def run(protocol: protocol_api.ProtocolContext):
         tip_racks=[tiprack1])
 ```
 
-_New in version 2.0_
+*New in version 2.0*
 
 ## Adding tip racks
 
 The `load_instrument()` method includes the optional argument `tip_racks`. This parameter accepts a list of tip rack labware objects, which lets you to specify as many tip racks as you want. You can also edit a pipette's tip racks after loading it by setting its [`InstrumentContext.tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks] property.
 
 !!! note
-Some methods, like [`configure_nozzle_layout()`][opentrons.protocol_api.InstrumentContext.configure_nozzle_layout], reset a pipette's tip racks. See [Partial Tip Pickup](partial-tip-pickup.md) for more information.
+    Some methods, like [`configure_nozzle_layout()`][opentrons.protocol_api.InstrumentContext.configure_nozzle_layout], reset a pipette's tip racks. See [Partial Tip Pickup](partial-tip-pickup.md) for more information.
 
 The advantage of using `tip_racks` is twofold. First, associating tip racks with your pipette allows for automatic tip tracking throughout your protocol. Second, it removes the need to specify tip locations in the [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip] method. For example, let's start by loading some labware and instruments like this:
 
@@ -142,23 +213,25 @@ right_pipette.pick_up_tip()  # picks up from A3
 right_pipette.drop_tip()
 ```
 
-_New in version 2.0_
+*New in version 2.0*
 
 See also [Building Block Commands](../building-block-commands/index.md) and [Complex Commands](../complex-commands/index.md).
 
 ### Tip-pipette compatibility
 
-Flex pipettes only accept tips with capacities less than or equal to the pipette capacity.
+Flex pipettes only accept tips with capacities less than or equal to the pipette capacity. 
 
-| Pipette capacity {width="17%"} | Pipettes {width="31%"}                                                                                                             | Compatible tips                                                                                                                                                                                                                                                                                                                                           |
-| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1–50 µL                        | <ul><li><code>flex_1channel_50</code></li><li><code>flex_8channel_50</code></li></ul>                                              | <ul><li><code>opentrons_flex_96_tiprack_20ul</code></li><li><code>opentrons_flex_96_filtertiprack_20ul</code></li><li><code>opentrons_flex_96_tiprack_50ul</code></li><li><code>opentrons_flex_96_filtertiprack_50ul</code></li></ul>                                                                                                                     |
-| 1–200 µL                       | <ul><li><code>flex_96channel_200</code></li></ul>                                                                                  | <ul><li><code>opentrons_flex_96_tiprack_20ul</code></li><li><code>opentrons_flex_96_filtertiprack_20ul</code></li><li><code>opentrons_flex_96_tiprack_50ul</code></li><li><code>opentrons_flex_96_filtertiprack_50ul</code></li><li><code>opentrons_flex_96_tiprack_200ul</code></li><li><code>opentrons_flex_96_filtertiprack_200ul</code></li></ul>     |
-| 5–1000 µL                      | <ul><li><code>flex_1channel_1000</code></li><li><code>flex_8channel_1000</code></li><li><code>flex_96channel_1000</code></li></ul> | <ul><li><code>opentrons_flex_96_tiprack_50ul</code></li><li><code>opentrons_flex_96_filtertiprack_50ul</code></li><li><code>opentrons_flex_96_tiprack_200ul</code></li><li><code>opentrons_flex_96_filtertiprack_200ul</code></li><li><code>opentrons_flex_96_tiprack_1000ul</code></li><li><code>opentrons_flex_96_filtertiprack_1000ul</code></li></ul> |
+| Pipette capacity {width="17%"}| Pipettes {width="31%"} | Compatible tips |
+|--------------|--------------|-----------------------------|
+| 1–50 µL    | <ul><li><code>flex_1channel_50</code></li><li><code>flex_8channel_50</code></li></ul> | <ul><li><code>opentrons_flex_96_tiprack_20ul</code></li><li><code>opentrons_flex_96_filtertiprack_20ul</code></li><li><code>opentrons_flex_96_tiprack_50ul</code></li><li><code>opentrons_flex_96_filtertiprack_50ul</code></li></ul> |
+| 1–200 µL | <ul><li><code>flex_96channel_200</code></li></ul> |<ul><li><code>opentrons_flex_96_tiprack_20ul</code></li><li><code>opentrons_flex_96_filtertiprack_20ul</code></li><li><code>opentrons_flex_96_tiprack_50ul</code></li><li><code>opentrons_flex_96_filtertiprack_50ul</code></li><li><code>opentrons_flex_96_tiprack_200ul</code></li><li><code>opentrons_flex_96_filtertiprack_200ul</code></li></ul> |
+| 5–1000 µL | <ul><li><code>flex_1channel_1000</code></li><li><code>flex_8channel_1000</code></li><li><code>flex_96channel_1000</code></li></ul> | <ul><li><code>opentrons_flex_96_tiprack_50ul</code></li><li><code>opentrons_flex_96_filtertiprack_50ul</code></li><li><code>opentrons_flex_96_tiprack_200ul</code></li><li><code>opentrons_flex_96_filtertiprack_200ul</code></li><li><code>opentrons_flex_96_tiprack_1000ul</code></li><li><code>opentrons_flex_96_filtertiprack_1000ul</code></li></ul> |
 
-_New in version 2.28_: Use 20 µL pipette tips in your Flex protocols.
+*New in version 2.28*: Use 20 µL pipette tips in your Flex protocols. 
 
 The API includes less restrictions for OT-2 pipettes. We recommend choosing tips with capacities less than or equal to pipette capacity for the most accurate liquid handling.
+
+
 
 ## Adding trash containers
 
@@ -191,9 +264,9 @@ trash = protocol.load_trash_bin("A3")
 pipette.trash_container = trash  # overrides default
 ```
 
-_New in version 2.0_
+*New in version 2.0*
 
-_Changed in version 2.16:_ Added support for `TrashBin` and `WasteChute` objects.
+*Changed in version 2.16:* Added support for `TrashBin` and `WasteChute` objects.
 
 ## Liquid presence detection
 
@@ -209,7 +282,7 @@ Liquid presence detection works with Flex 1-, 8-, and 96-channel pipettes only. 
 
 ### Enabling globally
 
-To automatically use liquid presence detection, add the optional Boolean argument `liquid_presence_detection=True` to [`load_instrument()`][opentrons.protocol_api.ProtocolContext.load_instrument] in your protocol. The robot will check for liquid on every aspiration. You can also turn this feature off and back on again later in a protocol. This example enables liquid presence detection on the 8-channel pipette used in the sample protocol at the top of the page.
+To automatically use liquid presence detection, add the optional Boolean argument  `liquid_presence_detection=True` to [`load_instrument()`][opentrons.protocol_api.ProtocolContext.load_instrument] in your protocol. The robot will check for liquid on every aspiration. You can also turn this feature off and back on again later in a protocol. This example enables liquid presence detection on the 8-channel pipette used in the sample protocol at the top of the page.
 
 ```python
 right = protocol.load_instrument(
@@ -221,8 +294,8 @@ right = protocol.load_instrument(
 ```
 
 !!! note
-Accurate liquid detection requires fresh, dry pipette tips. Protocols using this feature must discard used tips after an aspirate/dispense cycle and pick up new tips before the next cycle. [Complex commands](../complex-commands/index.md) may include aspirate steps after a tip is already wet. When global liquid detection is enabled, use [building block commands](../building-block-commands/index.md) to ensure that your protocol picks up a tip immediately before aspiration.
-
+    Accurate liquid detection requires fresh, dry pipette tips. Protocols using this feature must discard used tips after an aspirate/dispense cycle and pick up new tips before the next cycle. [Complex commands](../complex-commands/index.md) may include aspirate steps after a tip is already wet. When global liquid detection is enabled, use [building block commands](../building-block-commands/index.md) to ensure that your protocol picks up a tip immediately before aspiration.
+    
     The API will not raise an error during liquid detection if a tip is empty but wet. It will raise an error if liquid detection is active and your protocol attempts to aspirate with liquid in the tip.
 
 Let's take a look at how all this works. With automatic liquid detection enabled, tell the robot to pick up a clean tip, aspirate 100 µL from a reservoir, and dispense that volume into a well plate:
@@ -237,7 +310,7 @@ Liquid detection takes place prior to aspiration. Upon detecting a liquid, the p
 
 However, aspiration isn't required for liquid level detection. Three standalone methods, [`detect_liquid_presence()`][opentrons.protocol_api.InstrumentContext.detect_liquid_presence], [`require_liquid_presence()`][opentrons.protocol_api.InstrumentContext.require_liquid_presence], and [`measure_liquid_height()`][opentrons.protocol_api.InstrumentContext.measure_liquid_height], let you add liquid detection to a protocol with or without aspirating. Automatic detection is the same as calling `require_liquid_presence()` before every aspiration. See [Detect Liquids][detect-liquids], [Require Liquids][require-liquids], or [Measure Liquids][measure-liquids] for details.
 
-_New in version 2.20_
+*New in version 2.20*
 
 ### Activating and deactivating
 
@@ -261,4 +334,4 @@ right.aspirate(100, reservoir["A3"])    # Detects liquid before aspirating.
 
 The robot will continue to check for liquid until this feature is disabled again, or an empty well is detected (and the robot raises an error), or the protocol completes.
 
-_New in version 2.20_
+*New in version 2.20*

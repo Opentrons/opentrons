@@ -1,6 +1,6 @@
 ---
-title: 'Heater-Shaker Module: Before You Begin'
-description: 'Deck placement, Flex caddies, and anchor adjustments before installation.'
+title: "Heater-Shaker Module: Before You Begin"
+description: "Deck placement, Flex caddies, and anchor adjustments before installation."
 ---
 
 Review this section for important information about deck placement, alignment, and anchor adjustments for the Heater-Shaker.
@@ -33,10 +33,10 @@ Before installation:
 
 The supported deck slot positions for the Heater-Shaker depend on the robot you’re using.
 
-| Robot Model | Deck Placement                                                                                          |
-| ----------- | ------------------------------------------------------------------------------------------------------- |
-| Flex        | In any slot in column 1 or 3. The module can go in slot A3, but you need to remove the trash bin first. |
-| OT-2        | In deck slots 1, 3, 4, 6, 7, or 10.                                                                     |
+| Robot Model | Deck Placement |
+|----|----|
+| Flex | In any slot in column 1 or 3. The module can go in slot A3, but you need to remove the trash bin first. |
+| OT-2 | In deck slots 1, 3, 4, 6, 7, or 10. |
 
 ![Deck map showing module installation locations](images/hs-deck-map.png)
 

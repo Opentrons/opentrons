@@ -1,6 +1,6 @@
 ---
-title: 'Heater-Shaker Module: G-Code Concepts'
-description: 'Heater-Shaker G-code syntax, examples, and configuration information.'
+title: "Heater-Shaker Module: G-Code Concepts"
+description: "Heater-Shaker G-code syntax, examples, and configuration information."
 ---
 
 G-codes are machine-readable instructions used to control hardware. You do not need to understand or use G-codes to operate a Heater-Shaker with Flex or OT-2. This section is a technical resource for developers building custom applications that work with the Heater-Shaker.
@@ -81,4 +81,4 @@ To establish a serial USB connection with a Heater-Shaker, your application must
 - **PID**: `0x4853`
 
 !!! tip "Making Good G-Code Connections"
-Identifying modules by their VID and PID helps you write resilient, cross-platform code. Hard coding for a specific port (e.g., `COM3` for Windows or `/dev/ttyUSB0` for macOS) makes code brittle. By using a library like [pyserial](https://pythonhosted.org/pyserial/) to scan for specific VID/PID combinations, your application can dynamically find and connect to the correct Opentrons module regardless of its physical connection point.
+    Identifying modules by their VID and PID helps you write resilient, cross-platform code. Hard coding for a specific port (e.g., `COM3` for Windows or `/dev/ttyUSB0` for macOS) makes code brittle. By using a library like [pyserial](https://pythonhosted.org/pyserial/) to scan for specific VID/PID combinations, your application can dynamically find and connect to the correct Opentrons module regardless of its physical connection point.

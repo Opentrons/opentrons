@@ -1,6 +1,6 @@
 ---
-title: 'Heater-Shaker Module: Safety Information and Regulatory Compliance'
-description: 'Environmental conditions, safe use, and regulatory compliance for the Heater-Shaker.'
+title: "Heater-Shaker Module: Safety Information and Regulatory Compliance"
+description: "Environmental conditions, safe use, and regulatory compliance for the Heater-Shaker."
 ---
 
 Opentrons recommends that you follow the safe use specifications listed in this section and throughout this manual.
@@ -50,11 +50,11 @@ Opentrons has validated the Heater-Shaker’s performance in the conditions reco
 
 The following table lists and defines use and storage standards for the Heater-Shaker.
 
-| Operating Conditions | Description                                                                                                                                                                                                                                    |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Recommended          | Opentrons has validated the Heater-Shaker’s performance in the conditions recommended for system operation. Operating the Heater-Shaker in these conditions means you can expect the module to meet performance specifications for the module. |
-| Acceptable           | These conditions are acceptable for system operation. The Heater-Shaker is safe to use in these conditions, but the module may not meet performance specifications.                                                                            |
-| Storage              | Storage and transportation conditions only apply when the device is completely disconnected from power and other equipment.                                                                                                                    |
+| Operating Conditions | Description |
+|----|----|
+| Recommended | Opentrons has validated the Heater-Shaker’s performance in the conditions recommended for system operation. Operating the Heater-Shaker in these conditions means you can expect the module to meet performance specifications for the module. |
+| Acceptable | These conditions are acceptable for system operation. The Heater-Shaker is safe to use in these conditions, but the module may not meet performance specifications. |
+| Storage | Storage and transportation conditions only apply when the device is completely disconnected from power and other equipment. |
 
 ## Instrument Safety Warnings
 
@@ -86,7 +86,7 @@ Warning symbols posted on the Heater-Shaker or listed here refer directly to the
 ## Temperature Safety
 
 !!!warning
-Never touch the module when its status light is red.
+    Never touch the module when its status light is red.
 
 During normal operation, the top plate, labware adapters, and labware on top of the Heater-Shaker can reach temperatures of up to 95 °C. Touching these surfaces while they are hot poses the risk of burns.
 

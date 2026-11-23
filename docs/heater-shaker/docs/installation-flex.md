@@ -1,6 +1,6 @@
 ---
-title: 'Heater-Shaker Module: Flex Installation Instructions'
-description: 'Attach to caddy, mount on deck, and calibrate the Heater-Shaker on Flex.'
+title: "Heater-Shaker Module: Flex Installation Instructions"
+description: "Attach to caddy, mount on deck, and calibrate the Heater-Shaker on Flex."
 ---
 
 Installing the Heater-Shaker on your robot includes attaching it to the deck and calibrating it for the first time. The instructions here and on the touchscreen will help you get started. The tools you need are included with the module or in the User Kit that came with your Flex.
@@ -13,21 +13,21 @@ Installing the Heater-Shaker on your robot includes attaching it to the deck and
 
 2. Insert the Heater-Shaker into its caddy by aligning the power button on the module with the on/off switch on the caddy.
 
-   !!!tip
-   If you’re having trouble inserting the module into its caddy, the module’s power button is probably facing away from the caddy’s on/off switch. Turn the module so the power button faces the on/off switch and try again.
+    !!!tip
+        If you’re having trouble inserting the module into its caddy, the module’s power button is probably facing away from the caddy’s on/off switch. Turn the module so the power button faces the on/off switch and try again.
 
 3. Holding the module in the caddy, use the T10 Torx screwdriver to turn the anchor screws clockwise to tighten the anchors. The module is secure when it doesn’t move while gently pulling on it and rocking it from side to side.
 
-   !!!warning
-   The shaking motion of the Heater-Shaker requires anchoring to help ensure it does not dislodge itself while in operation.
+    !!!warning
+        The shaking motion of the Heater-Shaker requires anchoring to help ensure it does not dislodge itself while in operation.
 
 4. Connect the USB cable to the module.
 
 5. Connect power cable to the module. The Heater-Shaker has an asymmetrical 4-pin power connector. When connecting the power cable to the module:
 
-   - Match the connector's flat side to the flat side of the module's power port.
-   - Aligned cables attach easily; misaligned cables do not.
-   - _Do not_ plug the power cable into a wall outlet until instructed to do so.
+    - Match the connector's flat side to the flat side of the module's power port.
+    - Aligned cables attach easily; misaligned cables do not.
+    - _Do not_ plug the power cable into a wall outlet until instructed to do so.
 
     <figure class="screenshot">
     ![DIN power connector](images/din-power-connector.png)
@@ -54,12 +54,12 @@ When you first install a module on Flex, you need to run automated positional ca
 To calibrate the Heater-Shaker, turn on the power supply. This starts the calibration workflow process on the touchscreen. Instructions on the touchscreen will guide you through the calibration procedure, which is outlined below.
 
 !!!warning
-The gantry and pipette will move during calibration. Keep your hands clear of the working area before tapping an action button on the touchscreen.
+    The gantry and pipette will move during calibration. Keep your hands clear of the working area before tapping an action button on the touchscreen.
 
 <div class="instruction-list" markdown>
 
 1. Tap **Start setup** on the touchscreen. The robot checks the
-   module’s firmware and updates it automatically, if required.
+module’s firmware and updates it automatically, if required.
 
 2. Attach the Heater-Shaker’s calibration adapter to the module and tap **Confirm placement**.
 

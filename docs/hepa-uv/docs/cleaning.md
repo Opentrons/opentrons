@@ -1,17 +1,19 @@
 ---
-title: 'HEPA/UV Module: Cleaning'
-description: 'Approved cleaning solutions and procedures for the HEPA/UV Module exterior.'
+title: "HEPA/UV Module: Cleaning"
+description: "Approved cleaning solutions and procedures for the HEPA/UV Module exterior."
 ---
 
 The following table lists the chemicals you can use to clean the exterior of your HEPA/UV Module. Diluted alcohol and distilled water are our recommended cleaning products, but you can refer to this list for other cleaning options.
 
-!!! warning - _Do not_ use acetone to clean the HEPA/UV Module. - _Do not_ disassemble the HEPA/UV Module and attempt to clean its internal electronic components.
+!!! warning
+    - *Do not* use acetone to clean the HEPA/UV Module.
+    - *Do not* disassemble the HEPA/UV Module and attempt to clean its internal electronic components.
 
-| Solution        | Description                                                                                           |
-| --------------- | ----------------------------------------------------------------------------------------------------- |
-| Alcohol         | Includes ethyl/ethanol, isopropyl, and methanol. Dilute to 70% for cleaning. Do not use 100% alcohol. |
-| Bleach          | Dilute to 10% (1:10 bleach/water ratio) for cleaning. Do not use 100% bleach.                         |
-| Distilled water | You can use distilled water to clean or rinse your HEPA/UV Module.                                    |
+| Solution | Description |
+|---|---|
+| Alcohol | Includes ethyl/ethanol, isopropyl, and methanol. Dilute to 70% for cleaning. Do not use 100% alcohol. |
+| Bleach | Dilute to 10% (1:10 bleach/water ratio) for cleaning. Do not use 100% bleach. |
+| Distilled water | You can use distilled water to clean or rinse your HEPA/UV Module. |
 
 ## Cleaning the HEPA/UV Module
 

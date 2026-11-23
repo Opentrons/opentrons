@@ -1,14 +1,14 @@
 ---
-title: 'Python API: Absorbance Plate Reader'
-description: 'Initialize and read data from the Absorbance Plate Reader in Python protocols.'
+title: "Python API: Absorbance Plate Reader"
+description: "Initialize and read data from the Absorbance Plate Reader in Python protocols."
 ---
 
-The Absorbance Plate Reader Module is an on-deck microplate spectrophotometer that works with the Flex robot only. The module uses light absorbance to determine sample concentrations in 96-well plates.
+The Absorbance Plate Reader Module is an on-deck microplate spectrophotometer that works with the Flex robot only. The module uses light absorbance to determine sample concentrations in 96-well plates. 
 
 The Absorbance Plate Reader is represented in code by an [`AbsorbanceReaderContext`][opentrons.protocol_api.AbsorbanceReaderContext] object, which has methods for moving the module lid with the Flex Gripper, initializing the module to read at a single wavelength or multiple wavelengths, and reading a plate. With the Python Protocol API, you can process plate reader data immediately in your protocol or export it to a CSV for post-run use.
 
 !!! note
-Use of the Absorbance Plate Reader requires an installed Flex Gripper. Only the gripper can move the module's illumination unit (lid). The API does not support manual lid movement or plate reader protocols without a gripper.
+    Use of the Absorbance Plate Reader requires an installed Flex Gripper. Only the gripper can move the module's illumination unit (lid). The API does not support manual lid movement or plate reader protocols without a gripper.
 
 This page explains the actions necessary for using the Absorbance Plate Reader. These combine to form the typical reader workflow:
 
@@ -31,8 +31,7 @@ pr_mod = protocol.load_module(
     location="D3"
 )
 ```
-
-_New in version 2.21_
+*New in version 2.21*
 
 ## Lid control
 
@@ -46,7 +45,7 @@ If you call `open_lid()` or `close_lid()` and the lid is already in the correspo
 You need to call `close_lid()` before initializing the reader, even if the reader was in the closed position at the start of the protocol.
 
 !!! warning
-Do not move the lid manually, during or outside of a protocol. The API does not allow manual lid movement because there is a risk of damaging the module.
+    Do not move the lid manually, during or outside of a protocol. The API does not allow manual lid movement because there is a risk of damaging the module.
 
 ## Initialization
 
@@ -59,8 +58,7 @@ Let’s take a look at examples of how to combine these parameters to prepare di
 ```python
 pr_mod.initialize(mode="single", wavelengths=[450])
 ```
-
-_New in version 2.21_
+*New in version 2.21*
 
 Now the reader is prepared to read at 450 nm. Note that the `wavelengths` parameter always takes a list of integer wavelengths, even when only reading a single wavelength.
 
@@ -71,7 +69,6 @@ pr_mod.initialize(
     mode="single", wavelengths=[450], reference_wavelength=562
 )
 ```
-
 When configured this way, the module will read twice. In the [output data][using-plate-reader-data], the values read for `reference_wavelength` will be subtracted from the values read for the single member of `wavelengths`. This is useful for normalization, or to correct for background interference in wavelength measurements.
 
 The reader can also be initialized to take multiple measurements. When `mode="multi"`, the `wavelengths` list can have up to six elements. This example will initialize the reader to read at three wavelengths:
@@ -79,27 +76,22 @@ The reader can also be initialized to take multiple measurements. When `mode="mu
 ```python
 pr_mod.initialize(mode="multi", wavelengths=[450, 562, 600])
 ```
-
 You can't use a reference wavelength when performing multiple measurements.
 
 ## Reading a plate
 
 Use [`AbsorbanceReaderContext.read()`][opentrons.protocol_api.AbsorbanceReaderContext.read] to have the module read the plate, using the parameters that you specified during initialization:
-
 ```python
 pr_data = pr_mod.read()
 ```
-
-_New in version 2.21_
+*New in version 2.21*
 
 The `read()` method returns the results in a dictionary, which the above example saves to the variable `pr_data`.
 
 If you need to access this data after the conclusion of your protocol, add the `export_filename` parameter to instruct the API to output a CSV file, which is available in the Opentrons App by going to your Flex and viewing Recent Protocol Runs:
-
 ```python
 pr_data = pr_mod.read(export_filename="plate_data")
 ```
-
 In the above example, the API both saves the data to a variable and outputs a CSV file. If you only need the data post-run, you can omit the variable assignment.
 
 ## Using plate reader data
@@ -116,7 +108,6 @@ The two formats are structured differently, even though they contain the same me
 The dictionary object returned by `read()` has two nested levels. The keys at the top level are the wavelengths you provided to `initialize()`. The keys at the second level are string names of each of the 96 wells, `"A1"` through `"H12"`. The values at the second level are the measured values for each well. These values are floating point numbers, representing the optical density (OD) of the samples in each well. OD ranges from 0.0 (low sample concentration) to 4.0 (high sample concentration).
 
 The nested dictionary structure allows you to access results by index later in your protocol. This example initializes a multiple read and then accesses different portions of the results:
-
 ```python
 # initializing and reading
 pr_mod.initialize(mode="multi", wavelengths=[450, 600])
@@ -130,9 +121,7 @@ pr_data[450]["A1"]   # value for well A1 at 450 nm
 pr_data[600]["H12"]  # value for well H12 at 600 nm
 pr_data[450]         # dict of all wells at 450 nm
 ```
-
 You can write additional code to transform this data in any way that you need. For example, you could use a list comprehension to create a list of only the 450 nm values for column 1, ordered by well from A1 to H1:
-
 ```python
 [pr_data[450][w.well_name] for w in plate.columns()[0]]
 ```

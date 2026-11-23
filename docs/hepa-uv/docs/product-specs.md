@@ -1,6 +1,6 @@
 ---
-title: 'HEPA/UV Module: Product Specifications'
-description: 'Included parts, dimensions, power, and physical specs for the HEPA/UV Module.'
+title: "HEPA/UV Module: Product Specifications"
+description: "Included parts, dimensions, power, and physical specs for the HEPA/UV Module."
 ---
 
 ![Labeled HEPA/UV Module diagram](images/hepa-features-labeled.png)
@@ -51,19 +51,19 @@ description: 'Included parts, dimensions, power, and physical specs for the HEPA
 
 ## Physical specifications
 
-| Specification     | Details                                        |
-| ----------------- | ---------------------------------------------- |
-| Box dimensions    | 102 cm L x 79 cm W x 25 cm H                   |
-| Module dimensions | 87 cm L x 64 cm W x 14 cm H                    |
-| Module weight     | ~20 kg (42 lbs)                                |
-| Operating space   | 20 cm / 8” (minimum) of side and top clearance |
+| Specification | Details |
+|---|---|
+| Box dimensions | 102 cm L x 79 cm W x 25 cm H |
+| Module dimensions | 87 cm L x 64 cm W x 14 cm H |
+| Module weight | ~20 kg (42 lbs) |
+| Operating space | 20 cm / 8” (minimum) of side and top clearance |
 
 ## Input and output connections
 
 The HEPA/UV Module has the following power input requirements, which are met by the included power supply.
 
 !!! warning
-Observe the following when handling the module power cable:
+    Observe the following when handling the module power cable:
 
     - Always plug the power cable into a grounded outlet.
     - Make sure that the power cable is not obstructed, in case it needs to be disconnected.
@@ -71,12 +71,12 @@ Observe the following when handling the module power cable:
 
 ### Power specifications
 
-| Specification                    | Details                                                                                   |
-| -------------------------------- | ----------------------------------------------------------------------------------------- |
-| Input                            | <ul><li>100–240 VAC, 50/60 Hz</li><li>2.2 A at 115 VAC</li><li>1.1 A at 230 VAC</li></ul> |
-| Output                           | 24 VDC, 8.4 A, 201 W max                                                                  |
-| Mains supply voltage fluctuation | 100–240 VAC ±10%                                                                          |
-| Fuse type                        | T3.15 A, 250 V, 5×20 mm                                                                   |
+| Specification | Details |
+|---|---|
+| Input | <ul><li>100–240 VAC, 50/60 Hz</li><li>2.2 A at 115 VAC</li><li>1.1 A at 230 VAC</li></ul> |
+| Output | 24 VDC, 8.4 A, 201 W max |
+| Mains supply voltage fluctuation | 100–240 VAC ±10% |
+| Fuse type | T3.15 A, 250 V, 5×20 mm |
 
 ### Power consumption { #power-consumption-hepa-uv }
 

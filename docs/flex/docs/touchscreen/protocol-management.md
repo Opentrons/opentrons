@@ -1,6 +1,6 @@
 ---
-title: 'Opentrons Flex: Protocol Management'
-description: 'Browse, delete, and organize protocols stored on the Flex touchscreen.'
+title: "Opentrons Flex: Protocol Management"
+description: "Browse, delete, and organize protocols stored on the Flex touchscreen."
 ---
 
 The All Protocols screen is an interactive list of all protocols that you've stored on Opentrons Flex. (Sending a protocol to Flex requires the Opentrons App. See [Transferring Protocols](../opentrons-app/protocol-transfer.md) for more information about that process.)
@@ -18,7 +18,7 @@ There are two sections of the All Protocols screen:
 Regardless of which section a protocol is in, its card or list entry includes information about when it was last run and when it was added to this robot.
 
 !!! note
-Flex can store a maximum of 20 unique protocols. It automatically deletes older protocols to maintain this limit. Use the Opentrons App if you need to manage a larger number of protocols.
+    Flex can store a maximum of 20 unique protocols. It automatically deletes older protocols to maintain this limit. Use the Opentrons App if you need to manage a larger number of protocols.
 
 ## Pin a protocol
 
@@ -45,4 +45,4 @@ Long press on a protocol and tap **Delete protocol** to delete it directly from 
 </figure>
 
 !!! warning
-Run history is _not recoverable_ after you delete a protocol on Flex. The protocol file itself is also not recoverable, although you may be able to resend the protocol to Flex if you've kept a copy of it on a computer.
+    Run history is *not recoverable* after you delete a protocol on Flex. The protocol file itself is also not recoverable, although you may be able to resend the protocol to Flex if you've kept a copy of it on a computer.

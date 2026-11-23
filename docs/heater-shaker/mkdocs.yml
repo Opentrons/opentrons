@@ -36,7 +36,7 @@ plugins:
       exclude:
         - index.md
       add_cover_page: true
-      cover_page_template: 'docs/cover.tpl'
+      cover_page_template: "docs/cover.tpl"
       include_css: false
       enumerate_headings: false
 

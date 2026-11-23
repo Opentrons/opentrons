@@ -1,6 +1,6 @@
 ---
-title: 'Opentrons OT-2: Robot Calibration'
-description: 'Deck, tip length, and pipette offset calibration steps and when to run them.'
+title: "Opentrons OT-2: Robot Calibration"
+description: "Deck, tip length, and pipette offset calibration steps and when to run them."
 ---
 
 Your OT-2 moves gantry-mounted pipettes in three-dimensional space (left–right, front–back, up–down). To move accurately, the robot needs a precise map of its own hardware relative to a good reference point: the deck. The robot calibration process creates this map.
@@ -16,13 +16,14 @@ During robot calibration, the Opentrons OT-2 App automatically takes you through
 2. **Tip length calibration:** Measures the distance from the nozzle of the pipette to the tip.
 3. **Pipette offset calibration:** Aligns the pipette nozzle to the calibrated deck.
 
+
 ## Deck calibration
 
 Deck calibration helps the OT-2 understand deck location and size. This calibration ensures that the distance the robot moves in software corresponds to the physical distance it moves across the deck. It compensates for physical variations caused by factors such as:
 
-- How the deck is fastened to the frame.
-- Parallelism of the gantry rails.
-- Manufacturing tolerance variations in motors and pulleys.
+* How the deck is fastened to the frame.
+* Parallelism of the gantry rails.
+* Manufacturing tolerance variations in motors and pulleys.
 
 <table>
   <tbody>
@@ -45,7 +46,7 @@ Deck calibration helps the OT-2 understand deck location and size. This calibrat
 </table>
 
 !!! note
-Deck calibration does _not_ account for the deck being tilted or bent. It assumes the deck is perfectly level.
+    Deck calibration does *not* account for the deck being tilted or bent. It assumes the deck is perfectly level.
 
 ## Tip length calibration
 

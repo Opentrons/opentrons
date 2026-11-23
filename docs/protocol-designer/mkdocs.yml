@@ -15,14 +15,14 @@ extra_css:
 
 markdown_extensions:
   - toc:
-      permalink: true
-      title: Table of Contents
-  - admonition
-  - abbr
-  - pymdownx.blocks.caption
-  - md_in_html
-  - attr_list
-  - pymdownx.blocks.caption
+      permalink: true 
+      title: Table of Contents 
+  - admonition 
+  - abbr 
+  - pymdownx.blocks.caption 
+  - md_in_html 
+  - attr_list 
+  - pymdownx.blocks.caption 
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
@@ -35,23 +35,24 @@ plugins:
       exclude:
         - index.md
       add_cover_page: true
-      cover_page_template: 'docs/cover.tpl'
+      cover_page_template: "docs/cover.tpl"
       include_css: false
       enumerate_headings: false
 
 nav:
+  
   - Protocol Designer Instruction Manual: index.md
-  - About Protocol Designer: about.md
+  - About Protocol Designer: about.md 
   - Create a protocol:
       - Robot and instruments: create-protocol/robot-instruments.md
       - Modules and fixtures: create-protocol/modules-fixtures.md
       - Protocol metadata and overview: create-protocol/metadata-overview.md
-  - Protocol starting deck: starting-deck.md
+  - Protocol starting deck: starting-deck.md 
   - Protocol steps:
       - Transfer steps: steps/transfer.md
       - Mix steps: steps/mix.md
       - Move steps: steps/move.md
-      - Module steps: steps/module.md
+      - Module steps: steps/module.md 
       - Magnet steps: steps/magnet.md
       - Pause steps: steps/pause.md
       - Camera steps: steps/camera.md

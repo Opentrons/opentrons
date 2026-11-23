@@ -1,6 +1,6 @@
 ---
-title: 'Opentrons OT-2: Cleaning'
-description: 'How to clean the OT-2 frame, deck, gantry, and which cleaning solutions to use.'
+title: "Opentrons OT-2: Cleaning"
+description: "How to clean the OT-2 frame, deck, gantry, and which cleaning solutions to use."
 ---
 
 Routine cleaning helps keep your OT-2 free of contaminants that can affect your protocols. Cleaning also gives you a chance to inspect the robot for wear and damage. Review this section for information and instructions on how to clean your robot.
@@ -22,13 +22,13 @@ You can wipe off all the visible and easily accessible surfaces of your OT-2. Th
 The following table lists the chemicals you can use to clean your OT-2. Diluted alcohol and distilled water are our recommended cleaning solutions, but you can refer to this list for other cleaning options. You can also use these chemicals to clean modules, pipettes, and other attached hardware.
 
 !!!warning
-_Do not use acetone._ The robot, pipettes, and modules are made from materials that acetone can damage.
+    _Do not use acetone._ The robot, pipettes, and modules are made from materials that acetone can damage.
 
-| Solution            | Recommendations                                                                                       |
-| ------------------- | ----------------------------------------------------------------------------------------------------- |
-| **Alcohol**         | Includes ethyl/ethanol, isopropyl, and methanol. Dilute to 70% for cleaning. Do not use 100% alcohol. |
-| **Bleach**          | Dilute to 10% (1:10 bleach/water ratio) for cleaning. Do not use 100% bleach.                         |
-| **Distilled water** | You can use distilled water to clean or rinse your robot.                                             |
+| Solution | Recommendations |
+|----|----|
+| **Alcohol** | Includes ethyl/ethanol, isopropyl, and methanol. Dilute to 70% for cleaning. Do not use 100% alcohol. |
+| **Bleach** | Dilute to 10% (1:10 bleach/water ratio) for cleaning. Do not use 100% bleach. |
+| **Distilled water** | You can use distilled water to clean or rinse your robot. |
 
 ## Frame and window panel cleaning
 
@@ -78,16 +78,18 @@ To clean a single- or multi-channel pipette:
 1. Remove the pipette from the gantry.
 2. Dampen a soft, clean cloth or paper towel with a cleaning solution.
 3. Gently wipe down the following parts:
-   - Body
-   - Ejector
-   - Nozzles
+    - Body
+    - Ejector
+    - Nozzles
 4. Rinse off any remaining residue using a cloth dampened with distilled water.
 5. Let the pipette air dry.
 6. Reattach the pipette to the gantry. When prompted, recalibrate the pipette (optional, but recommended).
 
 </div>
 
-!!!warning - Do not disassemble OT-2 pipettes for cleaning or attempt to clean their internal electronic components. - Do not put OT-2 pipettes in an autoclave. The high temperatures, pressures, and steam used inside an autoclave can damage the electronics, circuit boards, small electric motors, and other sensitive components.
+!!!warning
+    - Do not disassemble OT-2 pipettes for cleaning or attempt to clean their internal electronic components.
+    - Do not put OT-2 pipettes in an autoclave. The high temperatures, pressures, and steam used inside an autoclave can damage the electronics, circuit boards, small electric motors, and other sensitive components.
 
 ## Pipette decontamination
 
@@ -97,13 +99,13 @@ The routine cleaning steps described above may not clean your pipette if it beco
 
 Refer to the following table for recommended cleaning methods, by contamination type.
 
-| Contaminant               | Cleaning recommendation                                                                                                                 |
-| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| **Aqueous solutions**     | Rinse the contaminated parts with distilled water or 70% ethanol and air dry at 15.5 °C (60 °F).                                        |
-| **Nucleic acids**         | Clean the contaminated parts in a glycine/HCl buffer (pH 2) for 10 minutes, rinse with distilled water, and air dry.                    |
-| **Organic solvents**      | Allow the solvent to evaporate on its own or immerse the pipette _nozzle only_ in a detergent, rinse with distilled water, and air dry. |
-| **Proteins**              | Clean the contaminated parts with a detergent, rinse with distilled water, and air dry. Do not use alcohol. That will set the proteins. |
-| **Radioactive materials** | Place the pipette nozzle in a solution like Decon 90, rinse with distilled water, and air dry.                                          |
+| Contaminant | Cleaning recommendation |
+|----|----|
+| **Aqueous solutions** | Rinse the contaminated parts with distilled water or 70% ethanol and air dry at 15.5 °C (60 °F). |
+| **Nucleic acids** | Clean the contaminated parts in a glycine/HCl buffer (pH 2) for 10 minutes, rinse with distilled water, and air dry. |
+| **Organic solvents** | Allow the solvent to evaporate on its own or immerse the pipette _nozzle only_ in a detergent, rinse with distilled water, and air dry. |
+| **Proteins** | Clean the contaminated parts with a detergent, rinse with distilled water, and air dry. Do not use alcohol. That will set the proteins. |
+| **Radioactive materials** | Place the pipette nozzle in a solution like Decon 90, rinse with distilled water, and air dry. |
 
 ### Pipette barrel
 
@@ -124,7 +126,9 @@ Filtered pipette tips help prevent contaminating the barrel or inside of the pip
 
 The GEN2 multi-channel (8-channel) pipettes have a rubber O-ring around their nozzles. These O-rings help tips form a good seal against the pipette. You can replace the O-rings on a GEN2 multi-channel pipette if the rings become worn or broken.
 
-!!!note - OT-2 single-channel and GEN1 8-channel pipettes do not have O-rings. - OT-2 and Flex pipette O-rings are not interchangeable.
+!!!note
+    - OT-2 single-channel and GEN1 8-channel pipettes do not have O-rings.
+    - OT-2 and Flex pipette O-rings are not interchangeable.
 
 Each GEN2 multi-channel pipette ships with several replacement O-rings and the special tools shown here.
 
@@ -138,8 +142,8 @@ Follow these instructions to replace the O-rings on your OT-2 multi-channel pipe
 
 1. Attach the O-ring removal tool to the pipette nozzle. Labels on either side of the tool help you match it to the pipette model.
 
-   - Use the 20M side for a P20 pipette.
-   - Use the 300M side for a P300 pipette.
+    - Use the 20M side for a P20 pipette.
+    - Use the 300M side for a P300 pipette.
 
     <figure class="screenshot" markdown>
     ![o-ring removal tool alignment](../images/o-ring-removal-tool.png)
@@ -168,7 +172,9 @@ Be sure to turn the module's power off before cleaning it. You can clean the top
 - Turn off power to the module and disconnect any USB or power cables.
 - Remove the module from its deck slot.
 
-!!!warning - Do not disassemble modules for cleaning or attempt to clean their internal electronic components. - Do not put OT-2 modules in an autoclave. The high temperatures, pressures, and steam used inside an autoclave can damage the electronics, circuit boards, small electric motors, and other sensitive components.
+!!!warning
+    - Do not disassemble modules for cleaning or attempt to clean their internal electronic components.
+    - Do not put OT-2 modules in an autoclave. The high temperatures, pressures, and steam used inside an autoclave can damage the electronics, circuit boards, small electric motors, and other sensitive components.
 
 ### General module cleaning
 

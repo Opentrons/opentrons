@@ -1,6 +1,6 @@
 ---
-title: 'Opentrons Flex: Instrument Management'
-description: 'View and manage pipettes and modules from the touchscreen.'
+title: "Opentrons Flex: Instrument Management"
+description: "View and manage pipettes and modules from the touchscreen."
 ---
 
 The Instruments screen is an interactive list of all instruments that you've connected to your Flex. The list is organized by mount: left pipette mount, right pipette mount, and extension mount.
@@ -38,4 +38,4 @@ Choose an attached instrument that you want to detach. Then loosen the instrumen
 Choose an attached instrument that you want to recalibrate. Then connect the instrument's calibration probe or pin and begin the automated calibration process. For more details, follow the instructions on the touchscreen or see the [Instrument Installation and Calibration section](../installation/instruments.md) of the Installation and Relocation chapter.
 
 !!! note
-The new calibration data will overwrite any previous calibration data for that instrument.
+    The new calibration data will overwrite any previous calibration data for that instrument.

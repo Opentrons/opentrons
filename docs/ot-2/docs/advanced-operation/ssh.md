@@ -1,6 +1,6 @@
 ---
-title: 'Opentrons OT-2: Command Line Operation Over SSH'
-description: 'Learn how to create SSH keys and connect to an OT-2 robot via the terminal.'
+title: "Opentrons OT-2: Command Line Operation Over SSH"
+description: "Learn how to create SSH keys and connect to an OT-2 robot via the terminal."
 ---
 
 The OT-2 gives you command-line access to its operating system through a Secure Shell (SSH) terminal connection. Terminal access lets you:
@@ -27,9 +27,9 @@ Follow these steps to create an SSH key on your Mac, Windows, or Linux computer:
 
 1. Open a terminal window and run the following command:
 
-   ```bash
-   ssh-keygen -f ot2_ssh_key -t ecdsa
-   ```
+    ```bash
+    ssh-keygen -f ot2_ssh_key -t ecdsa
+    ```
 
 2. Create a passphrase when prompted. A passphrase is not required, but it is recommended for extra security.
 
@@ -49,44 +49,42 @@ Follow these steps to create an SSH key on your Mac, Windows, or Linux computer:
 
 6. Type the command shown below in the terminal window. Replace `ROBOT_IP` with the IP address of your OT-2.
 
-   curl \
-   -H "Content-Type: application/json" \
-   -d "{\"key\":\"$(cat ot2_ssh_key.pub)\"}" \
-   http://ROBOT_IP:31950/server/ssh_keys
+    
+    curl \
+    -H "Content-Type: application/json" \
+    -d "{\"key\":\"$(cat ot2_ssh_key.pub)\"}" \
+    http://ROBOT_IP:31950/server/ssh_keys
+    ```
 
-   ```
-
-   When successful, the robot responds with a message that the key has been added.
-
-   ```
+    When successful, the robot responds with a message that the key has been added.
 
 7. Type the command shown below in the terminal window to establish the connection. Replace `ROBOT_IP` with the IP address of your OT-2.
 
-   ```
-   ssh -i ot2_ssh_key root@ROBOT_IP
-   ```
+    ```
+    ssh -i ot2_ssh_key root@ROBOT_IP
+    ```
 
-   !!! note
-   The first time you connect, the terminal will:
+    !!! note
+        The first time you connect, the terminal will:
 
         * Show a message indicating the authenticity of the host can't be established. Ignore the message.
         * Ask if you want to continue. Type the full word `yes` and press **Enter** or **Return** to continue.
 
 8. Verify the connection. The terminal will show ASCII art that spells "OT2" when the connection is successful.
 
-   ```
-         @@@@@    @@@@@
-       @@@@          @@@@
-      @@@      @@      @@@    @@@@@@   @@@@@
-     @@@      @@@@      @@@   @@@@@@  &@' '@@
-     @@     @@@@@@@@    &@@     @@         @@
-     @@    .@@@    @    #@@     @@        @@
-     @@@    @      @    @@@     @@       @@
-      @@@    @@..@@    @@@      @@      @@
-       @@@@          @@@@       @@     @@@@@&
-         @@@@@@@@@@@@@@         ##    &@@@@@#
-             @@@@@@.
-   ```
+    ```
+          @@@@@    @@@@@
+        @@@@          @@@@
+       @@@      @@      @@@    @@@@@@   @@@@@
+      @@@      @@@@      @@@   @@@@@@  &@' '@@
+      @@     @@@@@@@@    &@@     @@         @@
+      @@    .@@@    @    #@@     @@        @@
+      @@@    @      @    @@@     @@       @@
+       @@@    @@..@@    @@@      @@      @@
+        @@@@          @@@@       @@     @@@@@&
+          @@@@@@@@@@@@@@         ##    &@@@@@#
+              @@@@@@.
+    ```
 
 </div>
 

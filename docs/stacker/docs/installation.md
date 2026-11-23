@@ -1,13 +1,13 @@
 ---
-title: 'Flex Stacker: Installation'
-description: 'Unbox, replace side panel, attach to Flex, and connect power and data.'
+title: "Flex Stacker: Installation"
+description: "Unbox, replace side panel, attach to Flex, and connect power and data."
 ---
 
 Before you begin, make sure you've read and are familiar with the information provided in the [Pre-Installation Information section](pre-installation.md).
 
 ## Part 1: Unboxing the Stacker
 
-Your Stacker ships in two separate boxes; one contains the module, and the other includes a special User Kit. Follow these instructions to begin:
+Your Stacker ships in two separate  boxes; one contains the module, and the other includes a special User Kit. Follow these instructions to begin:
 
 <div class="instruction-list" markdown>
 
@@ -29,13 +29,13 @@ The Stacker attaches to the right side of your robot and requires a replacement 
 
 1. Take the replacement side panel from the User Kit and attach it to the robot. You can re-use the original window screws or the screws that ship in the User Kit. When attaching the panel ensure the beveled (V-shaped) holes in the replacement panel face out, towards you.
 
-   !!!tip
-   Hand tighten the screws until the window panels are reasonably secure. This is not a trial of strength. Excessive torque may damage the screws.
+    !!!tip
+        Hand tighten the screws until the window panels are reasonably secure. This is not a trial of strength. Excessive torque may damage the screws.
 
-   ![Attaching a replacement window panel](images/window-attach-detail.png){: .img-medium }
+    ![Attaching a replacement window panel](images/window-attach-detail.png){: .img-medium }
 
-   !!!Note
-   A properly attached panel fits flush and square to the robot's frame, without gaps or misalignment. This helps ensure a good connection between the safety interlock pins on panel and Flex.
+    !!!Note
+        A properly attached panel fits flush and square to the robot's frame, without gaps or misalignment. This helps ensure a good connection between the safety interlock pins on panel and Flex.
 
 </div>
 
@@ -43,7 +43,7 @@ The Stacker attaches to the right side of your robot and requires a replacement 
 
 6. After attaching the replacement window, identify the four, smaller access panels on the window. Select the panel that matches the deck slot where you will attach the Stacker.
 
-   ![Removing the small access panel](images/access-panel.png){: .img-medium }
+    ![Removing the small access panel](images/access-panel.png){: .img-medium }
 
 </div>
 
@@ -58,7 +58,7 @@ The Stacker attaches to the right side of your robot and requires a replacement 
 With the new window panel in place, it's time to install a deck plate adapter and attach the Stacker to the robot.
 
 !!!Warning "Warning: Heavy Object"
-The Stacker is heavy. Ask a lab partner to assist with lifting and attaching this module.
+    The Stacker is heavy. Ask a lab partner to assist with lifting and attaching this module.
 
 To install the deck adapter and attach the Stacker:
 
@@ -68,18 +68,18 @@ To install the deck adapter and attach the Stacker:
 
 1. Replace the deck plate with the Stacker's deck slot adapter and screw it in place. You can re-use the original deck plate screws or the screws that ship in the User Kit.
 
-   ![Stacker deck plate image](images/deck-plate-attaching.png){: .img-medium }
+    ![Stacker deck plate image](images/deck-plate-attaching.png){: .img-medium }
 
-   !!!note
-   Use the Waste Chute adapter if you want to use the Waste Chute and Stacker in adjacent slots (D3 and D4).
+    !!!note
+        Use the Waste Chute adapter if you want to use the Waste Chute and Stacker in adjacent slots (D3 and D4).
 
 1. Insert the Stacker through the access panel opening and lower it onto the adapter plate alignment pins. The module should be flush against the adapter plate when properly seated.
 
-   ![Aligning Stacker to deck plate pins](images/stacker-attach-detail.png){: .img-medium }
+    ![Aligning Stacker to deck plate pins](images/stacker-attach-detail.png){: .img-medium }
 
 1. Fasten the 4 captive screws on the track to the deck slot adapter to secure the Stacker in place.
 
-   ![Fastening Stacker screws to deck plate](images/fasten-stacker.png){: .img-medium }
+    ![Fastening Stacker screws to deck plate](images/fasten-stacker.png){: .img-medium }
 
 1. Remove the packing tape from the Stacker door and peel the protective film from the door window.
 
@@ -93,12 +93,14 @@ After attaching the Stacker to the robot, you can connect all the cables and tur
 
 13. Remove the power/data hub from the User Kit. Place it with its back flush against the robot.
 
-    !!!note * Keep the area around the hub free from obstacles that could prevent easy access to the main power switch or Emergency Stop Pendant (E-stop). * To help with heat dissipation, do not place labware or other objects on top of the hub.
+    !!!note
+        * Keep the area around the hub free from obstacles that could prevent easy access to the main power switch or Emergency Stop Pendant (E-stop).
+        * To help with heat dissipation, do not place labware or other objects on top of the hub.
 
 1. Retrieve the various cables from the Stacker box and User Kit. Start connecting the supplied cables as described below.
 
-   !!!warning
-   _Do not force cable connections_. Aligned cables attach easily; misaligned cables do not.
+    !!!warning
+        _Do not force cable connections_. Aligned cables attach easily; misaligned cables do not.
 
     <table>
         <tr>

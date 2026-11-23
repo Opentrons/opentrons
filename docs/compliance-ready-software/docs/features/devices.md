@@ -1,5 +1,5 @@
 ---
-title: 'Compliance Ready Software: Features'
+title: "Compliance Ready Software: Features"
 description: "An overview of the Flex's compliance-ready features."
 ---
 
@@ -14,7 +14,7 @@ The keyboard is available in English and in Mandarin. Change your preferred lang
 
 The Flex also supports external keyboards connected via [USB](../../flex/system-description/connections.md#usb-and-auxiliary-connections). When you use an external keyboard, the keyboard on the Flex touchscreen is hidden by default.
 
-If you choose to [download files](../using/files.md) from the Flex touchscreen, you'll need to use an external storage device.
+If you choose to [download files](../using/files.md) from the Flex touchscreen, you'll need to use an external storage device. 
 
 <figure class="screenshot" markdown>
   ![Add a USB device.](../images/add-usb.png)

@@ -1,6 +1,6 @@
 ---
-title: 'Opentrons Flex: Settings'
-description: 'Touchscreen settings for network, display, and robot configuration.'
+title: "Opentrons Flex: Settings"
+description: "Touchscreen settings for network, display, and robot configuration."
 ---
 
 The Settings screen provides additional controls you can use to customize the behavior of your Flex. Tap a setting to toggle it on or off, or to open another screen that displays related adjustment controls.
@@ -8,6 +8,7 @@ The Settings screen provides additional controls you can use to customize the be
 ## Settings example
 
 Refer to the [Settings list section](#settings-list) below for definitions of the currently released features.
+
 
 <figure class="screenshot" markdown>
 ![Example of settings on Flex touchscreen](../images/touchscreen-settings.png){ width="80%" }
@@ -23,7 +24,7 @@ Many of these settings are covered when you [first set up your Flex](../installa
 Choose whether your Flex will download robot software updates in the background as soon as they become available. This setting is available in robot software version 9.1.1 and later, and is off by default.
 
 !!! note
-When this setting is on, software downloads may occur at any time that Flex is connected to the internet, even while running a protocol.
+    When this setting is on, software downloads may occur at any time that Flex is connected to the internet, even while running a protocol.
 
 ### Camera preferences
 
@@ -35,7 +36,7 @@ Enable additional tools and features designed for developers. Not recommended fo
 
 ### Devices
 
-View attached devices, like an external keyboard or USB device.
+View attached devices, like an external keyboard or USB device. 
 
 ### Device reset
 
@@ -48,7 +49,7 @@ Controls the _Time of Flight_ (ToF) sensor in the Flex Stacker. By default, the 
 You should disable this setting only when using labware that causes detection errors (false positives or negatives). Sometimes these errors can occur with labware that has an irregular shape or interferes with the sensor's ability to "see" labware in the Stacker.
 
 !!! note
-When disabled, the Stacker will always try to store or dispense labware, even if it is empty.
+    When disabled, the Stacker will always try to store or dispense labware, even if it is empty.
 
 ### Download protocol source file
 
@@ -71,7 +72,7 @@ Set the language used by the touchscreen to Chinese or English.
 View the status of or set up a Wi-Fi, Ethernet, or USB connection. Multiple connections can be active simultaneously.
 
 !!! Note
-When first setting up your Flex, connect it to a network switch, hub, or router with an Ethernet cable _before_ connecting it to a Wi-Fi network. See the [First Run section](../installation/first-run.md#ethernet-recommended) for more information.
+    When first setting up your Flex, connect it to a network switch, hub, or router with an Ethernet cable *before* connecting it to a Wi-Fi network. See the [First Run section](../installation/first-run.md#ethernet-recommended) for more information.
 
 ### Privacy
 
@@ -86,13 +87,13 @@ Flex records what it's doing in several diagnostic files that are stored on the 
 If you opt out of automatic data sharing, you can still download Flex files for your own use or to send them to Opentrons Support for troubleshooting. See [Downloading Flex Diagnostic Files](../advanced-operation/diagnostic-files.md#downloading-flex-files) for instructions.
 
 !!! note
-There are separate privacy controls in the Opentrons App. Turning sharing on or off from the touchscreen only affects data collected and sent by the robot. Your laptop or desktop computer will still automatically share data if this feature is enabled in the Opentrons App.
+    There are separate privacy controls in the Opentrons App. Turning sharing on or off from the touchscreen only affects data collected and sent by the robot. Your laptop or desktop computer will still automatically share data if this feature is enabled in the Opentrons App.
 
 ### Recovery mode
 
 Turns [error recovery][error-recovery] on and off. Error recovery mode pauses the active protocol and gives you a chance to fix a problem if something unexpected happens during the run.
 
-### Robot encryption key
+### Robot encryption key 
 
 Flex robots with [Opentrons Flex Compliance Ready Software](../../compliance-ready-software/index.md) use an encryption key to establish a connection between the Opentrons App and the Flex.
 

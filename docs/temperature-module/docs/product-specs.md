@@ -1,6 +1,6 @@
 ---
-title: 'Temperature Module: Product Specifications'
-description: 'Included parts, dimensions, temperature range, and thermal block options.'
+title: "Temperature Module: Product Specifications"
+description: "Included parts, dimensions, temperature range, and thermal block options."
 ---
 
 ![Temperature module with labels](images/temp-mod-labeled.svg)
@@ -49,7 +49,7 @@ The Temperature Module uses interchangeable aluminum thermal blocks to help hold
 At the time of purchase, each Temperature Module includes your choice of one (1) thermal block. You can select a 24-well block, a 96-well block, a deep well block, or a flat-bottom block. The blocks hold 1.5 mL and 2.0 mL tubes, 96-well PCR plates, PCR strips, deep well plates, and flat bottom plates.
 
 !!! note "Hardware compatibility"
-All Opentrons thermal blocks are compatible with a Flex or an OT-2. However, the [OT-2 Flat Bottom Block](https://opentrons.com/products/aluminum-block-flat-bottom-ot-2) _is not compatible_ with the Flex Gripper. Flex protocols that require the Gripper should use the [Flex Flat Bottom Block](https://opentrons.com/products/aluminum-block-flat-bottom-flex) instead.
+    All Opentrons thermal blocks are compatible with a Flex or an OT-2. However, the [OT-2 Flat Bottom Block](https://opentrons.com/products/aluminum-block-flat-bottom-ot-2) _is not compatible_ with the Flex Gripper. Flex protocols that require the Gripper should use the [Flex Flat Bottom Block](https://opentrons.com/products/aluminum-block-flat-bottom-flex) instead.
 
 <div class="parts-list" markdown>
 

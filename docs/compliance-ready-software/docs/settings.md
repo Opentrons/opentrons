@@ -1,6 +1,6 @@
 ---
-title: 'Compliance Ready Software: Settings'
-description: 'Settings that can be used to customize a compliance ready Flex during setup.'
+title: "Compliance Ready Software: Settings"
+description: "Settings that can be used to customize a compliance ready Flex during setup."
 ---
 
 During Opentrons Flex Compliance Ready Software activation, an Opentrons-trained representative can help you change settings to customize your day-to-day experience.
@@ -22,15 +22,15 @@ Administrators can change this setting in the Opentrons App or on the Flex touch
 
 <div class="instruction-list" markdown>
 
-1. Log in to your account.
+1. Log in to your account. 
 2. Access your robot's settings either in the Opentrons App (click the three-dot menu on the right) or on the Flex touchscreen (tap the user account icon in the top right).
-3. Select the **Compliance Ready** tab or **Compliance Ready Software settings** option.
-4. Under **Audit log requirements**, toggle the **Require downloading audit logs in the Opentrons App at the end of a protocol run** setting.
-5. Document your reason for updating this setting.
+2. Select the **Compliance Ready** tab or **Compliance Ready Software settings** option.
+3. Under **Audit log requirements**, toggle the **Require downloading audit logs in the Opentrons App at the end of a protocol run** setting.
+4. Document your reason for updating this setting.
 
 ## Download folder
 
-When you require users to download audit logs from the Opentrons App, you can also configure the app to download all logs to a default storage location.
+When you require users to download audit logs from the Opentrons App, you can also configure the app to download all logs to a default storage location. 
 
 <figure class="screenshot" markdown>
 ![Image showing how to choose a storage location.](images/storage-location.png)
@@ -42,4 +42,4 @@ Click the :material-cog: in the lower left to access **App settings**. Select th
 If robot settings, like your Flex's name, are ever changed, you may need to repeat this process.
 
 !!! note
-There's more than one way to save your files. You can attach a [USB drive](features/devices.md) and copy files to it from the Flex touchscreen. Then, attach the drive to your computer and save them in your preferred location.
+    There's more than one way to save your files. You can attach a [USB drive](features/devices.md) and copy files to it from the Flex touchscreen. Then, attach the drive to your computer and save them in your preferred location.

@@ -1,20 +1,20 @@
 ---
-title: 'HEPA/UV Module: Hardware Controls'
-description: 'Fan and UV light buttons, status indicators, and safe operation.'
+title: "HEPA/UV Module: Hardware Controls"
+description: "Fan and UV light buttons, status indicators, and safe operation."
 ---
 
 Separate on/off buttons on the front of the HEPA/UV Module control the fan and UV lights. You can operate these systems simultaneously or independently of each other.
 
-![HEPA/UV Module button controls](images/uv-buttons.png 'HEPA/UV Module button controls')
+![HEPA/UV Module button controls](images/uv-buttons.png "HEPA/UV Module button controls")
 
 See the following table for the information on how to operate the HEPA and UV systems.
 
-| Function            | Operation                                                                    |
-| ------------------- | ---------------------------------------------------------------------------- |
-| HEPA filtration on  | Press **Fan** once.                                                          |
-| HEPA filtration off | Press **Fan** again.                                                         |
-| UV lights on        | Press **UV Light** once. Do not turn on the lights during a protocol run.    |
-| UV lights off       | Lights turn off automatically after 15 minutes. Or press **UV Light** again. |
+| Function | Operation |
+|---|---|
+| HEPA filtration on | Press **Fan** once. |
+| HEPA filtration off | Press **Fan** again. |
+| UV lights on | Press **UV Light** once. Do not turn on the lights during a protocol run. |
+| UV lights off | Lights turn off automatically after 15 minutes. Or press **UV Light** again. |
 
 Ring lights around the on/off buttons change colors to indicate the operational status of the HEPA fan and UV lights.
 

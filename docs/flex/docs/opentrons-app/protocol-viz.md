@@ -1,8 +1,8 @@
 ---
-title: 'Opentrons Flex: Protocol Visualization'
+title: "Opentrons Flex: Protocol Visualization"
 ---
 
-Test new protocols in the Opentrons App before running them on your Flex. Use _protocol visualization_ to:
+Test new protocols in the Opentrons App before running them on your Flex. Use *protocol visualization* to: 
 
 - See protocol steps, including labware and liquid changes, even while offline and disconnected from your Flex.
 - Detect and fix protocol errors before the first run.
@@ -14,14 +14,14 @@ Click **Visualize** on any Flex protocol's details page to get started. You'll b
 ![Image showing the protocol visualization screen for a protocol.](../images/protocol-viz.png)
 </figure>
 
-The visualization screen shown above includes protocol steps on the left, a view of the Flex deck in the middle, and hardware and labware details on the right. The following sections take a closer look at using protocol visualization to preview, troubleshoot, and edit your Flex protocols.
+The visualization screen shown above includes protocol steps on the left, a view of the Flex deck in the middle, and hardware and labware details on the right. The following sections take a closer look at using protocol visualization to preview, troubleshoot, and edit your Flex protocols. 
 
 ## Protocol steps
 
-Choose how to visualize your Flex protocol's steps:
+Choose how to visualize your Flex protocol's steps: 
 
 - Click the play button :material-play-circle: at the top of the page to play your protocol, and choose a playback speed (seconds per step).
-- Click and drag the blue bar to move through the protocol steps.
+- Click and drag the blue bar to move through the protocol steps. 
 - Scroll the timeline on the left and click on any protocol step to view it.
 
 <figure class="screenshot" markdown>
@@ -31,9 +31,10 @@ Choose how to visualize your Flex protocol's steps:
 For each step of your protocol, the deck view changes to include liquid, labware, and pipette tip changes.
 
 !!! note
-In the example protocol above, liquids are assigned a color in Protocol Designer, so wells containing liquids are colored and changes on the deck are more visible.
+    In the example protocol above, liquids are assigned a color in Protocol Designer, so wells containing liquids are colored and changes on the deck are more visible.
 
     You're not required to define or label liquids in protocols created using the Python Protocol API. In order to see liquid changes on the deck, we recommend using [optional liquid labels][labeling-wells-and-reservoirs] and colors for the best protocol visualization.
+
 
 ## Step details
 
@@ -58,7 +59,7 @@ You can create [step groups](../../python-api/groups.md) in your Python protocol
 <figcaption>A group of steps to assemble master mix reagents in the timeline on the left.</figcaption>
 </figure>
 
-Step groups appear in the protocol timeline on the left. In the example above, three groups combine related steps, like transferring all the required reagents to assemble a PCR master mix. Click the arrow to expand each group and view its steps.
+Step groups appear in the protocol timeline on the left. In the example above, three groups combine related steps, like transferring all the required reagents to assemble a PCR master mix. Click the arrow to expand each group and view its steps. 
 
 ## Slot spotlights
 
@@ -73,10 +74,10 @@ Open a slot spotlight to see changes over the course of your protocol. For examp
 
 ## Editing errors
 
-When you import any protocol, the Opentrons App analyzes it for errors. You can still visualize a protocol with errors, but you won't be able to see step details past the error.
+When you import any protocol, the Opentrons App analyzes it for errors. You can still visualize a protocol with errors, but you won't be able to see step details past the error. 
 
 <figure class="screenshot" markdown>
 ![Image showing protocol visualization details for tips, labware, wells, and more.](../images/viz-error.png)
 </figure>
 
-In this example serial dilution protocol, the tip rack would run out of tips before the robot could complete the final transfer step. Scroll in the timeline on the left to view the step the error occurs in, and click to view error details.
+In this example serial dilution protocol, the tip rack would run out of tips before the robot could complete the final transfer step. Scroll in the timeline on the left to view the step the error occurs in, and click to view error details. 
