@@ -413,7 +413,7 @@ When a tall or short collar is seated on the vacuum base in slot A3 or staged on
 <figcaption>Protocol analysis failure caused by a vacuum collar conflict.</figcaption>
 </figure>
 
-You can avoid an analysis error (and a collision), by setting the `start` nozzle to the side of the pipette facing the collar. This works because it keeps the unused part of the pipette away from the collar. Moving the collar or well plate so are not adjacent side by side or front to back is also acceptable. Diagonal slots are unaffected.
+You can avoid this analysis error by setting the `start` nozzle to the side of the pipette facing the collar. This works because it keeps the unused part of the pipette away from the collar. Moving the collar or well plate so they are not adjacent (side by side or front to back) is also acceptable. Partial tip pickup with labware in diagonal slots is unaffected.
 
 The following table lists the allowed partial tip configurations by collar location.
 
