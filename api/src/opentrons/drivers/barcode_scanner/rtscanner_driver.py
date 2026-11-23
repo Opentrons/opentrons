@@ -1,6 +1,7 @@
 """Implementation for talking to the RT214C scanner."""
 
 import logging
+from pathlib import Path
 from typing import ByteString, Optional
 
 from serial.tools.list_ports import comports  # type: ignore[import-untyped]
@@ -62,7 +63,12 @@ class RTScanner(AbstractBarcodeScannerDriver):
                     device = p.device
         else:
             for p in ports:
-                if p.device == port and p.vid == 0x1EAB:
+                # need to get the original thing and not the symlink
+                device_path = Path(p.device)
+                target_port = Path(port)
+                if target_port.is_symlink():
+                    target_port = Path("/dev") / target_port.readlink()
+                if device_path == target_port and p.vid == 0x1EAB:
                     device = port
         if device is None:
             raise RuntimeError("No scanner found.")
