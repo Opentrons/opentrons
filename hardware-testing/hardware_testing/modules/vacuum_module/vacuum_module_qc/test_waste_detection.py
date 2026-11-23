@@ -34,6 +34,8 @@ EQUALIZE_TOLERANCE_MBAR = 8.0
 EQUALIZE_WAIT_S = 10
 # waste_detector.hpp counts sealed time only while commanded RPM is at least this.
 BRAKE_RPM = 1.0
+# waste_detector.hpp learns signed (A-B) while B is this close to atmosphere.
+ORIFICE_TARE_VACUUM_MBAR = 20.0
 # Columns on each trip line, one per sample period. Early trips pad with None.
 WASTE_SAMPLE_COUNT = int(HOLD_DURATION_S / SAMPLE_PERIOD_S)
 
@@ -55,6 +57,7 @@ class WasteDiag(NamedTuple):
     on_target_s: float
     brake_s: float
     mean_abs_ab: Optional[float]
+    max_abs_ab: Optional[float]
     brake_slope_mbar_s: Optional[float]
 
 
@@ -84,7 +87,7 @@ def _full_tag(target: int) -> str:
 
 def _empty_diag() -> WasteDiag:
     """Summary used when a hold records no samples."""
-    return WasteDiag(0.0, 0.0, None, None)
+    return WasteDiag(0.0, 0.0, None, None, None)
 
 
 def _gauge_slope(times: List[float], gauges: List[float]) -> Optional[float]:
@@ -101,16 +104,40 @@ def _gauge_slope(times: List[float], gauges: List[float]) -> Optional[float]:
     return cov / var_t
 
 
+def _orifice_tare(samples: List[WasteSample]) -> Optional[float]:
+    """Mean signed (A-B) while the chamber is still near atmosphere.
+
+    Matches waste_detector.hpp: average until B leaves the 20 mbar atmosphere
+    band, then freeze. No atmospheric samples means the detector uses raw |A-B|.
+    """
+    diffs: List[float] = []
+    for sample in samples:
+        if not (
+            math.isfinite(sample.gauge)
+            and math.isfinite(sample.abs_a)
+            and math.isfinite(sample.abs_b)
+        ):
+            continue
+        if abs(sample.gauge) <= ORIFICE_TARE_VACUUM_MBAR:
+            diffs.append(sample.abs_a - sample.abs_b)
+        elif diffs:
+            break
+    if not diffs:
+        return None
+    return sum(diffs) / len(diffs)
+
+
 def _diag_from_samples(samples: List[WasteSample], target: float) -> WasteDiag:
     """Summarize a hold from its samples.
 
     on_target_s is time inside the detector's ±20 mbar band. brake_s is the
-    part of that time with commanded RPM under BRAKE_RPM. mean_abs_ab is
-    |A−B| inside the band. brake_slope_mbar_s is the gauge slope for every
-    sample whose commanded RPM is under BRAKE_RPM.
+    part of that time with commanded RPM under BRAKE_RPM. mean_abs_ab and
+    max_abs_ab are the tared |A−B| inside that band. brake_slope_mbar_s is
+    the gauge slope for every sample whose commanded RPM is under BRAKE_RPM.
     """
     if not samples:
         return _empty_diag()
+    tare = _orifice_tare(samples)
     on_target_s = 0.0
     brake_s = 0.0
     abs_ab: List[float] = []
@@ -130,14 +157,23 @@ def _diag_from_samples(samples: List[WasteSample], target: float) -> WasteDiag:
         if in_band:
             on_target_s += dt
             if math.isfinite(sample.abs_a) and math.isfinite(sample.abs_b):
-                abs_ab.append(abs(sample.abs_a - sample.abs_b))
+                live_dp = sample.abs_a - sample.abs_b
+                residual = abs(live_dp if tare is None else live_dp - tare)
+                abs_ab.append(residual)
             if braked:
                 brake_s += dt
         if braked:
             brake_t.append(sample.t_s)
             brake_g.append(sample.gauge)
     mean_abs_ab = sum(abs_ab) / len(abs_ab) if abs_ab else None
-    return WasteDiag(on_target_s, brake_s, mean_abs_ab, _gauge_slope(brake_t, brake_g))
+    max_abs_ab = max(abs_ab) if abs_ab else None
+    return WasteDiag(
+        on_target_s,
+        brake_s,
+        mean_abs_ab,
+        max_abs_ab,
+        _gauge_slope(brake_t, brake_g),
+    )
 
 
 def _sample_columns() -> List[Any]:
@@ -158,6 +194,8 @@ def build_csv_lines() -> List[CSVLine]:
         float,  # brake_s, commanded RPM under 1 while in band
         float,  # gauge slope while commanded RPM is braked
         float,  # atmospheric, sampled once
+        float,  # mean tared |A-B| while in band
+        float,  # max tared |A-B| while in band
         *_sample_columns(),
         *_sample_columns(),
         *_sample_columns(),
@@ -513,6 +551,8 @@ def _report_hold(
             _csv_float(diag.brake_s),
             _csv_float(diag.brake_slope_mbar_s),
             _csv_float(result.atm),
+            _csv_float(diag.mean_abs_ab),
+            _csv_float(diag.max_abs_ab),
             *_padded_series([sample.abs_b for sample in result.samples]),
             *_padded_series([sample.target_rpm for sample in result.samples]),
             *_padded_series([sample.current_rpm for sample in result.samples]),
@@ -520,7 +560,8 @@ def _report_hold(
     )
     print(
         f"diag on_target={diag.on_target_s:.1f}s brake={diag.brake_s:.1f}s "
-        f"|A-B|={_fmt(diag.mean_abs_ab)} slope={_fmt(diag.brake_slope_mbar_s)} mbar/s"
+        f"tared |A-B| mean={_fmt(diag.mean_abs_ab)} max={_fmt(diag.max_abs_ab)} "
+        f"slope={_fmt(diag.brake_slope_mbar_s)} mbar/s"
     )
 
 
