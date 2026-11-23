@@ -8,8 +8,8 @@ import {
   getModuleDef,
   HEATERSHAKER_MODULE_TYPE,
   OT2_STANDARD_DECKID,
-  STD_SLOT_X_DIM,
-  STD_SLOT_Y_DIM,
+  SLOT_RENDER_HEIGHT,
+  SLOT_RENDER_WIDTH,
   TEMPERATURE_MODULE_TYPE,
   VACUUM_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -83,45 +83,34 @@ export const ModuleCommandSummary = (
   const hopperAdjustmentX = showHopperAdjustment ? 190 : 0
   const hopperAdjustmentY = showHopperAdjustment ? -5 : 0
 
-  // Vacuum footprint includes the dock; outline only the main plate interface.
-  if (def?.moduleType === VACUUM_MODULE_TYPE) {
-    return (
-      <DeckLabelSet
-        ref={labelContainerRef}
-        deckLabels={[
-          {
-            text: commandSummary,
-            isSelected: true,
-            isLast: true,
-            moduleModel: def?.model,
-            isZoomed: false,
-          },
-        ]}
-        x={position[0] + def.labwareOffset.x}
-        y={position[1] + def.labwareOffset.y - labelContainerHeight}
-        width={def.dimensions.labwareInterfaceXDimension ?? STD_SLOT_X_DIM}
-        height={def.dimensions.labwareInterfaceYDimension ?? STD_SLOT_Y_DIM}
-        showModuleIcon={showModuleIcon}
-      />
-    )
-  }
-
-  const x =
-    position[0] +
-    def.cornerOffsetFromSlot.x +
-    (cornerOffsetsFromSlotFromTransform?.[0][3] ?? 0) +
-    hopperAdjustmentX +
-    tempAdjustmentX +
-    heaterShakerAdjustmentX -
-    1
-
-  const y =
-    position[1] +
-    def.cornerOffsetFromSlot.y +
-    (cornerOffsetsFromSlotFromTransform?.[1][3] ?? 0) -
-    labelContainerHeight +
-    tempAdjustmentY +
-    hopperAdjustmentY
+  // Vacuum cornerOffset is (0,0) but the footprint is larger than the slot —
+  // center it like CenterLabwareInSlot does for labware.
+  const isVacuum = def?.moduleType === VACUUM_MODULE_TYPE
+  const width = isVacuum
+    ? def.dimensions.xDimension + 2
+    : def.dimensions.xDimension + (showHopperAdjustment ? -15 : 2)
+  const height = isVacuum
+    ? def.dimensions.yDimension + 2
+    : def.dimensions.yDimension + (showHopperAdjustment ? 10 : 2)
+  const x = isVacuum
+    ? position[0] + (SLOT_RENDER_WIDTH - def.dimensions.xDimension) / 2
+    : position[0] +
+      def.cornerOffsetFromSlot.x +
+      (cornerOffsetsFromSlotFromTransform?.[0][3] ?? 0) +
+      hopperAdjustmentX +
+      tempAdjustmentX +
+      heaterShakerAdjustmentX -
+      1
+  const y = isVacuum
+    ? position[1] +
+      (SLOT_RENDER_HEIGHT - def.dimensions.yDimension) / 2 -
+      labelContainerHeight
+    : position[1] +
+      def.cornerOffsetFromSlot.y +
+      (cornerOffsetsFromSlotFromTransform?.[1][3] ?? 0) -
+      labelContainerHeight +
+      tempAdjustmentY +
+      hopperAdjustmentY
 
   return (
     <DeckLabelSet
@@ -137,8 +126,8 @@ export const ModuleCommandSummary = (
       ]}
       x={x}
       y={y}
-      width={def?.dimensions.xDimension + (showHopperAdjustment ? -15 : 2)}
-      height={def?.dimensions.yDimension + (showHopperAdjustment ? 10 : 2)}
+      width={width}
+      height={height}
       showModuleIcon={showModuleIcon}
     />
   )

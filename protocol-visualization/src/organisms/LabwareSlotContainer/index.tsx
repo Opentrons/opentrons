@@ -89,7 +89,7 @@ export function LabwareSlotContainer(
     item => moduleEntities[item]?.type === VACUUM_MODULE_TYPE
   )
   const displaySlot =
-    slot === 'offDeck' ? 'OffDeck' : getModuleLocationSlot(slot)
+    slot === 'offDeck' ? t('off_deck') : getModuleLocationSlot(slot)
   const vacuumModuleDisplayName =
     vacuumModuleId != null
       ? getModuleDisplayName(moduleEntities[vacuumModuleId].model)
@@ -200,30 +200,20 @@ export function LabwareSlotContainer(
             {labware[topLabwareOnSlotId]?.stack
               .filter(item => item !== topLabwareOnSlotId)
               .reverse()
-              .map((item, index) => {
+              .map(item => {
                 if (moduleEntities[item] != null) {
                   return (
                     <RobotInfoLabel
-                      key={`${item}-${index}`}
+                      key={item}
                       iconName={
                         MODULE_ICON_NAME_BY_TYPE[moduleEntities[item].type]
                       }
                     />
                   )
                 } else if (labware[item] != null) {
-                  return (
-                    <RobotInfoLabel
-                      key={`${item}-${index}`}
-                      iconName="stacked"
-                    />
-                  )
+                  return <RobotInfoLabel key={item} iconName="stacked" />
                 } else {
-                  return (
-                    <RobotInfoLabel
-                      key={`${item}-${index}`}
-                      deckLabel={displaySlot}
-                    />
-                  )
+                  return <RobotInfoLabel key={item} deckLabel={displaySlot} />
                 }
               })}
           </div>

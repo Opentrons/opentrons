@@ -53,17 +53,15 @@ export function LabwareCommandSummary(
   const showDeckRiserAdjustments =
     labwareDef.parameters.loadName === 'opentrons_flex_deck_riser'
   const { minX, minY, maxX, maxY } = getLabwareViewBox(labwareDef)
+  const x =
+    position[0] + minX - (showDeckRiserAdjustments ? DECK_RISER_ADJUSTED_X : 0)
 
   return (
     <CenterLabwareInSlot definition={labwareDef}>
       <DeckLabelSet
         ref={labelContainerRef}
         deckLabels={deckLabels}
-        x={
-          position[0] +
-          minX -
-          (showDeckRiserAdjustments ? DECK_RISER_ADJUSTED_X : 0)
-        }
+        x={x}
         y={position[1] + minY - labelContainerHeight}
         width={
           showDeckRiserAdjustments
