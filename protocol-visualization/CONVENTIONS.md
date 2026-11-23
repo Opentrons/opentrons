@@ -36,5 +36,5 @@ Summary:
 
 ## Lint
 
-- ESLint includes this package via root [`tsconfig-eslint.json`](../tsconfig-eslint.json).
+- Oxlint covers this package via root [`.oxlintrc.json`](../.oxlintrc.json).
 - Before merging, run **`make lint-js lint-css lint-json`** from the monorepo root, or **`make -C protocol-visualization lint`**.

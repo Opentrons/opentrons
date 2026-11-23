@@ -25,7 +25,7 @@ ruff-check:
 format: 
 	@echo "Running ruff"
 	$(MAKE) ruff
-	@echo "Formatting the readme with pnpm exec prettier"
+	@echo "Formatting the readme with pnpm exec oxfmt"
 	$(MAKE) format-readme
 
 .PHONY: audit

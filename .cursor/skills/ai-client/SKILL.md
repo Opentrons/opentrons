@@ -126,7 +126,7 @@ Run from the **monorepo root**:
 make -C opentrons-ai-client dev     # Start Vite dev server
 make test-js-opentrons-ai-client    # Run unit tests
 make format-js                      # Oxfmt auto-fix
-make lint-js                        # ESLint + Oxfmt check
+make lint-js                        # Oxlint + Oxfmt check
 make lint-css                       # Stylelint check
 make check-js                       # TypeScript type check
 ```

@@ -1,12 +1,8 @@
-# opentrons ai client makefile
-
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
-# add node_modules/.bin to PATH
 PATH := $(shell cd .. && pnpm exec bin):$(PATH)
 
-# dev server port
 PORT ?= 5173
 
 # These variables can be overriden when make is invoked to customize the
@@ -15,11 +11,7 @@ tests ?=
 cov_opts ?= --coverage=true
 test_opts ?=
 
-# This variable is for all command
 target ?= production
-
-# standard targets
-#####################################################################
 
 .PHONY: all
 all: clean build-$(target)
@@ -31,9 +23,6 @@ setup:
 .PHONY: clean
 clean:
 	pnpm exec shx rm -rf dist
-
-# artifacts
-#####################################################################
 
 .PHONY: build-production
 build-production: export NODE_ENV := production
@@ -51,16 +40,12 @@ build-staging:
 build:
 	pnpm exec vite build
 
-# development
-#####################################################################
-
 .PHONY: dev
 dev: export NODE_ENV := development
 dev: export PORT := $(PORT)
 dev:
 	pnpm exec vite serve
 
-# production assets server
 .PHONY: serve
 serve: all
 	pnpm exec vite preview

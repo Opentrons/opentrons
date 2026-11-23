@@ -1,5 +1,3 @@
-# opentrons ai server makefile
-
 include ../scripts/python-uv.mk
 
 # Pin the Python API docs release synced into LLM context. Bump when publishing new mkdocs tags.

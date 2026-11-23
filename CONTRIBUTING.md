@@ -235,7 +235,7 @@ To help with code quality and maintainability, we use a collection of tools that
 - [Linters][lint]
   - Analyze the code for various potential bugs and errors
   - [Flake8][flake8] - Python code audit tool
-  - [ESLint][eslint] - JavaScript/JSON linter
+  - [Oxlint][oxlint] - JavaScript linter
   - [stylelint][] - CSS linter
 - [Typecheckers][type-check]
   - Verify that the code is [type safe][type-safe]
@@ -269,23 +269,22 @@ make format
 [type-check]: https://en.wikipedia.org/wiki/Type_system#Type_checking
 [type-safe]: https://en.wikipedia.org/wiki/Type_safety
 [code-style]: https://en.wikipedia.org/wiki/Programming_style
-[eslint]: https://eslint.org/
 [flake8]: https://flake8.pycqa.org
 [stylelint]: https://stylelint.io/
 [typescript]: https://www.typescriptlang.org/
 [mypy]: http://mypy-lang.org/
+[oxlint]: https://oxc.rs/docs/guide/usage/linter
 [oxfmt]: https://oxc.rs/docs/guide/usage/formatter
 
 #### Editor setup
 
 Most, if not all, of the tools above have plugins available for your code editor that will run quality checks and formatting as you write and/or save. We **highly recommend** setting up your editor to format and check your code automatically.
 
-- ESLint - <https://eslint.org/docs/user-guide/integrations#editors>
+- Oxlint / Oxfmt - <https://oxc.rs/docs/guide/usage/linter/editors.html>
 - stylelint - <https://stylelint.io/user-guide/complementary-tools/#editor-plugins>
 - Flake8 - Search your editor's package manager
 - mypy - Search your editor's package manager
 - TypeScript - <https://github.com/Microsoft/TypeScript/wiki/TypeScript-Editor-Support>
-- Oxfmt - <https://oxc.rs/docs/guide/usage/formatter>
 
 ### Adding dependencies
 
@@ -298,7 +297,7 @@ JavaScript dependencies are installed by [pnpm][]. When calling pnpm, you should
 A development dependency is any dependency that is used only to help manage the project. Examples of development dependencies would be:
 
 - Build tools (webpack, babel)
-- Testing/linting/checking tools (vitest, typescript, eslint)
+- Testing/linting/checking tools (vitest, typescript, oxlint, oxfmt)
 - Libraries used only in support scripts (aws, express)
 
 To add a development dependency:
