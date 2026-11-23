@@ -11,6 +11,8 @@ from hardware_testing.data.csv_report import (
 
 from opentrons.hardware_control.modules.vacuum_module import VacuumModule
 
+from .common import resting_sensor_faults, sensor_replace_message
+
 
 PRESSURE_SAMPLES = 10
 
@@ -34,19 +36,27 @@ async def test_abs_sensors_for_comms(
     """Test the communication of the atm pressure sensor."""
     ui.print_header(f"Pressure Sensor - {sensor} sensor.")
 
-    data = []
+    abs_a: List[float] = []
+    abs_b: List[float] = []
+    data: List[float] = []
     for i in range(PRESSURE_SAMPLES):
         await vacuum._reader.update_vacuum_state()
         state = vacuum.vacuum_state
-        pressure = state.pressure_atm
-        data.append(pressure)
-        print(f"Pressure Sensor ABS {sensor} #{i}: {pressure}")
+        abs_a.append(state.pressure_abs_a)
+        abs_b.append(state.pressure_abs_b)
+        data.append(state.pressure_atm)
+        print(f"Pressure Sensor ATM #{i}: {state.pressure_atm}")
 
+    faults = resting_sensor_faults(abs_a, abs_b, data)
+    if "atm" in faults:
+        ui.print_error(sensor_replace_message(faults, abs_a, abs_b, data))
+    comms_ok = all(data)
+    offset_ok = "atm" not in faults
     report(
         section,
         f"pressure-{sensor}-basic",
         [
-            CSVResult.from_bool(all(data) or not expect_pass),
+            CSVResult.from_bool((comms_ok and offset_ok) or not expect_pass),
             *data,
         ],
     )
