@@ -46,7 +46,7 @@ mypy:
 
 .PHONY: format-readme
 format-readme:
-	cd .. && pnpm exec prettier --ignore-path .eslintignore --write opentrons-ai-server/**/*.md opentrons-ai-server/**/*.json
+	cd .. && pnpm exec oxfmt --write opentrons-ai-server/**/*.md opentrons-ai-server/**/*.json
 
 .PHONY: lint
 lint: ruff-check mypy
@@ -55,7 +55,7 @@ lint: ruff-check mypy
 format:
 	@echo running ruff format and lint fix
 	$(MAKE) ruff
-	@echo formatting the readme with pnpm exec prettier
+	@echo formatting the readme with pnpm exec oxfmt
 	$(MAKE) format-readme
 
 .PHONY: prep

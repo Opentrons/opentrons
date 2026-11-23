@@ -47,7 +47,7 @@ build-ts:
 
 .PHONY: format-js
 format-js:
-	pnpm exec oxfmt --ignore-path ../.eslintignore --write $(FORMAT_FILE_GLOB)
+	pnpm exec oxfmt --write $(FORMAT_FILE_GLOB)
 
 .PHONY: lint-js
 lint-js: lint-js-oxlint lint-js-oxfmt
@@ -58,7 +58,7 @@ lint-js-oxlint:
 
 .PHONY: lint-js-oxfmt
 lint-js-oxfmt:
-	pnpm exec oxfmt --ignore-path ../.eslintignore --check $(FORMAT_FILE_GLOB)
+	pnpm exec oxfmt --check $(FORMAT_FILE_GLOB)
 
 
 # Python targets

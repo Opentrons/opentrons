@@ -61,7 +61,6 @@
     "**/*.gif",
     "**/*.svg",
     "**/*.webp",
-    ".prettierrc.js",
     "eslint.config.js",
     ".stylelintrc.js"
   ],

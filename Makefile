@@ -297,7 +297,7 @@ $(SHARED_DATA_DIR)-py-format:
 
 .PHONY: format-js
 format-js:
-	pnpm exec oxfmt --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
+	pnpm exec oxfmt --write $(FORMAT_FILE_GLOB)
 
 .PHONY: format-css
 format-css:

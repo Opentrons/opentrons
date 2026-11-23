@@ -83,4 +83,4 @@ prod-deploy:
 
 .PHONY: format-md-json
 format-md-json:
-	pnpm exec prettier --ignore-path .eslintignore --write **/*.md **/*.json
+	pnpm exec oxfmt --write **/*.md **/*.json
