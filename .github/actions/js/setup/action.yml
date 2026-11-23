@@ -19,7 +19,7 @@ runs:
         version: 11.28.7
 
     - name: 'Setup Node'
-      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+      uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
       with:
         node-version: '24.22.1'
         cache: 'pnpm'
@@ -28,7 +28,7 @@ runs:
           components-testing/pnpm-lock.yaml
 
     - name: 'Setup Python'
-      uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4.9.1
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
       with:
         python-version: '3.12'
 
