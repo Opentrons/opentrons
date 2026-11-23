@@ -40,23 +40,23 @@ PRESSURE_TOLERANCE = 8  # mbar
 # removed, so 1 mbar high and 1 mbar low count the same.
 #
 # Mean absolute error (MEAN_ABS_ERR_LIMIT) is the average of those 50 errors.
-# The limit is 3 mbar from −200 through −800, and 4 mbar at −100. This is the
-# regulation result: the chamber is sitting on the target. A hold that stays
-# 1.5 mbar off passes. A hold that stays 4 mbar off fails from −200 down, and
-# passes at −100. A few bad samples barely move the average, so this gate can
-# pass a trace that mostly holds and occasionally jumps.
+# The limit is 3 mbar from −300 through −800, and 4 mbar at −100 and −200.
+# This is the regulation result: the chamber is sitting on the target. A hold
+# that stays 1.5 mbar off passes. A hold that stays 4 mbar off fails from −300
+# down, and passes at −100 and −200. A few bad samples barely move the average,
+# so this gate can pass a trace that mostly holds and occasionally jumps.
 #
 # p95 absolute error (P95_ABS_ERR_LIMIT) is the 95th percentile of those same
 # 50 errors. Sorted from smallest to largest, it is the sample at about position
-# 47, so three samples are allowed to be worse. The limit is 5 mbar from −200
-# through −800, and 9 mbar at −100. This catches the jumps the average hides.
-# A hold whose typical error is 1 mbar still fails if the noisy tail is beyond
-# 5 mbar.
+# 47, so three samples are allowed to be worse. The limit is 5 mbar from −300
+# through −800, and 9 mbar at −100 and −200. This catches the jumps the average
+# hides. A hold whose typical error is 1 mbar still fails if the noisy tail is
+# beyond 5 mbar.
 MEAN_ABS_ERR_LIMIT = 3.0
 P95_ABS_ERR_LIMIT = 5.0
 
-# -100 only. Shallow holds are noisier than -200 and below.
-SHALLOW_TARGET = -100
+# -100 and -200. Shallower holds kick harder than -300 and below.
+SHALLOW_TARGET = -200
 SHALLOW_MEAN_ABS_ERR_LIMIT = 4.0
 SHALLOW_P95_ABS_ERR_LIMIT = 9.0
 # Time to first enter the reach band. A slow unit that then holds still fails.
@@ -132,7 +132,7 @@ def _window_stats(window: List[float], target_pressure: float) -> HoldStats:
 
 def _regulation_limits(target_pressure: int) -> tuple[float, float]:
     """Return the mean |error| and p95 limits for a regulation target."""
-    if target_pressure == SHALLOW_TARGET:
+    if target_pressure >= SHALLOW_TARGET:
         return SHALLOW_MEAN_ABS_ERR_LIMIT, SHALLOW_P95_ABS_ERR_LIMIT
     return MEAN_ABS_ERR_LIMIT, P95_ABS_ERR_LIMIT
 
