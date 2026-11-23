@@ -1,6 +1,8 @@
 """Implementation for talking to the RT214C scanner."""
 
 import logging
+from os.path import realpath
+from time import monotonic
 from typing import ByteString, Optional
 
 from serial.tools.list_ports import comports  # type: ignore[import-untyped]
@@ -36,8 +38,8 @@ class SmartScanner(AbstractBarcodeScannerDriver):
                     device = p.device
         else:
             for p in ports:
-                if p.device == port and p.vid == 0xAC90:
-                    device = port
+                if realpath(p.device) == realpath(port) and p.vid == 0xAC90:
+                    device = p.device
         if device is None:
             raise RuntimeError("No scanner found.")
         read_timeout_ms = 4000
@@ -61,6 +63,7 @@ class SmartScanner(AbstractBarcodeScannerDriver):
         self._conn = connection
         self._prefix = ""
         self._suffix = ""
+        self._receive_buffer = b""
 
     async def connect(self) -> None:
         await self.set_scan_timeout(self._timeout_ms)
@@ -89,7 +92,9 @@ class SmartScanner(AbstractBarcodeScannerDriver):
         cmd = (len(cmd) + 1).to_bytes(1) + cmd
         cmd = cmd + self.calculate_checksum(cmd)
         await self._conn.write(cmd)
-        await self._conn.read_until(bytes(ack))  # eat the ack response
+        # Preserve data received while waiting for acknowledgement. Some scanners
+        # send a different response, or a manually scanned barcode, here.
+        self._receive_buffer += await self._conn.read_until(bytes(ack))
 
     async def _set_scan_terminator(self, terminator: ByteString) -> None:
         self._scan_terminator = terminator
@@ -97,24 +102,60 @@ class SmartScanner(AbstractBarcodeScannerDriver):
 
     async def scan_barcode(self) -> Optional[str]:
         """Search for a barcode and return if found else None."""
-        self._conn.reset_input_buffer()
-        self._conn.reset_output_buffer()
-        await self.send_cmd(bytes(scan_trigger))
-        try:
-            barcode: bytes = await self._conn.read_until(bytes(self._scan_terminator))
-        except BaseException:
-            log.exception("failed to scan")
-            barcode = b""
-        if barcode == ack:
-            log.warning("Barcode scanner hardware timed out")
-            barcode = b""
-        log.debug(f"Scanned {barcode.decode('ascii')}")
-        if len(barcode) == 0:
-            return None
-        else:
-            # strip off our internal terminator
-            barcode = barcode[: -1 * len(self._scan_terminator)]
-        return f"{self._prefix}{barcode.decode('ascii')}{self._suffix}"
+        command = (len(scan_trigger) + 1).to_bytes(1) + bytes(scan_trigger)
+        await self._conn.write(command + self.calculate_checksum(command))
+        read_timeout = self._timeout_ms / 1000
+        idle_deadline = monotonic() + read_timeout
+        hard_deadline = monotonic() + 2 * read_timeout
+        while True:
+            barcode = self._barcode_from_receive_buffer()
+            if barcode is not None:
+                return barcode
+            remaining = min(idle_deadline, hard_deadline) - monotonic()
+            if remaining <= 0:
+                return None
+            async with self._conn.timeout_override("timeout", remaining):
+                chunk = await self._conn.read_until(bytes(self._scan_terminator))
+            if not chunk:
+                return None
+            self._receive_buffer += chunk
+            # A response frame or a fragmented barcode may consume the initial
+            # timeout. Give newly received data time to complete, within the
+            # hard limit for one scan attempt.
+            idle_deadline = monotonic() + read_timeout
+
+    def _barcode_from_receive_buffer(self) -> Optional[str]:
+        """Remove scanner responses and return the first complete barcode."""
+        # Responses are binary length-prefixed frames. Keep them separate from
+        # CRLF-terminated barcode text, even across serial read chunks.
+        while self._receive_buffer:
+            data = self._receive_buffer
+            if self._discard_response_frame():
+                continue
+            end = data.find(bytes(self._scan_terminator))
+            if end < 0:
+                return None
+            barcode = data[:end]
+            self._receive_buffer = data[end + len(self._scan_terminator) :]
+            if barcode:
+                return f"{self._prefix}{barcode.decode('ascii')}{self._suffix}"
+        return None
+
+    def _discard_response_frame(self) -> bool:
+        """Discard one complete binary response frame, if present."""
+        data = self._receive_buffer
+        if len(data) < 2 or data[0] >= 0x20 or data[1] not in (0xD0, 0xD1):
+            return False
+        frame_size = data[0] + 2
+        if len(data) < frame_size:
+            return False
+        frame = data[:frame_size]
+        if self.calculate_checksum(frame[:-2]) != frame[-2:]:
+            raise ValueError(f"Invalid scanner response checksum: {frame.hex()}")
+        if frame != ack:
+            log.warning("Unexpected scanner response: %s", frame.hex(" "))
+        self._receive_buffer = data[frame_size:]
+        return True
 
     async def _fetch_device_info(self) -> None:
         serial = "fake serial for smartscan"
