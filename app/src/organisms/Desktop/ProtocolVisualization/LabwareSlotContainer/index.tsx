@@ -211,7 +211,10 @@ export function LabwareSlotContainer(
                   )
                 } else {
                   return (
-                    <RobotInfoLabel key={`${item}-${index}`} deckLabel={slot} />
+                    <RobotInfoLabel
+                      key={`${item}-${index}`}
+                      deckLabel={slot === 'offDeck' ? 'OffDeck' : slot}
+                    />
                   )
                 }
               })}
