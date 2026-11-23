@@ -58,7 +58,6 @@ async def test_vent_set_state(
 
 async def _pull_for_bleed(vacuum: VacuumModule) -> float:
     """Close the vent, pull toward -800, and return the gauge reached."""
-
     print(f"Setting Pressure Target: {BLEED_TARGET_MBAR}")
     await vacuum.set_vacuum_state(False)
     await vacuum.set_vent_state(types.VentState.CLOSED)

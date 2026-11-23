@@ -3,12 +3,13 @@
 import math
 import asyncio
 import time
-from typing import Any, Awaitable, List, NamedTuple, Optional, Tuple
+from typing import Any, Awaitable, List, NamedTuple, Optional, Tuple, Union
 
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import (
     CSVReport,
     CSVLine,
+    CSVLineRepeating,
     CSVResult,
 )
 
@@ -181,13 +182,14 @@ def _sample_columns() -> List[Any]:
     return [float] * WASTE_SAMPLE_COUNT
 
 
-def build_csv_lines() -> List[CSVLine]:
+def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV lines."""
     # Gauge is absolute B minus the one atmospheric reading.
     # Then each series is WASTE_SAMPLE_COUNT columns:
     # absolute B, commanded RPM, measured RPM.
     hold_fields: List[Any] = [
         CSVResult,
+        str,  # detection or no-detection; the line still passes
         float,  # trip_t_s; -1 if no trip
         float,  # elapsed_s
         float,  # on_target_s
@@ -200,7 +202,7 @@ def build_csv_lines() -> List[CSVLine]:
         *_sample_columns(),
         *_sample_columns(),
     ]
-    lines: List[CSVLine] = [
+    lines: List[Union[CSVLine, CSVLineRepeating]] = [
         CSVLine(
             "waste-config-tunings",
             [
@@ -370,22 +372,52 @@ async def test_waste_config_roundtrip(
     )
 
 
-async def _run_waste_hold(
-    vacuum: VacuumModule, target_mbar: int, expect_trip: bool
+class _ArmedHold(NamedTuple):
+    """A waste hold that got past equalization and the pump start."""
+
+    t0: float
+    duration_s: int
+    sample_period: float
+
+
+def _hold_timing(simulated: bool) -> Tuple[int, float]:
+    """Return the hold length and the pause between samples."""
+    if simulated:
+        return 1, 0.0
+    return HOLD_DURATION_S, SAMPLE_PERIOD_S
+
+
+def _hold_ended_early(
+    tripped: bool,
+    trip_t_s: Optional[float],
+    elapsed_s: float,
+    equalized: bool,
 ) -> WasteHoldResult:
-    """Hold ``target_mbar`` with waste on until duration or ERR401."""
+    """Result for a hold that stopped before it recorded samples."""
+    return WasteHoldResult(
+        tripped,
+        trip_t_s,
+        elapsed_s,
+        False,
+        equalized,
+        0.0,
+        [],
+        _empty_diag(),
+        None,
+    )
+
+
+async def _open_waste_hold(
+    vacuum: VacuumModule, target_mbar: int, expect_trip: bool
+) -> Union[WasteHoldResult, _ArmedHold]:
+    """Arm the hold. A result means it ended before sampling."""
     await _recover_after_hold(vacuum)
-    equalized = await _wait_to_pressurize(vacuum)
-    if not equalized:
-        return WasteHoldResult(
-            False, None, 0.0, False, False, 0.0, [], _empty_diag(), None
-        )
+    if not await _wait_to_pressurize(vacuum):
+        return _hold_ended_early(False, None, 0.0, False)
 
     await vacuum.set_vent_state(VentState.CLOSED)
     await vacuum._driver.set_waste_configs(enable_waste_full_detection=True)
-
-    duration_s = 1 if vacuum.is_simulated else HOLD_DURATION_S
-    sample_period = 0.0 if vacuum.is_simulated else SAMPLE_PERIOD_S
+    duration_s, sample_period = _hold_timing(vacuum.is_simulated)
     t0 = time.monotonic()
     try:
         await vacuum.set_vacuum_state(
@@ -395,21 +427,24 @@ async def _run_waste_hold(
             timeout_s=TIMEOUT_S,
         )
     except Exception as exc:
-        if _is_waste_full_error(exc):
-            return WasteHoldResult(
-                True,
-                0.0,
-                time.monotonic() - t0,
-                False,
-                True,
-                0.0,
-                [],
-                _empty_diag(),
-                None,
-            )
-        raise
+        if not _is_waste_full_error(exc):
+            raise
+        return _hold_ended_early(True, 0.0, time.monotonic() - t0, True)
     if vacuum.is_simulated and expect_trip:
         vacuum.inject_async_gcode_response("ERR401")
+    return _ArmedHold(t0, duration_s, sample_period)
+
+
+async def _run_waste_hold(
+    vacuum: VacuumModule, target_mbar: int, expect_trip: bool
+) -> WasteHoldResult:
+    """Hold ``target_mbar`` with waste on until duration or ERR401."""
+    armed = await _open_waste_hold(vacuum, target_mbar, expect_trip)
+    if isinstance(armed, WasteHoldResult):
+        return armed
+    t0 = armed.t0
+    duration_s = armed.duration_s
+    sample_period = armed.sample_period
 
     tripped = False
     trip_t_s: Optional[float] = None
@@ -530,12 +565,16 @@ def _padded_series(values: List[Optional[float]]) -> List[Optional[float]]:
     return padded
 
 
+def _detection_label(result: WasteHoldResult) -> str:
+    """Return the waste call, separate from the line's pass result."""
+    return "detection" if result.tripped else "no-detection"
+
+
 def _report_hold(
     report: CSVReport,
     section: str,
     tag: str,
     result: WasteHoldResult,
-    passed: bool,
 ) -> None:
     """Store one hold on its trip line, summary first, then each sample series."""
     trip_out = result.trip_t_s if result.trip_t_s is not None else -1.0
@@ -544,7 +583,8 @@ def _report_hold(
         section,
         tag,
         [
-            CSVResult.from_bool(passed),
+            CSVResult.PASS,
+            _detection_label(result),
             round(trip_out, 2),
             round(result.elapsed_s, 2),
             _csv_float(diag.on_target_s),
@@ -568,7 +608,7 @@ def _report_hold(
 async def test_waste_empty(
     vacuum: VacuumModule, report: CSVReport, section: str
 ) -> None:
-    """Empty bottle must not trip while the pump holds vacuum."""
+    """Record whether the empty bottle trips. The CSV line passes either way."""
     if not vacuum.is_simulated:
         ui.get_user_ready("Fit a filter plate with liquid, fit an EMPTY waste carboy")
     for target in TARGET_PRESSURES:
@@ -581,14 +621,14 @@ async def test_waste_empty(
             f"trip_t={trip_out:.2f}s pulled={result.pulled} "
             f"elapsed={result.elapsed_s:.2f}s PASS={passed}"
         )
-        _report_hold(report, section, _empty_tag(target), result, passed)
+        _report_hold(report, section, _empty_tag(target), result)
         await _recover_after_hold(vacuum)
 
 
 async def test_waste_full(
     vacuum: VacuumModule, report: CSVReport, section: str
 ) -> None:
-    """Full bottle must trip with ERR401 within the time cap."""
+    """Record whether the full bottle trips. The CSV line passes either way."""
     if not vacuum.is_simulated:
         ui.get_user_ready("Fit a FULL waste carboy")
     for target in TARGET_PRESSURES:
@@ -600,7 +640,7 @@ async def test_waste_full(
             f"full {target} equalized={result.equalized} tripped={result.tripped} "
             f"trip_t={trip_out:.2f}s elapsed={result.elapsed_s:.2f}s PASS={passed}"
         )
-        _report_hold(report, section, _full_tag(target), result, passed)
+        _report_hold(report, section, _full_tag(target), result)
         await _recover_after_hold(vacuum)
 
 
