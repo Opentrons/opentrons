@@ -406,7 +406,7 @@ You would get a similar error trying to aspirate from or dispense into a well pl
 
 ## Vacuum Module conflicts
 
-When a tall or short collar is seated on the vacuum base in slot A3 or staged on A4, it can block a multi-channel pipette configured for partial tip pickup or pipetting in an adjacent slot, causing a protocol analysis failure.
+When a tall or short collar is seated on the vacuum base in slot A3 or staged on A4, it can block a multi-channel pipette configured for partial tip pickup or pipetting in an adjacent slot. This raises a `LocationNotAccessibleByPipetteError` during protocol analysis.
 
 <figure class="screenshot" markdown>
 ![Protocol analysis failure message for partial tip pickup problems with a vacuum collar](../img/vacuum-partial-tip-error.png){ width="80%" }
