@@ -69,6 +69,7 @@ const SUBHEADER_STYLE = css`
   margin-bottom: ${SPACING.spacing32};
   text-align: ${TYPOGRAPHY.textAlignCenter};
   min-height: 1.75rem;
+  font-size: 0.875rem;
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: ${TYPOGRAPHY.fontSize28};
@@ -166,18 +167,20 @@ export function SimpleWizardBodyContent(props: Props): ReactNode {
                 marginBottom={SPACING.spacing24}
               />
             )}
-            <LegacyStyledText
-              css={isSuccess ? HEADER_STYLE : ERROR_HEADER_STYLE}
-            >
-              {header}
-            </LegacyStyledText>
-            {subHeader != null ? (
-              <LegacyStyledText css={SUBHEADER_STYLE}>
-                {subHeader}
+            <Flex gap={SPACING.spacing8} flexDirection="column">
+              <LegacyStyledText
+                css={isSuccess ? HEADER_STYLE : ERROR_HEADER_STYLE}
+              >
+                {header}
               </LegacyStyledText>
-            ) : (
-              <Flex aria-label="flex_spacing" css={FLEX_SPACING_STYLE} />
-            )}
+              {subHeader != null ? (
+                <LegacyStyledText css={SUBHEADER_STYLE}>
+                  {subHeader}
+                </LegacyStyledText>
+              ) : (
+                <Flex aria-label="flex_spacing" css={FLEX_SPACING_STYLE} />
+              )}
+            </Flex>
           </>
         )}
       </Flex>

@@ -230,6 +230,7 @@ describe('parseNumericalInput', () => {
       result: 'rangeError',
       min: 1,
       max: 10,
+      type: 'max',
     })
     expect(
       parseNumericalInput('0', {
@@ -242,6 +243,7 @@ describe('parseNumericalInput', () => {
       result: 'rangeError',
       min: 1,
       max: 10,
+      type: 'min',
     })
   })
 })

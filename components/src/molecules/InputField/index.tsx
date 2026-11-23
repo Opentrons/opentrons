@@ -78,7 +78,7 @@ export interface InputFieldProps {
   textAlign?:
     typeof TYPOGRAPHY.textAlignLeft | typeof TYPOGRAPHY.textAlignCenter
   /** small or medium input field height, relevant only */
-  size?: 'medium' | 'small'
+  size?: 'medium' | 'xsmall' | 'small'
   /** optional element to display aligned to the left of the input field */
   leftElement?: ReactNode
   /** optional element to display aligned to the right of the input field */
@@ -89,6 +89,12 @@ export interface InputFieldProps {
   padding?: string
   /** optional props for data-testid */
   testId?: string
+  /** optional prop to override component width */
+  width?: string
+  /** optional prop to override input field width */
+  inputWidth?: string
+  /** optional prop to override align items */
+  alignItems?: string
 }
 
 /**
@@ -111,12 +117,15 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       onClick,
       isIndeterminate = false,
       textAlign = TYPOGRAPHY.textAlignLeft,
-      size = 'small',
+      size = 'xsmall',
       leftElement,
       rightElement,
       borderRadius,
       padding,
       testId,
+      width,
+      inputWidth,
+      alignItems,
       ...inputProps
     } = props
     const [targetProps, tooltipProps] = useHoverTooltip()
@@ -142,8 +151,8 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       border: 1px ${BORDERS.styleSolid}
         ${hasError ? COLORS.red50 : COLORS.grey50};
       font-size: ${TYPOGRAPHY.fontSizeP};
-      width: 100%;
-      height: ${size === 'small' ? '2rem' : '2.75rem'};
+      width: ${width ?? '100%'};
+      height: ${size === 'xsmall' ? '2rem' : size === 'small' ? '2.25rem' : '2.75rem'};
 
       & input {
         border-radius: inherit;
@@ -209,7 +218,11 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
         color={error != null ? COLOR_WARNING_DARK : COLORS.black90}
         opacity={disabled === true ? 0.5 : 1}
       >
-        <Flex flexDirection={DIRECTION_COLUMN} width="100%">
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          width="100%"
+          alignItems={alignItems}
+        >
           {title != null ? (
             <Flex
               flexDirection={DIRECTION_ROW}
@@ -234,7 +247,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
             </Flex>
           ) : null}
           <Flex
-            width="100%"
+            width={inputWidth ?? '100%'}
             flexDirection={DIRECTION_COLUMN}
             onClick={disabled === true ? undefined : onClick}
           >

@@ -89,6 +89,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): ReactNode {
         hoveredSlot={hoveredSlot}
         selectedSlot={selectedSlot}
         selectedRunTimeCommand={selectedRunTimeCommand}
+        stagingAreaCutoutIds={stagingAreaCutoutIds}
       />
       {/* SlotControls for all empty deck */}
       <DeckViewSlots
@@ -116,6 +117,7 @@ export function DeckViewDetails(props: DeckViewDetailsProps): ReactNode {
         hoveredSlot={hoveredSlot}
         selectedSlot={selectedSlot}
         selectedRunTimeCommand={selectedRunTimeCommand}
+        stagingAreaCutoutIds={stagingAreaCutoutIds}
       />
       {/* when commandSummary happens on a trash bin */}
       {isPipetteOverTrashBin &&

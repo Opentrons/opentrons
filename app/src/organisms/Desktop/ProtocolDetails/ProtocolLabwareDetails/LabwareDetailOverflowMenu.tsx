@@ -37,9 +37,11 @@ export const LabwareDetailOverflowMenu = ({
     e.preventDefault()
     setShowOverflowMenu(false)
     setShowLabwareDetailSlideout(true)
+    console.log('handleClickMenuItem')
   }
   return (
     <div className={styles.menu_item_container}>
+      {menuOverlay}
       <OverflowBtn onClick={handleOverflowClick} />
       {showOverflowMenu ? (
         <div className={styles.menu_item_wrapper}>
@@ -50,7 +52,6 @@ export const LabwareDetailOverflowMenu = ({
       ) : null}
       {createPortal(
         <>
-          {menuOverlay}
           {showLabwareDetailSlideout ? (
             <LabwareDetails
               labware={labware}

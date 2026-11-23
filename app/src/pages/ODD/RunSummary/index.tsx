@@ -73,7 +73,6 @@ import {
   formatTimeWithUtcLabel,
   useCloseCurrentRun,
   useCurrentRunCommands,
-  useIsRunCurrent,
   useNotifyRunQuery,
   useRunCreatedAtTimestamp,
   useRunTimestamps,
@@ -96,14 +95,15 @@ export function RunSummary(): ReactNode {
   const { data: runRecord, isLoading: isRunRecordLoading } = useNotifyRunQuery(
     runId,
     {
-      staleTime: Infinity,
       onError: () => {
         // in case the run is remotely deleted by a desktop app, navigate to the dash
         navigate('/dashboard')
       },
     }
   )
-  const isRunCurrent = useIsRunCurrent(runId)
+
+  // optimistically assume the run is current until the run record is loaded
+  const isRunCurrent = runRecord == null ? true : runRecord?.data.current
   const runStatus = runRecord?.data.status ?? null
   const didRunSucceed = runStatus === RUN_STATUS_SUCCEEDED
   const wasRunCanceled = runStatus === RUN_STATUS_STOPPED
@@ -245,6 +245,36 @@ export function RunSummary(): ReactNode {
     !isLogDeletedError &&
     !isLogDeleted
 
+  // to prevent flickering
+  const [delayPassed, setDelayPassed] = useState(false)
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDelayPassed(true)
+    }, 5000)
+    return () => {
+      clearTimeout(t)
+    }
+  }, [])
+
+  // This is to prevent the ODD from getting stuck on the splash screen when interacting only from the desktop app
+  // Now, if you haven't interacted with the ODD (i.e. clicked the splash screen), and the run is dismissed, we navigate to the dashboard
+  useEffect(() => {
+    if (
+      !isRunCurrent &&
+      !splashClicked &&
+      !shouldPromptDownloadLog &&
+      delayPassed
+    ) {
+      navigate('/dashboard')
+    }
+  }, [
+    isRunCurrent,
+    splashClicked,
+    shouldPromptDownloadLog,
+    navigate,
+    delayPassed,
+  ])
+
   let headerText: string | null = null
   if (runStatus === RUN_STATUS_SUCCEEDED) {
     headerText = hasCommandErrors
@@ -326,19 +356,16 @@ export function RunSummary(): ReactNode {
       }
       if (!isRunCurrent) {
         setShowSplash(false)
-        setSplashClicked(false)
         return
       }
       if (initialPipettesWithTipsCount === 0 || tipCheckSkippedBecauseER) {
         closeCurrentRunIfValid(() => {
           setShowSplash(false)
-          setSplashClicked(false)
         })
         return
       }
       if (initialPipettesWithTipsCount != null) {
         setShowSplash(false)
-        setSplashClicked(false)
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -529,7 +556,7 @@ export function RunSummary(): ReactNode {
               <SplashBody>{protocolName}</SplashBody>
             </Flex>
           </SplashFrame>
-          {splashClicked ? (
+          {splashClicked && showSplash ? (
             <Flex
               position={POSITION_ABSOLUTE}
               top="0"

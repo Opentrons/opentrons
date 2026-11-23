@@ -7,6 +7,7 @@ import {
 } from '@opentrons/components'
 import {
   FAKE_HOPPER_LOCATION_MAP,
+  getModuleLocationSlot,
   HOPPER_FAKE_LOCATIONS,
 } from '@opentrons/step-generation'
 
@@ -56,7 +57,7 @@ export function SlotSpotlightViewer(
     return null
   }
 
-  let deckLabel = slotId
+  let deckLabel = getModuleLocationSlot(slotId)
   if (HOPPER_FAKE_LOCATIONS.includes(slotId)) {
     deckLabel = FAKE_HOPPER_LOCATION_MAP[slotId as HopperLocationMapKey]
   }

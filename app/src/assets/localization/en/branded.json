@@ -83,7 +83,6 @@
   "restore_description": "Opentrons does not recommend reverting to previous software versions, but you can access previous releases below. For best results, uninstall the existing app and remove its configuration files before installing the previous version.",
   "retrieve_labware_from_stacker_to": "Retrieve {{primaryDefinitionDisplayName}} from Flex Stacker to {{slotName}}",
   "robot_server_version_ot3_description": "The Opentrons Flex software includes the robot server and the touchscreen display interface.",
-  "robot_software_update_required": "A robot software update is required to run protocols with this version of the Opentrons App.",
   "run_failed_modal_description_desktop": "Download the run log and send it to support@opentrons.com for assistance.",
   "secure_labware_explanation_magnetic_module": "<block>Opentrons recommends ensuring your labware locks to the Magnetic Module by adjusting the black plate bracket on top of the module.</block> <block>There are two sizes of plate brackets supplied with your module: standard and deep well. These brackets can be removed and swapped by unscrewing the module's thumb screw (the silver knob on the front).</block>",
   "secure_labware_explanation_thermocycler": "Opentrons recommends securing your labware to the Thermocycler Module by closing its latch. Doing so ensures level and accurate plate placement for optimal results.",

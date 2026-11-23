@@ -17,9 +17,9 @@ import { POSITION_REFERENCE_TOP } from '@opentrons/shared-data'
 import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
 import { ANALYTICS_QUICK_TRANSFER_SETTING_SAVED } from '/app/redux/analytics'
+import { parseNumericalInput } from '/app/resources/utils/parseNumericalInput'
 
 import { ACTIONS } from '../constants'
 

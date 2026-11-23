@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { COLORS, RobotInfoLabel, StyledText } from '@opentrons/components'
+import { getModuleLocationSlot } from '@opentrons/step-generation'
 
 import styles from './slotdetailsemptystate.module.css'
 
@@ -18,7 +19,7 @@ export function SlotDetailsEmptyState(
   return (
     <div className={styles.slot_empty_container}>
       <div className={styles.slot_empty_header}>
-        <RobotInfoLabel deckLabel={slotId} />
+        <RobotInfoLabel deckLabel={getModuleLocationSlot(slotId)} />
       </div>
       <div className={styles.slot_empty_body}>
         <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey50}>

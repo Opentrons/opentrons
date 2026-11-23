@@ -37,7 +37,7 @@ describe('ProtocolAnalysisFailure', () => {
   it('renders modal after clicking view details', () => {
     render()
     const viewDetailsButton = screen.getByRole('button', {
-      name: 'error details',
+      name: 'view error details',
     })
     fireEvent.click(viewDetailsButton)
     const closeButton = screen.getByRole('button', { name: 'close' })
