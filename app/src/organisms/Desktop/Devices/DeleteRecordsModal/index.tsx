@@ -37,6 +37,17 @@ export function DeleteRecordsModal(props: DeleteRecordsModalProps): ReactNode {
           ),
           confirmation: t('delete_all'),
         }
+      case 'selectedRun':
+        return {
+          title: t('device_details:delete_selected_run_record'),
+          description: t(
+            'device_details:delete_selected_run_record_description'
+          ),
+          recommendation: t(
+            'device_details:delete_selected_run_record_recommendation'
+          ),
+          confirmation: t('shared:delete'),
+        }
       case 'selectedRuns':
         return {
           title: t('device_details:delete_selected_run_records'),

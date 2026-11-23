@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -18,6 +20,7 @@ import { EMPTY_TIMESTAMP } from '/app/resources/runs'
 import { formatInterval } from '/app/transformations/commands'
 import { formatTimestamp } from '/app/transformations/runs'
 
+import { DeleteRecordsModal } from '../DeleteRecordsModal'
 import { HistoricalProtocolRunOverflowMenu as OverflowMenu } from './HistoricalProtocolRunOverflowMenu'
 import styles from './recentprotocolruns.module.css'
 
@@ -69,13 +72,32 @@ export function HistoricalProtocolRun(
     }
   }
 
+  const [showDeleteRecordsModal, setShowDeleteRecordsModal] =
+    useState<boolean>(false)
+
   const documentationState = useDocumentationState()
 
   const { deleteRun, isLoading: isDeletingRunSingle } =
     useDeleteRunMutation(documentationState)
 
+  const handleDeleteRun = (): void => {
+    setShowDeleteRecordsModal(true)
+  }
+
   return (
     <>
+      {showDeleteRecordsModal ? (
+        <DeleteRecordsModal
+          onClose={() => {
+            setShowDeleteRecordsModal(false)
+          }}
+          onConfirm={() => {
+            void deleteRun({ runId: run.id })
+            setShowDeleteRecordsModal(false)
+          }}
+          type="selectedRun"
+        />
+      ) : null}
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
@@ -129,7 +151,7 @@ export function HistoricalProtocolRun(
             robotName={robotName}
             robotIsBusy={robotIsBusy}
             runHasImages={imageFileCount > 0}
-            deleteRun={deleteRun}
+            deleteRun={handleDeleteRun}
             isDeletingRun={isDeletingRunSingle}
           />
         )}

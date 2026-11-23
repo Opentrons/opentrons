@@ -73,14 +73,13 @@ import type {
 } from 'react'
 import type { RunData } from '@opentrons/api-client'
 import type { IconProps } from '@opentrons/components'
-import type { UseDeleteRunMutationResult } from '@opentrons/react-api-client'
 
 export interface HistoricalProtocolRunOverflowMenuProps {
   run: RunData
   robotName: string
   robotIsBusy: boolean
   runHasImages: boolean
-  deleteRun: UseDeleteRunMutationResult['deleteRun']
+  deleteRun: () => void
   isDeletingRun: boolean
 }
 
@@ -164,7 +163,7 @@ interface MenuDropdownProps extends HistoricalProtocolRunOverflowMenuProps {
   isDownloading: boolean
   setShowRobotOutOfStorageModal: Dispatch<SetStateAction<boolean>>
   setShowOverflowMenu: Dispatch<SetStateAction<boolean>>
-  deleteRun: UseDeleteRunMutationResult['deleteRun']
+  deleteRun: () => void
   isDeletingRun: boolean
 }
 function MenuDropdown(props: MenuDropdownProps): ReactNode {
@@ -241,7 +240,7 @@ function MenuDropdown(props: MenuDropdownProps): ReactNode {
   const handleDeleteClick: MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
     e.stopPropagation()
-    void deleteRun({ runId })
+    deleteRun()
     closeOverflowMenu()
   }
 
