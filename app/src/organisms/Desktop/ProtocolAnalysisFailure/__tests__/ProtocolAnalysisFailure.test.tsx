@@ -46,7 +46,9 @@ describe('ProtocolAnalysisFailure', () => {
   })
   it('dispatches reanalyze action on click', () => {
     const store = render()[1]
-    const reanalyzeButton = screen.getByRole('button', { name: 'Reanalyze' })
+    const reanalyzeButton = screen.getByRole('button', {
+      name: 'Reanalyze protocol',
+    })
     fireEvent.click(reanalyzeButton)
     expect(store.dispatch).toHaveBeenCalledWith(
       analyzeProtocol('fakeProtocolKey')
