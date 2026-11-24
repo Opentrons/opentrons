@@ -16,10 +16,10 @@ from opentrons.drivers.vacuum_module import types
 
 from .common import ATMOSPHERE_WAIT_S, VENT_BLEED_TAG
 
-# Pull this deep, then open the vent. Shallower than this and the bleed
-# did not start from vacuum, so the valve was not tested.
+# Command -800. Pass at -792, the same ±8 mbar reach as the functional holds.
+# A shallower pull means the hose or a vent that did not close.
 BLEED_TARGET_MBAR = -800
-BLEED_MIN_GAUGE_MBAR = -400.0
+BLEED_MIN_GAUGE_MBAR = -792.0
 BLEED_PULL_TIMEOUT_S = 45.0
 
 
@@ -77,7 +77,7 @@ async def _pull_for_bleed(vacuum: VacuumModule) -> float:
         gauge = vacuum.current_gauge_pressure_mbar
         print(f"Gauge: {gauge}")
     await vacuum.set_vacuum_state(False)
-    return vacuum.current_gauge_pressure_mbar
+    return gauge
 
 
 async def test_vent_bleed(

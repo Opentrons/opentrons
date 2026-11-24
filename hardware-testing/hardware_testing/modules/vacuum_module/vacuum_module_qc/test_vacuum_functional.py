@@ -30,6 +30,9 @@ SETTLE_WINDOW_SAMPLES = max(2, round(SETTLE_WINDOW_S / SAMPLE_PERIOD_S))
 TIMEOUT_S = HOLD_DURATION_S + 60
 # First sample inside this band of the command counts as reached.
 PRESSURE_TOLERANCE = 8  # mbar
+# Unscored pull on the filter plate before the holds.
+SEAL_TARGET_MBAR = -800
+SEAL_ATTEMPTS = 2
 
 # Gates: Determines if a run passes or a fails
 # The MEAN_ABS_ERR_LIMIT and P95_ABS_ERR_LIMIT determine if a hold is on target AND
@@ -98,7 +101,9 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
                 float,  # sample_period_s
                 int,  # n samples per target
             ],
-        )
+        ),
+        # result, gauge reached on the filter plate
+        CSVLine("fixture-seal", [CSVResult, float]),
     ]
     for p in TARGET_PRESSURES:
         lines.append(
@@ -193,6 +198,56 @@ def _target_passed(
         and stats.mean_abs_err <= mean_limit
         and stats.p95_abs_err <= p95_limit
     )
+
+
+async def _pull_for_seal(vacuum: VacuumModule) -> float:
+    """Close the vent, pull toward -800, and return the gauge reached."""
+    print("Checking fixture seal")
+    await vacuum.set_vacuum_state(False)
+    await vacuum.set_vent_state(VentState.CLOSED)
+    await vacuum.set_vacuum_state(
+        True,
+        SEAL_TARGET_MBAR,
+        duration_s=int(REACH_TIME_LIMIT_S),
+        timeout_s=int(REACH_TIME_LIMIT_S),
+        vent_after=False,
+    )
+    started = time.monotonic()
+    gauge = vacuum.vacuum_state.current_gauge_pressure
+    while time.monotonic() - started < REACH_TIME_LIMIT_S:
+        await vacuum._reader.update_vacuum_state()
+        gauge = vacuum.vacuum_state.current_gauge_pressure
+        print(f"Gauge: {gauge}")
+        if abs(gauge - SEAL_TARGET_MBAR) <= PRESSURE_TOLERANCE:
+            break
+        await asyncio.sleep(0.5)
+    await vacuum.set_vacuum_state(False)
+    await vacuum.set_vent_state(VentState.OPENED)
+    return gauge
+
+
+async def _fixture_sealed(
+    vacuum: VacuumModule, report: CSVReport, section: str
+) -> bool:
+    """Require -800 on the filter plate. The first miss is a reseat only."""
+    if vacuum.is_simulated:
+        report(section, "fixture-seal", [CSVResult.PASS, float(SEAL_TARGET_MBAR)])
+        return True
+    gauge = 0.0
+    for attempt in range(SEAL_ATTEMPTS):
+        gauge = await _pull_for_seal(vacuum)
+        if abs(gauge - SEAL_TARGET_MBAR) <= PRESSURE_TOLERANCE:
+            report(section, "fixture-seal", [CSVResult.PASS, round(gauge, 2)])
+            return True
+        if attempt == 0:
+            ui.get_user_ready(
+                f"Seal check did not reach {SEAL_TARGET_MBAR} ±{PRESSURE_TOLERANCE}. Reseat the plate, collar, and hose"
+            )
+    ui.print_error(
+        f"Seal check did not reach {SEAL_TARGET_MBAR} ±{PRESSURE_TOLERANCE} after a reseat: gauge={gauge:.1f}"
+    )
+    report(section, "fixture-seal", [CSVResult.FAIL, round(gauge, 2)])
+    return False
 
 
 async def test_vacuum_regulation(
@@ -326,7 +381,6 @@ async def run(vacuum: VacuumModule, report: CSVReport, section: str) -> None:
         "plate with liquid on the manifold"
     )
 
-    print("Set Vacuum State")
     # Disable waste detection for now
     await vacuum._driver.set_waste_configs(enable_waste_full_detection=False)
     report(
@@ -336,6 +390,8 @@ async def run(vacuum: VacuumModule, report: CSVReport, section: str) -> None:
     )
 
     try:
+        if not await _fixture_sealed(vacuum, report, section):
+            return
         for pressure in TARGET_PRESSURES:
             await test_vacuum_regulation(vacuum, pressure, report, section)
     finally:
