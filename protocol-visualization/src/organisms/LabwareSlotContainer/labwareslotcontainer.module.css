@@ -41,6 +41,10 @@
   justify-content: center;
 }
 
+.module_name {
+  align-self: flex-start;
+}
+
 /* Width 172px up to 299px */
 @container labware-slot-container (min-width: 172px) and (max-width: 299px) {
   .main_content {
