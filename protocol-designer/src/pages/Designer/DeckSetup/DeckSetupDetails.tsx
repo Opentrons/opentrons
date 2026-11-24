@@ -776,11 +776,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): ReactNode {
                 showBorder={false}
               />
             ) : null}
-            <HighlightLabware
-              labwareOnDeck={labware}
-              position={slotPosition}
-              isZoomed={selectedZoomInSlot != null}
-            />
             {labwareIsAdapter ? (
               <AdapterControls
                 terminalItemId={terminalItemId}
@@ -825,6 +820,35 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): ReactNode {
               setHover={setHover}
             />
           </Fragment>
+        )
+      })}
+
+      {/* labware highlight labels: rendered after every labware so that SVG
+          paint order never lets a plate higher in a stack cover the label of
+          a labware beneath it */}
+      {sortedLabware.map(labware => {
+        if (
+          getSlotInLocationStack(labware.stack) === 'offDeck' ||
+          allModules.some(m => labware.stack.includes(m.id)) ||
+          labware.id === adjacentLabware?.id ||
+          labware.stack.includes('fixedTrash')
+        ) {
+          return null
+        }
+        const labelSlotPosition = getPositionFromSlotId(
+          getSlotInLocationStack(labware.stack),
+          deckDef
+        )
+        if (labelSlotPosition == null) {
+          return null
+        }
+        return (
+          <HighlightLabware
+            key={`label_${labware.id}`}
+            labwareOnDeck={labware}
+            position={labelSlotPosition}
+            isZoomed={selectedZoomInSlot != null}
+          />
         )
       })}
 
