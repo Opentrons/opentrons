@@ -1,5 +1,3 @@
-# shared-data makefile
-
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
@@ -9,12 +7,9 @@ tests ?=
 cov_opts ?= --coverage=true
 test_opts ?=
 
-# warning suppression variables for tests and linting
 quiet ?= false
 
 FORMAT_FILE_GLOB = "**/*.{ts,tsx,js,json,md,yml}"
-
-# Top level targets
 
 .PHONY: all
 all: clean dist
@@ -34,8 +29,6 @@ format: format-js format-py
 .PHONY: lint
 lint: lint-js lint-py
 
-# JavaScript targets
-
 .PHONY: lib-js
 lib-js: export NODE_ENV := production
 lib-js:
@@ -47,7 +40,7 @@ build-ts:
 
 .PHONY: format-js
 format-js:
-	pnpm exec oxfmt --ignore-path ../.eslintignore --write $(FORMAT_FILE_GLOB)
+	pnpm exec oxfmt --write $(FORMAT_FILE_GLOB)
 
 .PHONY: lint-js
 lint-js: lint-js-oxlint lint-js-oxfmt
@@ -58,10 +51,8 @@ lint-js-oxlint:
 
 .PHONY: lint-js-oxfmt
 lint-js-oxfmt:
-	pnpm exec oxfmt --ignore-path ../.eslintignore --check $(FORMAT_FILE_GLOB)
+	pnpm exec oxfmt --check $(FORMAT_FILE_GLOB)
 
-
-# Python targets
 
 .PHONY: setup-py
 setup-py:

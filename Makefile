@@ -270,11 +270,11 @@ lint-js-oxlint:
 
 .PHONY: lint-js-oxfmt
 lint-js-oxfmt:
-	pnpm exec oxfmt --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
+	pnpm exec oxfmt --check $(FORMAT_FILE_GLOB)
 
 .PHONY: lint-json
 lint-json:
-	pnpm exec oxfmt --ignore-path .eslintignore --check "**/*.json"
+	pnpm exec oxfmt --check "**/*.json"
 
 
 .PHONY: lint-css
@@ -297,7 +297,7 @@ $(SHARED_DATA_DIR)-py-format:
 
 .PHONY: format-js
 format-js:
-	pnpm exec oxfmt --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
+	pnpm exec oxfmt --write $(FORMAT_FILE_GLOB)
 
 .PHONY: format-css
 format-css:

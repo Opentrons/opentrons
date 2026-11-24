@@ -25,7 +25,7 @@ ruff-check:
 format: 
 	@echo "Running ruff"
 	$(MAKE) ruff
-	@echo "Formatting the readme with pnpm exec prettier"
+	@echo "Formatting the readme with pnpm exec oxfmt"
 	$(MAKE) format-readme
 
 .PHONY: audit
@@ -53,7 +53,7 @@ teardown:
 
 .PHONY: format-readme
 format-readme:
-	cd .. && pnpm exec prettier --ignore-path .eslintignore --write analyses-snapshot-testing/**/*.md .github/workflows/analyses-snapshot-test.yaml
+	cd .. && pnpm exec oxfmt --write analyses-snapshot-testing/**/*.md .github/workflows/analyses-snapshot-test.yaml
 
 
 .PHONY: snapshot-test
