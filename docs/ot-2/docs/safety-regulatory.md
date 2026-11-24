@@ -1,6 +1,6 @@
 ---
-title: 'Opentrons OT-2: Safety and Regulatory Information'
-description: 'Safety symbols, compliance guidelines, and regulatory information for the OT-2.'
+title: "Opentrons OT-2: Safety and Regulatory Information"
+description: "Safety symbols, compliance guidelines, and regulatory information for the OT-2."
 ---
 
 ## Safety information
@@ -49,13 +49,13 @@ Throughout this manual, you'll find specially formatted text blocks. These callo
 Callouts used in the OT-2 manual look like this:
 
 !!!note
-**Sample note:** This is something you ought to know, but it doesn't pose any danger.
+    **Sample note:** This is something you ought to know, but it doesn't pose any danger.
 
 !!!tip
-**Sample tip:** This is something you might want to know, but is wholly optional.
+    **Sample tip:** This is something you might want to know, but is wholly optional.
 
 !!!warning
-**Sample warning:** This is something you need to know because there is risk associated with it.
+    **Sample warning:** This is something you need to know because there is risk associated with it.
 
 ## OT-2 warnings, cautions, and notes
 
@@ -84,7 +84,7 @@ Always observe the following electrical safety warnings and cautions:
 
 ### Biological safety
 
-Specimens and reagents containing materials taken from humans should be treated as potentially infectious agents. Opentrons recommends using safe laboratory procedures as explained in [_Biosafety in Microbiological and Biomedical Laboratories (BMBL) 6th Edition_](https://www.cdc.gov/labs/bmbl/).
+Specimens and reagents containing materials taken from humans should be treated as potentially infectious agents. Opentrons recommends using safe laboratory procedures as explained in [*Biosafety in Microbiological and Biomedical Laboratories (BMBL) 6th Edition*](https://www.cdc.gov/labs/bmbl/).
 
 Under normal circumstances, the OT-2 does not create detectable aerosols from source liquids. However, under certain conditions, it is possible to generate aerosols from source liquids. When operating with BSL2 or above source liquids, precautions against aerosol exposure should be considered in accordance with your local regulatory bodies.
 
@@ -124,7 +124,6 @@ To minimize the potential risk of aerosol exposure from the OT-2, it is a good p
 </table>
 
 ### Product labels
-
 The OT-2 may display one or more of the following labels for:
 
 - Electrical hazards

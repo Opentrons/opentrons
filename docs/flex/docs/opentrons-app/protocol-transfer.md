@@ -1,6 +1,6 @@
 ---
-title: 'Opentrons Flex: Transferring Protocols'
-description: 'Import, analyze, and transfer protocols to Flex from your computer.'
+title: "Opentrons Flex: Transferring Protocols"
+description: "Import, analyze, and transfer protocols to Flex from your computer."
 ---
 
 Every protocol will begin as a file on your computer, regardless of what method of [protocol development](../protocols/index.md) you use. You need to import the protocol into the Opentrons App and then transfer it to your Flex. When transferring a protocol, you can choose to begin run setup immediately or later.
@@ -9,7 +9,7 @@ Every protocol will begin as a file on your computer, regardless of what method 
 
 When you first launch the Opentrons App, you will see the Protocols screen. (Click **Protocols** in the left sidebar to access it at any other time.) Click **Import** in the top right corner to reveal the Import a Protocol pane. Then click **Choose File** and find your protocol in the system file picker, or drag and drop your protocol file into the well.
 
-The Opentrons App will analyze your protocol as soon as you import it. _Protocol analysis_ is the process of taking the JSON object or Python code contained in the protocol file and turning it into a series of commands that the robot can execute in order. If there are any errors in your protocol file, or if you're missing custom labware definitions, a warning banner will appear on the protocol's card. Correct the errors and re-import the protocol. If there are no errors, your protocol is ready to transfer to Flex.
+The Opentrons App will analyze your protocol as soon as you import it. *Protocol analysis* is the process of taking the JSON object or Python code contained in the protocol file and turning it into a series of commands that the robot can execute in order. If there are any errors in your protocol file, or if you're missing custom labware definitions, a warning banner will appear on the protocol's card. Correct the errors and re-import the protocol. If there are no errors, your protocol is ready to transfer to Flex.
 
 <figure class="screenshot" markdown>
 ![Expanded three-dot menu for a protocol, showing these options: Start setup, Reanalyze, Send to Opentrons Flex, Show in folder, and Delete](../images/app-protocol-menu.png "Screenshot")
@@ -17,7 +17,7 @@ The Opentrons App will analyze your protocol as soon as you import it. _Protocol
 </figure>
 
 !!! note
-In-app protocol analysis is only a preliminary check of the validity of your protocol. Protocol analysis will run again on the robot once you transfer the protocol to it. It's possible for analysis to fail in the app and succeed on the robot, or vice versa. Analysis mismatches may occur when your app and robot software versions are out of sync, or if you have customized the Python environment on your Flex.
+    In-app protocol analysis is only a preliminary check of the validity of your protocol. Protocol analysis will run again on the robot once you transfer the protocol to it. It's possible for analysis to fail in the app and succeed on the robot, or vice versa. Analysis mismatches may occur when your app and robot software versions are out of sync, or if you have customized the Python environment on your Flex.
 
 ### Run immediately
 
@@ -46,6 +46,6 @@ Each entry in the **Run History** tab includes the protocol name, its timestamp,
 - **Delete protocol run record:** Delete all information about this protocol run from Flex, including labware offset data. When you choose this option, it's as though the protocol run never happened.
 
 !!! note
-If you need to maintain a comprehensive record of all runs performed on your Flex, you must use the **Download run log** feature to save this information to your computer.
+    If you need to maintain a comprehensive record of all runs performed on your Flex, you must use the **Download run log** feature to save this information to your computer.
 
-Flex _will not_ retain information about more than 20 runs on the robot. Proceeding to the Run Setup screen generates an entry in the list and counts towards the maximum of 20 runs, even if you never begin the protocol.
+Flex *will not* retain information about more than 20 runs on the robot. Proceeding to the Run Setup screen generates an entry in the list and counts towards the maximum of 20 runs, even if you never begin the protocol.

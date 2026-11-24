@@ -1,6 +1,6 @@
 ---
-title: 'Opentrons Flex: App Installation and Management'
-description: 'Download, install, and update the Opentrons App.'
+title: "Opentrons Flex: App Installation and Management"
+description: "Download, install, and update the Opentrons App."
 ---
 
 Start here for step-by-step instructions for downloading, installing, and maintaining the Opentrons App on a computer.
@@ -56,7 +56,7 @@ The Ubuntu version of the Opentrons App is packaged as an AppImage. To use it:
 4.  Double-click the `.AppImage` file.
 
 !!! note
-Do not use third-party AppImage launchers with the Opentrons App. They may interfere with App updates. Opentrons does not support using third-party launchers to control Opentrons robots.
+    Do not use third-party AppImage launchers with the Opentrons App. They may interfere with App updates. Opentrons does not support using third-party launchers to control Opentrons robots.
 
 </div>
 
@@ -84,11 +84,11 @@ Downgrading App software should only be done at the direction of Opentrons Suppo
 
 4. Click the compressed file with an extension that corresponds to the operating system of your computer.
 
-   | Operating system | File extension | File example                             |
-   | ---------------- | -------------- | ---------------------------------------- |
-   | Windows          | `.exe`         | `Opentrons-v8.7.0-win-b62711.exe`        |
-   | macOS            | `.dmg`         | `Opentrons-v8.7.0-mac-b62711.dmg`        |
-   | Linux            | `.AppImage`    | `Opentrons-v8.7.0-linux-b62711.AppImage` |
+    | Operating system | File extension | File example |
+    |----|----|----|
+    | Windows | `.exe` | `Opentrons-v8.7.0-win-b62711.exe` |
+    | macOS | `.dmg` | `Opentrons-v8.7.0-mac-b62711.dmg` |
+    | Linux | `.AppImage` | `Opentrons-v8.7.0-linux-b62711.AppImage` |
 
 5. Follow the instructions on your computer to complete the installation.
 

@@ -1,6 +1,6 @@
 ---
-title: 'Plate Reader: Maintenance and Cleaning'
-description: 'Cleaning procedures and when to contact support for the Absorbance Plate Reader.'
+title: "Plate Reader: Maintenance and Cleaning"
+description: "Cleaning procedures and when to contact support for the Absorbance Plate Reader."
 hide: toc
 ---
 
@@ -14,4 +14,8 @@ Use a soft cloth dampened with water to wipe off all exterior surfaces. You can 
 
 Use the included cleaning cloth or compressed air to remove dust or dirt from the interior surfaces of the illumination and detection units. You can also use a cloth dampened with 80% ethanol if a light dusting does not clean these parts of the plate reader sufficiently.
 
-!!!warning - Do not spray cleaning liquids directly onto the plate reader. - Never clean the device with stiff, coarse brushes, abrasives, detergents, or harsh solvents. - Wear protective gloves if cleaning involves potential contact with hazardous materials or liquids.
+!!!warning
+    - Do not spray cleaning liquids directly onto the plate reader.
+    - Never clean the device with stiff, coarse brushes, abrasives, detergents, or harsh solvents.
+    - Wear protective gloves if cleaning involves potential contact with hazardous materials or liquids.
+

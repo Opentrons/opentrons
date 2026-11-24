@@ -1,12 +1,12 @@
 ---
-title: 'Opentrons OT-2: Pipettes'
-description: 'GEN1 and GEN2 pipette types, compatibility, and attachment for the OT-2.'
+title: "Opentrons OT-2: Pipettes"
+description: "GEN1 and GEN2 pipette types, compatibility, and attachment for the OT-2."
 ---
 
-OT-2 pipettes are a class of gantry-mounted instruments you attach to an Opentrons OT-2 liquid handling robot. They move liquids throughout the working area during protocol execution. For an OT-2, this class of instruments includes single-channel and multi-channel GEN1 and GEN2 pipettes.
+OT-2 pipettes are a class of gantry-mounted instruments you attach to an Opentrons OT-2 liquid handling robot. They move liquids throughout the working area during protocol execution. For an OT-2, this class of instruments includes single-channel and multi-channel GEN1 and GEN2 pipettes. 
 
 !!! note
-OT-2 pipettes are not compatible with the Opentrons Flex. Flex pipettes are not compatible with an OT-2.
+    OT-2 pipettes are not compatible with the Opentrons Flex. Flex pipettes are not compatible with an OT-2.
 
 ## GEN1 pipettes
 
@@ -59,10 +59,10 @@ To discard tips (or return them to their rack), the pipette ejector mechanism pu
 OT-2 pipettes are designed to handle a wide range of liquid volumes and are compatible with multiple tip sizes. To help ensure performance and quality, Opentrons has tested these instruments with different tips and liquid volume combinations.
 
 !!!tip
-For best results, use the smallest capacity tips that meet the needs of your protocol.
+    For best results, use the smallest capacity tips that meet the needs of your protocol.
 
 !!!note
-You do not have to calibrate the volume that your pipettes dispense before use. You only have to perform positional calibration. See [Robot Calibration](calibration/robot-calibration.md).
+    You do not have to calibrate the volume that your pipettes dispense before use. You only have to perform positional calibration. See [Robot Calibration](calibration/robot-calibration.md).
 
 The following tables list the accuracy and precision specifications for OT-2 pipettes. For flow rate information, see [OT-2 Pipette Flow Rates](../python-api/pipettes/characteristics.md#pipette-flow-rates) in the Opentrons API documentation.
 

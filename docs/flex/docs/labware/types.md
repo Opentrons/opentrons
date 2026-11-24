@@ -1,6 +1,6 @@
 ---
-title: 'Opentrons Flex: Labware Types'
-description: 'Reservoirs, well plates, tube racks, and other labware types for Flex.'
+title: "Opentrons Flex: Labware Types"
+description: "Reservoirs, well plates, tube racks, and other labware types for Flex."
 ---
 
 This section covers the different types of labware included in the Opentrons Labware Library for use with Flex.
@@ -60,7 +60,7 @@ Opentrons Flex tips come in racks that hold 96 tips. Flex pipette tips are made 
 Sealed, unopened packages of Opentrons pipette tips are certified to be free of contaminants. Tips are sterilized based on ANSI/AAMI/ISO 11137 standards with irradiation at a Sterility Assurance Level (SAL) of 10<sup>-6</sup>. Each package includes a letter describing our test procedures and certifies that every lot is free of common contaminants such as DNase, RNase, endotoxins (pyrogens), human DNA, PCR inhibitors, and protease.
 
 !!! note
-Opentrons recommends using sealed tips within three years from the production date.
+    Opentrons recommends using sealed tips within three years from the production date.
 
 ### Tip racks
 
@@ -118,25 +118,25 @@ See the following table for Flex pipette and tip compatibility.
 
 | Pipette capacity | Compatible tips             |
 | :--------------- | :-------------------------- |
-| 1–50 µL          | 20 µL, 50 µL tips           |
-| 1–200 µL         | 20 µL, 50 µL, 200 µL tips   |
+| 1–50 µL          | 20 µL, 50 µL tips             |
+| 1–200 µL         | 20 µL, 50 µL, 200 µL tips |
 | 5–1000 µL        | 50 µL, 200 µL, 1000 µL tips |
 
 Flex pipette tips are designed for Opentrons Flex pipettes. Flex tips are not backwards compatible with Opentrons OT-2 pipettes, nor can you use OT-2 tips on Flex pipettes.
 
 Other industry-standard tips may work with Flex pipettes, but this is not recommended. To ensure optimum performance, only use Opentrons Flex tips with Flex pipettes.
 
-### Tip rack adapter
+### Tip rack adapter 
 
 The 96-channel pipette requires an adapter to attach a full rack of tips properly. During the attachment procedure, the pipette moves over the adapter, lowers itself onto the mounting pins, and pulls tips onto the pipettes by lifting the adapter and tip rack.
 
-![The 96-channel tip rack adapter.](../images/96-channel-tip-rack-adapter.png '96-channel tip rack adapter')
+![The 96-channel tip rack adapter.](../images/96-channel-tip-rack-adapter.png "96-channel tip rack adapter")
 
 !!! note
-Only use the tip rack adapter when picking up a full rack of tips at once. Place tip racks directly on the deck when picking up fewer tips.
+    Only use the tip rack adapter when picking up a full rack of tips at once. Place tip racks directly on the deck when picking up fewer tips.
 
 !!! warning
-Pinch point hazard. Keep hands away from the tip rack adapter while the pipette is attaching pipette tips.
+    Pinch point hazard. Keep hands away from the tip rack adapter while the pipette is attaching pipette tips.
 
 The tip rack adapter is compatible with the Opentrons Flex Gripper. You can use the gripper to place fresh tip racks on the adapter or to pick up and move used tip racks into the waste chute.
 
@@ -170,14 +170,14 @@ The Opentrons Flex uses aluminum blocks to hold sample tubes or well plates. Whe
 
 ### Flat bottom plate
 
-![The flat bottom plate with the Opentrons Flex logo.](../images/temperature-module-block-flat.png 'Flex flat bottom plate')
+![The flat bottom plate with the Opentrons Flex logo.](../images/temperature-module-block-flat.png "Flex flat bottom plate")
 
 The flat bottom plate for Flex ships with the Temperature Module's caddy and is compatible with various ANSI/SLAS standard well plates. This flat plate differs from the plate that ships with the Temperature Module itself. It features a wider working surface and chamfered corner clips. These features help improve the performance of the Opentrons Flex Gripper when moving labware onto or off of the plate.
 
 !!! note
-You can tell which flat bottom plate you have because the one for Flex has the words "Opentrons Flex" on its top surface. The one for OT-2 does not.
+    You can tell which flat bottom plate you have because the one for Flex has the words "Opentrons Flex" on its top surface. The one for OT-2 does not.
 
-### 24-well aluminum block
+### 24-well aluminum block 
 
 <figure markdown>
 ![24-well aluminum block adapter.](../images/labware-24-well-block.jpg "24-well block"){style="width: 65%"}

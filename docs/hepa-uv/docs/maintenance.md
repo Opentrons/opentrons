@@ -1,6 +1,6 @@
 ---
-title: 'HEPA/UV Module: Maintenance'
-description: 'UV bulb and filter replacement; when to contact support for service.'
+title: "HEPA/UV Module: Maintenance"
+description: "UV bulb and filter replacement; when to contact support for service."
 ---
 
 <style>
@@ -20,7 +20,7 @@ The UV bulbs are user-replaceable items. To purchase a new bulb, [contact Opentr
 
 You can clean and reuse the pre-filter but not the HEPA filter. Always replace your dirty HEPA filter with a fresh filter. To purchase a new set of filters, [contact Opentrons Support](mailto:support@opentrons.com).
 
-![HEPA and pre-filter components](images/hepa-filter-diagram.png 'HEPA and pre-filter components')
+![HEPA and pre-filter components](images/hepa-filter-diagram.png "HEPA and pre-filter components")
 
 To access, replace, and clean the filters:
 

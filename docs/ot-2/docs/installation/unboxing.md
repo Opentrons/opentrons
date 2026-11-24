@@ -1,6 +1,6 @@
 ---
-title: 'Opentrons OT-2: Unboxing'
-description: 'Step-by-step unboxing, assembly, and initial preparation of your new OT-2.'
+title: "Opentrons OT-2: Unboxing"
+description: "Step-by-step unboxing, assembly, and initial preparation of your new OT-2."
 ---
 
 Congratulations! Your OT-2 has arrived and you've prepared a space for it in your lab. This section provides instructions to walk you through unboxing, assembling, and preparing the OT-2 for use.
@@ -107,41 +107,41 @@ The OT-2 ships with the components listed below. Additional pipettes and modules
 
 <div class="instruction-list" markdown>
 
-1. Remove the top foam padding and window panels. Also remove the power cable box from the foam, if present.
+1. Remove the top foam padding and window panels. Also remove the power cable box from the foam, if present. 
 
-   ![image shows padding removal](../images/remove-padding.png)
+    ![image shows padding removal](../images/remove-padding.png)
 
 2. Carefully cut open the blue plastic shipping bag. Be sure to avoid cutting any robot components inside.
 
-   ![cutting the shipping bag](../images/cut-shipping-bag.png)
+    ![cutting the shipping bag](../images/cut-shipping-bag.png)
 
 3. Pull upwards using the black steel frame to remove the robot from the shipping bag and box. Because the OT-2 weighs about 48 kg (105 lbs), always get help from a lab partner to lift it.
 
-   ![lifting points on frame](../images/lift-points.png)
+    ![lifting points on frame](../images/lift-points.png)
 
 4. Place the robot on a secure and stable surface.
 
-   ![robot shown on a workbench](../images/workbench-placement.png)
+    ![robot shown on a workbench](../images/workbench-placement.png)
 
 5. Cut the zip ties supporting the customer kit and place the kit aside.
 
-   ![cut zip ties image](../images/zip-ties.png)
+    ![cut zip ties image](../images/zip-ties.png)
 
 6. Pull the remaining zip tie ends and remove completely from the deck.
 
-   ![remove zip ties image](../images/zip-ties-remove.png)
+    ![remove zip ties image](../images/zip-ties-remove.png)
 
 7. Remove the tape from the calibration switch cover.
 
-   ![remove tape from switch cover](../images/switch-cover-tape.png)
+    ![remove tape from switch cover](../images/switch-cover-tape.png)
 
 8. Remove the plastic calibration switch cover.
 
-   ![remove calibration switch cover](../images/switch-cover.png)
+    ![remove calibration switch cover](../images/switch-cover.png)
 
 9. Put the trash bin in place.
 
-   ![trash bin placement](../images/installing-trash-bin.png)
+    ![trash bin placement](../images/installing-trash-bin.png)
 
 10. Use a 3 mm hex screwdriver to remove the red transport brackets, and then remove the brackets.
 
@@ -171,7 +171,7 @@ At this point you should have a fully assembled robot, but it isn't time to powe
 - Confirm that all 3 transport fasteners have been removed.
 
 !!! warning
-Turning on the power with these brackets attached can damage the robot.
+    Turning on the power with these brackets attached can damage the robot.
 
 - Confirm that you are not missing any required cables or parts. If you are missing components, contact Opentrons Support.
 
@@ -184,7 +184,7 @@ Turning on the power with these brackets attached can damage the robot.
 - [Clean and sanitize](../maintenance/cleaning.md) the robot prior to use.
 
 !!!note
-During cleaning or other maintenance, be sure to turn off the robot and disconnect the power before proceeding. Also, pay attention to any warning labels as you work.
+    During cleaning or other maintenance, be sure to turn off the robot and disconnect the power before proceeding. Also, pay attention to any warning labels as you work.
 
 ## Next steps
 

@@ -1,12 +1,12 @@
 ---
-title: 'Opentrons Flex: Thermocycler'
-description: 'Installation and use of the Thermocycler Module on Flex for on-deck PCR.'
+title: "Opentrons Flex: Thermocycler"
+description: "Installation and use of the Thermocycler Module on Flex for on-deck PCR."
 ---
 
-![The Thermocycler as seen from the top right. The lid is open to show the thermal block inside.](../images/thermocycler.png 'Thermocycler')
+![The Thermocycler as seen from the top right. The lid is open to show the thermal block inside.](../images/thermocycler.png "Thermocycler")
 
 !!! info "Additional Documentation"
-For complete instructions on module installation and use, see the [Thermocycler Module Instruction Manual](../../thermocycler/index.md).
+    For complete instructions on module installation and use, see the [Thermocycler Module Instruction Manual](../../thermocycler/index.md).
 
 ## Thermocycler features
 
@@ -30,7 +30,7 @@ The automated lid can be opened or closed as needed during protocol execution.
 
 ### Thermocycler profiles
 
-The Thermocycler can execute _profiles_: automatically cycling through a sequence of block temperatures to perform heat-sensitive reactions.
+The Thermocycler can execute *profiles*: automatically cycling through a sequence of block temperatures to perform heat-sensitive reactions.
 
 ### Software control
 
@@ -43,7 +43,7 @@ temperature, and lid position.
 
 ## Thermocycler lids and seals
 
-The Thermocycler is compatible with two different plate seals to help protect your samples: the single-use [Opentrons Tough PCR Auto-sealing Lid](https://opentrons.com/products/opentrons-flex-tough-auto-sealing-lids-20-count) and reuseable [rubber automation seals](https://opentrons.com/products/gen2-thermocycler-seals).
+The Thermocycler is compatible with two different plate seals to help protect your samples: the single-use  [Opentrons Tough PCR Auto-sealing Lid](https://opentrons.com/products/opentrons-flex-tough-auto-sealing-lids-20-count) and reuseable [rubber automation seals](https://opentrons.com/products/gen2-thermocycler-seals).
 
 ### Opentrons Tough PCR lids
 
@@ -62,21 +62,21 @@ These are adhesive-backed ethylene propylene diene monomer (EPDM) seals you manu
 Unlike the Opentrons Tough PCR lids, reuseable seals are not sterile. They must be cleaned and sanitized before each use.
 
 !!!warning
-Do not use the Opentrons Tough Auto-sealing PCR Lid and a rubber automation seal on the Thermocycler at the same time. This combination prevents the module's lid from closing properly, which can cause temperature control problems and mechanical damage. Always remove the rubber seal before running protocols that use the disposable PCR lid.
-![PCR lid and rubber seal warning](../images/thermocycler-lid-warning.png)
+    Do not use the Opentrons Tough Auto-sealing PCR Lid and a rubber automation seal on the Thermocycler at the same time. This combination prevents the module's lid from closing properly, which can cause temperature control problems and mechanical damage. Always remove the rubber seal before running protocols that use the disposable PCR lid.
+    ![PCR lid and rubber seal warning](../images/thermocycler-lid-warning.png)
 
 ## Thermocycler specifications
 
-| Specification                    | Details                                           |
-| -------------------------------- | ------------------------------------------------- |
-| **Dimensions (lid open)**        | 244.95 × 172 × 310.1 mm (L/W/H)                   |
-| **Dimensions (lid closed)**      | 244.95 × 172 × 170.35 mm (L/W/H)                  |
-| **Weight (including rear duct)** | 8.4 kg                                            |
-| **Power adapter voltage**        | 100–240 V at 50/60 Hz                             |
-| **Power adapter current**        | 8.5–5 A                                           |
-| **Overvoltage**                  | Category II                                       |
-| **Environmental conditions**     | Indoor use only                                   |
-| **Ambient temperature**          | 20–25 °C (ideal); 2–40 °C (acceptable)            |
-| **Relative humidity**            | 30–80%, non-condensing                            |
-| **Altitude**                     | Up to 2000 m above sea level                      |
-| **Ventilation requirements**     | At least 20 cm / 8 in between the unit and a wall |
+| Specification                    | Details                                          |
+|----------------------------------|--------------------------------------------------|
+| **Dimensions (lid open)**        | 244.95 × 172 × 310.1 mm (L/W/H)                  |
+| **Dimensions (lid closed)**      | 244.95 × 172 × 170.35 mm (L/W/H)                 |
+| **Weight (including rear duct)** | 8.4 kg                                           |
+| **Power adapter voltage**        | 100–240 V at 50/60 Hz                            |
+| **Power adapter current**        | 8.5–5 A                                          |
+| **Overvoltage**                  | Category II                                      |
+| **Environmental conditions**     | Indoor use only                                  |
+| **Ambient temperature**          | 20–25 °C (ideal); 2–40 °C (acceptable)           |
+| **Relative humidity**            | 30–80%, non-condensing                           |
+| **Altitude**                     | Up to 2000 m above sea level                     |
+| **Ventilation requirements**     | At least 20 cm / 8 in between the unit and a wall|

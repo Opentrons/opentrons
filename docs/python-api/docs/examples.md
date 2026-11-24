@@ -1,6 +1,6 @@
 ---
-title: 'Python API: Protocol Examples'
-description: 'Example protocols for transfers, mixes, and common workflows.'
+title: "Python API: Protocol Examples"
+description: "Example protocols for transfers, mixes, and common workflows."
 ---
 
 This page provides simple, ready-made protocols for Flex and OT-2. Feel free to copy and modify these examples to create unique protocols that help automate your laboratory workflows. Also, experimenting with these protocols is another way to build upon the skills you've learned from working through the [tutorial](tutorial.md). Try adding different hardware, labware, and commands to a sample protocol and test its validity after importing it into the Opentrons App.
@@ -33,12 +33,12 @@ The sample protocols all use the following pipettes:
 
 They also use the labware listed below:
 
-| Labware type  | Labware name                           | API load name {width="40%"}       |
-| ------------- | -------------------------------------- | --------------------------------- |
+| Labware type   | Labware name                        | API load name  {width="40%"} |
+|---------------|-------------------------------------|---------------------------------|
 | Reservoir     | USA Scientific 12-Well Reservoir 22 mL | `usascientific_12_reservoir_22ml` |
-| Well plate    | Corning 96-Well Plate 360 µL Flat      | `corning_96_wellplate_360ul_flat` |
-| Flex tip rack | Opentrons Flex 96 Tip Rack 200 µL      | `opentrons_flex_96_tiprack_200ul` |
-| OT-2 tip rack | Opentrons 96 Tip Rack 300 µL           | `opentrons_96_tiprack_300ul`      |
+| Well plate    | Corning 96-Well Plate 360 µL Flat    | `corning_96_wellplate_360ul_flat` |
+| Flex tip rack | Opentrons Flex 96 Tip Rack 200 µL    | `opentrons_flex_96_tiprack_200ul` |
+| OT-2 tip rack | Opentrons 96 Tip Rack 300 µL         | `opentrons_96_tiprack_300ul`      |
 
 ---
 
@@ -48,10 +48,10 @@ This code only loads the instruments and labware listed above, and performs no o
 
 === "Flex"
     ```python
-from opentrons import protocol_api
-
+    from opentrons import protocol_api
+    
     requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
-
+    
     def run(protocol: protocol_api.ProtocolContext):
         # load tip rack in deck slot D3
         tiprack = protocol.load_labware(
@@ -78,10 +78,10 @@ from opentrons import protocol_api
 
 === "OT-2"
     ```python
-from opentrons import protocol_api
-
+    from opentrons import protocol_api
+    
     metadata = {"apiLevel": "{{ apiLevel }}"}
-
+    
     def run(protocol: protocol_api.ProtocolContext):
         # load tip rack in deck slot 3
         tiprack = protocol.load_labware(
@@ -92,7 +92,7 @@ from opentrons import protocol_api
             instrument_name="p300_single_gen2",
             mount="left",
             tip_racks=[tiprack]
-        )
+        )  
         # load well plate in deck slot 2
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat", location=2
@@ -114,10 +114,10 @@ This protocol uses some [building block commands](building-block-commands/index.
 
 === "Flex"
     ```python
-from opentrons import protocol_api
-
+    from opentrons import protocol_api
+    
     requirements = {"robotType": "Flex", "apiLevel":"{{ apiLevel }}"}
-
+    
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
@@ -133,7 +133,7 @@ from opentrons import protocol_api
             mount="left",
             tip_racks=[tiprack_1]
         )
-
+    
         pipette.pick_up_tip()
         pipette.aspirate(100, plate["A1"])
         pipette.dispense(100, plate["B1"])
@@ -142,10 +142,10 @@ from opentrons import protocol_api
 
 === "OT-2"
     ```python
-from opentrons import protocol_api
-
+    from opentrons import protocol_api
+    
     metadata = {"apiLevel": "{{ apiLevel }}"}
-
+    
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
@@ -160,7 +160,7 @@ from opentrons import protocol_api
             mount="left",
             tip_racks=[tiprack_1]
         )
-
+    
         pipette.pick_up_tip()
         pipette.aspirate(100, plate["A1"])
         pipette.dispense(100, plate["B1"])
@@ -173,10 +173,10 @@ These protocols accomplish the same thing as the previous example, but a little 
 
 === "Flex"
     ```python
-from opentrons import protocol_api
-
+    from opentrons import protocol_api
+    
     requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
-
+    
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
@@ -202,10 +202,10 @@ from opentrons import protocol_api
 
 === "OT-2"
     ```python
-from opentrons import protocol_api
-
+    from opentrons import protocol_api
+    
     metadata = {"apiLevel": "{{ apiLevel }}"}
-
+    
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
@@ -234,10 +234,10 @@ Opentrons-verified liquid class definitions are based on Flex pipette and tip co
 
 === "Flex"
     ```python
-from opentrons import protocol_api
-
+    from opentrons import protocol_api
+    
     requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
-
+    
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
@@ -271,10 +271,10 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
 
 === "Flex"
     ```python
-from opentrons import protocol_api
-
+    from opentrons import protocol_api
+    
     requirements = {"robotType": "Flex", "apiLevel":"{{ apiLevel }}"}
-
+    
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
@@ -308,10 +308,10 @@ from opentrons import protocol_api
 
 === "OT-2"
     ```python
-from opentrons import protocol_api
-
+    from opentrons import protocol_api
+    
     metadata = {"apiLevel": "{{ apiLevel }}"}
-
+    
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
@@ -342,7 +342,7 @@ from opentrons import protocol_api
             )
     ```
 
-Notice here how Python’s [`range`](https://docs.python.org/3/library/stdtypes.html#range) class (e.g., `range(8)`) determines how many times the code loops. Also, in Python, a range of numbers is _exclusive_ of the end value and counting starts at 0, not 1. For the Corning 96-well plate used here, this means well A1=0, B1=1, C1=2, and so on to the last well in the row, which is H1=7.
+Notice here how Python’s [`range`](https://docs.python.org/3/library/stdtypes.html#range) class (e.g., `range(8)`) determines how many times the code loops. Also, in Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the Corning 96-well plate used here, this means well A1=0, B1=1, C1=2, and so on to the last well in the row, which is H1=7.
 
 ## Multiple air gaps
 
@@ -350,10 +350,10 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
 
 === "Flex"
     ```python
-from opentrons import protocol_api
-
+    from opentrons import protocol_api
+    
     requirements = {"robotType": "Flex", "apiLevel":"{{ apiLevel }}"}
-
+    
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
@@ -369,29 +369,29 @@ from opentrons import protocol_api
         )
         trash = protocol.load_trash_bin("A3")
         pipette = protocol.load_instrument(
-            instrument_name="flex_1channel_1000",
+            instrument_name="flex_1channel_1000", 
             mount="left",
             tip_racks=[tiprack_1]
         )
-
+    
         pipette.pick_up_tip()
-
+    
         # aspirate from the first 5 wells
         for well in reservoir.wells()[:5]:
             pipette.aspirate(volume=35, location=well)
             pipette.air_gap(10)
-
+    
         pipette.dispense(225, plate["A1"])
-
+    
         pipette.return_tip()
     ```
 
 === "OT-2"
     ```python
-from opentrons import protocol_api
-
+    from opentrons import protocol_api
+    
     metadata = {"apiLevel": "{{ apiLevel }}"}
-
+    
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
@@ -406,23 +406,23 @@ from opentrons import protocol_api
             location=3
         )
         pipette = protocol.load_instrument(
-            instrument_name="p300_single",
+            instrument_name="p300_single", 
             mount="left",
             tip_racks=[tiprack_1])
-
+    
         pipette.pick_up_tip()
-
+    
         # aspirate from the first 5 wells
         for well in reservoir.wells()[:5]:
             pipette.aspirate(volume=35, location=well)
             pipette.air_gap(10)
-
+    
         pipette.dispense(225, plate["A1"])
-
+    
         pipette.return_tip()
     ```
 
-Notice here how Python’s [`slice`](https://docs.python.org/3/library/functions.html#slice) functionality (in the code sample as `[:5]`) lets us select the first five wells of the well plate only. Also, in Python, a range of numbers is _exclusive_ of the end value and counting starts at 0, not 1. For the USA Scientific 12-well reservoir used here, this means well A1=0, A2=1, A3=2, and so on to the last well used, which is A5=4. See also the [Commands](tutorial.md#commands) section of the Tutorial.
+Notice here how Python’s [`slice`](https://docs.python.org/3/library/functions.html#slice) functionality (in the code sample as `[:5]`) lets us select the first five wells of the well plate only. Also, in Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the USA Scientific 12-well reservoir used here, this means well A1=0, A2=1, A3=2, and so on to the last well used, which is A5=4. See also the [Commands](tutorial.md#commands) section of the Tutorial.
 
 ## Dilution
 
@@ -430,10 +430,10 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
 
 === "Flex"
     ```python
-from opentrons import protocol_api
-
+    from opentrons import protocol_api
+    
     requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
-
+    
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
@@ -463,21 +463,21 @@ from opentrons import protocol_api
             source=reservoir["A12"],
             dest=plate.wells()
         )
-
+    
         # loop through each row
         for i in range(8):
             # save the source well and destination column to variables
             source = reservoir.wells()[i]
             row = plate.rows()[i]
-
+    
             # transfer 30 µL of source to first well in column
             pipette.transfer(
-                volume=30,
+                volume=30, 
                 source=source,
                 dest=row[0],
                 mix_after=(3, 25)
             )
-
+    
             # dilute the sample down the column
             pipette.transfer(
                 volume=30,
@@ -489,10 +489,10 @@ from opentrons import protocol_api
 
 === "OT-2"
     ```python
-from opentrons import protocol_api
-
+    from opentrons import protocol_api
+    
     metadata = {"apiLevel": "{{ apiLevel }}"}
-
+    
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
@@ -521,13 +521,13 @@ from opentrons import protocol_api
             source=reservoir["A12"],
             dest=plate.wells()
         )
-
+    
         # loop through each row
         for i in range(8):
             # save the source well and destination column to variables
             source = reservoir.wells()[i]
             row = plate.rows()[i]
-
+    
             # transfer 30 µL of source to first well in column
             pipette.transfer(
                 volume=30,
@@ -535,7 +535,7 @@ from opentrons import protocol_api
                 dest=row[0],
                 mix_after=(3, 25)
             )
-
+    
             # dilute the sample down the column
             pipette.transfer(
                 volume=30,
@@ -553,10 +553,10 @@ This protocol dispenses different volumes of liquids to a well plate and automat
 
 === "Flex"
     ```python
-from opentrons import protocol_api
-
+    from opentrons import protocol_api
+    
     requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
-
+        
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
@@ -580,7 +580,7 @@ from opentrons import protocol_api
             mount="right",
             tip_racks=[tiprack_1, tiprack_2]
         )
-
+    
         # Volume amounts are for demonstration purposes only
         water_volumes = [
             1,  2,  3,  4,  5,  6,  7,  8,
@@ -596,7 +596,7 @@ from opentrons import protocol_api
             81, 82, 83, 84, 85, 86, 87, 88,
             89, 90, 91, 92, 93, 94, 95, 96
         ]
-
+    
         pipette.distribute(
             volume=water_volumes,
             source=reservoir["A12"],
@@ -606,10 +606,10 @@ from opentrons import protocol_api
 
 === "OT-2"
     ```python
-from opentrons import protocol_api
+    from opentrons import protocol_api
 
     metadata = {"apiLevel": "{{ apiLevel }}"}
-
+        
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
@@ -628,11 +628,11 @@ from opentrons import protocol_api
             location=4
         )
         pipette = protocol.load_instrument(
-            instrument_name="p300_single",
+            instrument_name="p300_single", 
             mount="right",
             tip_racks=[tiprack_1, tiprack_2]
         )
-
+    
         # Volume amounts are for demonstration purposes only
         water_volumes = [
             1,  2,  3,  4,  5,  6,  7,  8,
@@ -648,7 +648,7 @@ from opentrons import protocol_api
             81, 82, 83, 84, 85, 86, 87, 88,
             89, 90, 91, 92, 93, 94, 95, 96
         ]
-
+    
         pipette.distribute(
             volume=water_volumes,
             source=reservoir["A12"],

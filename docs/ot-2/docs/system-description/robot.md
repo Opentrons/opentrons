@@ -1,13 +1,13 @@
 ---
-title: 'Opentrons OT-2: Robot Components'
-description: 'Frame, gantry, deck, working area, and visual indicators of the OT-2.'
+title: "Opentrons OT-2: Robot Components"
+description: "Frame, gantry, deck, working area, and visual indicators of the OT-2."
 ---
 
 ![OT-2 main parts with labels](../images/ot2-features-hero.png)
 
 ## Frame and enclosure
 
-The frame of the OT-2 provides rigidity and structural support for its deck and gantry. It is constructed of sheet metal and aluminum extrusions. All of the mechanical subsystems are mounted to the frame.
+The frame of the OT-2 provides rigidity and structural support for its deck and gantry. It is constructed of sheet metal and aluminum extrusions. All of the mechanical subsystems are mounted to the frame. 
 
 The metal frame has openings for side, top, and back windows along with a front door made of transparent polycarbonate that lets you see what's going on inside the robot. The lower half of the front door hinges open for access to the deck and working area. With the front door open, you can attach instruments to the gantry, place modules and labware on the deck, and prepare or organize the deck before and during a protocol run.
 
@@ -42,7 +42,7 @@ The OT-2 deck slides in and out of the enclosure. You can pull it out part way, 
 ![OT-2 sliding deck](../images/sliding-deck.png)
 
 !!! note
-Remember to [calibrate the deck](../calibration/robot-calibration.md#deck-calibration) after removing, reinstalling, or replacing it.
+    Remember to [calibrate the deck](../calibration/robot-calibration.md#deck-calibration) after removing, reinstalling, or replacing it.
 
 ## Other connections
 
@@ -113,14 +113,14 @@ See the [OT-2 Modules section](../modules/index.md) for more information on conn
 
 Every OT-2 has a unique serial number. The format of the serial number provides additional information, including the robot's date of production. For example, the serial number OT2CEP20220927R04 would indicate:
 
-| Characters | Category | Description                                                   |
-| ---------- | -------- | ------------------------------------------------------------- |
-| OT2        | Model    | The robot is an OT-2.                                         |
-| CEP        | Version  | A code for the production version of the robot.               |
-| 2022       | Year     | This robot was made in 2022.                                  |
-| 09         | Month    | This robot was made in September.                             |
-| 27         | Day      | This robot was made on the 27th day of the month.             |
-| R04        | Unit     | A unique code for robots made during a certain time interval. |
+| Characters | Category | Description |
+|----|----|----|
+| OT2 | Model | The robot is an OT-2. |
+| CEP | Version | A code for the production version of the robot. |
+| 2022 | Year | This robot was made in 2022. |
+| 09 | Month | This robot was made in September. |
+| 27 | Day | This robot was made on the 27th day of the month. |
+| R04 | Unit | A unique code for robots made during a certain time interval. |
 
 You can find the serial number for your OT-2:
 

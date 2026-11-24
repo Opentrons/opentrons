@@ -1,6 +1,6 @@
 ---
-title: 'Python API: Deck Slots'
-description: 'Deck slot layout and naming for OT-2 and Flex in the Python API.'
+title: "Python API: Deck Slots"
+description: "Deck slot layout and naming for OT-2 and Flex in the Python API."
 ---
 
 <style>
@@ -15,7 +15,7 @@ Deck slots are where you place hardware items on the deck surface of your Opentr
 
 ## Physical deck labels
 
-Flex uses a coordinate labeling system for slots A1 (back left) through D4 (front right). Columns 1 through 3 are in the _working area_ and are accessible by pipettes and the gripper. Column 4 is in the _staging area_ and is only accessible by the gripper. For more information on staging area slots, see [Deck Configuration](#deck-configuration) below.
+Flex uses a coordinate labeling system for slots A1 (back left) through D4 (front right). Columns 1 through 3 are in the *working area* and are accessible by pipettes and the gripper. Column 4 is in the *staging area* and is only accessible by the gripper. For more information on staging area slots, see [Deck Configuration](#deck-configuration) below.
 
 ![Flex Deck](img/flex-deck.svg)
 
@@ -37,14 +37,12 @@ For example, these two `load_labware()` commands are equivalent:
 ```python
 protocol.load_labware("nest_96_wellplate_200ul_flat", "A1")
 ```
-
-_New in version 2.15_
+*New in version 2.15*
 
 ```python
 protocol.load_labware("nest_96_wellplate_200ul_flat", 10)
 ```
-
-_New in version 2.0_
+*New in version 2.0*
 
 Both of these commands would require you to load the well plate in the back left slot of the robot.
 
@@ -86,13 +84,13 @@ Slots A4, B4, C4, and D4 on Flex have no equivalent on OT-2.
 
 ## Deck configuration
 
-A Flex running robot system version 7.1.0 or higher lets you specify its deck configuration on the touchscreen or in the Opentrons App. This tells the robot the positions of unpowered _deck fixtures_: items that replace standard deck slots. The following table lists currently supported deck fixtures and their allowed deck locations.
+A Flex running robot system version 7.1.0 or higher lets you specify its deck configuration on the touchscreen or in the Opentrons App. This tells the robot the positions of unpowered *deck fixtures*: items that replace standard deck slots. The following table lists currently supported deck fixtures and their allowed deck locations.
 
-| Fixture            | Slots        |
-| ------------------ | ------------ |
-| Staging area slots | A3–D3        |
-| Trash bin          | A1–D1, A3–D3 |
-| Waste chute        | D3           |
+| Fixture           | Slots           |
+|-------------------|-----------------|
+| Staging area slots| A3–D3           |
+| Trash bin         | A1–D1, A3–D3    |
+| Waste chute       | D3              |
 
 Which fixtures you need to configure depend on both load methods and the effects of other methods called in your protocol. The following sections explain how to configure each type of fixture.
 
@@ -111,8 +109,7 @@ protocol.move_labware(
     labware=plate_1, new_location="C4"
 )  # two staging slots required
 ```
-
-_New in version 2.16_
+*New in version 2.16*
 
 Since staging area slots also include a standard deck slot in column 3, they are physically incompatible with powered modules in the same row of column 3. For example, if you try to load a module in C3 and labware in C4, the API will raise an error:
 
@@ -137,8 +134,7 @@ Starting in API version 2.16, you must load trash bin fixtures in your protocol 
 ```python
 default_trash = protocol.load_trash_bin(location = "A3")
 ```
-
-_New in version 2.16_
+*New in version 2.16*
 
 Call `load_trash_bin()` multiple times to add more than one bin. See [Adding Trash Containers][adding-trash-containers] for more information on using pipettes with multiple trash bins.
 
@@ -151,8 +147,7 @@ To use the waste chute, first use [`load_waste_chute()`][opentrons.protocol_api.
 ```python
 chute = protocol.load_waste_chute()
 ```
-
-_New in version 2.16_
+*New in version 2.16*
 
 The `load_waste_chute()` method takes no arguments, since D3 is the only valid location for the chute. However, there are multiple variant configurations of the waste chute, depending on how other methods in your protocol use it.
 
@@ -163,7 +158,7 @@ The waste chute has a removable cover with a narrow opening which helps prevent 
 - [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense], [`blow_out()`][opentrons.protocol_api.InstrumentContext.blow_out], or [`drop_tip()`][opentrons.protocol_api.InstrumentContext.drop_tip] with a 96-channel pipette.
 - [`move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] with the chute as `new_location` and `use_gripper=True`.
 
-If your protocol _does not_ call any of these methods, your deck configuration should include the cover.
+If your protocol *does not* call any of these methods, your deck configuration should include the cover.
 
 In total, there are four possible deck configurations for the waste chute:
 

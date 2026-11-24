@@ -1,6 +1,6 @@
 ---
-title: 'Opentrons OT-2: Heater-Shaker'
-description: 'Heater-Shaker Module: on-deck heating and orbital shaking (37–95 °C, 200–3000 rpm).'
+title: "Opentrons OT-2: Heater-Shaker"
+description: "Heater-Shaker Module: on-deck heating and orbital shaking (37–95 °C, 200–3000 rpm)."
 ---
 
 ![Heater-Shaker image](../images/heater-shaker-module.png)
@@ -10,7 +10,7 @@ description: 'Heater-Shaker Module: on-deck heating and orbital shaking (37–95
 The [Opentrons Heater-Shaker Module](https://opentrons.com/products/heater-shaker-module?sku=991-00115-FL-UN) provides on-deck heating and orbital shaking. The Heater-Shaker can heat samples to 95 °C and shake them at speeds ranging from 200 to 3000 rpm. It is compatible with the Opentrons Flex and OT-2 liquid handling robots and selected flat, deep-well, and 96-well plates. The Heater-Shaker can also be used alongside other Opentrons modules.
 
 !!! info "Additional Documentation"
-For complete instructions on module installation and use, see the [Heater-Shaker Instruction Manual](../../heater-shaker/index.md).
+    For complete instructions on module installation and use, see the [Heater-Shaker Instruction Manual](../../heater-shaker/index.md).
 
 ### Heating and shaking
 

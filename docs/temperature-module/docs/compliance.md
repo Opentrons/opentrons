@@ -1,18 +1,18 @@
 ---
-title: 'Temperature Module: Safety and Compliance'
-description: 'Power requirements, environmental conditions, and regulatory compliance.'
+title: "Temperature Module: Safety and Compliance"
+description: "Power requirements, environmental conditions, and regulatory compliance."
 ---
 
 Opentrons recommends that you follow the safe use specifications listed in this section and throughout this manual.
 
-## Safe Use Specifications
+## Safe Use Specifications 
 
 ### Input and Output Connections
 
 The Temperature Module has the following power requirements, which are met by the unit’s power supply.
 
 !!!warning
-Do not replace the power supply cable unless at the direction of Opentrons Support.
+    Do not replace the power supply cable unless at the direction of Opentrons Support.
 
 - **Input:** 100–240 VAC, 50/60 Hz, 4.0 A at 115 VAC, 2.0 A at 230 VAC
 - **Output:** 36 VDC, 6.1 A, 219.6 W maximum
@@ -23,14 +23,14 @@ The Temperature Module should only be used indoors on a sturdy, dry, flat horizo
 
 Opentrons has validated the Temperature Module’s performance in the conditions recommended for system operation. Operating the unit in these conditions helps provide optimal results. The Temperature Module is safe to use in conditions outside of the recommended ranges, but results may vary. The following table lists and defines the environmental operating conditions for recommended use and storage of your Temperature Module.
 
-| Environmental Conditions | Recommended                    | Acceptable                   | Storage and Transportation           |
-| ------------------------ | ------------------------------ | ---------------------------- | ------------------------------------ |
-| Ambient Temperatures     | 20–22 °C (for optimal cooling) | 20–25 °C                     | -10 to +60 °C                        |
-| Relative Humidity        | Up to 60%, non-condensing      | 80% maximum                  | 10–85%, non-condensing (below 30 °C) |
-| Altitude                 | Up to 2000 m above sea level   | Up to 2000 m above sea level | Up to 2000 m above sea level         |
+| Environmental Conditions | Recommended | Acceptable  | Storage and Transportation |
+|----|----|----|----|
+| Ambient Temperatures | 20–22 °C (for optimal cooling) | 20–25 °C | -10 to +60 °C |
+| Relative Humidity | Up to 60%, non-condensing | 80% maximum | 10–85%, non-condensing (below 30 °C) |
+| Altitude | Up to 2000 m above sea level | Up to 2000 m above sea level | Up to 2000 m above sea level |
 
 !!!note "Note: Low Temperature Condensation"
-You may see condensation on the module’s cold surfaces upon reaching temperatures lower than ambient. The exact temperature at which condensation occurs depends on the atmospheric temperature and relative humidity in your lab. You can calculate this temperature by consulting any standard dew point index or condensation table.
+    You may see condensation on the module’s cold surfaces upon reaching temperatures lower than ambient. The exact temperature at which condensation occurs depends on the atmospheric temperature and relative humidity in your lab. You can calculate this temperature by consulting any standard dew point index or condensation table.
 
 ### Instrument Safety Warnings
 

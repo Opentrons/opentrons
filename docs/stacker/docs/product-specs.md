@@ -1,6 +1,6 @@
 ---
-title: 'Flex Stacker: Product Specifications'
-description: 'Box contents, User Kit parts, physical specs, and capacity for the Stacker.'
+title: "Flex Stacker: Product Specifications"
+description: "Box contents, User Kit parts, physical specs, and capacity for the Stacker."
 ---
 
 ![Stacker with labels identifying main features](images/parts-map4.png)
@@ -43,15 +43,15 @@ The User Kit is packaged separately from the Stacker and ships with its own set 
 
 The following table lists the environmental conditions for recommended use, acceptable use, and storage.
 
-|                     | Recommended                         | Acceptable                           | Storage and transportation           |
-| ------------------- | ----------------------------------- | ------------------------------------ | ------------------------------------ |
-| Ambient temperature | +20 to +25 °C                       | +2 to +40 °C                         | -10 to +60 °C                        |
-| Relative humidity   | 40–60%, non-condensing              | 30–80%, non-condensing (below 30 °C) | 10–85%, non-condensing (below 30 °C) |
-| Altitude            | Approximately 500 m above sea level | Up to 2000 m above sea level         | Up to 2000 m above sea level         |
-| Pollution degree    | 2 or lower                          | 2 or lower                           | 2 or lower                           |
+|    | Recommended | Acceptable | Storage and transportation |
+|----|----|----|----|
+| Ambient temperature | +20 to +25 °C | +2 to +40 °C | -10 to +60 °C |
+| Relative humidity | 40–60%, non-condensing | 30–80%, non-condensing (below 30 °C) | 10–85%, non-condensing (below 30 °C) |
+| Altitude | Approximately 500 m above sea level | Up to 2000 m above sea level | Up to 2000 m above sea level |
+| Pollution degree | 2 or lower | 2 or lower | 2 or lower |
 
 !!!info "Info: Pollution Degree"
-Pollution degree is a measure of the contaminants that could occur in the environment around and within this module. The Stacker is designed for indoor use in dry locations with a pollution degree of 2 or lower where only dry, non-conductive pollution is present and only temporary condensation occurs.
+    Pollution degree is a measure of the contaminants that could occur in the environment around and within this module. The Stacker is designed for indoor use in dry locations with a pollution degree of 2 or lower where only dry, non-conductive pollution is present and only temporary condensation occurs.
 
 ## LED Status Lights
 
@@ -90,7 +90,7 @@ Status lights on the Stacker provide at-a-glance information about its operation
 The Stacker accepts Opentrons Flex tip racks, selected items in our [Labware Library](https://labware.opentrons.com/), and well plates and reservoirs that conform to ANSI/SLAS dimensional standards. The following table lists labware that has been tested and verified by Opentrons to work with the Stacker.
 
 !!!note
-To help ensure reliable Stacker operations, test any well plates or reservoirs not listed in the compatibility table before running a protocol.
+    To help ensure reliable Stacker operations, test any well plates or reservoirs not listed in the compatibility table before running a protocol.
 
 <table>
     <tr>
@@ -125,4 +125,4 @@ To help ensure reliable Stacker operations, test any well plates or reservoirs n
 </table>
 
 !!!warning
-Do not put microcentrifuge tubes, PCR tubes, tube racks, or custom labware in the Stacker.
+    Do not put microcentrifuge tubes, PCR tubes, tube racks, or custom labware in the Stacker.

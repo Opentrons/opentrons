@@ -1,6 +1,6 @@
 ---
-title: 'Python API Reference: Labware and Trash'
-description: 'Labware and trash container API reference for the Python API.'
+title: "Python API Reference: Labware and Trash"
+description: "Labware and trash container API reference for the Python API."
 ---
 
 ::: opentrons.protocol_api.Labware

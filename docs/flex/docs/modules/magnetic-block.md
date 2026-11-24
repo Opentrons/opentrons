@@ -1,9 +1,9 @@
 ---
-title: 'Opentrons Flex: Magnetic Block'
-description: 'Installation and use of the Magnetic Block for bead-based purification on Flex.'
+title: "Opentrons Flex: Magnetic Block"
+description: "Installation and use of the Magnetic Block for bead-based purification on Flex."
 ---
 
-![The Magnetic Block has an array of 96 high-strength magnets.](../images/magnetic-block.png 'Magnetic Block')
+![The Magnetic Block has an array of 96 high-strength magnets.](../images/magnetic-block.png "Magnetic Block")
 
 ## Magnetic Block features
 
@@ -17,18 +17,18 @@ The Magnetic Block is unpowered, does not contain any electronic components, and
 
 The Magnetic Block GEN1 is fully programmable in Protocol Designer and the Python Protocol API.
 
-Outside of protocols, however, the touchscreen and the Opentrons App _are not_ aware of and _cannot_ display the current status of the Magnetic Block GEN1. This is an unpowered module. It does not contain electronic or mechanical components that can communicate with the Flex robot. You "control" the Magnetic Block via protocols that use the Opentrons Flex Gripper to add and remove labware from this module.
+Outside of protocols, however, the touchscreen and the Opentrons App *are not* aware of and *cannot* display the current status of the Magnetic Block GEN1. This is an unpowered module. It does not contain electronic or mechanical components that can communicate with the Flex robot. You "control" the Magnetic Block via protocols that use the Opentrons Flex Gripper to add and remove labware from this module.
 
 ## Magnetic Block specifications
 
-| **Specification**            | **Details**                  |
-| ---------------------------- | ---------------------------- |
-| **Dimensions**               | 136 × 94 × 45 mm (L/W/H)     |
-| **Weight**                   | 1.13 kg                      |
-| **Module power**             | None, module is unpowered    |
-| **Magnet grade**             | N52 neodymium                |
-| **Environmental conditions** | Indoor use only              |
-| **Ambient temperature**      | 20–25 °C                     |
-| **Relative humidity**        | 30–80%, non-condensing       |
-| **Altitude**                 | Up to 2000 m above sea level |
-| **Pollution degree**         | 2                            |
+| **Specification**       | **Details**                     |
+|--------------------------|---------------------------------|
+| **Dimensions**           | 136 × 94 × 45 mm (L/W/H)       |
+| **Weight**               | 1.13 kg                        |
+| **Module power**         | None, module is unpowered      |
+| **Magnet grade**         | N52 neodymium                  |
+| **Environmental conditions** | Indoor use only           |
+| **Ambient temperature**  | 20–25 °C                       |
+| **Relative humidity**    | 30–80%, non-condensing         |
+| **Altitude**             | Up to 2000 m above sea level   |
+| **Pollution degree**     | 2                              |

@@ -1,9 +1,9 @@
 ---
-title: 'Opentrons Flex: Quick Transfer'
-description: 'Run a simple liquid transfer from the touchscreen without a full protocol.'
+title: "Opentrons Flex: Quick Transfer"
+description: "Run a simple liquid transfer from the touchscreen without a full protocol."
 ---
 
-_Quick transfer_ is a touchscreen-only feature that lets you create, save, and run simple procedures that move liquid from a source to a destination, all without creating a protocol or writing code. Available starting in robot software version 8.0.0, this feature is ideal for preparing labware you need to use in other, more complex procedures. For example, you can use quick transfers to:
+*Quick transfer* is a touchscreen-only feature that lets you create, save, and run simple procedures that move liquid from a source to a destination, all without creating a protocol or writing code. Available starting in robot software version 8.0.0, this feature is ideal for preparing labware you need to use in other, more complex procedures. For example, you can use quick transfers to:
 
 - Provision well plates with a reagent, buffer, or other liquid.
 
@@ -22,6 +22,7 @@ To get started, tap **+Quick transfer** in the Protocols tab.
 Tapping **+Quick transfer** starts a guided setup. Follow the instructions on the screen. You can run, save, pin, or delete the transfer when finished.
 
 The remainder of this section goes through quick transfer features in detail.
+
 
 ## Deck slots and hardware requirements
 
@@ -71,29 +72,30 @@ You'll set the amount of liquid to transfer (in µL) after specifying the source
 
 These are available after you name a quick transfer and before you save it. If some settings are familiar to you that's because they're the same as those offered in Protocol Designer. Advanced settings are optional; select any that you need or just save or run the transfer.
 
-If your quick transfer will apply liquid class settings, values for your chosen liquid class are shown for each advanced setting. You can still make changes before moving to the next step.
+If your quick transfer will apply liquid class settings, values for your chosen liquid class are shown for each advanced setting. You can still make changes before moving to the next step. 
 
-| Setting {style="width: 25%;"}    | Description                                                                                                                                                                                                                           |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Aspirate and dispense flow rates | Set how quickly the pipette will aspirate or dispense, in µL/s.                                                                                                                                                                       |
-| Pipette path                     | Choose how the pipette moves between wells. Options include:<br><ul><li>single transfer (1 well to 1 well)</li><li>multi-aspirate (many wells to 1 well)</li><li>multi-dispense (1 well to many wells)</li></ul>                      |
-| Tip position                     | Change where in the well the pipette aspirates or dispenses. By default, the robot positions the tip 1 mm from the bottom center of a well.                                                                                           |
-| Pre-wet tip                      | Pre-wet the pipette tip by aspirating and dispensing ⅔ of the tip's maximum volume.                                                                                                                                                   |
-| Mix                              | Aspirate and dispense repeatedly from a single location. Used to mix the contents of a well together.                                                                                                                                 |
-| Delay                            | Adds a timed delay (in seconds) before an aspirate or dispense action.                                                                                                                                                                |
-| Touch tip                        | Move the pipette so the tip touches the wall of a well. Used to help knock off any droplets that might cling to the pipette's tip. Not supported on all labware.                                                                      |
-| Air gap                          | When used during aspiration, draw in extra air after the liquid. When used during dispense, draw in extra air before moving to the trash container to dispose of the tip. Used to prevent liquid from leaking out of the pipette tip. |
-| Blowout                          | Blow an extra amount of air through the tip to clear it. The pipette can blow out into the trash bin, source well, or destination well.                                                                                               |
-| Change tip                       | Replace the tip at the start of the transfer, before every aspirate, or per source well.                                                                                                                                              |
+| Setting {style="width: 25%;"} | Description |
+|----------|-------------|
+| Aspirate and dispense flow rates | Set how quickly the pipette will aspirate or dispense, in µL/s.|
+| Pipette path           | Choose how the pipette moves between wells. Options include:<br><ul><li>single transfer (1 well to 1 well)</li><li>multi-aspirate (many wells to 1 well)</li><li>multi-dispense (1 well to many wells)</li></ul> |
+| Tip position           | Change where in the well the pipette aspirates or dispenses. By default, the robot positions the tip 1 mm from the bottom center of a well. |
+| Pre-wet tip            | Pre-wet the pipette tip by aspirating and dispensing ⅔ of the tip's maximum volume. |
+| Mix                    | Aspirate and dispense repeatedly from a single location. Used to mix the contents of a well together. |
+| Delay                  | Adds a timed delay (in seconds) before an aspirate or dispense action. |
+| Touch tip              | Move the pipette so the tip touches the wall of a well. Used to help knock off any droplets that might cling to the pipette's tip. Not supported on all labware. |
+| Air gap                | When used during aspiration, draw in extra air after the liquid. When used during dispense, draw in extra air before moving to the trash container to dispose of the tip. Used to prevent liquid from leaking out of the pipette tip. |
+| Blowout                | Blow an extra amount of air through the tip to clear it. The pipette can blow out into the trash bin, source well, or destination well. |
+| Change tip             | Replace the tip at the start of the transfer, before every aspirate, or per source well. |
 
 ## Managing transfers
 
 Click **Create Transfer** when you're satisfied with your transfer settings. After creating a quick transfer, you can run, save, or delete it.
 
-You can find all your quick transfer protocols in the Protocols tab.
+You can find all your quick transfer protocols in the Protocols tab. 
 
 !!! note
-Flex can store a maximum of 20 unique protocols, including quick transfers. It automatically deletes older protocols to maintain this limit.
+    Flex can store a maximum of 20 unique protocols, including quick transfers. It automatically deletes older protocols to maintain this limit.  
+
 
 - Long press a saved quick transfer to run it, pin it, or delete it. Flex pins a maximum of 8 protocols, including quick transfers.
 
@@ -102,3 +104,4 @@ Flex can store a maximum of 20 unique protocols, including quick transfers. It a
 <figure class="screenshot" markdown>
 ![Menu with options to run, pin, or delete a quick transfer.](../images/touchscreen-protocol-menu.png "Quick transfer menu")
 </figure>
+

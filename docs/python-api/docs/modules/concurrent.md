@@ -1,29 +1,29 @@
 ---
-title: 'Python API: Concurrent Module Actions'
-description: How to use concurrent module actions in a Python protocol.
+title: "Python API: Concurrent Module Actions"
+description: How to use concurrent module actions in a Python protocol. 
 ---
 
-You can use multiple modules simultaneously to speed up protocol runtime and reduce your hands-on time at the bench. Beginning with API version 2.27, add concurrent module actions in Flex and OT-2 protocols:
+You can use multiple modules simultaneously to speed up protocol runtime and reduce your hands-on time at the bench. Beginning with API version 2.27, add concurrent module actions in Flex and OT-2 protocols: 
 
 - Execute protocol steps in parallel with module actions, like pipetting while running a Thermocycler profile or cooling samples on the Temperature Module.
 - Run multiple Heater-Shaker or Temperature Modules together, or in parallel with a Thermocycler Module.
 
-This section covers module tasks and explains how to run multiple module actions in the same protocol, including timing tasks to work together.
+This section covers module tasks and explains how to run multiple module actions in the same protocol, including timing tasks to work together. 
 
 !!! note
-In API version 2.27, lids and labware latch moves are still blocking actions. These moves happen quickly, and you'll be able to proceed with other steps of your protocol immediately after.
+    In API version 2.27, lids and labware latch moves are still blocking actions. These moves happen quickly, and you'll be able to proceed with other steps of your protocol immediately after.
 
 ## Module tasks
 
-When you use a Heater-Shaker, Temperature, or Thermocycler Module in your protocol, you can choose to use a concurrent command for the module actions shown below. Each command returns a [`Task`][opentrons.protocol_api.Task] that runs in the background of your protocol and allows the robot to continue performing protocol steps, regardless of whether the module reaches the target temperature or completes another action.
+When you use a Heater-Shaker, Temperature, or Thermocycler Module in your protocol, you can choose to use a concurrent command for the module actions shown below. Each command returns a [`Task`][opentrons.protocol_api.Task] that runs in the background of your protocol and allows the robot to continue performing protocol steps, regardless of whether the module reaches the target temperature or completes another action. 
 
-| **Module**           | **Concurrent commands**                                                                                                                                                                                                                                                                                                                         |
-| :------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Heater-Shaker Module | <ul><li>[`set_target_temperature()`][opentrons.protocol_api.HeaterShakerContext.set_target_temperature]</li><li>[`set_shake_speed()`][opentrons.protocol_api.HeaterShakerContext.set_shake_speed]</li></ul>                                                                                                                                     |
-| Temperature Module   | <ul><li>[`start_set_temperature()`][opentrons.protocol_api.TemperatureModuleContext.start_set_temperature]</li></ul>                                                                                                                                                                                                                            |
-| Thermocycler Module  | <ul><li>[`start_set_lid_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_lid_temperature]</li><li>[`start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature]</li><li>[`start_execute_profile()`][opentrons.protocol_api.ThermocyclerContext.start_execute_profile]</li></ul> |
+| **Module** | **Concurrent commands** |
+| :----------|------------------------ |
+| Heater-Shaker Module | <ul><li>[`set_target_temperature()`][opentrons.protocol_api.HeaterShakerContext.set_target_temperature]</li><li>[`set_shake_speed()`][opentrons.protocol_api.HeaterShakerContext.set_shake_speed]</li></ul> |
+| Temperature Module | <ul><li>[`start_set_temperature()`][opentrons.protocol_api.TemperatureModuleContext.start_set_temperature]</li></ul> |
+| Thermocycler Module | <ul><li>[`start_set_lid_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_lid_temperature]</li><li>[`start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature]</li><li>[`start_execute_profile()`][opentrons.protocol_api.ThermocyclerContext.start_execute_profile]</li></ul> |
 
-Your protocol can include multiple module tasks that run parallel to one another. The example below has the API create two tasks: one for a Temperature Module, holding samples at 4 °C, and another for a Thermocycler Module running a profile. Neither task affects the other, and neither module action will prevent the robot from continuing to the next protocol steps.
+Your protocol can include multiple module tasks that run parallel to one another. The example below has the API create two tasks: one for a Temperature Module, holding samples at 4 °C, and another for a Thermocycler Module running a profile. Neither task affects the other, and neither module action will prevent the robot from continuing to the next protocol steps. 
 
 ```python
 temp_mod.start_set_temperature(celsius=4)
@@ -50,7 +50,7 @@ Although tasks are created when you use concurrent commands like [`TemperatureMo
 
 ## Timing module tasks
 
-Sometimes, the amount of time it takes for a module to finish a task is still important to your protocol. You might need to wait for samples on the Temperature Module to reach a target temperature before moving to the next step. The example below combines a concurrent module command with [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to prevent the Flex Gripper from moving a plate until the target temperature is reached:
+Sometimes, the amount of time it takes for a module to finish a task is still important to your protocol. You might need to wait for samples on the Temperature Module to reach a target temperature before moving to the next step. The example below combines a concurrent module command with [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to prevent the Flex Gripper from moving a plate until the target temperature is reached: 
 
 ```python
 temp_adapter = temp_mod.load_adapter("opentrons_96_well_aluminum_block")
@@ -60,7 +60,7 @@ protocol.wait_for_tasks([heat_task])
 protocol.move_labware(labware=temp_plate, new_location="D3", use_gripper="True")
 ```
 
-Let's say your samples have to both reach a target temperature and incubate for a specific amount of time. The example below uses concurrent commands to heat samples to 75 °C and shake at 300 rpm, and [`create_timer()`][opentrons.protocol_api.ProtocolContext.create_timer] to set an incubation time.
+Let's say your samples have to both reach a target temperature and incubate for a specific amount of time. The example below uses concurrent commands to heat samples to 75 °C and shake at 300 rpm, and [`create_timer()`][opentrons.protocol_api.ProtocolContext.create_timer] to set an incubation time. 
 
 ```python
 
@@ -79,12 +79,12 @@ protocol.wait_for_tasks([hs_timer])
 hs_mod.deactivate_heater()
 ```
 
-Because the Heater-Shaker Module could take longer than 5 minutes to reach 75 °C, the first `wait_for_tasks()` command ensures the timer starts only after the temperature is reached.
+Because the Heater-Shaker Module could take longer than 5 minutes to reach 75 °C, the first `wait_for_tasks()` command ensures the timer starts only after the temperature is reached. 
 
 Then, the protocol waits for the 300 second timer to complete before proceeding with the protocol and deactivating the Heater-Shaker Module. You won't see a notification when a timer is complete, so it's best to use `wait_for_tasks()` to make sure your tasks happen in the order you intend.
 
 !!! note
-Using the [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] method to wait for multiple of the same task on the same module will cause the API to raise an error. For example, if you need to heat a Temperature Module to two separate target temperatures, use [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] twice:
+    Using the [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] method to wait for multiple of the same task on the same module will cause the API to raise an error. For example, if you need to heat a Temperature Module to two separate target temperatures, use [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] twice: 
 
     ```python
     heat_task_1 = temp_mod.start_set_temperature(55)
@@ -93,3 +93,4 @@ Using the [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_t
     heat_task_2 = temp_mod.start_set_temperature(75)
     protocol.wait_for_tasks([heat_task_2])
     ```
+

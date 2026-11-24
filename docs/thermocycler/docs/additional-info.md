@@ -1,6 +1,6 @@
 ---
-title: 'Thermocycler Module: Additional Product Information'
-description: 'Warranty, support, app download, and WEEE policy for the Thermocycler.'
+title: "Thermocycler Module: Additional Product Information"
+description: "Warranty, support, app download, and WEEE policy for the Thermocycler."
 ---
 
 ## Warranty

@@ -1,6 +1,6 @@
 ---
-title: 'Opentrons Flex: Preface'
-description: 'How to use this manual and where to find setup, safety, and daily use topics.'
+title: "Opentrons Flex: Preface"
+description: "How to use this manual and where to find setup, safety, and daily use topics."
 ---
 
 Welcome to the instruction manual for the Opentrons Flex liquid handling robot. This manual guides you through just about everything you need to know to set up and use Flex, focusing on topics that are most relevant to everyday users of Flex in a lab environment.
@@ -23,13 +23,13 @@ If you prefer a guided approach, this manual is structured so you can follow it 
 
 - **Learn even more.** Still need something else? Consult the appendices.
 
-  - The [glossary](glossary.md) defines Flex-related terms.
+    - The [glossary](glossary.md) defines Flex-related terms.
 
-  - Read [additional documentation](additional-docs.md) for even more information about Opentrons products and writing code to control Flex.
-
-  - Our [open-source software](open-source.md) is hosted on GitHub as a resource for both developers and non-developers.
-
-  - [Get in touch with Opentrons](support.md) if you need assistance beyond what our documentation provides.
+    - Read [additional documentation](additional-docs.md) for even more information about Opentrons products and writing code to control Flex.
+    
+    - Our [open-source software](open-source.md) is hosted on GitHub as a resource for both developers and non-developers.
+    
+    - [Get in touch with Opentrons](support.md) if you need assistance beyond what our documentation provides.
 
 ## Notes and warnings
 
@@ -38,7 +38,7 @@ Throughout this manual, you'll find specially formatted note and warning blocks.
 Notes and warnings look like this:
 
 !!! note
-**Sample Note:** This is something you ought to know, but it doesn't pose any danger.
+    **Sample Note:** This is something you ought to know, but it doesn't pose any danger.
 
 !!! warning
-**Sample Warning:** This is something you need to know because there is risk associated with it.
+    **Sample Warning:** This is something you need to know because there is risk associated with it.

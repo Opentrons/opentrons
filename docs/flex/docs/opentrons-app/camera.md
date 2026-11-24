@@ -1,6 +1,6 @@
 ---
-title: 'Opentrons Flex: Using the Camera'
-description: 'Live monitoring, automatic image capture, and downloading protocol images.'
+title: "Opentrons Flex: Using the Camera"
+description: "Live monitoring, automatic image capture, and downloading protocol images."
 ---
 
 Every Flex comes equipped with a built-in high-resolution camera. Starting with robot software version 8.8, you can control the camera via the Opentrons App or the touchscreen.
@@ -66,7 +66,7 @@ Live video streaming is available in the Opentrons App when the camera is enable
 </figure>
 
 !!! note
-Flex cannot save live video streamed during a protocol run.
+    Flex cannot save live video streamed during a protocol run.
 
 ## Capturing and downloading still images
 

@@ -1,6 +1,6 @@
 ---
-title: 'Opentrons Flex: Software Downgrade'
-description: 'Roll back Flex robot software for troubleshooting or compliance.'
+title: "Opentrons Flex: Software Downgrade"
+description: "Roll back Flex robot software for troubleshooting or compliance."
 ---
 
 Downgrading Flex software should only be done at the direction of Opentrons Support for troubleshooting or software compliance purposes. The instructions in this section take you through the robot software downgrade process.
@@ -8,7 +8,7 @@ Downgrading Flex software should only be done at the direction of Opentrons Supp
 Previous versions of the Flex operating system (and App software) are available on Github at <https://github.com/Opentrons/opentrons/releases>.
 
 !!! tip
-Make sure your Flex is idle before downgrading. Some required App features are not available while the robot is running a protocol.
+    Make sure your Flex is idle before downgrading. Some required App features are not available while the robot is running a protocol.
 
 <!-- Reviewer note: changed to H2 (from H3). Not sure why I used H3 originally, maybe looked to large? Silly. -->
 

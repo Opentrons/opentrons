@@ -1,9 +1,9 @@
 ---
-title: 'Opentrons Flex: Pipettes'
-description: 'Flex pipette types (1-, 8-, and 96-channel), and compatibility.'
+title: "Opentrons Flex: Pipettes"
+description: "Flex pipette types (1-, 8-, and 96-channel), and compatibility."
 ---
 
-Opentrons _pipettes_ are configurable devices used to move liquids throughout the working area during the execution of protocols. There are several Opentrons Flex pipettes, which can handle volumes from 1 µL to 1000 µL in 1, 8, or 96 channels:
+Opentrons *pipettes* are configurable devices used to move liquids throughout the working area during the execution of protocols. There are several Opentrons Flex pipettes, which can handle volumes from 1 µL to 1000 µL in 1, 8, or 96 channels:
 
 - Opentrons Flex 1-Channel Pipette (1–50 µL)
 
@@ -17,24 +17,24 @@ Opentrons _pipettes_ are configurable devices used to move liquids throughout th
 
 - Opentrons Flex 96-Channel Pipette (5–1000 µL)
 
-Pipettes attach to the gantry using captive screws on the front of the pipette. 1-channel and 8-channel pipettes each occupy one _pipette mount_ (left or right); the 96-channel pipette occupies both mounts. For details on installing pipettes, see [Instrument Installation and Calibration](../installation/instruments.md).
+Pipettes attach to the gantry using captive screws on the front of the pipette. 1-channel and 8-channel pipettes each occupy one *pipette mount* (left or right); the 96-channel pipette occupies both mounts. For details on installing pipettes, see [Instrument Installation and Calibration](../installation/instruments.md).
 
 <figure markdown>
 ![Each capacity of pipette has captive attachment screws on its front. Pipette ejectors are at the bottom of each pipette, above the nozzles. The 1- and 8-channel pipettes have replaceable O-rings, and the 96-channel pipette has fixed O-rings.](../images/pipette-components.png "Pipette components")
 <figcaption>Locations of components of the 1-, 8-, and 96-channel pipettes.</figcaption>
 </figure>
 
-The pipettes pick up disposable plastic _tips_ by pressing them onto the pipette _nozzles_, and then use the tips to aspirate and dispense liquids. The amount of total force required for pickup increases as more tips get picked up simultaneously. For smaller numbers of tips, the pipette attaches tips by pushing each pipette nozzle down into a tip. To achieve the necessary force to pick up a full rack of tips, the 96-channel pipette also pulls the tips upward onto the nozzles. This pulling action requires placing tip racks into a _tip rack adapter_, rather than directly in a deck slot. To discard tips (or return them to their rack), the pipette _ejector_ mechanism pushes the tips off of the nozzles.
+The pipettes pick up disposable plastic *tips* by pressing them onto the pipette *nozzles*, and then use the tips to aspirate and dispense liquids. The amount of total force required for pickup increases as more tips get picked up simultaneously. For smaller numbers of tips, the pipette attaches tips by pushing each pipette nozzle down into a tip. To achieve the necessary force to pick up a full rack of tips, the 96-channel pipette also pulls the tips upward onto the nozzles. This pulling action requires placing tip racks into a *tip rack adapter*, rather than directly in a deck slot. To discard tips (or return them to their rack), the pipette *ejector* mechanism pushes the tips off of the nozzles.
 
 ## Pipette specifications
 
 Opentrons Flex pipettes are designed to handle a wide range of liquid volumes and are compatible with multiple tip sizes. To help ensure performance and quality, Opentrons has tested these instruments with different tips and liquid volume combinations.
 
 !!!tip
-For best results, use the smallest capacity tips that meet the needs of your protocol.
+    For best results, use the smallest capacity tips that meet the needs of your protocol.
 
 !!!note
-You _do not_ have to calibrate the volume that your pipettes dispense before use. You only have to perform positional calibration. See [Pipette calibration](pipettes.md#pipette-calibration) below, as well as the [Pipette Installation section][pipette-installation] of the Installation and Relocation chapter, for details.
+    You *do not* have to calibrate the volume that your pipettes dispense before use. You only have to perform positional calibration. See [Pipette calibration](pipettes.md#pipette-calibration) below, as well as the [Pipette Installation section][pipette-installation] of the Installation and Relocation chapter, for details.
 
 The following tables list the accuracy and precision specifications for Opentrons Flex pipettes.
 
@@ -262,19 +262,19 @@ Flex 96-channel pipettes meet the following accuracy and precision specification
 
 ## Pipette calibration
 
-The User Kit includes a metal pipette _calibration probe_, which you use during positional calibration. During protocol runs, safely store the probe on the magnetic holder on the front pillar of the robot. During the calibration process, attach the probe to the appropriate nozzle and lock it in place. The robot moves the probe to calibration points on the deck to measure the pipette's exact position.
+The User Kit includes a metal pipette *calibration probe*, which you use during positional calibration. During protocol runs, safely store the probe on the magnetic holder on the front pillar of the robot. During the calibration process, attach the probe to the appropriate nozzle and lock it in place. The robot moves the probe to calibration points on the deck to measure the pipette's exact position.
 
 ## Pipette tip rack adapter
 
-![The 96-channel tip rack adapter.](../images/96-channel-tip-rack-adapter.png '96-channel tip rack adapter')
+![The 96-channel tip rack adapter.](../images/96-channel-tip-rack-adapter.png "96-channel tip rack adapter")
 
-The Opentrons Flex 96-channel pipette ships with four _tip rack adapters_. These are precision formed aluminum brackets that you place on the deck. The adapters hold Flex 50 µL, 200 µL, and 1000 µL tip racks.
+The Opentrons Flex 96-channel pipette ships with four *tip rack adapters*. These are precision formed aluminum brackets that you place on the deck. The adapters hold Flex 50 µL, 200 µL, and 1000 µL tip racks.
 
 Because of the force involved, the 96-channel pipette requires an adapter to attach a full tip rack properly. During the attachment procedure, the pipette moves over the adapter, lowers itself onto the mounting pins, and pulls tips onto the pipettes by lifting the adapter and tip rack. Pulling the tips, rather than pushing, provides the leverage needed to secure tips to the pipettes and prevents warping the deck surface. When finished, the 96-channel pipette lowers the adapter and empty tip rack onto the deck. See the [Tips and Tip Racks section][tips-and-tip-racks] of the Labware chapter for more information.
 
 ## Partial tip pickup
 
-By default, multi-channel pipettes use all of their nozzles to pick up tips and handle liquids: an 8-channel pipette picks up 8 tips at once, and a 96-channel pipette picks up 96 tips at once. _Partial tip pickup_ lets you configure a multi-channel pipette to use fewer tips. This expands the liquid handling capabilities of your robot without having to physically switch pipettes, and is especially useful for the 96-channel pipette, which occupies both pipette mounts.
+By default, multi-channel pipettes use all of their nozzles to pick up tips and handle liquids: an 8-channel pipette picks up 8 tips at once, and a 96-channel pipette picks up 96 tips at once. *Partial tip pickup* lets you configure a multi-channel pipette to use fewer tips. This expands the liquid handling capabilities of your robot without having to physically switch pipettes, and is especially useful for the 96-channel pipette, which occupies both pipette mounts.
 
 Currently, the 96-channel pipette supports partial tip pickup for a column, a row, or a single tip. The 8-channel pipettes support a partial column (2–7 consecutive tips) or a single tip.
 
