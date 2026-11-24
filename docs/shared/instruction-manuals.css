@@ -7,6 +7,11 @@ div.parts-list {
   gap: 5px;
 }
 
+/* Overrides bottom-alignment problems for lists with multi-line captions */
+div.parts-list.align-top {
+  align-items: flex-start;
+}
+
 div.parts-list figure {
   width: 200px;
 }
@@ -131,4 +136,25 @@ figure.side-by-side img {
   display: flex;
   align-items: center;
   gap: 5px;
+}
+
+/* Status colors for chemical compatibility table */
+.md-typeset .dark-green {
+  color: #006400;
+}
+
+.md-typeset .light-green {
+  color: #00a300;
+}
+
+.md-typeset .red {
+  color: red;
+}
+
+.md-typeset .yellow {
+  color: #F09D20;
+}
+
+.md-typeset .gray {
+  color: #818589;
 }

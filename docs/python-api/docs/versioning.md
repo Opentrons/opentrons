@@ -71,6 +71,7 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 | API Version | Introduced in Robot Software |
 |-------------|------------------------------|
+| 2.31        | 10.2.0                       |
 | 2.30        | 10.0.0                       |
 | 2.29        | 9.1.1                        |
 | 2.28        | 9.0.0 / OT-2 26.6.0          |
@@ -106,6 +107,10 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 ## Changes in API versions
 
+### Version 2.31
+
+- Adds [`VacuumModuleContext`][opentrons.protocol_api.VacuumModuleContext] to support the [Vacuum Module](modules/vacuum.md). Use the load name `vacuumModuleV1` with [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module] to load the Vacuum Module on the deck for solid-phase extraction or other vacuum-based protocols.
+
 ### Version 2.30
 
 - Aspirating at the [`Well.meniscus()`][opentrons.protocol_api.Well.meniscus] now works when only specifying `target="start"`. In earlier API versions, aspirating with `target="start"` and no `end_location` raised an error. See [Meniscus](robot-position.md#meniscus).
@@ -131,10 +136,10 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 ### Version 2.27
 
-- Adds [concurrent module commands](modules/concurrent.md) to perform Temperature, Heater-Shaker, or Thermocycler Module actions alonside other protocol steps: 
+- Adds [concurrent module commands](modules/concurrent.md) to perform Temperature, Heater-Shaker, or Thermocycler Module actions alongside other protocol steps: 
     - [`TemperatureModuleContext.start_set_temperature()`][opentrons.protocol_api.TemperatureModuleContext.start_set_temperature]
     - [`HeaterShakerContext.set_shake_speed()`][opentrons.protocol_api.HeaterShakerContext.set_shake_speed]
-    - [`ThermocyclerContext.start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature],[`ThermocycylerContext.start_set_lid_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_lid_temperature], and [`ThermocyclerContext.start_execute_profile()`][opentrons.protocol_api.ThermocyclerContext.start_execute_profile]
+    - [`ThermocyclerContext.start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature],[`ThermocyclerContext.start_set_lid_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_lid_temperature], and [`ThermocyclerContext.start_execute_profile()`][opentrons.protocol_api.ThermocyclerContext.start_execute_profile]
 - Control pipette movement while aspirating or dispensing: 
      - Use the `end_location` and `movement_delay` parameters to control pipette movement while [aspirating](building-block-commands/liquids.md#aspirate-building-block) or [dispensing](building-block-commands/liquids.md#dispense-building-block). 
      - Pipette relative to the [liquid meniscus](robot-position.md#meniscus) as liquid level changes. 
