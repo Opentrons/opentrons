@@ -1,4 +1,4 @@
-import { Fragment, useMemo } from 'react'
+import { useMemo } from 'react'
 
 import { CenterLabwareInSlot, COLORS, StyledText } from '@opentrons/components'
 import {
@@ -96,42 +96,49 @@ export function DeckViewLabware(props: DeckViewLabwareProps): ReactNode {
   )
   return (
     <>
+      {/* render every labware first, then all overlays/labels, so that SVG
+          paint order never lets a plate higher in a stack cover the label of
+          a labware beneath it */}
+      {labwareEntries.map(({ id, slotPosition }) => (
+        <g
+          key={id}
+          transform={`translate(${slotPosition[0]}, ${slotPosition[1]})`}
+        >
+          <CenterLabwareInSlot definition={labwareEntitiesExtended[id].def}>
+            <LabwareOnDeck
+              x={0}
+              y={0}
+              robotState={robotState}
+              labwareDef={labwareEntitiesExtended[id].def}
+              liquids={liquids}
+              labwareId={id}
+              setSelectedSlot={setSelectedSlot}
+              setHoveredSlot={setHoveredSlot}
+            />
+          </CenterLabwareInSlot>
+        </g>
+      ))}
+
       {labwareEntries.map(({ id, slot, slotPosition, showCommandSummary }) => (
-        <Fragment key={id}>
-          <g transform={`translate(${slotPosition[0]}, ${slotPosition[1]})`}>
-            <CenterLabwareInSlot definition={labwareEntitiesExtended[id].def}>
-              <LabwareOnDeck
-                x={0}
-                y={0}
-                robotState={robotState}
-                labwareDef={labwareEntitiesExtended[id].def}
-                liquids={liquids}
-                labwareId={id}
-                setSelectedSlot={setSelectedSlot}
-                setHoveredSlot={setHoveredSlot}
-              />
-            </CenterLabwareInSlot>
-          </g>
-          <DeckViewOverlay
-            key={`${slot}_hoveredSlot_labware`}
-            slotId={slot}
-            slotPosition={slotPosition}
-            slotFillColor={COLORS.purple50}
-            robotType={robotType}
-            invariantContext={invariantContext}
-            robotState={robotState}
-            setSelectedSlot={setSelectedSlot}
-            setHoveredSlot={setHoveredSlot}
-            hover={hoveredSlot}
-          >
-            {showCommandSummary ? null : (
-              <StyledText desktopStyle="captionRegular" color={COLORS.white}>
-                {labwareEntitiesExtended[id]?.nickName ??
-                  labwareEntitiesExtended[id].def.metadata.displayName}
-              </StyledText>
-            )}
-          </DeckViewOverlay>
-        </Fragment>
+        <DeckViewOverlay
+          key={`${id}_${slot}_hoveredSlot_labware`}
+          slotId={slot}
+          slotPosition={slotPosition}
+          slotFillColor={COLORS.purple50}
+          robotType={robotType}
+          invariantContext={invariantContext}
+          robotState={robotState}
+          setSelectedSlot={setSelectedSlot}
+          setHoveredSlot={setHoveredSlot}
+          hover={hoveredSlot}
+        >
+          {showCommandSummary ? null : (
+            <StyledText desktopStyle="captionRegular" color={COLORS.white}>
+              {labwareEntitiesExtended[id]?.nickName ??
+                labwareEntitiesExtended[id].def.metadata.displayName}
+            </StyledText>
+          )}
+        </DeckViewOverlay>
       ))}
 
       {labwareEntries.map(({ id, slotPosition, showCommandSummary }) =>
