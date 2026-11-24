@@ -1,6 +1,6 @@
 import Markdown from 'react-markdown'
 
-import { LegacyStyledText } from '../../atoms'
+import { StyledText } from '../../atoms'
 import { COLORS } from '../../helix-design-system'
 import { Box } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
@@ -46,19 +46,19 @@ function ExternalLink(props: JSX.IntrinsicAttributes): ReactNode {
 }
 
 function ParagraphText(props: JSX.IntrinsicAttributes): ReactNode {
-  return <LegacyStyledText {...props} forwardedAs="p" />
+  return <StyledText {...props} forwardedAs="p" />
 }
 
 function HeaderText(props: JSX.IntrinsicAttributes): ReactNode {
-  return <LegacyStyledText {...props} forwardedAs="h3" />
+  return <StyledText {...props} forwardedAs="h3" />
 }
 
 function ListItemText(props: JSX.IntrinsicAttributes): ReactNode {
-  return <LegacyStyledText {...props} forwardedAs="li" />
+  return <StyledText {...props} forwardedAs="li" />
 }
 
 function UnnumberedListText(props: JSX.IntrinsicAttributes): ReactNode {
-  return <LegacyStyledText {...props} forwardedAs="ul" />
+  return <StyledText {...props} forwardedAs="ul" />
 }
 
 function HorizontalRule(): ReactNode {

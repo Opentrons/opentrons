@@ -1,4 +1,4 @@
-import { LegacyStyledText } from '../atoms/StyledText'
+import { StyledText } from '../atoms/StyledText'
 import { BORDERS, COLORS } from '../helix-design-system'
 import { Box, Flex as FlexComponent } from '../primitives'
 import { DIRECTION_COLUMN, JUSTIFY_SPACE_AROUND } from '../styles'
@@ -24,9 +24,9 @@ export const Flex: Story = {
         padding={SPACING.spacing16}
         borderRadius={BORDERS.borderRadius4}
       >
-        <LegacyStyledText as="p" color={COLORS.white}>
+        <StyledText as="p" color={COLORS.white}>
           This is a flex child
-        </LegacyStyledText>
+        </StyledText>
       </Box>,
       <Box
         key="2"
@@ -34,9 +34,9 @@ export const Flex: Story = {
         padding={SPACING.spacing16}
         borderRadius={BORDERS.borderRadius4}
       >
-        <LegacyStyledText as="p" color={COLORS.white}>
+        <StyledText as="p" color={COLORS.white}>
           This is a flex child
-        </LegacyStyledText>
+        </StyledText>
       </Box>,
     ],
     flexDirection: DIRECTION_COLUMN,
