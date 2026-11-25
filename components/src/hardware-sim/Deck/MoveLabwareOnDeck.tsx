@@ -3,12 +3,13 @@ import { animated, easings, useSpring } from '@react-spring/web'
 import styled from 'styled-components'
 
 import {
-  computeLabwareOrigin,
   getDeckDefFromRobotType,
   getLabwareViewBox,
+  getSlotOriginCoordinates,
 } from '@opentrons/shared-data'
 
 import { COLORS } from '../../helix-design-system'
+import { CenterLabwareInSlot } from '../alignment'
 import { BaseDeck } from '../BaseDeck'
 import { LabwareRender } from '../Labware'
 import { resolveLabwareLocation } from './resolveLabwareLocation'
@@ -78,13 +79,22 @@ export function MoveLabwareOnDeck(
   })
 
   const initialCoordinates =
-    initialResolvedLocation === 'error' || initialResolvedLocation === 'offDeck'
+    initialResolvedLocation === 'error' ||
+    initialResolvedLocation === 'offDeck'
       ? initialResolvedLocation
-      : (computeLabwareOrigin(initialResolvedLocation) ?? 'error')
+      : (getSlotOriginCoordinates(
+          initialResolvedLocation.deckDefinition,
+          initialResolvedLocation.slotId,
+          initialResolvedLocation.moduleDefinition
+        ) ?? 'error')
   const finalCoordinates =
     finalResolvedLocation === 'error' || finalResolvedLocation === 'offDeck'
       ? finalResolvedLocation
-      : (computeLabwareOrigin(finalResolvedLocation) ?? 'error')
+      : (getSlotOriginCoordinates(
+          finalResolvedLocation.deckDefinition,
+          finalResolvedLocation.slotId,
+          finalResolvedLocation.moduleDefinition
+        ) ?? 'error')
 
   const referenceForOffDeckCoordinates = (() => {
     if (initialCoordinates !== 'error' && initialCoordinates !== 'offDeck') {
@@ -173,22 +183,24 @@ export function MoveLabwareOnDeck(
       deckLayerBlocklist={robotType === 'OT-2 Standard' ? ['fixedTrash'] : []}
     >
       <AnimatedG style={{ x: springProps.x, y: springProps.y }}>
-        <LabwareRender
-          definition={movedLabwareDef}
-          positioningMode="passThrough"
-          highlight={true}
-        />
-        <AnimatedG style={{ opacity: springProps.splashOpacity }}>
-          <AlignSplashToLabware labwareDefinition={movedLabwareDef}>
-            <path
-              d="M158.027 111.537L154.651 108.186M145.875 113L145.875 109.253M161 99.3038L156.864 99.3038M11.9733 10.461L15.3495 13.8128M24.1255 9L24.1254 12.747M9 22.6962L13.1357 22.6962"
-              stroke={COLORS.blue50}
-              strokeWidth="3.57"
-              strokeLinecap="round"
-              transform="scale(.97, -1) translate(-19, -104)"
-            />
-          </AlignSplashToLabware>
-        </AnimatedG>
+        <CenterLabwareInSlot definition={movedLabwareDef}>
+          <LabwareRender
+            definition={movedLabwareDef}
+            positioningMode="passThrough"
+            highlight={true}
+          />
+          <AnimatedG style={{ opacity: springProps.splashOpacity }}>
+            <AlignSplashToLabware labwareDefinition={movedLabwareDef}>
+              <path
+                d="M158.027 111.537L154.651 108.186M145.875 113L145.875 109.253M161 99.3038L156.864 99.3038M11.9733 10.461L15.3495 13.8128M24.1255 9L24.1254 12.747M9 22.6962L13.1357 22.6962"
+                stroke={COLORS.blue50}
+                strokeWidth="3.57"
+                strokeLinecap="round"
+                transform="scale(.97, -1) translate(-19, -104)"
+              />
+            </AlignSplashToLabware>
+          </AnimatedG>
+        </CenterLabwareInSlot>
       </AnimatedG>
     </BaseDeck>
   )

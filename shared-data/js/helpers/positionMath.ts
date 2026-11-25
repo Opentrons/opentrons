@@ -459,6 +459,37 @@ export function getModuleParentOriginToChildSlotOrigin(
 }
 
 /**
+ * Front-left origin of a deck slot, or of a module's child slot when a module is given.
+ * Returns null if the slot id is not on the deck.
+ */
+export function getSlotOriginCoordinates(
+  deckDefinition: DeckDefinition,
+  slotId: string,
+  moduleDefinition: ModuleDefinition | null = null
+): Vector3D | null {
+  const slotPosition = getPositionFromSlotId(slotId, deckDefinition)
+  if (slotPosition == null) {
+    return null
+  }
+  const slotCoordinates: Vector3D = {
+    x: slotPosition[0],
+    y: slotPosition[1],
+    z: slotPosition[2] ?? 0,
+  }
+  if (moduleDefinition == null) {
+    return slotCoordinates
+  }
+  return getVectorSum(
+    slotCoordinates,
+    getModuleParentOriginToChildSlotOrigin(
+      deckDefinition.otId,
+      slotId,
+      moduleDefinition
+    )
+  )
+}
+
+/**
  * Return a definition's cornerOffsetFromSlot in the style of labware schema 2.
  *
  * @deprecated This is probably an inherently wrong interface to attempt, for a couple

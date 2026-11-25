@@ -6,8 +6,11 @@ import {
   getDeckSlotOriginToLabwareOrigin,
   getLabwareViewBox,
   getModuleDef,
+  getModuleParentOriginToChildSlotOrigin,
   getPositionFromSlotId,
   getSchema2Dimensions,
+  getSlotOriginCoordinates,
+  getVectorSum,
   ot3StandardDeckV5 as ot3StandardDeckV5Untyped,
 } from '../..'
 
@@ -125,6 +128,47 @@ describe('getPositionFromSlotId()', () => {
     expect(
       getPositionFromSlotId('vacuumModuleV1A3', OT3_DECK_DEF)
     ).toStrictEqual([328.3, 321, 18.75])
+  })
+})
+
+describe('getSlotOriginCoordinates()', () => {
+  it('returns the deck slot origin when there is no module', () => {
+    const slotPosition = getPositionFromSlotId('A1', OT3_DECK_DEF)
+    expect(slotPosition).not.toBeNull()
+    expect(
+      getSlotOriginCoordinates(OT3_DECK_DEF, 'A1', null)
+    ).toStrictEqual({
+      x: slotPosition![0],
+      y: slotPosition![1],
+      z: slotPosition![2] ?? 0,
+    })
+  })
+
+  it('adds the module child-slot offset when a module is present', () => {
+    const temperatureModuleDef = getModuleDef('temperatureModuleV2')
+    const slotPosition = getPositionFromSlotId('C1', OT3_DECK_DEF)
+    expect(slotPosition).not.toBeNull()
+    const expected = getVectorSum(
+      {
+        x: slotPosition![0],
+        y: slotPosition![1],
+        z: slotPosition![2] ?? 0,
+      },
+      getModuleParentOriginToChildSlotOrigin(
+        OT3_DECK_DEF.otId,
+        'C1',
+        temperatureModuleDef
+      )
+    )
+    expect(
+      getSlotOriginCoordinates(OT3_DECK_DEF, 'C1', temperatureModuleDef)
+    ).toStrictEqual(expected)
+  })
+
+  it('returns null for an unknown slot id', () => {
+    expect(
+      getSlotOriginCoordinates(OT3_DECK_DEF, 'notARealSlot', null)
+    ).toBeNull()
   })
 })
 
