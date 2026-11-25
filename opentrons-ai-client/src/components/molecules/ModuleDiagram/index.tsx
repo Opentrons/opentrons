@@ -28,8 +28,8 @@ import magdeck_gen2 from '/ai-client/assets/images/modules/magdeck_gen2.png'
 import mag_block from '/ai-client/assets/images/modules/MagneticBlock_GEN1_HERO.png'
 import temp_deck_gen_2_transparent from '/ai-client/assets/images/modules/temp_deck_gen_2_transparent.png'
 import tempdeck_gen1 from '/ai-client/assets/images/modules/tempdeck_gen1.png'
-import thermocycler_gen2 from '/ai-client/assets/images/modules/thermocycler_gen2.png'
 import thermocycler from '/ai-client/assets/images/modules/thermocycler.png'
+import thermocycler_gen2 from '/ai-client/assets/images/modules/thermocycler_gen2.png'
 
 import styles from './modulediagram.module.css'
 

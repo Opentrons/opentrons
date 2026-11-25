@@ -83,7 +83,7 @@
   "sign_protocol_run_description": "Enter your legal name to verify that the protocol run has ended.",
   "sign_protocol_run_name_mismatch": "Name doesn't match our records. Try again.",
   "signature_required": "Signature required",
-  "signature_required_description": "A signature is required to verify the protocol run has ended.",
+  "signature_required_description": "Signature is required to verify the protocol run has ended.",
   "submit": "Submit",
   "tap_to_sign": "Tap to sign",
   "username": "Username",

@@ -1,8 +1,7 @@
+import { renderHook } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { renderHook } from '@testing-library/react'
 
 import { getProviderWrapperForHooks } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'

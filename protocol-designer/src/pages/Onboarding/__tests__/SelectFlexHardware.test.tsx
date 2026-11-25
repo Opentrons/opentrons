@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -59,15 +60,17 @@ describe('SelectFlexHardware', () => {
     screen.getByRole('button', { name: 'Go back' })
   })
 
-  it('should call mock function when clicking confirm', () => {
+  it('should call mock function when clicking confirm', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    await user.click(screen.getByRole('button', { name: 'Confirm' }))
     expect(mockProceed).toHaveBeenCalled()
   })
 
-  it('should call mock function when clicking go back', () => {
+  it('should call mock function when clicking go back', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Go back' }))
+    await user.click(screen.getByRole('button', { name: 'Go back' }))
     expect(mockGoBack).toHaveBeenCalled()
   })
 })

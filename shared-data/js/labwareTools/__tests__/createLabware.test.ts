@@ -3,10 +3,10 @@ import range from 'lodash/range'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { createRegularLabware } from '..'
+import type { RegularLabwareProps } from '..'
 import fixture_regular_example_1 from '../../../labware/fixtures/2/fixture_regular_example_1.json'
 import fixture_regular_example_2 from '../../../labware/fixtures/2/fixture_regular_example_2.json'
 
-import type { RegularLabwareProps } from '..'
 import type {
   LabwareDefinition2,
   LabwareOffset,

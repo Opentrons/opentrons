@@ -2,6 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { KeyboardReact as Keyboard } from 'react-simple-keyboard'
 
+import '../index.css'
+import './index.css'
+
 import { getAppLanguage } from '/app/redux/config'
 
 import {
@@ -10,16 +13,11 @@ import {
   layoutCandidates,
   softwareKeyboardButtonAttributes,
 } from '../constants'
+import { useSoftwareKeyboardControl } from '../utils/useSoftwareKeyboardControl'
 
 import type { MutableRefObject, ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 import type { KeyboardLanguage, LayoutName } from '../types'
-
-import '../index.css'
-import './index.css'
-
-import { useSoftwareKeyboardControl } from '../utils/useSoftwareKeyboardControl'
-
 import type { SoftwareKeyboardControlOptions } from '../utils/useSoftwareKeyboardControl'
 
 const SPECIAL_LAYOUT_KEYS = ['{numbers}', '{abc}', '{shift}', '{symbols}']

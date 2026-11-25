@@ -25,6 +25,7 @@ import {
 } from '/protocol-designer/step-forms/selectors'
 import { uuid } from '/protocol-designer/utils'
 
+import type { FixtureName, Fixtures } from '..'
 import { ConfirmDeleteEntityInUseModal } from '../ConfirmDeleteEntityInUseModal'
 import { ConfirmDeleteStagingAreaModal } from '../ConfirmDeleteStagingAreaModal'
 import { HardwareConfigurator } from '../HardwareConfigurator'
@@ -40,7 +41,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { ModuleOnDeck } from '/protocol-designer/step-forms'
 import type { ThunkDispatch } from '/protocol-designer/types'
-import type { FixtureName, Fixtures } from '..'
 import type { InitialDeckStateModules } from '../HardwareConfigurator/AddFixtureModal'
 
 export function FlexHardware(): ReactNode {

@@ -1,8 +1,8 @@
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { fireEvent, screen } from '@testing-library/react'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
@@ -131,10 +131,11 @@ describe('ProtocolSteps', () => {
     screen.getByText('mock DeckSetupContainer')
   })
 
-  it('renders the toggle when formData is null', () => {
+  it('renders the toggle when formData is null', async () => {
+    const user = userEvent.setup()
     render()
     screen.getByText('mock DeckSetupContainer')
-    fireEvent.click(screen.getByText('Off-deck'))
+    await user.click(screen.getByText('Off-deck'))
     screen.getByText('mock OffDeck')
   })
 
@@ -163,10 +164,11 @@ describe('ProtocolSteps', () => {
     screen.getByText('Custom Pause')
   })
 
-  it('should render export button and call mock function when clicking it', () => {
+  it('should render export button and call mock function when clicking it', async () => {
+    const user = userEvent.setup()
     render()
     const exportButton = screen.getByRole('button', { name: 'Export' })
-    fireEvent.click(exportButton)
+    await user.click(exportButton)
     expect(mockHandleExportClick).toHaveBeenCalled()
   })
 })

@@ -1,10 +1,10 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../assets/localization'
 import { MaterialsListModal } from '../../../components/organisms/MaterialsListModal'
 import {
   getFileMetadata,
@@ -28,6 +28,8 @@ import { StartingDeck } from '../StartingDeck'
 import { StepsInfo } from '../StepsInfo'
 
 import type { NavigateFunction } from 'react-router-dom'
+
+import { i18n } from '../../../assets/localization'
 
 vi.mock('../../../step-forms/selectors')
 vi.mock('../../../tutorial/selectors')
@@ -126,10 +128,11 @@ describe('ProtocolOverview', () => {
     screen.getByText('mock StartingDeck')
   })
 
-  it('navigates to starting deck state', () => {
+  it('navigates to starting deck state', async () => {
+    const user = userEvent.setup()
     render()
     const button = screen.getByRole('button', { name: 'Edit protocol' })
-    fireEvent.click(button)
+    await user.click(button)
     expect(mockNavigate).toHaveBeenCalledWith('/designer')
   })
 })

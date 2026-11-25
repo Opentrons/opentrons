@@ -2,10 +2,9 @@ import { MemoryRouter } from 'react-router-dom'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
-
 import '@testing-library/jest-dom/vitest'
 
+import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import {
   useAccessControlEnabledQuery,
   useProtocolQuery,

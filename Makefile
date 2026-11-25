@@ -43,8 +43,8 @@ watch ?= false
 cover ?= true
 quiet ?= true
 
-format_file_exts = ts|tsx|js|mts|mjs|json|md|yaml|yml
-FORMAT_FILE_GLOB = ".*.@($(format_file_exts))" "**/*.@($(format_file_exts))"
+format_file_exts = ts,tsx,js,mts,mjs,json,md,yaml,yml
+FORMAT_FILE_GLOB = "**/*.{$(format_file_exts)}"
 
 ifeq ($(watch), true)
 	cover := false
@@ -252,7 +252,7 @@ $(SHARED_DATA_DIR)-py-lint:
 	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
 
 .PHONY: lint-js
-lint-js: check-mutating-api-client-exports lint-js-oxlint lint-js-prettier
+lint-js: check-mutating-api-client-exports lint-js-oxlint lint-js-oxfmt
 
 # Regenerate the denylist used by opentrons/no-direct-mutating.
 .PHONY: generate-mutating-api-client-exports
@@ -268,13 +268,13 @@ check-mutating-api-client-exports:
 lint-js-oxlint:
 	pnpm exec oxlint $(if $(filter true,$(quiet)),--quiet)
 
-.PHONY: lint-js-prettier
-lint-js-prettier:
-	pnpm exec prettier --ignore-path .eslintignore --check $(FORMAT_FILE_GLOB)
+.PHONY: lint-js-oxfmt
+lint-js-oxfmt:
+	pnpm exec oxfmt --check $(FORMAT_FILE_GLOB)
 
 .PHONY: lint-json
 lint-json:
-	pnpm exec prettier --ignore-path .eslintignore --check ".*.@(json)" "**/*.@(json)"
+	pnpm exec oxfmt --check "**/*.json"
 
 
 .PHONY: lint-css
@@ -297,7 +297,7 @@ $(SHARED_DATA_DIR)-py-format:
 
 .PHONY: format-js
 format-js:
-	pnpm exec prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
+	pnpm exec oxfmt --write $(FORMAT_FILE_GLOB)
 
 .PHONY: format-css
 format-css:

@@ -9,6 +9,8 @@ import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
 import { getLegacyLabwareOffsetLocation } from '/app/transformations/analysis'
 import { getLabwareDefinitionUri } from '/app/transformations/protocols'
 
+import type { LabwareOffsetSnippetProps } from '..'
+
 import type {
   LabwareOffsetCreateData,
   LegacyLabwareOffsetCreateData,
@@ -21,7 +23,6 @@ import type {
   LoadModuleRunTimeCommand,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { LabwareOffsetSnippetProps } from '..'
 
 // Returns all copy for all load commands.
 export function buildLoadCommandCopy(

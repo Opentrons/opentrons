@@ -97,7 +97,7 @@ This internal release, pulled from the `edge` branch, contains features being de
 
 ## Internal Release 1.5.0
 
-This internal release is from the `edge` branch to contain rapid dev on new features for 7.3.0. This release is for internal testing purposes and if used may require a factory reset of the robot to return to a stable version.  Though designated as stable, this build contains many critical bugs and should not be used in production.
+This internal release is from the `edge` branch to contain rapid dev on new features for 7.3.0. This release is for internal testing purposes and if used may require a factory reset of the robot to return to a stable version. Though designated as stable, this build contains many critical bugs and should not be used in production.
 
 <https://github.com/Opentrons/opentrons/compare/ot3@1.1.0...ot3@1.5.0>
 
@@ -152,7 +152,6 @@ This internal release is from the `edge` branch to contain rapid dev on new feat
 This is 1.0.0, an internal release for the app supporting the Opentrons Flex.
 
 This is still pretty early in the process, so some things are known not to work, and are listed below. Some things that may surprise you do work, and are also listed below. There may also be some littler things of note, and those are at the bottom.
-
 
 ## New Stuff In This Release
 

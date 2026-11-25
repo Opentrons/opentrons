@@ -1,8 +1,7 @@
+import { act, fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { act, fireEvent, screen } from '@testing-library/react'
 
 import { Toast, TOAST_ANIMATION_DURATION } from '..'
 import { renderWithProviders } from '../../../testing/utils'

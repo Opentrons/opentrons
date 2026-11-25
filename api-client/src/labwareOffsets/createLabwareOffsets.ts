@@ -11,12 +11,14 @@ import type { ANY_LOCATION, StoredLabwareOffset } from './types'
 export interface StoredLabwareOffsetCreate {
   definitionUri: string
   locationSequence:
-    LabwareOffsetLocationSequenceComponent[] | typeof ANY_LOCATION
+    | LabwareOffsetLocationSequenceComponent[]
+    | typeof ANY_LOCATION
   vector: VectorOffset
 }
 
 export type CreateLabwareOffsetData =
-  StoredLabwareOffsetCreate | StoredLabwareOffsetCreate[]
+  | StoredLabwareOffsetCreate
+  | StoredLabwareOffsetCreate[]
 
 export interface CreateLabwareOffsetResponse {
   data: StoredLabwareOffset | StoredLabwareOffset[]

@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -30,13 +31,15 @@ describe('AnnouncementModal', () => {
       },
     ])
   })
-  it('renders an announcement modal that has not been seen', () => {
+
+  it('renders an announcement modal that has not been seen', async () => {
+    const user = userEvent.setup()
     render()
     screen.getByText('mockMessage')
     const heading = screen.getByText('mockHeading')
     expect(heading).toBeVisible()
     screen.getByText('mockImage')
-    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+    await user.click(screen.getByRole('button', { name: 'Close' }))
     expect(vi.mocked(setLocalStorageItem)).toHaveBeenCalled()
     expect(heading).not.toBeVisible()
   })

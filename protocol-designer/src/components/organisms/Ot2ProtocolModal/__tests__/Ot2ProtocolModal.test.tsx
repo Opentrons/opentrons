@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -37,15 +38,17 @@ describe('Ot2ProtocolModal', () => {
     screen.getByRole('button', { name: 'Open OT-2 Protocol Designer' })
   })
 
-  it('should call mock function when clicking cancel', () => {
+  it('should call mock function when clicking cancel', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(mockOnClose).toHaveBeenCalled()
   })
 
-  it('should call mock function when clicking open ot-2 protocol designer', () => {
+  it('should call mock function when clicking open ot-2 protocol designer', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Open OT-2 Protocol Designer' })
     )
     expect(mockOnOpenOt2Designer).toHaveBeenCalled()

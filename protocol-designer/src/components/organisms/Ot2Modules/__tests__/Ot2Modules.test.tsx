@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { DeckFromLayers } from '@opentrons/components'
@@ -79,6 +80,7 @@ const mockModules = {
   },
 }
 const mockMakeSnackbar = vi.fn()
+
 describe('Ot2Modules', () => {
   beforeEach(() => {
     vi.mocked(MagnetModuleChangeContent).mockReturnValue(
@@ -116,7 +118,8 @@ describe('Ot2Modules', () => {
     ])
   })
 
-  it('should render all the module buttons and deck and hitting a button calls the createModule action', () => {
+  it('should render all the module buttons and deck and hitting a button calls the createModule action', async () => {
+    const user = userEvent.setup()
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       pipettes: {},
       modules: {},
@@ -131,7 +134,7 @@ describe('Ot2Modules', () => {
     screen.getByText('Temperature Module GEN2')
     screen.getByText('Temperature Module GEN1')
     screen.getByText('Thermocycler Module GEN2')
-    fireEvent.click(screen.getByText('Thermocycler Module GEN1'))
+    await user.click(screen.getByText('Thermocycler Module GEN1'))
     expect(vi.mocked(createModule)).toHaveBeenCalledWith({
       slot: '7',
       model: THERMOCYCLER_MODULE_V1,
@@ -139,7 +142,9 @@ describe('Ot2Modules', () => {
     })
     screen.getByText('mock DeckFromLayers')
   })
-  it('should render a temperature module on slot 1 and removing it calls the deleteModule action', () => {
+
+  it('should render a temperature module on slot 1 and removing it calls the deleteModule action', async () => {
+    const user = userEvent.setup()
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       pipettes: {},
       modules: mockModules,
@@ -148,10 +153,12 @@ describe('Ot2Modules', () => {
     })
     render()
     screen.getAllByText('Deck slot')
-    fireEvent.click(screen.getAllByRole('button', { name: 'Remove' })[0])
+    await user.click(screen.getAllByRole('button', { name: 'Remove' })[0])
     expect(vi.mocked(deleteModule)).toHaveBeenCalledWith({ moduleId: 'temp' })
   })
-  it('shoulder render the conflict in slot due to module snackbar', () => {
+
+  it('shoulder render the conflict in slot due to module snackbar', async () => {
+    const user = userEvent.setup()
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       pipettes: {},
       modules: mockModules,
@@ -159,13 +166,15 @@ describe('Ot2Modules', () => {
       additionalEquipmentOnDeck: {},
     })
     render()
-    fireEvent.click(screen.getByText('3'))
-    fireEvent.click(screen.getAllByText('1')[1])
+    await user.click(screen.getByText('3'))
+    await user.click(screen.getAllByText('1')[1])
     expect(mockMakeSnackbar).toHaveBeenCalledWith(
       'Cannot add module to this slot due to a module conflict'
     )
   })
-  it('should render the conflict in slot due to labware snackbar', () => {
+
+  it('should render the conflict in slot due to labware snackbar', async () => {
+    const user = userEvent.setup()
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       pipettes: {},
       modules: mockModules,
@@ -181,13 +190,15 @@ describe('Ot2Modules', () => {
       additionalEquipmentOnDeck: {},
     })
     render()
-    fireEvent.click(screen.getByText('3'))
-    fireEvent.click(screen.getByText('4'))
+    await user.click(screen.getByText('3'))
+    await user.click(screen.getByText('4'))
     expect(mockMakeSnackbar).toHaveBeenCalledWith(
       'Cannot add module to this slot because the ANSI 96 Standard Microplate is incompatible with this module'
     )
   })
-  it('should render the conflict in slot due to a labware in tc slot snackbar', () => {
+
+  it('should render the conflict in slot due to a labware in tc slot snackbar', async () => {
+    const user = userEvent.setup()
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       pipettes: {},
       modules: {},
@@ -203,12 +214,14 @@ describe('Ot2Modules', () => {
       additionalEquipmentOnDeck: {},
     })
     render()
-    fireEvent.click(screen.getByText('Thermocycler Module GEN1'))
+    await user.click(screen.getByText('Thermocycler Module GEN1'))
     expect(mockMakeSnackbar).toHaveBeenCalledWith(
       'Cannot add the Thermocycler due to a conflict with slot 8.'
     )
   })
-  it('should render the conflict in slot due to 3 labware in tc slot snackbar', () => {
+
+  it('should render the conflict in slot due to 3 labware in tc slot snackbar', async () => {
+    const user = userEvent.setup()
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       pipettes: {},
       modules: {},
@@ -238,12 +251,14 @@ describe('Ot2Modules', () => {
       additionalEquipmentOnDeck: {},
     })
     render()
-    fireEvent.click(screen.getByText('Thermocycler Module GEN1'))
+    await user.click(screen.getByText('Thermocycler Module GEN1'))
     expect(mockMakeSnackbar).toHaveBeenCalledWith(
       'Cannot add the Thermocycler due to conflicts with slots 8, 10 and 11.'
     )
   })
-  it('should call the createModuleEntityAndChangeForm action when moving a module in use', () => {
+
+  it('should call the createModuleEntityAndChangeForm action when moving a module in use', async () => {
+    const user = userEvent.setup()
     vi.mocked(getModuleOnSlot).mockReturnValue({
       isModuleInUse: true,
       moduleId: 'temp',
@@ -255,8 +270,8 @@ describe('Ot2Modules', () => {
       additionalEquipmentOnDeck: {},
     })
     render()
-    fireEvent.click(screen.getByText('3'))
-    fireEvent.click(screen.getByText('4'))
+    await user.click(screen.getByText('3'))
+    await user.click(screen.getByText('4'))
     expect(vi.mocked(createModuleEntityAndChangeForm)).toHaveBeenCalledWith({
       model: MAGNETIC_MODULE_V1,
       moduleSteps: [],
@@ -265,7 +280,9 @@ describe('Ot2Modules', () => {
       type: MAGNETIC_MODULE_TYPE,
     })
   })
-  it('should render the ConfirmDeleteEntityInUseModal when trying to delete a module in use', () => {
+
+  it('should render the ConfirmDeleteEntityInUseModal when trying to delete a module in use', async () => {
+    const user = userEvent.setup()
     vi.mocked(getModuleOnSlot).mockReturnValue({
       isModuleInUse: true,
       moduleId: 'temp',
@@ -277,7 +294,7 @@ describe('Ot2Modules', () => {
       additionalEquipmentOnDeck: {},
     })
     render()
-    fireEvent.click(screen.getAllByRole('button', { name: 'Remove' })[0])
+    await user.click(screen.getAllByRole('button', { name: 'Remove' })[0])
     screen.getByText('mock ConfirmDeleteEntityInUseModal')
   })
 })

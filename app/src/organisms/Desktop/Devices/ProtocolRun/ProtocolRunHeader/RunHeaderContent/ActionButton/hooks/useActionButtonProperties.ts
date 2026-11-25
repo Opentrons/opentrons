@@ -33,6 +33,7 @@ import {
 } from '/app/redux/protocol-runs'
 import { useIsRobotOutOfStorage } from '/app/resources/devices'
 
+import type { BaseActionButtonProps } from '..'
 import { useRunHeaderRunControls } from '../../../hooks'
 import { isAnyHeaterShakerShaking } from '../../../RunHeaderModalContainer/modals'
 import { useActionBtnDisabledUtils } from './useActionBtnDisabledUtils'
@@ -42,7 +43,6 @@ import type { IconName } from '@opentrons/components'
 import type { DocumentedAction } from '@opentrons/react-api-client'
 import type { StepKey } from '/app/redux/protocol-runs'
 import type { State } from '/app/redux/types'
-import type { BaseActionButtonProps } from '..'
 
 interface UseButtonPropertiesProps extends BaseActionButtonProps {
   isProtocolNotReady: boolean

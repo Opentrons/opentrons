@@ -4,12 +4,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Liquids } from '..'
 import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../assets/localization'
 import { AssignLiquidsModalContainer } from '../../../components/organisms'
 import { LiquidsOverflowMenu } from '../../../components/organisms/LiquidsOverflowMenu'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 
 import type { NavigateFunction } from 'react-router-dom'
+
+import { i18n } from '../../../assets/localization'
 
 const mockNavigate = vi.fn()
 

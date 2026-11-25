@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -9,12 +10,13 @@ import {
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../assets/localization'
 import { HardwareInfo } from '../HardwareInfo'
 
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
 import type { AdditionalEquipmentEntities } from '@opentrons/step-generation'
+
+import { i18n } from '../../../assets/localization'
 
 const mockNavigate = vi.fn()
 
@@ -60,17 +62,20 @@ describe('HardwareInfo', () => {
     }
   })
 
-  it('should render trash bin and tc for flex robot and header copy and button', () => {
+  it('should render trash bin and tc for flex robot and header copy and button', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('Deck Hardware')
     screen.getByText('A3')
     screen.getAllByText('Trash Bin')
     screen.getByText('A1+B1')
     screen.getAllByText('Thermocycler Module GEN2')
-    fireEvent.click(screen.getByText('Edit'))
+    await user.click(screen.getByText('Edit'))
     expect(mockNavigate).toHaveBeenCalled()
   })
-  it('should render tc for ot-2 robot and header copy and button', () => {
+
+  it('should render tc for ot-2 robot and header copy and button', async () => {
+    const user = userEvent.setup()
     props = {
       ...props,
       robotType: OT2_ROBOT_TYPE,
@@ -89,7 +94,7 @@ describe('HardwareInfo', () => {
     screen.getByText('Modules')
     screen.getByText('7,8,10,11')
     screen.getAllByText('Thermocycler Module GEN2')
-    fireEvent.click(screen.getByText('Edit'))
+    await user.click(screen.getByText('Edit'))
     expect(mockNavigate).toHaveBeenCalled()
   })
 })

@@ -1,7 +1,7 @@
-import '@testing-library/jest-dom/vitest'
-
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import '@testing-library/jest-dom/vitest'
 
 import { JUSTIFY_CENTER, JUSTIFY_START } from '../../../styles'
 import { renderWithProviders } from '../../../testing/utils'

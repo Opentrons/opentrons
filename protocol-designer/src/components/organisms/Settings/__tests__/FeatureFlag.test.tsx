@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -37,16 +38,18 @@ describe('FeatureFlag', () => {
     screen.getByText('You can add comments anywhere between timeline steps.')
     expect(screen.getAllByRole('switch').length).toBe(2)
   })
-  it('should call function when clicking toggle switches', () => {
+
+  it('should call function when clicking toggle switches', async () => {
+    const user = userEvent.setup()
     render(props)
     const toggleButtons = screen.getAllByRole('switch')
 
-    fireEvent.click(toggleButtons[0])
+    await user.click(toggleButtons[0])
     expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
       PRERELEASE_MODE: false,
     })
 
-    fireEvent.click(toggleButtons[1])
+    await user.click(toggleButtons[1])
     expect(vi.mocked(featureFlagActions.setFeatureFlags)).toHaveBeenCalledWith({
       OT_PD_ENABLE_COMMENT: false,
     })

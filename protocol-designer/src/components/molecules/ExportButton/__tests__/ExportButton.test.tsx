@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -30,10 +31,11 @@ describe('ExportButton', () => {
     expect(exportButton).toBeInTheDocument()
   })
 
-  it('should call a mock function when clicking', () => {
+  it('should call a mock function when clicking', async () => {
+    const user = userEvent.setup()
     render(props)
     const exportButton = screen.getByRole('button', { name: 'Export' })
-    fireEvent.click(exportButton)
+    await user.click(exportButton)
     expect(mockOnClick).toHaveBeenCalled()
   })
 })

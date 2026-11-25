@@ -63,7 +63,10 @@ interface ErrorPastStepsMessageRow {
 }
 
 type AnnotatedStepsRow =
-  GroupRow | CommandRow | ErrorRow | ErrorPastStepsMessageRow
+  | GroupRow
+  | CommandRow
+  | ErrorRow
+  | ErrorPastStepsMessageRow
 
 export interface ItemData {
   rows: AnnotatedStepsRow[]

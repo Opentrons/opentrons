@@ -85,7 +85,8 @@ export function getProtocolOrRunCreationErrorMessage(
   if (isAxiosError(error)) {
     const detail = (
       error.response?.data as
-        { errors?: Array<{ detail?: unknown }> } | undefined
+        | { errors?: Array<{ detail?: unknown }> }
+        | undefined
     )?.errors?.[0]?.detail
     if (typeof detail === 'string' && detail.length > 0) {
       return detail.length > MAX_ERROR_DETAIL_LENGTH

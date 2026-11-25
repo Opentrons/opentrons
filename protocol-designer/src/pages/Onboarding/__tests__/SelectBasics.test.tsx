@@ -1,8 +1,8 @@
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { fireEvent, screen } from '@testing-library/react'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
@@ -104,7 +104,8 @@ describe('SelectBasics', () => {
     vi.clearAllMocks()
   })
 
-  it('renders all the text and buttons for selecting the basics', () => {
+  it('renders all the text and buttons for selecting the basics', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('Step 1')
     screen.getByText('Let’s start with the basics')
@@ -119,16 +120,16 @@ describe('SelectBasics', () => {
     ).not.toBeInTheDocument()
     //  pipette
     screen.getByText('Your pipettes')
-    fireEvent.click(screen.getByText('Add a pipette'))
+    await user.click(screen.getByText('Add a pipette'))
 
     // gripper
     screen.getByText(
       'Do you want to move labware automatically with the gripper?'
     )
     screen.getByText('Some modules require a gripper to operate.')
-    fireEvent.click(screen.getAllByRole('label', { name: 'Yes' })[0])
+    await user.click(screen.getAllByRole('label', { name: 'Yes' })[0])
     expect(props.setValue).toHaveBeenCalled()
-    fireEvent.click(screen.getAllByRole('label', { name: 'No' })[0])
+    await user.click(screen.getAllByRole('label', { name: 'No' })[0])
     expect(props.setValue).toHaveBeenCalled()
 
     //  confirm

@@ -1,19 +1,19 @@
-// client entry point and application manifest
-import ReactDom from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { HashRouter } from 'react-router-dom'
-
-import { ApiClientProvider } from '@opentrons/react-api-client'
-
-import { App } from './App'
-import { uiInitialized } from './redux/shell'
-import { store } from './redux/store'
+// client entry point and application manifest
+import ReactDom from 'react-dom/client'
 
 import '../src/components/ODD/keyboard/AlphanumericKeyboard'
 import '../src/components/ODD/keyboard/FullKeyboard/index.css'
 import '../src/components/ODD/keyboard/IndividualKey/index.css'
 import '../src/components/ODD/keyboard/NumericalKeyboard/index.css'
+
+import { ApiClientProvider } from '@opentrons/react-api-client'
 import '@opentrons/components/styles/global'
+
+import { App } from './App'
+import { uiInitialized } from './redux/shell'
+import { store } from './redux/store'
 
 // export public types so they can be accessed by external deps
 export * from './redux/types'

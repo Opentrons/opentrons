@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
 import { createDefaultDisplayName } from '..'
-
 import type { RegularNameProps } from '..'
 
 interface TestCase {

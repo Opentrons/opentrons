@@ -66,6 +66,7 @@
   "retry_action": "正在重试当前步骤",
   "right_mount": "右侧安装支架",
   "set_lights": "正在切换灯光状态",
+  "set_log_level": "设置日志级别",
   "shutdown_robot": "正在关闭机器人",
   "sign_run": "正在签署协议运行记录",
   "single_channel_and_8_channel": "单通道或8通道",

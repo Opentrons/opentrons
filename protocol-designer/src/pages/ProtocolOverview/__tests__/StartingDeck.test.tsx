@@ -1,15 +1,17 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '../../../__testing-utils__'
-import { i18n } from '../../../assets/localization'
 import { SlotDetailsContainer } from '../../../components/organisms'
 import { getInitialDeckSetup } from '../../../step-forms/selectors'
 import { StartingDeck } from '../StartingDeck'
 
 import type { ComponentProps } from 'react'
+
+import { i18n } from '../../../assets/localization'
 
 vi.mock('../DeckThumbnail')
 vi.mock('../OffDeckThumbnail')
@@ -26,8 +28,7 @@ const mockSetShowMaterialsListModal = vi.fn()
 
 const render = (props: ComponentProps<typeof StartingDeck>) => {
   return (
-    renderWithProviders(<StartingDeck {...props} />),
-    { i18nInstance: i18n }
+    renderWithProviders(<StartingDeck {...props} />), { i18nInstance: i18n }
   )
 }
 
@@ -60,16 +61,18 @@ describe('StartingDeck', () => {
     screen.getByText('mock DeckThumbnail')
   })
 
-  it('should render off deck when clicking toggle button', () => {
+  it('should render off deck when clicking toggle button', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('mock DeckThumbnail')
-    fireEvent.click(screen.getByRole('button', { name: 'Off-deck' }))
+    await user.click(screen.getByRole('button', { name: 'Off-deck' }))
     screen.getByText('mock OffDeckThumbnail')
   })
 
-  it('should call mock function when clicking material list', () => {
+  it('should call mock function when clicking material list', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByText('Materials list'))
+    await user.click(screen.getByText('Materials list'))
     expect(mockSetShowMaterialsListModal).toHaveBeenCalled()
   })
 

@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fixture96Plate } from '@opentrons/shared-data'
@@ -9,7 +10,6 @@ import {
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 
-import { i18n } from '../../../../assets/localization'
 import { openIngredientSelector } from '../../../../labware-ingred/actions'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
@@ -20,6 +20,8 @@ import { LabwareCard } from '../index'
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
+import { i18n } from '../../../../assets/localization'
 
 const mockNavigate = vi.fn()
 
@@ -102,15 +104,16 @@ describe('LabwareCard', () => {
     })
   })
 
-  it('renders a labware card with the liquids button and overflow menu', () => {
+  it('renders a labware card with the liquids button and overflow menu', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('ANSI 96 Standard Microplate')
     screen.getByText('No liquids added')
     screen.getByText('with mock lid')
-    fireEvent.click(screen.getByText('Edit liquid'))
+    await user.click(screen.getByText('Edit liquid'))
     expect(mockNavigate).toHaveBeenCalledWith('/liquids')
     expect(vi.mocked(openIngredientSelector)).toHaveBeenCalled()
-    fireEvent.click(
+    await user.click(
       screen.getByLabelText('ANSI 96 Standard Microplate options')
     )
     screen.getByText('mock LabwareCardOverflowMenu')
@@ -128,7 +131,8 @@ describe('LabwareCard', () => {
     screen.getByText('1 liquid')
   })
 
-  it('renders a labware card with edit quantity copy and pressing button renders modal', () => {
+  it('renders a labware card with edit quantity copy and pressing button renders modal', async () => {
+    const user = userEvent.setup()
     props.labware = {
       ...props.labware,
       def: {
@@ -138,7 +142,7 @@ describe('LabwareCard', () => {
       } as LabwareDefinition2,
     }
     render(props)
-    fireEvent.click(screen.getByText('Edit quantity'))
+    await user.click(screen.getByText('Edit quantity'))
     screen.getByText('mock EditLabwareQuantityModal')
   })
 })

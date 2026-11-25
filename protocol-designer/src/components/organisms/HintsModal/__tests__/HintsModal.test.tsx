@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -20,17 +21,21 @@ describe('HintsModal', () => {
   beforeEach(() => {
     vi.mocked(getHint).mockReturnValue({ hintKey: 'waste_chute_warning' })
   })
-  it('renders the text for waste chute warning and clicking button calls action', () => {
+
+  it('renders the text for waste chute warning and clicking button calls action', async () => {
+    const user = userEvent.setup()
     render()
     screen.getByText('Disposing labware')
     screen.getByText(
       'Moving labware to the Waste Chute permanently discards it. You can’t use this labware in later steps. During a protocol run, the labware will be dropped in the chute and become irretrievable.'
     )
 
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    await user.click(screen.getByRole('button', { name: 'Confirm' }))
     expect(vi.mocked(removeHint)).toHaveBeenCalled()
   })
-  it('renders the text for tc lid passive cooling and clicking button calls action', () => {
+
+  it('renders the text for tc lid passive cooling and clicking button calls action', async () => {
+    const user = userEvent.setup()
     vi.mocked(getHint).mockReturnValue({
       hintKey: 'thermocycler_lid_passive_cooling',
     })
@@ -43,7 +48,7 @@ describe('HintsModal', () => {
     screen.getByText(
       'The lid might not ever reach a temperature below ambient.'
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+    await user.click(screen.getByRole('button', { name: 'Confirm' }))
     expect(vi.mocked(removeHint)).toHaveBeenCalled()
   })
 })

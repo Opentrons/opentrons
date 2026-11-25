@@ -12,7 +12,11 @@ import type { StyleProps } from '../../primitives'
 export * from './ListButtonChildren/index'
 
 type ListButtonType =
-  'noActive' | 'connected' | 'notConnected' | 'onColor' | 'error'
+  | 'noActive'
+  | 'connected'
+  | 'notConnected'
+  | 'onColor'
+  | 'error'
 
 interface ListButtonProps extends StyleProps {
   /** ListButton type */

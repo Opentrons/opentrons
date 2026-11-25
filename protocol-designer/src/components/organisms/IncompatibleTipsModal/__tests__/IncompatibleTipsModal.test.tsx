@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -13,7 +14,7 @@ vi.mock('/protocol-designer/feature-flags/actions')
 const render = (props: ComponentProps<typeof IncompatibleTipsModal>) => {
   return renderWithProviders(<IncompatibleTipsModal {...props} />, {
     i18nInstance: i18n,
-  })[0]
+  })
 }
 
 describe('IncompatibleTipsModal', () => {
@@ -25,15 +26,17 @@ describe('IncompatibleTipsModal', () => {
       setAllowAllTipracks: vi.fn(),
     }
   })
-  it('renders the text and ctas', () => {
+
+  it('renders the text and ctas', async () => {
+    const user = userEvent.setup()
     render(props)
     screen.getByText('Incompatible tips')
     screen.getByText(
       'Incompatible tip racks cause reduced pipette accuracy and collisions. Use compatible tip racks only.'
     )
-    fireEvent.click(screen.getByText('Show more tip types'))
+    await user.click(screen.getByText('Show more tip types'))
     expect(props.setAllowAllTipracks).toHaveBeenCalled()
-    fireEvent.click(screen.getByText('Cancel'))
+    await user.click(screen.getByText('Cancel'))
     expect(props.onClose).toHaveBeenCalled()
   })
 })

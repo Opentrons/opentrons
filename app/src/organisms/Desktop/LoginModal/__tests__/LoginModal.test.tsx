@@ -1,8 +1,8 @@
-import '@testing-library/jest-dom/vitest'
-
 import NiceModal from '@ebay/nice-modal-react'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import '@testing-library/jest-dom/vitest'
 
 import { getUserLoginStatus } from '@opentrons/api-client'
 

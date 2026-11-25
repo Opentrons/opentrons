@@ -5,9 +5,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { deleteMaintenanceRun } from '@opentrons/api-client'
 
 import { useDeleteMaintenanceRunMutation } from '..'
-import { MAINTENANCE_RUN_ID } from '../__fixtures__'
 import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '../../accessControl/__fixtures__/documentationState'
 import { useHost } from '../../api'
+import { MAINTENANCE_RUN_ID } from '../__fixtures__'
 
 import type * as React from 'react'
 import type { EmptyResponse, HostConfig, Response } from '@opentrons/api-client'

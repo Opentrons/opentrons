@@ -1,7 +1,7 @@
-import '@testing-library/jest-dom/vitest'
-
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import '@testing-library/jest-dom/vitest'
 
 import { useCreateUserMutation } from '@opentrons/react-api-client'
 

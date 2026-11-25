@@ -126,18 +126,20 @@ export function RecentProtocolRuns({
           <StyledText desktopStyle="bodyLargeSemiBold">
             {t('run_history')}
           </StyledText>
-          <div className={styles.header_actions}>
-            <BasicButton
-              onClick={handleDownloadSelected}
-              iconName="download"
-              underLine
-            >
-              {t('download_all')}
-            </BasicButton>
-            <BasicButton onClick={handleClickDeleteAll} underLine>
-              {t('delete_all')}
-            </BasicButton>
-          </div>
+          {isRobotViewable && (
+            <div className={styles.header_actions}>
+              <BasicButton
+                onClick={handleDownloadSelected}
+                iconName="download"
+                underLine
+              >
+                {t('download_all')}
+              </BasicButton>
+              <BasicButton onClick={handleClickDeleteAll} underLine>
+                {t('delete_all')}
+              </BasicButton>
+            </div>
+          )}
         </div>
         <div className={styles.content}>
           {isRobotViewable && allRunsMutable && allRunsMutable?.length > 0 && (

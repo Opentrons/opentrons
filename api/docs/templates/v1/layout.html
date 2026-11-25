@@ -28,8 +28,14 @@ endif %}
 {% endblock %} {# Disable base theme's top+bottom related navs; we have our own
 in sidebar #} {%- block relbar1 %}{% endblock %} {%- block relbar2 %}{% endblock
 %} {# Nav should appear before content, not after #} {%- block content %}
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WCDX9CX"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<noscript
+  ><iframe
+    src="https://www.googletagmanager.com/ns.html?id=GTM-WCDX9CX"
+    height="0"
+    width="0"
+    style="display: none; visibility: hidden"
+  ></iframe
+></noscript>
 <header id="nav">
   <nav class="docs-navbar">
     <div class="container">
@@ -1055,11 +1061,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="heading_group">
             <h2 id="heading_2">We thought you’d like to know…</h2>
             <h4 id="heading_4">
-                The documentation you are viewing is for version 1 of the OT-2
-                Python Protocol API. This version of the API is <b>no longer supported</b>
-                on Opentrons App and Robot Software 4.0.0 and later. Please visit the
-                documentation for <a href="../v2/index.html">version 2</a> of the API
-                to access the most up to date information.
+              The documentation you are viewing is for version 1 of the OT-2
+              Python Protocol API. This version of the API is
+              <b>no longer supported</b> on Opentrons App and Robot Software
+              4.0.0 and later. Please visit the documentation for
+              <a href="../v2/index.html">version 2</a> of the API to access the
+              most up to date information.
             </h4>
           </div>
         </div>
@@ -1067,10 +1074,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="banner_wrapper banner_v1">
           <p>
             You are currently viewing the documentation for version 1 of the
-              Opentrons OT-2 Python Protocol API. This version of the API is
-              <b>no longer supported</b> on Opentrons App and Robot Software 4.0.0
-              and later. To view version 2 of the API,
-              <a href="../v2/index.html">click here</a>.
+            Opentrons OT-2 Python Protocol API. This version of the API is
+            <b>no longer supported</b> on Opentrons App and Robot Software 4.0.0
+            and later. To view version 2 of the API,
+            <a href="../v2/index.html">click here</a>.
           </p>
         </div>
         {%- endif %} {% block body %}{% endblock %}
@@ -1130,15 +1137,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
       <h3>Sign Up For Our Newsletter</h3>
       <div>
-        <script charset="utf-8" type="text/javascript" src="https://js.hsforms.net/forms/v2.js"></script>
-          <script>
-            hbspt.forms.create({
-          	region: "na1",
-          	portalId: "5383285",
-          	formId: "210adc2c-072f-4c9c-a812-6367469358d5",
-          	version: "V2_PRERELEASE"
-            });
-          </script>
+        <script
+          charset="utf-8"
+          type="text/javascript"
+          src="https://js.hsforms.net/forms/v2.js"
+        ></script>
+        <script>
+          hbspt.forms.create({
+            region: 'na1',
+            portalId: '5383285',
+            formId: '210adc2c-072f-4c9c-a812-6367469358d5',
+            version: 'V2_PRERELEASE',
+          })
+        </script>
       </div>
       <p class="copyrite">
         &#169;&nbsp;OPENTRONS
@@ -1196,7 +1207,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </footer>
 <script>
-  ;(function(w, d, s, l, i) {
+  ;(function (w, d, s, l, i) {
     w[l] = w[l] || []
     w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })
     var f = d.getElementsByTagName(s)[0],
@@ -1273,7 +1284,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     })
   }
   var navbar = document.querySelector('.navbar-menu')
-  document.addEventListener('click', function(event) {
+  document.addEventListener('click', function (event) {
     var isClickInside = navbar.contains(event.target)
     if (!isClickInside && window.innerWidth >= 1024) {
       close()
@@ -1287,7 +1298,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   class="github"
 >
   <img
-    style="position: absolute; top: 0; right: 0; border: 0;"
+    style="position: absolute; top: 0; right: 0; border: 0"
     src="{{ pathto('_static/' ~ theme_github_banner, 1) if theme_github_banner|lower != 'true' else 'https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png' }}"
     alt="Fork me on GitHub"
     class="github"

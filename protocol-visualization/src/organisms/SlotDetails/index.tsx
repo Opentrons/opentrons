@@ -131,26 +131,27 @@ export function SlotDetails(props: SlotDetailsProps): ReactNode {
     }
   }
 
-  return (
-    <>
-      {isSlotEmpty ? (
-        <div className={styles.slot_detail_container}>
-          <SlotDetailsEmptyState />
-        </div>
-      ) : null}
-      <div className={styles.slot_container}>
-        <div className={styles.slot_details}>
-          {renderLabwareContent()}
-          {disposalType != null ? <TipDisposalSlot /> : null}
-          {moduleOnSlot != null ? (
-            <ModuleContainer
-              moduleId={moduleOnSlot[0]}
-              moduleEntities={moduleEntities}
-              moduleRobotState={modules}
-            />
-          ) : null}
-        </div>
+  if (isSlotEmpty) {
+    return (
+      <div className={styles.slot_detail_container}>
+        <SlotDetailsEmptyState />
       </div>
-    </>
+    )
+  }
+
+  return (
+    <div className={styles.slot_container}>
+      <div className={styles.slot_details}>
+        {renderLabwareContent()}
+        {disposalType != null ? <TipDisposalSlot /> : null}
+        {moduleOnSlot != null ? (
+          <ModuleContainer
+            moduleId={moduleOnSlot[0]}
+            moduleEntities={moduleEntities}
+            moduleRobotState={modules}
+          />
+        ) : null}
+      </div>
+    </div>
   )
 }

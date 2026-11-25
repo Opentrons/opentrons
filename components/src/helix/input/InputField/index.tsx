@@ -76,7 +76,8 @@ export interface InputFieldProps {
   min?: number | string
   /** horizontal text alignment for title, input, and (sub)captions */
   textAlign?:
-    typeof TYPOGRAPHY.textAlignLeft | typeof TYPOGRAPHY.textAlignCenter
+    | typeof TYPOGRAPHY.textAlignLeft
+    | typeof TYPOGRAPHY.textAlignCenter
   /** small or medium input field height, relevant only */
   size?: 'medium' | 'xsmall' | 'small'
   /** optional element to display aligned to the left of the input field */

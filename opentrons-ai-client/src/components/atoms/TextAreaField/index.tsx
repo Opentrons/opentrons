@@ -74,7 +74,8 @@ export interface TextAreaFieldProps {
   min?: number
   /** horizontal text alignment for title, textarea, and (sub)captions */
   textAlign?:
-    typeof TYPOGRAPHY.textAlignLeft | typeof TYPOGRAPHY.textAlignCenter
+    | typeof TYPOGRAPHY.textAlignLeft
+    | typeof TYPOGRAPHY.textAlignCenter
   /** react useRef to control textarea field instead of react event */
   ref?: MutableRefObject<HTMLTextAreaElement | null>
   /** optional IconName to display icon aligned to left of textarea field */

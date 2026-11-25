@@ -20,7 +20,6 @@ target ?= production
 
 # standard targets
 #####################################################################
-
 .PHONY: all
 all: clean build-$(target)
 
@@ -34,7 +33,6 @@ clean:
 
 # artifacts
 #####################################################################
-
 .PHONY: build-production
 build-production: export NODE_ENV := production
 build-production:
@@ -53,7 +51,6 @@ build:
 
 # development
 #####################################################################
-
 .PHONY: dev
 dev: export NODE_ENV := development
 dev: export PORT := $(PORT)
@@ -83,4 +80,4 @@ prod-deploy:
 
 .PHONY: format-md-json
 format-md-json:
-	pnpm exec prettier --ignore-path .eslintignore --write **/*.md **/*.json
+	pnpm exec oxfmt --write **/*.md **/*.json

@@ -67,7 +67,7 @@
     }
   },
   "gripForce": 25,
-  "gripHeightFromLabwareBottom": 32,
+  "gripHeightFromLabwareBottom": 33.3,
   "containedSpace": {
     "shape": "rectangular",
     "origin": { "x": 0, "y": 0, "z": 0 },

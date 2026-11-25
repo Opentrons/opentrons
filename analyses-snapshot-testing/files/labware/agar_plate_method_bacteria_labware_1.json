@@ -1,9 +1,7 @@
 {
   "brand": {
     "brand": "Thermo Fisher Scientific",
-    "brandId": [
-      "165218"
-    ]
+    "brandId": ["165218"]
   },
   "wells": {
     "A1": {
@@ -19,9 +17,7 @@
   },
   "groups": [
     {
-      "wells": [
-        "A1"
-      ],
+      "wells": ["A1"],
       "metadata": {
         "wellBottomShape": "flat"
       }
@@ -34,11 +30,7 @@
     "displayCategory": "wellPlate",
     "displayVolumeUnits": "\u00b5L"
   },
-  "ordering": [
-    [
-      "A1"
-    ]
-  ],
+  "ordering": [["A1"]],
   "namespace": "custom_beta",
   "dimensions": {
     "xDimension": 127.76,
@@ -47,10 +39,7 @@
   },
   "parameters": {
     "format": "irregular",
-    "quirks": [
-      "centerMultichannelOnWells",
-      "touchTipDisabled"
-    ],
+    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
     "loadName": "omintray_1well_plate",
     "isTiprack": false,
     "isMagneticModuleCompatible": false

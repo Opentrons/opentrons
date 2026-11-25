@@ -21,9 +21,9 @@ OT-2 deck slots: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, trash bin.
   - Not allowed: Slots 2, 5, 8, 11
 
 - Magnetic Block: Not compatible with OT-2
-  
+
 - Plate Reader Module (Absorbance): Not compatible with OT-2
-  
+
 - Temperature Module
   - Recommended: Slot 3
   - Allowed: Slot 1, 4, 6, 7, 9, 10
@@ -33,7 +33,7 @@ OT-2 deck slots: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, trash bin.
   - Recommended/Allowed: Slots 7, 8, 10, and 11 (All four slots)
   - Not allowed: Any other location
   - Note: Only one Thermocycler module can be added to the deck.
-    
+
 - Flex Stacker Module: Not compatible with OT-2
 
 - Fixtures - N/A
@@ -76,7 +76,7 @@ Flex deck layout: D1, D2, D3, C1, C2, C3, B1, B2, B3, A1, A2, A3 (Trash bin)
   - Not allowed: Slots A2, B2, C2, or D2
 
 - Magnetic Module: Not compatible with Flex
-  
+
 - Magnetic Block
   - Recommended: Slot D2
   - Allowed: Slots A1, B1, C1, D1, A2, B2, C2, D2, A3, B3, C3, or D3
@@ -95,7 +95,7 @@ Flex deck layout: D1, D2, D3, C1, C2, C3, B1, B2, B3, A1, A2, A3 (Trash bin)
 - Thermocycler Module
   - Recommended/Allowed: A1 + B1 (Both slots)
   - Not allowed: Any other location
- 
+
 - Flex Stacker Module
   - Recommended: D4
   - Allowed: A4, B4, C4, or D4

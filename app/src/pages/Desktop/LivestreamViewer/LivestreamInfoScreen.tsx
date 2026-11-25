@@ -11,7 +11,12 @@ import type { ReactNode } from 'react'
 import type { CameraData, RunStatus } from '@opentrons/api-client'
 
 type LiveStreamInfoScreenType =
-  'loading' | 'error' | 'disabled' | 'run-setup' | 'run-terminal' | null
+  | 'loading'
+  | 'error'
+  | 'disabled'
+  | 'run-setup'
+  | 'run-terminal'
+  | null
 
 export function useLivestreamInfoScreen(
   runStatus: RunStatus | null,

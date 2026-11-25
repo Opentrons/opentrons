@@ -59,9 +59,9 @@ All packages extend `tsconfig-base.json`:
 
 Each package defines `rootDir: "src"`, `outDir: "lib"`, and references its dependencies.
 
-## Code Style (Prettier)
+## Code Style (Oxfmt)
 
-Enforced by Prettier with `@ianvs/prettier-plugin-sort-imports`:
+Enforced by Oxfmt with `.oxfmtrc.json`:
 
 - **No semicolons**
 - **Single quotes** (double quotes in JSX)
@@ -71,7 +71,7 @@ Enforced by Prettier with `@ianvs/prettier-plugin-sort-imports`:
 
 ## Import Conventions
 
-### Order (auto-sorted by Prettier plugin)
+### Order (auto-sorted by Oxfmt)
 
 1. React imports (`import { useState } from 'react'`)
 2. Third-party packages
@@ -112,7 +112,7 @@ import { utils } from './utils'
 
 ### No Default Exports
 
-ESLint enforces `import/no-default-export`. Always use named exports. Exceptions: config files (`vite.config.mts`, `*.stories.tsx`).
+Oxlint enforces `import/no-default-export`. Always use named exports. Exceptions: config files (`vite.config.mts`, `*.stories.tsx`).
 
 ### Lodash
 
@@ -157,7 +157,7 @@ export function MyComponent({ title, onClose }: MyComponentProps): JSX.Element {
 
 ### Atomic Design Hierarchy
 
-Components are organized as `atoms/` → `molecules/` → `organisms/` → `pages/`. Custom ESLint rule `opentrons/no-imports-up-the-tree-of-life` prevents importing up the hierarchy:
+Components are organized as `atoms/` → `molecules/` → `organisms/` → `pages/`. Custom Oxlint jsPlugin rule `opentrons/no-imports-up-the-tree-of-life` prevents importing up the hierarchy:
 
 - atoms must NOT import from molecules, organisms, or pages
 - molecules must NOT import from organisms or pages
@@ -165,7 +165,7 @@ Components are organized as `atoms/` → `molecules/` → `organisms/` → `page
 
 ### Application Boundaries (`app/` specific)
 
-The `app` package separates Desktop and ODD (On-Device Display) UIs. ESLint rule `opentrons/no-imports-across-applications` prevents cross-contamination between `/Desktop/`, `/ODD/`, and shared code.
+The `app` package separates Desktop and ODD (On-Device Display) UIs. Oxlint jsPlugin rule `opentrons/no-imports-across-applications` prevents cross-contamination between `/Desktop/`, `/ODD/`, and shared code.
 
 ### Component Library (`@opentrons/components`)
 
@@ -190,7 +190,7 @@ import {
 - `useTranslation` from `react-i18next` for i18n
 - Custom hooks prefixed with `use*`
 - Never call hooks conditionally
-- ESLint enforces `react-hooks/rules-of-hooks` (error) and `react-hooks/exhaustive-deps` (warn)
+- Oxlint enforces `react-hooks/rules-of-hooks` (error) and `react-hooks/exhaustive-deps` (warn)
 
 ## Styling
 
@@ -315,11 +315,11 @@ Each package has a `Makefile` with some or all of:
 | `make setup-js`                   | Install all JS deps (`pnpm`)                                       |
 | `make test-js`                    | Run ALL JS tests                                                   |
 | `make test-js-<project>`          | Run tests for one project (e.g., `make test-js-protocol-designer`) |
-| `make lint-js`                    | ESLint + Prettier check                                            |
-| `make lint-js-eslint`             | ESLint only                                                        |
-| `make lint-js-prettier`           | Prettier only                                                      |
+| `make lint-js`                    | Oxlint + Oxfmt check                                               |
+| `make lint-js-oxlint`             | Oxlint only                                                        |
+| `make lint-js-oxfmt`              | Oxfmt only                                                         |
 | `make lint-css`                   | Stylelint all CSS                                                  |
-| `make format-js`                  | Auto-format with Prettier                                          |
+| `make format-js`                  | Auto-format with Oxfmt                                             |
 | `make format-css`                 | Auto-fix CSS with Stylelint                                        |
 | `make check-js` / `make build-ts` | TypeScript type-check (`tsc --build`)                              |
 | `make clean-ts`                   | Clean TS build output                                              |
@@ -344,10 +344,10 @@ make test-js-app tests="src/organisms/__tests__/MyComponent.test.tsx"
 ### Linting Specific Files
 
 ```bash
-pnpm eslint path/to/file.tsx
+pnpm exec oxlint path/to/file.tsx
 pnpm stylelint path/to/file.module.css
-pnpm prettier --check path/to/file.tsx
-pnpm prettier --write path/to/file.tsx   # auto-fix
+pnpm exec oxfmt --check path/to/file.tsx
+pnpm exec oxfmt --write path/to/file.tsx   # auto-fix
 ```
 
 ## Event Handlers
@@ -426,9 +426,9 @@ function AppContent({ isOnChatPage }: { isOnChatPage: boolean }) {
 - Do NOT introduce new styled-components — use CSS Modules
 - Do NOT import up the atomic design hierarchy (atoms ← molecules ← organisms ← pages)
 - Do NOT skip `afterEach(() => vi.clearAllMocks())` in test suites
-- Do NOT use semicolons (Prettier removes them)
+- Do NOT use semicolons (Oxfmt removes them)
 - Do NOT use `console.log` or `debugger` in committed code
-- Do NOT omit curly braces for control statements — ESLint `curly` rule enforces braces for all `if`, `else`, `for`, `while`, and `do` blocks
+- Do NOT omit curly braces for control statements — Oxlint `curly` rule enforces braces for all `if`, `else`, `for`, `while`, and `do` blocks
 - Do NOT use primitives (primitives are located in `components/src/primitives`) for new component - use HTML 5 tags and CSS Modules
 - Do NOT use margins to create a layout in a component - use padding and gap
 - Do NOT use a conditional statement for `aria-label`

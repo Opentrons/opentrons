@@ -44,7 +44,8 @@ export type OT2AddressableAreaName =
   | 'fixedTrash'
 
 export type AddressableAreaName =
-  FlexAddressableAreaName | OT2AddressableAreaName
+  | FlexAddressableAreaName
+  | OT2AddressableAreaName
 
 export type CutoutId =
   | 'cutoutD1'
@@ -75,7 +76,9 @@ export type OT2CutoutId =
   | 'cutout12'
 
 export type SingleSlotCutoutFixtureId =
-  'singleLeftSlot' | 'singleCenterSlot' | 'singleRightSlot'
+  | 'singleLeftSlot'
+  | 'singleCenterSlot'
+  | 'singleRightSlot'
 
 export type StagingAreaRightSlotFixtureId = 'stagingAreaRightSlot'
 

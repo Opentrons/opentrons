@@ -8,13 +8,13 @@ import { i18n } from '/app/i18n'
 import * as Shell from '/app/redux/shell'
 
 import { RELEASE_NOTES_URL_BASE, UpdateAppModal } from '..'
+import type { UpdateAppModalProps } from '..'
 import { useRemoveActiveAppUpdateToast } from '../../Alerts'
 
 import type { ComponentProps } from 'react'
 import type * as Dom from 'react-router-dom'
 import type { ShellUpdateState } from '/app/redux/shell/types'
 import type { State } from '/app/redux/types'
-import type { UpdateAppModalProps } from '..'
 
 vi.mock('/app/redux/shell/update', async importOriginal => {
   const actual = await importOriginal<typeof Shell>()

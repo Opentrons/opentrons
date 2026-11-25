@@ -58,7 +58,7 @@
   "innerLabwareGeometry": {
     "cylinder": {
       "sections": [
-         {
+        {
           "shape": "conical",
           "topDiameter": 16,
           "bottomDiameter": 16,

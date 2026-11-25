@@ -1,5 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -38,6 +39,7 @@ describe('Navigation', () => {
     vi.mocked(getHasUnsavedChanges).mockReturnValue(false)
     vi.mocked(SettingsIcon).mockReturnValue(<div>mock SettingsIcon</div>)
   })
+
   it('should render text and link button', () => {
     render()
     screen.getByText('Opentrons')
@@ -47,9 +49,10 @@ describe('Navigation', () => {
     screen.getByText('mock SettingsIcon')
   })
 
-  it('when clicking Create new, should call the toggle action', () => {
+  it('when clicking Create new, should call the toggle action', async () => {
+    const user = userEvent.setup()
     render()
-    fireEvent.click(screen.getByText('Create new'))
+    await user.click(screen.getByText('Create new'))
     expect(mockNavigate).toHaveBeenCalled()
   })
 

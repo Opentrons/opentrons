@@ -1,11 +1,13 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../__testing-utils__'
-import { i18n } from '../../assets/localization'
 import { ProtocolDesignerAppFallback } from '../ProtocolDesignerAppFallback'
 
 import type { FallbackProps } from 'react-error-boundary'
+
+import { i18n } from '../../assets/localization'
 
 const mockError = {
   message: 'mock error',
@@ -38,9 +40,10 @@ describe('ProtocolDesignerAppFallback', () => {
     screen.getByText('Reload app')
   })
 
-  it('should call mock function when clicking the button', () => {
+  it('should call mock function when clicking the button', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByText('Reload app'))
+    await user.click(screen.getByText('Reload app'))
     expect(mockFunc).toHaveBeenCalled()
   })
 })

@@ -8,10 +8,10 @@ import {
   _irregularWellName,
   createIrregularLabware,
 } from '..'
+import type { IrregularLabwareProps } from '..'
 import fixture_irregular_example_1 from '../../../labware/fixtures/2/fixture_irregular_example_1.json'
 import { sortWells, splitWellsOnColumn } from '../../helpers/index'
 
-import type { IrregularLabwareProps } from '..'
 import type { LabwareDefinition, LabwareWellProperties } from '../../types'
 
 // NOTE: loadName needs to be replaced here b/c fixture has a non-default loadName

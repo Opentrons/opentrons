@@ -53,7 +53,10 @@ type RuntimeParameterValue<T> = T extends any
 
 export type WithRuntimeParameterStrings<T> = {
   [K in keyof T]: K extends
-    'commandCreatorFnName' | 'stepNumber' | 'name' | 'description'
+    | 'commandCreatorFnName'
+    | 'stepNumber'
+    | 'name'
+    | 'description'
     ? T[K]
     : RuntimeParameterValue<T[K]>
 }

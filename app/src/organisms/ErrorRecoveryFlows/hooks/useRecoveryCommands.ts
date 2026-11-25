@@ -17,6 +17,7 @@ import {
   useUpdateRecoveryPolicyWithStrategy,
 } from '/app/resources/runs'
 
+import type { ErrorRecoveryFlowsProps } from '..'
 import { DEFINED_ERROR_TYPES, ERROR_KINDS, RECOVERY_MAP } from '../constants'
 
 import type { CommandData, IfMatchType, RunAction } from '@opentrons/api-client'
@@ -45,7 +46,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 import type { UpdateErrorRecoveryPolicyWithStrategy } from '/app/resources/runs'
-import type { ErrorRecoveryFlowsProps } from '..'
 import type { FailedCommand, RecoveryRoute, RouteStep } from '../types'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
 import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
@@ -214,7 +214,9 @@ export function useRecoveryCommands({
   )
 
   const buildRetryPrepMove = ():
-    MoveToCoordinatesCreateCommand | LiquidProbeCreateCommand | null => {
+    | MoveToCoordinatesCreateCommand
+    | LiquidProbeCreateCommand
+    | null => {
     type InPlaceCommand =
       | AspirateInPlaceRunTimeCommand
       | BlowoutInPlaceRunTimeCommand
@@ -222,7 +224,8 @@ export function useRecoveryCommands({
       | DropTipInPlaceRunTimeCommand
       | PrepareToAspirateRunTimeCommand
     type CommandsWithDynamicLiquidTracking =
-      AspirateWhileTrackingRunTimeCommand | DispenseWhileTrackingRunTimeCommand
+      | AspirateWhileTrackingRunTimeCommand
+      | DispenseWhileTrackingRunTimeCommand
 
     const IN_PLACE_COMMAND_TYPES = [
       'aspirateInPlace',
@@ -247,7 +250,8 @@ export function useRecoveryCommands({
     const requiresMoveToError = (
       error?: RunCommandError | null
     ): error is
-      RunCommandErrorOverpressure | RunCommandErrorTipPhysicallyAttached =>
+      | RunCommandErrorOverpressure
+      | RunCommandErrorTipPhysicallyAttached =>
       error != null &&
       error.isDefined &&
       (error.errorType === DEFINED_ERROR_TYPES.OVERPRESSURE ||

@@ -19,7 +19,10 @@ import type { ReactNode } from 'react'
 import type { AuthSettingsData } from '@opentrons/api-client'
 
 type CRSLoginSettingsPages =
-  'max_logins' | 'password_reset_time' | 'password_complexity' | 'idle_logout'
+  | 'max_logins'
+  | 'password_reset_time'
+  | 'password_complexity'
+  | 'idle_logout'
 
 export function LoginSettings({
   authSettings,

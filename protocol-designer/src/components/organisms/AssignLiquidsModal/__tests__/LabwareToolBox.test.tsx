@@ -1,5 +1,6 @@
 import { useDispatch } from 'react-redux'
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fixture96Plate } from '@opentrons/shared-data'
@@ -73,7 +74,7 @@ describe('LabwareStackToolboxContainer liquids dont match', () => {
     } as AllTemporalPropertiesForTimelineFrame)
     props = {
       showBadFormState: false,
-      setShowLiquidLayoutOverlay: setShowLiquidLayoutOverlay,
+      setShowLiquidLayoutOverlay,
       data: {
         labware: {
           mockLabwareId: {
@@ -110,38 +111,45 @@ describe('LabwareStackToolboxContainer liquids dont match', () => {
     }
   })
 
-  it('select shows an overlay when liquids dont match', () => {
+  it('select shows an overlay when liquids dont match', async () => {
+    const user = userEvent.setup()
     render(props)
     // Click on labware2 (which has no liquids) with ctrl key - should show overlay
     const labwareButton = screen.getByRole('button', {
       name: '2 ANSI 96 Standard Microplate',
     })
     expect(labwareButton).toBeInTheDocument()
-    fireEvent.click(labwareButton, { ctrlKey: true })
+    await user.keyboard('{Control>}')
+    await user.click(labwareButton)
+    await user.keyboard('{/Control}')
     expect(setShowLiquidLayoutOverlay).toHaveBeenCalledWith(true)
   })
 
-  it('selects a single labware when ctrl key is not pressed', () => {
+  it('selects a single labware when ctrl key is not pressed', async () => {
+    const user = userEvent.setup()
     render(props)
     const labwareButton = screen.getByRole('button', {
       name: '3 ANSI 96 Standard Microplate',
     })
     expect(labwareButton).toBeInTheDocument()
-    fireEvent.click(labwareButton)
+    await user.click(labwareButton)
     expect(mockDispatch).toHaveBeenCalledWith({
       payload: ['mockLabwareId'],
       type: 'OPEN_MULTIPLE_INGREDIENTS_SELECTOR',
     })
   })
 
-  it('selects multiple labware when ctrl key is pressed with different liquids', () => {
+  it('selects multiple labware when ctrl key is pressed with different liquids', async () => {
+    const user = userEvent.setup()
     render(props)
     // Click on labware2 (which has different liquids) with ctrl key - should show overlay
     const labwareButton = screen.getByRole('button', {
       name: '2 ANSI 96 Standard Microplate',
     })
     expect(labwareButton).toBeInTheDocument()
-    fireEvent.click(labwareButton, { ctrlKey: true })
+    await user.keyboard('{Control>}')
+    await user.click(labwareButton)
+    await user.keyboard('{/Control}')
     expect(setShowLiquidLayoutOverlay).toHaveBeenCalledWith(true)
   })
 })
@@ -171,7 +179,7 @@ describe('LabwareStackToolboxContainer liquids match', () => {
     } as AllTemporalPropertiesForTimelineFrame)
     props = {
       showBadFormState: false,
-      setShowLiquidLayoutOverlay: setShowLiquidLayoutOverlay,
+      setShowLiquidLayoutOverlay,
       data: {
         labware: {
           mockLabwareId: {
@@ -222,11 +230,12 @@ describe('LabwareStackToolboxContainer liquids match', () => {
     }
   })
 
-  it('select all labware buttons', () => {
+  it('select all labware buttons', async () => {
+    const user = userEvent.setup()
     render(props)
     const allLabwareButton = screen.getByRole('button', { name: 'Select all' })
     expect(allLabwareButton).toBeInTheDocument()
-    fireEvent.click(allLabwareButton)
+    await user.click(allLabwareButton)
     expect(mockDispatch).toBeCalledWith({
       payload: ['mockLabwareId', 'labware2', 'A2'],
       type: 'OPEN_MULTIPLE_INGREDIENTS_SELECTOR',

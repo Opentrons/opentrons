@@ -1,5 +1,3 @@
-import 'core-js/full/reflect'
-
 import { pbkdf2, randomBytes, webcrypto, X509Certificate } from 'crypto'
 import { promisify } from 'util'
 import * as x509 from '@peculiar/x509'

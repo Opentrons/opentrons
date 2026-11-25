@@ -1,7 +1,11 @@
 import type { MouseEvent } from 'react'
 
 export type MenuName =
-  'About' | 'Products' | 'Applications' | 'Protocols' | 'Support'
+  | 'About'
+  | 'Products'
+  | 'Applications'
+  | 'Protocols'
+  | 'Support'
 
 export interface Link {
   name: string
@@ -23,7 +27,11 @@ export interface Submenu {
 }
 
 export type ProtocolSubmenuName =
-  'options' | 'designer' | 'library' | 'api' | 'github'
+  | 'options'
+  | 'designer'
+  | 'library'
+  | 'api'
+  | 'github'
 
 export type ProtocolLinks = Record<ProtocolSubmenuName, Link> & {
   bottomLink: Link

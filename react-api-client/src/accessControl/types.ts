@@ -79,7 +79,8 @@ export interface UseDocumentedMutation {
   <TData = unknown, TError = unknown, TVariables = void, TContext = unknown>(
     documentationState: DocumentationState,
     actionsToDocument:
-      DocumentedAction[] | ((variables: TVariables) => DocumentedAction[]),
+      | DocumentedAction[]
+      | ((variables: TVariables) => DocumentedAction[]),
     mutationFn: DocumentedMutationFunction<TData, TVariables>,
     options?: UseMutationOptions<TData, TError, TVariables, TContext>
   ): UseMutationResult<TData, TError, TVariables, TContext>
@@ -87,7 +88,8 @@ export interface UseDocumentedMutation {
   <TData = unknown, TError = unknown, TVariables = void, TContext = unknown>(
     documentationState: DocumentationState,
     actionsToDocument:
-      DocumentedAction[] | ((variables: TVariables) => DocumentedAction[]),
+      | DocumentedAction[]
+      | ((variables: TVariables) => DocumentedAction[]),
     mutationKey: MutationKey,
     mutationFn: DocumentedMutationFunction<TData, TVariables>,
     options?: UseMutationOptions<TData, TError, TVariables, TContext>
@@ -219,7 +221,9 @@ export type DocumentedAction =
  * login_cancelled: user closed out of the login modal
  */
 export type DocumentedMutationErrorType =
-  'no_documentation_report' | 'access_control_loading' | 'login_cancelled'
+  | 'no_documentation_report'
+  | 'access_control_loading'
+  | 'login_cancelled'
 
 const DOCUMENTED_MUTATION_ERROR_MESSAGES: Record<
   DocumentedMutationErrorType,

@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -47,7 +48,7 @@ vi.mock('/protocol-designer/ui/steps')
 const render = (props: ComponentProps<typeof AddStepButton>) => {
   return renderWithProviders(<AddStepButton {...props} />, {
     i18nInstance: i18n,
-  })[0]
+  })
 }
 
 const MOCK_LID_ID = 'mockLidId'
@@ -179,9 +180,10 @@ describe('AddStepButton', () => {
     vi.mocked(getInitialRobotState).mockReturnValue(MOCK_INITIAL_ROBOT_STATE)
   })
 
-  it('renders add step button and clicking on it renders the overflow menu with all modules', () => {
+  it('renders add step button and clicking on it renders the overflow menu with all modules', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByText('Add Step'))
+    await user.click(screen.getByText('Add Step'))
     screen.getByText('Comment')
     screen.getByText('Transfer')
     screen.getByText('Mix')
@@ -200,12 +202,13 @@ describe('AddStepButton', () => {
     expect(text).toBeNull()
   })
 
-  it('should not render liquid handling steps if no compatible labware is present in entities', () => {
+  it('should not render liquid handling steps if no compatible labware is present in entities', async () => {
+    const user = userEvent.setup()
     vi.mocked(getLabwareEntities).mockReturnValue({
       [MOCK_TIPRACK_ID]: MOCK_TIPRACK_ENTITY,
     })
     render(props)
-    fireEvent.click(screen.getByText('Add Step'))
+    await user.click(screen.getByText('Add Step'))
     screen.getByText('Comment')
     expect(screen.queryByText('Transfer')).not.toBeInTheDocument()
     expect(screen.queryByText('Mix')).not.toBeInTheDocument()
@@ -216,12 +219,13 @@ describe('AddStepButton', () => {
     screen.getByText('Magnet')
   })
 
-  it('should not render liquid handling steps if only labware has a lid on top in entities', () => {
+  it('should not render liquid handling steps if only labware has a lid on top in entities', async () => {
+    const user = userEvent.setup()
     vi.mocked(getLabwareEntities).mockReturnValue({
       [MOCK_LID_ID]: MOCK_LID_ENTITY,
     })
     render(props)
-    fireEvent.click(screen.getByText('Add Step'))
+    await user.click(screen.getByText('Add Step'))
     screen.getByText('Comment')
     expect(screen.queryByText('Transfer')).not.toBeInTheDocument()
     expect(screen.queryByText('Mix')).not.toBeInTheDocument()
@@ -232,7 +236,8 @@ describe('AddStepButton', () => {
     screen.getByText('Magnet')
   })
 
-  it('should not render liquid handling steps if no compatible labware on deck', () => {
+  it('should not render liquid handling steps if no compatible labware on deck', async () => {
+    const user = userEvent.setup()
     vi.mocked(getInitialRobotState).mockReturnValue({
       ...MOCK_INITIAL_ROBOT_STATE,
       labware: {
@@ -241,7 +246,7 @@ describe('AddStepButton', () => {
       },
     })
     render(props)
-    fireEvent.click(screen.getByText('Add Step'))
+    await user.click(screen.getByText('Add Step'))
     screen.getByText('Comment')
     expect(screen.queryByText('Transfer')).not.toBeInTheDocument()
     expect(screen.queryByText('Mix')).not.toBeInTheDocument()
@@ -252,13 +257,15 @@ describe('AddStepButton', () => {
     screen.getByText('Magnet')
   })
 
-  it('should not render vacuum step if vacuum module is not enabled', () => {
+  it('should not render vacuum step if vacuum module is not enabled', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByText('Add Step'))
+    await user.click(screen.getByText('Add Step'))
     expect(screen.queryByText('Vacuum')).not.toBeInTheDocument()
   })
 
-  it('should render vacuum step if vacuum module is enabled', () => {
+  it('should render vacuum step if vacuum module is enabled', async () => {
+    const user = userEvent.setup()
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       ...MOCK_INITIAL_DECK_SETUP,
       modules: {
@@ -274,14 +281,15 @@ describe('AddStepButton', () => {
       } as any,
     } as any)
     render(props)
-    fireEvent.click(screen.getByText('Add Step'))
+    await user.click(screen.getByText('Add Step'))
     screen.getByText('Vacuum')
   })
 
-  it('should not render vacuum step if vacuum module is not on deck', () => {
+  it('should not render vacuum step if vacuum module is not on deck', async () => {
+    const user = userEvent.setup()
     vi.mocked(getInitialRobotState).mockReturnValue(MOCK_INITIAL_ROBOT_STATE)
     render(props)
-    fireEvent.click(screen.getByText('Add Step'))
+    await user.click(screen.getByText('Add Step'))
     expect(screen.queryByText('Vacuum')).not.toBeInTheDocument()
   })
 })

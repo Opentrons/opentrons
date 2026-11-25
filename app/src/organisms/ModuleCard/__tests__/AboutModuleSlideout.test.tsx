@@ -48,8 +48,8 @@ describe('AboutModuleSlideout', () => {
 
     screen.getByText('About Magnetic Module GEN1')
     screen.getByText('def456')
-    screen.getByText('SERIAL NUMBER')
-    screen.getByText('CURRENT VERSION')
+    screen.getByText('Serial Number')
+    screen.getByText('Current Version')
     screen.getByText('v2.0.0')
     const button = screen.getByRole('button', { name: /exit/i })
     fireEvent.click(button)
@@ -62,8 +62,8 @@ describe('AboutModuleSlideout', () => {
 
     screen.getByText('About Magnetic Module GEN1')
     screen.getByText('def456')
-    screen.getByText('SERIAL NUMBER')
-    screen.getByText('CURRENT VERSION')
+    screen.getByText('Serial Number')
+    screen.getByText('Current Version')
     screen.getByText('v2.0.0')
   })
 
@@ -73,8 +73,8 @@ describe('AboutModuleSlideout', () => {
 
     screen.getByText('About Magnetic Module GEN1')
     screen.getByText('def456')
-    screen.getByText('SERIAL NUMBER')
-    screen.getByText('CURRENT VERSION')
+    screen.getByText('Serial Number')
+    screen.getByText('Current Version')
     screen.getByText('v2.0.0')
   })
 
@@ -89,8 +89,8 @@ describe('AboutModuleSlideout', () => {
 
     screen.getByText('About Magnetic Module GEN2')
     screen.getByText('def456')
-    screen.getByText('SERIAL NUMBER')
-    screen.getByText('CURRENT VERSION')
+    screen.getByText('Serial Number')
+    screen.getByText('Current Version')
     screen.getByText('v2.0.0')
   })
 
@@ -105,8 +105,8 @@ describe('AboutModuleSlideout', () => {
 
     screen.getByText('About Temperature Module GEN2')
     screen.getByText('abc123')
-    screen.getByText('SERIAL NUMBER')
-    screen.getByText('CURRENT VERSION')
+    screen.getByText('Serial Number')
+    screen.getByText('Current Version')
     screen.getByText('v2.0.0')
   })
 
@@ -121,8 +121,8 @@ describe('AboutModuleSlideout', () => {
 
     screen.getByText('About Temperature Module GEN1')
     screen.getByText('abc123')
-    screen.getByText('SERIAL NUMBER')
-    screen.getByText('CURRENT VERSION')
+    screen.getByText('Serial Number')
+    screen.getByText('Current Version')
     screen.getByText('v2.0.0')
   })
 
@@ -137,8 +137,8 @@ describe('AboutModuleSlideout', () => {
 
     screen.getByText('About Thermocycler Module GEN1')
     screen.getByText('ghi789')
-    screen.getByText('SERIAL NUMBER')
-    screen.getByText('CURRENT VERSION')
+    screen.getByText('Serial Number')
+    screen.getByText('Current Version')
     screen.getByText('v2.0.0')
     screen.getByText('Firmware update available.')
     const viewUpdate = screen.getByRole('button', { name: 'Update now' })
@@ -162,8 +162,8 @@ describe('AboutModuleSlideout', () => {
 
     screen.getByText('About Temperature Module GEN1')
     screen.getByText('abc123')
-    screen.getByText('SERIAL NUMBER')
-    screen.getByText('CURRENT VERSION')
+    screen.getByText('Serial Number')
+    screen.getByText('Current Version')
     screen.getByText('v2.0.0')
     const button = screen.getByRole('button', { name: 'close' })
     fireEvent.click(button)

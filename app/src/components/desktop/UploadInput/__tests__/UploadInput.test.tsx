@@ -1,9 +1,8 @@
+import { BrowserRouter } from 'react-router-dom'
+import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
-
-import { BrowserRouter } from 'react-router-dom'
-import { fireEvent, screen } from '@testing-library/react'
 
 import {
   DIRECTION_ROW,

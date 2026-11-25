@@ -87,25 +87,24 @@ Pass options: `make test-js-<project> tests="src/path" test_opts="--reporter=ver
 
 ### Frontend Lint & Format — Always Use These Three
 
-All frontend (TS/TSX/JS/CSS) lint and format commands run from the **monorepo root** via these Make targets. Do not call ESLint, Oxlint, Prettier, or Stylelint directly.
+All frontend (TS/TSX/JS/CSS) lint and format commands run from the **monorepo root** via these Make targets. Do not call Oxlint, Oxfmt, or Stylelint directly.
 
 ```bash
-make format-js       # Prettier auto-format (all TS/TSX/JS/MD/JSON)
-make lint-js         # Oxlint + ESLint + Prettier check (run after format-js to confirm clean)
+make format-js       # Oxfmt auto-format (all TS/TSX/JS/MD/JSON)
+make lint-js         # Oxlint + Oxfmt check (run after format-js to confirm clean)
 make lint-css        # Stylelint check for all CSS Modules
 ```
 
 Run `format-js` first to auto-fix, then `lint-js` and `lint-css` to verify nothing remains.
 
-### Hybrid Oxlint + ESLint
+### Oxlint + Oxfmt
 
-JS/TS linting uses a **hybrid** setup:
+JS/TS quality uses Oxc tools:
 
-1. **Oxlint** (`make lint-js-oxlint`) — primary linter for most rules (fast; config in `.oxlintrc.json`)
-2. **ESLint** (`make lint-js-eslint`) — type-aware `@typescript-eslint` rules, `react-hooks/exhaustive-deps`, custom `opentrons/*` rules, and other gaps; config in `eslint.config.js` with `eslint-plugin-oxlint` disabling overlapping rules
-3. **Prettier** (`make lint-js-prettier`) — formatting check
+1. **Oxlint** (`make lint-js-oxlint`) — linter (config in `.oxlintrc.json`; custom rules via `jsPlugins`)
+2. **Oxfmt** (`make lint-js-oxfmt`) — formatting check (config in `.oxfmtrc.json`)
 
-`make lint-json` still uses ESLint with `eslint-plugin-json` for JSON files.
+`make lint-json` runs Oxfmt on JSON files.
 
 For editor integration, install the [Oxc VS Code extension](https://oxc.rs/docs/guide/usage/linter/editors.html).
 
@@ -113,12 +112,11 @@ For editor integration, install the [Oxc VS Code extension](https://oxc.rs/docs/
 
 | Target | Description |
 | --- | --- |
-| `make lint-js` | Oxlint + ESLint + Prettier check |
+| `make lint-js` | Oxlint + Oxfmt check |
 | `make lint-js-oxlint` | Oxlint only (`.oxlintrc.json`) |
-| `make lint-js-eslint` | ESLint only (unmigrated/type-aware rules) |
-| `make lint-js-prettier` | Prettier only |
+| `make lint-js-oxfmt` | Oxfmt only |
 | `make lint-css` | Stylelint all CSS |
-| `make lint-json` | ESLint for JSON files |
+| `make lint-json` | Oxfmt check for JSON files |
 | `make lint-py` | Lint all robot Python projects (ruff + mypy) |
 | `make check-js` / `make build-ts` | TypeScript type-check (`tsc --build`) |
 | `make circular-dependencies-js` | Check for circular imports (madge) |
@@ -127,7 +125,7 @@ For editor integration, install the [Oxc VS Code extension](https://oxc.rs/docs/
 
 | Target | Description |
 | --- | --- |
-| `make format-js` | Prettier auto-format |
+| `make format-js` | Oxfmt auto-format |
 | `make format-py` | ruff format for all robot Python projects |
 | `make format-css` | Stylelint auto-fix |
 
@@ -136,7 +134,7 @@ For editor integration, install the [Oxc VS Code extension](https://oxc.rs/docs/
 `opentrons-ai-server/` is a standalone Python project with its own Makefile. Run from inside that directory:
 
 ```bash
-make format   # ruff format + ruff check --fix + prettier for MD/JSON
+make format   # ruff format + ruff check --fix + oxfmt for MD/JSON
 make lint     # ruff format --check + ruff check + mypy
 ```
 

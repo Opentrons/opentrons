@@ -8,39 +8,34 @@ description = "A daemon to provide a bridge between the OT-3 USB port and the in
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
-authors = [
-    { name = "Opentrons", email = "engineering@opentrons.com" },
-]
+authors = [{ name = "Opentrons", email = "engineering@opentrons.com" }]
 classifiers = [
-    "Private :: Do Not Upload"  # Prevent uploading to PyPI.
+  "Private :: Do Not Upload", # Prevent uploading to PyPI.
 ]
 dependencies = [
-    "typing-extensions>=4.0.0,<5",
-    "pyserial==3.5",
-    "pyudev==0.23.2",
+  "typing-extensions>=4.0.0,<5",
+  "pyserial==3.5",
+  "pyudev==0.23.2",
 ]
 dynamic = ["version"]
 
 [dependency-groups]
 # Robot dependencies - exact versions for robot deployment
-robot = [
-    "pyserial==3.5",
-    "pyudev==0.23.2",
-]
+robot = ["pyserial==3.5", "pyudev==0.23.2"]
 dev = [
-    "ruff==0.17.4",
-    "pytest==9.2.0",
-    "pytest-asyncio==1.4.1.post1",
-    "pytest-watch==4.2.0",
-    "pytest-cov==7.1.0",
-    "pytest-xdist==3.8.0",
-    "coverage==7.16.2",
-    "mypy==2.4.1",
-    "decoy==2.6.0",
-    "mock==5.2.0",
-    "types-mock==5.2.0.20260518",
-    "build==1.6.1",
-    "setuptools==84.2.1",
+  "ruff==0.17.4",
+  "pytest==9.2.0",
+  "pytest-asyncio==1.4.1.post1",
+  "pytest-watch==4.2.0",
+  "pytest-cov==7.1.0",
+  "pytest-xdist==3.8.0",
+  "coverage==7.16.2",
+  "mypy==2.4.1",
+  "decoy==2.6.0",
+  "mock==5.2.0",
+  "types-mock==5.2.0.20260518",
+  "build==1.6.1",
+  "setuptools==84.2.1",
 ]
 
 [project.urls]
@@ -60,7 +55,12 @@ convention = "google"
 [tool.ruff.lint.mccabe]
 max-complexity = 9
 [tool.ruff.lint.isort]
-known-first-party = ["opentrons", "opentrons_hardware", "opentrons_shared_data", "robot_server" ]
+known-first-party = [
+  "opentrons",
+  "opentrons_hardware",
+  "opentrons_shared_data",
+  "robot_server",
+]
 known-local-folder = ["usb_bridge"]
 
 [tool.ruff.format]
@@ -86,10 +86,7 @@ local_scheme = 'no-local-version'
 
 [tool.hatch.build.targets.wheel]
 packages = ["ot3usb"]
-exclude = [
-    "tests",
-    "tests.*",
-]
+exclude = ["tests", "tests.*"]
 
 [tool.hatch.build.targets.sdist]
 include = ['ot3usb', 'LICENSE', 'tests', 'uv.lock']
@@ -98,7 +95,15 @@ include = ['ot3usb', 'LICENSE', 'tests', 'uv.lock']
 'LICENSE' = 'ot3usb/LICENSE'
 
 [tool.pytest]
-addopts = ["--cov=ot3usb", "--cov-report", "term-missing:skip-covered", "--cov-report", "xml:coverage.xml", "--color=yes", "--strict-markers"]
+addopts = [
+  "--cov=ot3usb",
+  "--cov-report",
+  "term-missing:skip-covered",
+  "--cov-report",
+  "xml:coverage.xml",
+  "--color=yes",
+  "--strict-markers",
+]
 
 [tool.mypy]
 show_error_codes = true

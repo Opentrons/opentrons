@@ -21,8 +21,8 @@ import multiSelect from '/protocol-designer/assets/images/announcements/multi_se
 import deckConfiguration from '/protocol-designer/assets/images/deck_configuration.png'
 import heaterShaker from '/protocol-designer/assets/images/modules/heatershaker.png'
 import magTempCombined from '/protocol-designer/assets/images/modules/magdeck_tempdeck_combined.png'
-import thermocyclerGen2 from '/protocol-designer/assets/images/modules/thermocycler_gen2.png'
 import thermocycler from '/protocol-designer/assets/images/modules/thermocycler.png'
+import thermocyclerGen2 from '/protocol-designer/assets/images/modules/thermocycler_gen2.png'
 import absorbancePlateReaderImage from '/protocol-designer/assets/images/opentrons_absorbance_plate_reader.png'
 import opentronsFlex from '/protocol-designer/assets/images/OpentronsFlex.png'
 

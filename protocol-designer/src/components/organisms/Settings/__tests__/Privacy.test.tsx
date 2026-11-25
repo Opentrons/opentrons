@@ -1,4 +1,5 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -24,6 +25,7 @@ describe('UserSettings', () => {
       hasOptedIn: true,
     }
   })
+
   it('renders the privacy section', () => {
     render(props)
     screen.getByText('Privacy')
@@ -34,16 +36,18 @@ describe('UserSettings', () => {
     screen.getByRole('switch')
   })
 
-  it('should call optOut when clicking toggle switch when opted in', () => {
+  it('should call optOut when clicking toggle switch when opted in', async () => {
+    const user = userEvent.setup()
     render(props)
-    fireEvent.click(screen.getByRole('switch'))
+    await user.click(screen.getByRole('switch'))
     expect(vi.mocked(analyticsActions.optOut)).toHaveBeenCalled()
   })
 
-  it('should call optIn when clicking toggle switch when not opted in', () => {
+  it('should call optIn when clicking toggle switch when not opted in', async () => {
+    const user = userEvent.setup()
     props.hasOptedIn = false
     render(props)
-    fireEvent.click(screen.getByRole('switch'))
+    await user.click(screen.getByRole('switch'))
     expect(vi.mocked(analyticsActions.optIn)).toHaveBeenCalled()
   })
 })

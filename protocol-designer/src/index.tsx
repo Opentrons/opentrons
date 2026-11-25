@@ -1,18 +1,19 @@
-import ReactDOM from 'react-dom/client'
 import { I18nextProvider } from 'react-i18next'
 import { Provider } from 'react-redux'
+import ReactDOM from 'react-dom/client'
+
+import '@opentrons/components/styles/global'
 
 import { initializeMixpanel } from './analytics/mixpanel'
 import { App } from './App'
-import { i18n } from './assets/localization'
 import { GlobalStyle } from './components/atoms'
 import { configureStore } from './configureStore'
 import { initialize } from './initialize'
 import { initializeSentry } from './resources/sentry'
 
-import '@opentrons/components/styles/global'
-
 import type { ReactNode } from 'react'
+
+import { i18n } from './assets/localization'
 
 // initialize Redux
 const store = configureStore()

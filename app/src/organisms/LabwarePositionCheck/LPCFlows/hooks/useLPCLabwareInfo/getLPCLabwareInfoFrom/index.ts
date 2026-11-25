@@ -9,6 +9,7 @@ import {
   OFFSETS_SOURCE_INITIALIZING,
 } from '/app/redux/protocol-runs'
 
+import type { UseLPCLabwareInfoProps } from '..'
 import { getDefaultOffsetDetailsForLabware } from './getDefaultOffsetForLabware'
 import { getLocationSpecificOffsetDetailsForLabware } from './getLocationSpecificOffsetDetailsForLabware'
 
@@ -18,7 +19,6 @@ import type {
   LabwareLocationInfo,
   LPCLabwareInfo,
 } from '/app/redux/protocol-runs'
-import type { UseLPCLabwareInfoProps } from '..'
 
 interface GetLPCLabwareInfoParams {
   currentOffsets: StoredLabwareOffset[] | undefined

@@ -1,5 +1,6 @@
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -42,6 +43,7 @@ describe('Settings', () => {
     vi.mocked(getFeatureFlagData).mockReturnValue({})
     vi.mocked(getCanClearHintDismissals).mockReturnValue(true)
   })
+
   it('renders the settings page without the dev ffs visible', () => {
     render()
     screen.getByText('Settings')
@@ -60,25 +62,33 @@ describe('Settings', () => {
     screen.getByText('Privacy')
     screen.getByText('Share analytics with Opentrons')
   })
-  it('renders the announcement modal when view release notes button is clicked', () => {
+
+  it('renders the announcement modal when view release notes button is clicked', async () => {
+    const user = userEvent.setup()
     vi.mocked(AnnouncementModal).mockReturnValue(
       <div>mock AnnouncementModal</div>
     )
     render()
-    fireEvent.click(screen.getByTestId('basic_button_Release notes'))
+    await user.click(screen.getByTestId('basic_button_Release notes'))
     screen.getByText('mock AnnouncementModal')
   })
-  it('renders the hints button and calls to dismiss them when text is pressed', () => {
+
+  it('renders the hints button and calls to dismiss them when text is pressed', async () => {
+    const user = userEvent.setup()
     render()
-    fireEvent.click(screen.getByText('Reset'))
+    await user.click(screen.getByText('Reset'))
     expect(vi.mocked(clearAllHintDismissals)).toHaveBeenCalled()
   })
-  it('renders the analytics toggle and calls the action when pressed', () => {
+
+  it('renders the analytics toggle and calls the action when pressed', async () => {
+    const user = userEvent.setup()
     render()
-    fireEvent.click(screen.getByLabelText('Settings_Privacy'))
+    await user.click(screen.getByLabelText('Settings_Privacy'))
     expect(vi.mocked(optIn)).toHaveBeenCalled()
   })
-  it('renders the dev ffs section when prerelease mode is turned on', () => {
+
+  it('renders the dev ffs section when prerelease mode is turned on', async () => {
+    const user = userEvent.setup()
     vi.mocked(getFeatureFlagData).mockReturnValue({
       PRERELEASE_MODE: true,
       OT_PD_DISABLE_MODULE_RESTRICTIONS: true,
@@ -92,7 +102,7 @@ describe('Settings', () => {
     screen.getByText(
       'Turn off all restrictions on module placement and related pipette crash guidance.'
     )
-    fireEvent.click(screen.getByLabelText('Settings_PRERELEASE_MODE'))
+    await user.click(screen.getByLabelText('Settings_PRERELEASE_MODE'))
     expect(vi.mocked(setFeatureFlags)).toHaveBeenCalled()
   })
 })

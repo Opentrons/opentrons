@@ -1,10 +1,10 @@
 import { MemoryRouter } from 'react-router-dom'
-import { fireEvent, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '../../../__testing-utils__'
 import { getHasOptedIn } from '../../../analytics/selectors'
-import { i18n } from '../../../assets/localization'
 import { useAnnouncements } from '../../../components/organisms/AnnouncementModal/announcements'
 import { useKitchen } from '../../../components/organisms/Kitchen/useKitchen'
 import { getFileMetadata } from '../../../file-data/selectors'
@@ -12,6 +12,8 @@ import { loadProtocolFile } from '../../../load-file/actions'
 import { toggleNewProtocolModal } from '../../../navigation/actions'
 import { getIsProduction } from '../../../networking/opentronsWebApi'
 import { Landing } from '../index'
+
+import { i18n } from '../../../assets/localization'
 
 vi.mock('../../../load-file/actions')
 vi.mock('../../../file-data/selectors')
@@ -54,14 +56,15 @@ describe('Landing', () => {
     vi.mocked(getIsProduction).mockReturnValue(true)
   })
 
-  it('renders the landing page image and text', () => {
+  it('renders the landing page image and text', async () => {
+    const user = userEvent.setup()
     render()
     screen.getByLabelText('welcome image')
     screen.getByText('Welcome to Protocol Designer!')
     screen.getByText(
       'The easiest way to automate liquid handling on your Opentrons robot. No code required.'
     )
-    fireEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Create a Flex protocol' })
     )
     expect(vi.mocked(toggleNewProtocolModal)).toHaveBeenCalled()
@@ -80,14 +83,15 @@ describe('Landing', () => {
     screen.getByRole('button', { name: 'Create an OT-2 protocol' })
   })
 
-  it('calls window.open with the OT-2 redirect URL when Create an OT-2 protocol is clicked', () => {
+  it('calls window.open with the OT-2 redirect URL when Create an OT-2 protocol is clicked', async () => {
+    const user = userEvent.setup()
     const windowOpenSpy = vi
       .spyOn(window, 'open')
       .mockImplementation(() => null)
     vi.mocked(getIsProduction).mockReturnValue(false)
     render()
 
-    fireEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Create an OT-2 protocol' })
     )
 
@@ -99,13 +103,14 @@ describe('Landing', () => {
     windowOpenSpy.mockRestore()
   })
 
-  it('calls window.open with the production OT-2 URL when getIsProduction is true', () => {
+  it('calls window.open with the production OT-2 URL when getIsProduction is true', async () => {
+    const user = userEvent.setup()
     const windowOpenSpy = vi
       .spyOn(window, 'open')
       .mockImplementation(() => null)
     render()
 
-    fireEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Create an OT-2 protocol' })
     )
 

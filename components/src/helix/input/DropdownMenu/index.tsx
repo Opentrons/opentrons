@@ -448,7 +448,5 @@ export const LINE_CLAMP_TEXT_STYLE = (
   text-overflow: ellipsis;
   word-wrap: break-word;
   -webkit-line-clamp: ${lineClamp ?? 1};
-  word-break: ${
-    wordBreak === true ? 'normal' : 'break-all'
-  }; // normal for tile and break-all for a non word case like aaaaaaaa
+  word-break: ${wordBreak === true ? 'normal' : 'break-all'}; // normal for tile and break-all for a non word case like aaaaaaaa
 `

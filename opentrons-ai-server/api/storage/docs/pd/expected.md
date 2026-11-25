@@ -22,7 +22,7 @@
                     "stepType": "'absorbanceReader' | 'comment' | 'heaterShaker' | 'magnet' | 'manualIntervention' | 'mix' | 'moveLabware' | 'moveLiquid' | 'pause' | 'temperature' | 'thermocycler'"
                     // Additional fields specific to each step type
                 }}  
- }},
+}},
 "orderedStepIds": ["step-id"],
 "pipettes": {{}},
 "modules": {{}},
