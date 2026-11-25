@@ -320,18 +320,18 @@ async def test_stop_when_run_never_started(
         (lazy_fixture("live_runner_subject")),
     ],
 )
-def test_resume_from_recovery(
+async def test_resume_from_recovery(
     decoy: Decoy,
     protocol_engine: ProtocolEngine,
     subject: AnyRunner,
 ) -> None:
     """It should call `resume_from_recovery()` on the underlying engine."""
-    subject.resume_from_recovery(
+    await subject.resume_from_recovery(
         reconcile_false_positive=sentinel.reconcile_false_positive
     )
 
     decoy.verify(
-        protocol_engine.resume_from_recovery(
+        await protocol_engine.resume_from_recovery(
             reconcile_false_positive=sentinel.reconcile_false_positive
         ),
         times=1,

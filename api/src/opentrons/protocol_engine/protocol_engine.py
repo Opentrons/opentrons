@@ -49,6 +49,9 @@ from .execution.associated_command_error_recovery import (
     AssociatedCommandErrorRecoveryOrchestrator,
 )
 from .execution.create_queue_worker import create_queue_worker
+from .execution.error_recovery_hardware_state_synchronizer import (
+    ErrorRecoveryHardwareStateSynchronizer,
+)
 from .plugins import AbstractPlugin, PluginStarter
 from .resources import CameraProvider, FileProvider, ModelUtils, ModuleDataProvider
 from .resources.camera_provider import CameraSettings
@@ -189,7 +192,7 @@ class ProtocolEngine:
         self._action_dispatcher.dispatch(action)
         self._hardware_api.pause(HardwarePauseType.PAUSE)
 
-    def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
+    async def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
         """Resume normal protocol execution after the engine was `AWAITING_RECOVERY`.
 
         If `reconcile_false_positive` is `False`, the engine will continue naively from
@@ -205,12 +208,18 @@ class ProtocolEngine:
         leave the engine state without a tip on the pipette. If `reconcile_false_positive=True`,
         the engine will set the pipette to have that missing tip before continuing, so
         subsequent path planning, aspirates, dispenses, etc. will work as if nothing
-        went wrong.
+        went wrong. A false-positive pickup also moves the plunger to the bottom before
+        this returns, matching a successful pickup. That happens before the protocol
+        resumes, so the protocol does not queue its own ``prepareToAspirate``.
         """
         if reconcile_false_positive:
             state_update = (
                 self._state_store.commands.get_state_update_for_false_positive()
             )
+            await ErrorRecoveryHardwareStateSynchronizer(
+                hardware_api=self._hardware_api,
+                state_view=self.state_view,
+            ).prepare_for_false_positive_tip_pickup(state_update)
         else:
             state_update = StateUpdate()  # Empty/no-op.
 

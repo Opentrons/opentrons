@@ -171,6 +171,11 @@ class PickUpTipImplementation(AbstractCommandImpl[PickUpTipParams, _ExecuteRetur
                     labware_id=labware_id,
                     well_names=tips_to_mark_as_empty,
                 )
+                # Match a successful pickup. The plunger move itself happens
+                # before this update is applied, while the protocol is still waiting.
+                .set_pipette_ready_to_aspirate(
+                    pipette_id=pipette_id, ready_to_aspirate=True
+                )
             )
             state_update = (
                 update_types.StateUpdate.reduce(

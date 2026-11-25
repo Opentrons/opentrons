@@ -233,6 +233,9 @@ async def test_tip_physically_missing_error(
                 ),
                 new_deck_point=DeckPoint(x=111, y=222, z=333),
             ),
+            ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
+                pipette_id="pipette-id", ready_to_aspirate=True
+            ),
         ),
     )
 

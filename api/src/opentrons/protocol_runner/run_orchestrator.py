@@ -215,7 +215,7 @@ class RunOrchestrator(AbstractRunCoordinator):
 
     async def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
         """Resume the run from recovery."""
-        self._protocol_engine.resume_from_recovery(reconcile_false_positive)
+        await self._protocol_engine.resume_from_recovery(reconcile_false_positive)
 
     async def finish(
         self,
