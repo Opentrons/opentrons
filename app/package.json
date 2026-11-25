@@ -78,6 +78,8 @@
     "@types/lodash": "4.17.24",
     "@types/mixpanel-browser": "^2.35.6",
     "@types/node-fetch": "2.6.11",
+    "@types/react": "18.2.51",
+    "@types/react-dom": "catalog:react18",
     "@types/styled-components": "^5.1.26",
     "axios": "^0.21.1",
     "electron-updater": "6.3.9",
