@@ -80,7 +80,7 @@ describe('RobotSettings OpenJupyterControl', () => {
       name: 'Launch Jupyter Notebook',
     })
     fireEvent.click(button)
-    expect(window.open).toHaveBeenCalledWith(mockLink, '_blank')
+    expect(window.open).toHaveBeenCalledWith(mockLink, '_blank', 'noopener')
   })
 
   it('should send and analytics event on button click', () => {

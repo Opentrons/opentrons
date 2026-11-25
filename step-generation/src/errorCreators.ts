@@ -118,6 +118,16 @@ export function tipVolumeExceeded(args: {
   }
 }
 
+export function invalidRuntimeParameter(args: {
+  parameterName: string
+}): CommandCreatorError {
+  const { parameterName } = args
+  return {
+    message: `Runtime parameter "${parameterName}" is missing`,
+    type: 'INVALID_RUNTIME_PARAMETER',
+  }
+}
+
 export function pipetteVolumeExceeded(args: {
   actionName: string
   volume: string | number
@@ -300,6 +310,21 @@ export const possiblePipetteCollision = (args: {
           addressableAreaCausingCollisionDisplayName:
             unsafePipetteMovementReason.addressableAreaCausingCollision
               .displayName,
+        },
+      }
+    case 'vacuumCollarCollision':
+      return {
+        type: 'POSSIBLE_PIPETTE_COLLISION_VACUUM_COLLAR',
+        message: `Cannot move the ${unsafePipetteMovementReason.channels}-channel pipette to ${unsafePipetteMovementReason.labwareName} on ${unsafePipetteMovementReason.slot} with the ${unsafePipetteMovementReason.primaryNozzle} nozzle configuration while ${unsafePipetteMovementReason.collarName} is ${unsafePipetteMovementReason.side} of it on ${unsafePipetteMovementReason.collarSlot}. Use ${unsafePipetteMovementReason.suggestion}, or move the collar.`,
+        translationParams: {
+          channels: String(unsafePipetteMovementReason.channels),
+          labwareName: unsafePipetteMovementReason.labwareName,
+          slot: unsafePipetteMovementReason.slot,
+          primaryNozzle: unsafePipetteMovementReason.primaryNozzle,
+          collarName: unsafePipetteMovementReason.collarName,
+          side: unsafePipetteMovementReason.side,
+          collarSlot: unsafePipetteMovementReason.collarSlot,
+          suggestion: unsafePipetteMovementReason.suggestion,
         },
       }
   }

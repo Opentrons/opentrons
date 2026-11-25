@@ -31,7 +31,7 @@ import { SelectLabwareOnAdapter } from './SelectLabwareOnAdapter'
 import { SelectLidOnLabware } from './SelectLidOnLabware'
 import { getIsNestedDefinitionALid } from './utils'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { StackingProps } from '@opentrons/components'
 import type { LabwareDefinition2, ModuleType } from '@opentrons/shared-data'
 import type { CategoryExpand } from '../../../pages/Designer/DeckSetup/DeckSetupToolbox'
@@ -49,7 +49,7 @@ interface SelectLabwareProps {
   universalLid?: [string, LabwareDefinition2]
   moduleType: ModuleType | null
 }
-export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
+export function SelectLabware(props: SelectLabwareProps): ReactNode {
   const {
     slot,
     handleCategoryClick,

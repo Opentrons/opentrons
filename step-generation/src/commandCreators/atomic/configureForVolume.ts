@@ -1,17 +1,43 @@
-import { uuid } from '../../utils'
+import * as errorCreators from '../../errorCreators'
+import {
+  resolveNumericRuntimeValue,
+  resolveStringRuntimeValue,
+  uuid,
+} from '../../utils'
 
-import type { ConfigureForVolumeParams } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+import type {
+  CommandCreator,
+  CommandCreatorError,
+  ConfigureForVolumeStepGenArgs,
+} from '../../types'
 
-export const configureForVolume: CommandCreator<ConfigureForVolumeParams> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
+export const configureForVolume: CommandCreator<
+  ConfigureForVolumeStepGenArgs
+> = (args, invariantContext, prevRobotState) => {
   const { pipetteId, volume } = args
-  const pipette = invariantContext.pipetteEntities[pipetteId]
-  // No-op if there is no pipette
-  if (!pipette) {
+  const { runtimeParameters } = invariantContext
+  const resolvedPipetteId = resolveStringRuntimeValue(
+    pipetteId,
+    runtimeParameters
+  )
+  const resolvedVolume = resolveNumericRuntimeValue(volume, runtimeParameters)
+  const errors: CommandCreatorError[] = []
+  if (resolvedPipetteId == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: pipetteId })
+    )
+  }
+  if (typeof volume === 'string' && resolvedVolume == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: volume })
+    )
+  }
+  if (resolvedPipetteId == null || resolvedVolume == null) {
+    return { errors }
+  }
+
+  const pipette = invariantContext.pipetteEntities[resolvedPipetteId]
+  if (pipette == null) {
     return {
       commands: [],
     }
@@ -22,8 +48,8 @@ export const configureForVolume: CommandCreator<ConfigureForVolumeParams> = (
       commandType: 'configureForVolume' as const,
       key: uuid(),
       params: {
-        pipetteId,
-        volume,
+        pipetteId: resolvedPipetteId,
+        volume: resolvedVolume,
       },
     },
   ]

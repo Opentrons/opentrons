@@ -1,6 +1,7 @@
 """Getters for specific adjacent slots."""
 
 from dataclasses import dataclass
+from enum import StrEnum
 from typing import Dict, List, Optional, Union
 
 from opentrons_shared_data.robot.types import RobotType
@@ -150,6 +151,38 @@ def get_surrounding_staging_slots(deck_slot: DeckSlotName) -> List[StagingSlotNa
     return _SURROUNDING_STAGING_SLOTS_MAP.get(deck_slot, [])
 
 
+# A4 is north. North of a staging slot is the previous entry.
+_STAGING_COLUMN: List[StagingSlotName] = [
+    StagingSlotName.SLOT_A4,
+    StagingSlotName.SLOT_B4,
+    StagingSlotName.SLOT_C4,
+    StagingSlotName.SLOT_D4,
+]
+
+
+def get_north_staging_slot(slot: StagingSlotName) -> Optional[StagingSlotName]:
+    """Get the staging slot north of the given staging slot."""
+    index = _STAGING_COLUMN.index(slot)
+    if index == 0:
+        return None
+    return _STAGING_COLUMN[index - 1]
+
+
+def get_south_staging_slot(slot: StagingSlotName) -> Optional[StagingSlotName]:
+    """Get the staging slot south of the given staging slot."""
+    index = _STAGING_COLUMN.index(slot)
+    if index + 1 == len(_STAGING_COLUMN):
+        return None
+    return _STAGING_COLUMN[index + 1]
+
+
+def get_north_south_staging_slots(slot: StagingSlotName) -> List[StagingSlotName]:
+    """Get staging slots north and south of the given staging slot."""
+    north = get_north_staging_slot(slot)
+    south = get_south_staging_slot(slot)
+    return [maybe_slot for maybe_slot in [north, south] if maybe_slot is not None]
+
+
 def get_east_west_slots(slot: int) -> List[int]:
     """Get slots east & west of the given slot."""
     east = get_east_slot(slot)
@@ -167,3 +200,82 @@ def get_north_south_slots(slot: int) -> List[int]:
 def get_adjacent_slots(slot: int) -> List[int]:
     """Get slots on the east, west, north and south of the given slot."""
     return get_east_west_slots(slot) + get_north_south_slots(slot)
+
+
+def get_flex_slot_id(slot: Union[DeckSlotName, StagingSlotName]) -> str:
+    """Return the Flex slot id, such as A3 or A4."""
+    if isinstance(slot, StagingSlotName):
+        return slot.id
+    return slot.to_ot3_equivalent().id
+
+
+def _flex_column(slot: Union[DeckSlotName, StagingSlotName]) -> str:
+    """Column of a deck or staging slot, in Flex names."""
+    return get_flex_slot_id(slot)[-1]
+
+
+def get_cardinal_neighbor_slots(
+    slot: Union[DeckSlotName, StagingSlotName],
+) -> List[Union[DeckSlotName, StagingSlotName]]:
+    """North, south, east, and west neighbors, including the staging column."""
+    if isinstance(slot, StagingSlotName):
+        return [
+            *get_north_south_staging_slots(slot),
+            get_west_of_staging_slot(slot),
+        ]
+
+    neighbors: List[Union[DeckSlotName, StagingSlotName]] = [
+        DeckSlotName.from_primitive(slot_id).to_ot3_equivalent()
+        for slot_id in get_adjacent_slots(slot.as_int())
+    ]
+    staging_slot = get_adjacent_staging_slot(slot)
+    if staging_slot is not None:
+        neighbors.append(staging_slot)
+    return neighbors
+
+
+class CardinalSide(StrEnum):
+    """Cardinal direction from one slot to a neighbor."""
+
+    NORTH = "north"
+    SOUTH = "south"
+    EAST = "east"
+    WEST = "west"
+
+
+def get_cardinal_neighbor_side(
+    slot: Union[DeckSlotName, StagingSlotName],
+    other: Union[DeckSlotName, StagingSlotName],
+) -> Optional[CardinalSide]:
+    """Return the cardinal side of `slot` that `other` occupies.
+
+    Diagonals and the slot itself return None.
+    """
+    if other not in get_cardinal_neighbor_slots(slot):
+        return None
+    slot_id = get_flex_slot_id(slot)
+    other_id = get_flex_slot_id(other)
+    if slot_id[0] == other_id[0]:
+        if other_id[1] > slot_id[1]:
+            return CardinalSide.EAST
+        if other_id[1] < slot_id[1]:
+            return CardinalSide.WEST
+    elif slot_id[1] == other_id[1]:
+        if other_id[0] > slot_id[0]:
+            return CardinalSide.SOUTH
+        return CardinalSide.NORTH
+    return None
+
+
+def get_north_south_neighbor_slots(
+    slot: Optional[Union[DeckSlotName, StagingSlotName]],
+) -> List[Union[DeckSlotName, StagingSlotName]]:
+    """North and south neighbors in the same column, including staging."""
+    if slot is None:
+        return []
+    column = _flex_column(slot)
+    return [
+        neighbor
+        for neighbor in get_cardinal_neighbor_slots(slot)
+        if _flex_column(neighbor) == column
+    ]

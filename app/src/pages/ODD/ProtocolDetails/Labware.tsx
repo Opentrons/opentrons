@@ -20,6 +20,8 @@ import { useRequiredProtocolLabware } from '/app/resources/protocols'
 
 import { EmptySection } from './EmptySection'
 
+import type { ReactNode } from 'react'
+
 const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
   border-collapse: separate;
@@ -63,7 +65,7 @@ const TableDatum = styled('td')`
   }
 `
 
-export const Labware = (props: { protocolId: string }): JSX.Element => {
+export const Labware = (props: { protocolId: string }): ReactNode => {
   const labwareItems = useRequiredProtocolLabware(props.protocolId)
 
   const { t, i18n } = useTranslation('protocol_details')

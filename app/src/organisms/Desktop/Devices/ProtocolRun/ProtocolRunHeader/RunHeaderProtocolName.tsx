@@ -9,6 +9,8 @@ import {
 
 import { useQuickProtocolDetailsForRun } from '/app/resources/runs'
 
+import type { ReactNode } from 'react'
+
 interface RunHeaderProtocolNameProps {
   runId: string
 }
@@ -16,7 +18,7 @@ interface RunHeaderProtocolNameProps {
 // Styles the protocol name copy.
 export function RunHeaderProtocolName({
   runId,
-}: RunHeaderProtocolNameProps): JSX.Element {
+}: RunHeaderProtocolNameProps): ReactNode {
   const { protocolKey, displayName } = useQuickProtocolDetailsForRun(runId)
 
   return (

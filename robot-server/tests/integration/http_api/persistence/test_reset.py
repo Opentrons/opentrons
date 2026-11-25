@@ -9,7 +9,7 @@ import httpx
 import pytest
 
 from tests.integration.dev_server import DevServer
-from tests.integration.protocol_files import get_json_protocol, get_py_protocol
+from tests.integration.protocol_files import get_py_protocol
 from tests.integration.robot_client import RobotClient, poll_until_all_analyses_complete
 
 from .persistence_snapshots_dir import PERSISTENCE_SNAPSHOTS_DIR
@@ -83,14 +83,11 @@ async def test_upload_protocols_and_reset_persistence_dir() -> None:
         base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
         assert await robot_client.dead(), "Dev Robot is running and must not be."
-        with DevServer(port=port) as server:
+        with DevServer(port=port, is_ot3=True) as server:
             server.start()
             await robot_client.wait_until_ready()
 
             with get_py_protocol(secrets.token_urlsafe(16)) as file:
-                await robot_client.post_protocol([Path(file.name)])
-
-            with get_json_protocol(secrets.token_urlsafe(16)) as file:
                 await robot_client.post_protocol([Path(file.name)])
 
             with anyio.fail_after(30):
@@ -104,7 +101,7 @@ async def test_upload_protocols_and_reset_persistence_dir() -> None:
 
             result = await robot_client.get_protocols()
 
-            assert len(result.json()["data"]) == 2
+            assert len(result.json()["data"]) == 1
 
             # Restart to enact the reset.
             server.stop()
@@ -129,7 +126,9 @@ async def test_reset_is_available_even_with_corrupt_persistence_directory() -> N
         base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
         assert await robot_client.dead(), "Dev Robot is running and must not be."
-        with DevServer(port=port, persistence_directory=persistence_dir) as server:
+        with DevServer(
+            port=port, persistence_directory=persistence_dir, is_ot3=True
+        ) as server:
             server.start()
             await _wait_until_initialization_failed(robot_client)
 

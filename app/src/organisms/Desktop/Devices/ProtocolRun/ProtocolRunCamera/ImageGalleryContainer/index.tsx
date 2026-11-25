@@ -8,6 +8,7 @@ import { useImageInfo } from '/app/resources/dataFiles/useImageInfo'
 import styles from './gallery.module.css'
 import { GalleryItemCard } from './GalleryItemCard'
 
+import type { ReactNode } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 import type { UseImageGalleryDataProps } from '/app/local-resources/images/hooks/useImageGalleryData'
 import type { GalleryContainerOverflowMenuProps } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunCamera/ImageGalleryContainer/GalleryContainerOverflowMenu'
@@ -24,7 +25,7 @@ export function ImageGalleryContainer({
   robotName: string
   runTimestamp: string
   protocolName: string
-}): JSX.Element {
+}): ReactNode {
   const { t } = useTranslation('run_details')
   const { items, protocolAnalysis, allRunDefs } = useImageInfo(runId)
 
@@ -71,7 +72,7 @@ interface GalleryHeaderProps extends GalleryContainerOverflowMenuProps {
 function GalleryHeader({
   imagesCount,
   ...rest
-}: GalleryHeaderProps): JSX.Element {
+}: GalleryHeaderProps): ReactNode {
   const { t } = useTranslation('run_details')
 
   return (
@@ -101,7 +102,7 @@ interface GalleryContentProps extends UseImageGalleryDataProps {
   protocolName: string
 }
 
-function GalleryContent(props: GalleryContentProps): JSX.Element {
+function GalleryContent(props: GalleryContentProps): ReactNode {
   return (
     <div className={styles.gallery_content_container}>
       <GalleryItemCard {...props} />
@@ -109,7 +110,7 @@ function GalleryContent(props: GalleryContentProps): JSX.Element {
   )
 }
 
-function GalleryTableHeaders(): JSX.Element {
+function GalleryTableHeaders(): ReactNode {
   const { t } = useTranslation('run_details')
 
   return (

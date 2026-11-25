@@ -13,6 +13,8 @@ import {
 
 import { getMainPagePortalEl } from '../Portal'
 
+import type { ReactNode } from 'react'
+
 interface LabwareNotCompatibleModalProps {
   onDone: () => void
   onClose: () => void
@@ -20,7 +22,7 @@ interface LabwareNotCompatibleModalProps {
 }
 export function LabwareNotCompatibleModal(
   props: LabwareNotCompatibleModalProps
-): JSX.Element | null {
+): ReactNode {
   const { onDone, onClose, labwareDisplayName } = props
   const { t } = useTranslation(['starting_deck_state', 'shared'])
 

@@ -8,6 +8,7 @@ import {
   getSelectedDropdownItem,
 } from '../../../ui/steps/selectors'
 
+import type { ReactNode } from 'react'
 import type { CoordinateTuple } from '@opentrons/shared-data'
 import type { LabwareOnDeck } from '../../../step-forms'
 
@@ -18,7 +19,7 @@ interface HighlightOffDeckSlotProps {
 
 export function HighlightOffDeckSlot(
   props: HighlightOffDeckSlotProps
-): JSX.Element | null {
+): ReactNode {
   const { labwareOnDeck, position } = props
   const { t } = useTranslation('application')
   const hoveredDropdownItem = useSelector(getHoveredDropdownItem)

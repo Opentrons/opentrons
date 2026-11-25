@@ -77,7 +77,7 @@ interface RadioButtonProps extends StyleProps {
 }
 
 // used for ODD and helix
-export function RadioButton(props: RadioButtonProps): JSX.Element {
+export function RadioButton(props: RadioButtonProps): ReactNode {
   const {
     buttonLabel,
     buttonSubLabel,
@@ -321,5 +321,13 @@ const SettingButtonLabel = styled.label<SettingsButtonLabelProps>`
       maxLines != null ? 'vertical' : 'none'};
     word-wrap: break-word;
     word-break: break-all;
+  }
+
+  p {
+    -webkit-line-clamp: ${({ maxLines }) => maxLines ?? 'none'};
+    -webkit-box-orient: ${({ maxLines }) =>
+      maxLines != null ? 'vertical' : 'none'};
+    display: ${({ maxLines }) => (maxLines != null ? '-webkit-box' : 'auto')};
+    overflow: hidden;
   }
 `

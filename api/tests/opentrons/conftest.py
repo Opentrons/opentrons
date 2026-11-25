@@ -1,7 +1,6 @@
 # Uncomment to enable logging during tests
 from __future__ import annotations
 
-import asyncio
 import contextlib
 import inspect
 import io
@@ -10,7 +9,6 @@ import os
 import pathlib
 import zipfile
 from typing import (
-    TYPE_CHECKING,
     Any,
     AsyncGenerator,
     Callable,
@@ -27,6 +25,7 @@ from _pytest.fixtures import SubRequest
 from decoy import Decoy
 from typing_extensions import TypedDict
 
+from opentrons_shared_data.errors.exceptions import UnsupportedHardwareCommand
 from opentrons_shared_data.liquid_classes.types import (
     AspiratePropertiesDict,
     BlowoutPropertiesDict,
@@ -88,10 +87,7 @@ from opentrons_shared_data.protocol.types import JsonProtocol
 from opentrons_shared_data.robot.types import RobotTypeEnum
 
 from opentrons import config
-from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.hardware_control import (
-    API,
-    HardwareControlAPI,
     ThreadManagedHardware,
     ThreadManager,
 )
@@ -114,9 +110,6 @@ from opentrons.protocols.api_support import deck_type
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import Location, Point
-
-if TYPE_CHECKING:
-    from opentrons.drivers.smoothie_drivers import SmoothieDriver as SmoothieDriverType
 
 
 class Protocol(NamedTuple):
@@ -192,13 +185,7 @@ def protocol(protocol_file: str) -> Generator[Protocol, None, None]:
         yield Protocol(text=text, filename=filename, filelike=file)
 
 
-@pytest.fixture()
-def virtual_smoothie_env(monkeypatch: pytest.MonkeyPatch) -> None:
-    # TODO (ben 20180426): move this to the .env file
-    monkeypatch.setenv("ENABLE_VIRTUAL_SMOOTHIE", "true")
-
-
-@pytest.fixture(params=["ot2", "ot3"])
+@pytest.fixture(params=["ot3"])
 async def machine_variant_ffs(
     request: SubRequest,
     decoy: Decoy,
@@ -214,28 +201,6 @@ async def machine_variant_ffs(
     decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(
         device_param == "ot3"
     )
-
-
-@contextlib.asynccontextmanager
-async def _build_ot2_hw() -> AsyncGenerator[ThreadManagedHardware, None]:
-    hw_sim = ThreadManager(API.build_hardware_simulator)
-    old_config = config.robot_configs.load()
-    try:
-        yield hw_sim
-    finally:
-        config.robot_configs.clear()
-        for m in hw_sim.wrapped().attached_modules:
-            await m.cleanup()
-        hw_sim.set_config(old_config)
-        hw_sim.clean_up()
-
-
-@pytest.fixture()
-async def ot2_hardware(
-    virtual_smoothie_env: None,
-) -> AsyncGenerator[ThreadManagedHardware, None]:
-    async with _build_ot2_hw() as hw:
-        yield hw
 
 
 @contextlib.asynccontextmanager
@@ -266,12 +231,11 @@ async def ot3_hardware(
         yield hw
 
 
-@pytest.fixture(params=["OT-2 Standard", "OT-3 Standard"])
+@pytest.fixture(params=["OT-3 Standard"])
 async def robot_model(
     request: pytest.FixtureRequest,
     decoy: Decoy,
     mock_feature_flags: None,
-    virtual_smoothie_env: None,
 ) -> AsyncGenerator[RobotModel, None]:
     which_machine = cast(RobotModel, request.param)
     if request.node.get_closest_marker("ot2_only") and which_machine == "OT-3 Standard":
@@ -313,12 +277,9 @@ async def hardware(
     request: SubRequest,
     decoy: Decoy,
     mock_feature_flags: None,
-    virtual_smoothie_env: None,
     robot_model: RobotModel,
 ) -> AsyncGenerator[ThreadManagedHardware, None]:
-    hw_builder = {"OT-2 Standard": _build_ot2_hw, "OT-3 Standard": _build_ot3_hw}[
-        robot_model
-    ]
+    hw_builder = {"OT-3 Standard": _build_ot3_hw}[robot_model]
 
     async with hw_builder() as hw:
         decoy.when(config.feature_flags.enable_ot3_hardware_controller()).then_return(
@@ -326,15 +287,6 @@ async def hardware(
         )
 
         yield hw
-
-
-def _make_ot2_non_pe_ctx(
-    hardware: ThreadManagedHardware, deck_type: str
-) -> ProtocolContext:
-    """Return a ProtocolContext configured for an OT-2 and not backed by Protocol Engine."""
-    return create_protocol_context(
-        api_version=APIVersion(2, 13), hardware_api=hardware, deck_type=deck_type
-    )
 
 
 @contextlib.contextmanager
@@ -386,7 +338,7 @@ def ctx(
     deck_definition_name: str,
 ) -> Generator[ProtocolContext, None, None]:
     if robot_model == "OT-2 Standard":
-        yield _make_ot2_non_pe_ctx(hardware=hardware, deck_type=deck_definition_name)
+        raise UnsupportedHardwareCommand(message="No OT-2 support anymore")
     elif robot_model == "OT-3 Standard":
         if request.node.get_closest_marker("apiv2_non_pe_only"):
             pytest.skip("Test requests only non-Protocol-Engine ProtocolContexts")
@@ -395,26 +347,6 @@ def ctx(
                 hardware=hardware, deck_type=deck_definition_name
             ) as ctx:
                 yield ctx
-
-
-@pytest.fixture()
-async def smoothie(
-    virtual_smoothie_env: None,
-    monkeypatch: pytest.MonkeyPatch,
-) -> AsyncGenerator[SmoothieDriverType, None]:
-    from opentrons.config import robot_configs
-    from opentrons.drivers.smoothie_drivers import SmoothieDriver
-
-    driver = SmoothieDriver(
-        robot_configs.load_ot2(), SimulatingGPIOCharDev("simulated")
-    )
-    await driver.connect()
-    yield driver
-    try:
-        await driver.disconnect()
-    except AttributeError:
-        # if the test disconnected
-        pass
 
 
 @pytest.fixture
@@ -428,12 +360,6 @@ def hardware_controller_lockfile(
     monkeypatch.setitem(config.CONFIG, "hardware_controller_lockfile", lockfile)
 
     return lockfile_dir
-
-
-@pytest.fixture()
-async def hardware_api(is_robot: None) -> HardwareControlAPI:
-    hw_api = await API.build_hardware_simulator(loop=asyncio.get_running_loop())
-    return hw_api
 
 
 @pytest.fixture()

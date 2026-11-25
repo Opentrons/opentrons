@@ -21,10 +21,12 @@ import {
 import { getTopPortalEl } from '/app/App/portal'
 import multipleModuleHelp from '/app/assets/images/Moam_modal_image.png'
 
+import type { ReactNode } from 'react'
+
 const HOW_TO_MULTIPLE_MODULES_HREF =
   'https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2'
 
-export function OT2MultipleModulesHelp(): JSX.Element {
+export function OT2MultipleModulesHelp(): ReactNode {
   const { t } = useTranslation(['protocol_setup', 'shared'])
   const [showMultipleModulesModal, setShowMultipleModulesModal] =
     useState<boolean>(false)

@@ -16,6 +16,8 @@ import {
 
 import { Divider } from '/app/atoms/structure'
 
+import type { ReactNode } from 'react'
+
 const IpItem = styled.div`
   flex: 1 1 auto;
   border: 0;
@@ -52,7 +54,7 @@ export function ManualIpHostnameItem({
   mostRecentAddition,
   setMostRecentAddition,
   setMostRecentDiscovered,
-}: IpHostnameItemProps): JSX.Element {
+}: IpHostnameItemProps): ReactNode {
   const remove = (): void => {
     removeIp(candidate)
   }

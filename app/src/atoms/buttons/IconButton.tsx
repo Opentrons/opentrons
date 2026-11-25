@@ -11,14 +11,14 @@ import {
 
 import { ODD_FOCUS_VISIBLE } from './constants'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 interface IconButtonProps extends ComponentProps<typeof Btn> {
   iconName: ComponentProps<typeof Icon>['name']
   hasBackground?: boolean
 }
 
-export function IconButton(props: IconButtonProps): JSX.Element {
+export function IconButton(props: IconButtonProps): ReactNode {
   const { iconName, hasBackground = false, ...buttonProps } = props
   return (
     <Btn

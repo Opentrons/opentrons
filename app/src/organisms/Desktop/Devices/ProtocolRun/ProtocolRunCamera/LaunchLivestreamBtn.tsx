@@ -14,6 +14,7 @@ import { cameraStreamOpenAction } from '/app/redux/shell'
 
 import styles from './runcamera.module.css'
 
+import type { ReactNode } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
 
 export function LaunchLivestreamBtn({
@@ -22,7 +23,7 @@ export function LaunchLivestreamBtn({
 }: {
   runId: string
   robotType: RobotType
-}): JSX.Element {
+}): ReactNode {
   const { t } = useTranslation('run_details')
   const dispatch = useDispatch()
   const host = useHost()

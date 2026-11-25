@@ -52,12 +52,20 @@
 
 .step_text {
   color: var(--grey-60);
-  font-weight: var(--font-weight-semi-bold);
+}
+
+/* Beat StyledText's font shorthand so the step shares the title line box. */
+p.step_text {
+  line-height: var(--line-height-24);
 }
 
 @media (width = 1024px) and (height = 600px) {
   .step_text {
     margin-left: var(--spacing-16);
     font-size: var(--font-size-22);
+  }
+
+  p.step_text {
+    line-height: var(--line-height-28);
   }
 }

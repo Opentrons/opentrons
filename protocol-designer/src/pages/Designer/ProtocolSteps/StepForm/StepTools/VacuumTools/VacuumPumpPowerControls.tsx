@@ -5,6 +5,7 @@ import { COLORS, Slider } from '@opentrons/components'
 import { PumpDurationField } from './PumpDurationField'
 import styles from './vacuumtools.module.css'
 
+import type { ReactNode } from 'react'
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
 
@@ -15,7 +16,7 @@ export interface VacuumPumpPowerControlsProps {
 
 export function VacuumPumpPowerControls(
   props: VacuumPumpPowerControlsProps
-): JSX.Element {
+): ReactNode {
   const { formData, propsForFields } = props
   const { t } = useTranslation('protocol_steps')
   return (

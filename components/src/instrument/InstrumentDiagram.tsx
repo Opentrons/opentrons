@@ -2,6 +2,7 @@ import { Flex } from '../primitives'
 import { ALIGN_CENTER, JUSTIFY_CENTER } from '../styles'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { ReactNode } from 'react'
 import type { PipetteV2Specs } from '@opentrons/shared-data'
 import type { StyleProps } from '..'
 import type { Mount } from '../robot-types'
@@ -21,7 +22,7 @@ export interface InstrumentDiagramProps extends StyleProps {
   imageStyle?: FlattenSimpleInterpolation
 }
 
-export function InstrumentDiagram(props: InstrumentDiagramProps): JSX.Element {
+export function InstrumentDiagram(props: InstrumentDiagramProps): ReactNode {
   const { mount, pipetteSpecs, className, imageStyle, ...styleProps } = props
   const { displayCategory, channels } = pipetteSpecs || {}
 

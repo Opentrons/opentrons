@@ -6,7 +6,6 @@ import { when } from 'vitest-when'
 import { mockHeaterShaker, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   useAddCameraSettingsToRunMutation,
-  useAllPipetteOffsetCalibrationsQuery,
   useCamera,
   useCreateProtocolAnalysisMutation,
   useInstrumentsQuery,
@@ -330,9 +329,6 @@ describe('ProtocolSetup', () => {
           data: [mockLeftPipetteData, mockRightPipetteData, mockGripperData],
         },
       } as any)
-    when(vi.mocked(useAllPipetteOffsetCalibrationsQuery))
-      .calledWith()
-      .thenReturn({ data: { data: [] } } as any)
     vi.mocked(useIsHeaterShakerInProtocol).mockReturnValue(false)
     when(vi.mocked(useIsDoorOpen))
       .calledWith(ROBOT_NAME)
@@ -411,8 +407,8 @@ describe('ProtocolSetup', () => {
     screen.getByText('Prepare to run')
     screen.getByText('Instruments')
     screen.getByText('Deck hardware')
-    screen.getByText('Labware & Liquids')
-    screen.getByText('Labware Offsets')
+    screen.getByText('Labware & liquids')
+    screen.getByText('Labware offsets')
   })
 
   it.skip('should play protocol when click play button', () => {
@@ -441,7 +437,7 @@ describe('ProtocolSetup', () => {
       })
     )
     render(`/runs/${RUN_ID}/setup/`)
-    fireEvent.click(screen.getByText('Labware & Liquids'))
+    fireEvent.click(screen.getByText('Labware & liquids'))
     expect(mockPlay).toBeCalledTimes(0)
     fireEvent.click(screen.getByRole('button', { name: 'play' }))
     expect(MockConfirmSetupStepsCompleteModal).toBeCalledTimes(0)
@@ -480,7 +476,7 @@ describe('ProtocolSetup', () => {
       .calledWith([], mockProtocolModuleInfo)
       .thenReturn({ missingModuleIds: [], remainingAttachedModules: [] })
     render(`/runs/${RUN_ID}/setup`)
-    fireEvent.click(screen.getByTestId('SetupButton_Labware & Liquids'))
+    fireEvent.click(screen.getByTestId('SetupButton_Labware & liquids'))
     expect(MockProtocolSetupLabware).toHaveBeenCalled()
   })
 
@@ -514,7 +510,7 @@ describe('ProtocolSetup', () => {
       vi.fn(() => <div>Mock ProtocolSetupOffsets</div>)
     )
     render(`/runs/${RUN_ID}/setup/`)
-    fireEvent.click(screen.getByText('Labware Offsets'))
+    fireEvent.click(screen.getByText('Labware offsets'))
     expect(MockProtocolSetupOffsets).toHaveBeenCalled()
     screen.getByText(/Mock ProtocolSetupOffsets/)
   })
@@ -555,8 +551,8 @@ describe('ProtocolSetup', () => {
       })
     )
     render(`/runs/${RUN_ID}/setup/`)
-    fireEvent.click(screen.getByText('Labware Offsets'))
-    fireEvent.click(screen.getByText('Labware & Liquids'))
+    fireEvent.click(screen.getByText('Labware offsets'))
+    fireEvent.click(screen.getByText('Labware & liquids'))
     fireEvent.click(screen.getByRole('button', { name: 'play' }))
     expect(vi.mocked(ConfirmAttachedModal)).toHaveBeenCalled()
   })

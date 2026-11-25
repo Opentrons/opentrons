@@ -6,7 +6,7 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import { WifiPasswordInput } from '../../NetworkSettings/WifiPasswordInput'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { SetSettingOption } from '../types'
 
 interface RobotSettingsSetWifiCredProps {
@@ -24,7 +24,7 @@ export function RobotSettingsSetWifiCred({
   password,
   setCurrentOption,
   setPassword,
-}: RobotSettingsSetWifiCredProps): JSX.Element {
+}: RobotSettingsSetWifiCredProps): ReactNode {
   const { t } = useTranslation('device_settings')
 
   return (

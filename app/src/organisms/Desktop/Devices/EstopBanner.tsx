@@ -17,13 +17,14 @@ import {
   useEstopContext,
 } from '/app/organisms/EmergencyStop'
 
+import type { ReactNode } from 'react'
 import type { EstopState } from '@opentrons/api-client'
 
 interface EstopBannerProps {
   status?: EstopState
 }
 
-export function EstopBanner({ status }: EstopBannerProps): JSX.Element {
+export function EstopBanner({ status }: EstopBannerProps): ReactNode {
   const { t } = useTranslation('device_details')
   const { setIsEmergencyStopModalDismissed } = useEstopContext()
 

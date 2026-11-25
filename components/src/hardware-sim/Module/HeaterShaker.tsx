@@ -1,10 +1,12 @@
 import { COLORS } from '../../helix-design-system'
 
+import type { ReactNode } from 'react'
+
 export interface HeaterShakerVizProps {
   targetTemp: number | null
 }
 
-export function HeaterShaker(props: HeaterShakerVizProps): JSX.Element {
+export function HeaterShaker(props: HeaterShakerVizProps): ReactNode {
   const { targetTemp } = props
   let ledLightColor: string = COLORS.white
   if (targetTemp != null) ledLightColor = COLORS.red30

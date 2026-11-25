@@ -1,19 +1,6 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { expect } from 'vitest'
 
-export async function fillProtocolFormatSectionAndClickConfirm(): Promise<void> {
-  const pyProtocolButton = screen.getByRole('label', {
-    name: 'Python protocol',
-  })
-  fireEvent.click(pyProtocolButton)
-
-  const confirmButton = screen.getByText('Confirm')
-  await waitFor(() => {
-    expect(confirmButton).toBeEnabled()
-  })
-  fireEvent.click(confirmButton)
-}
-
 export async function fillApplicationSectionAndClickConfirm(): Promise<void> {
   const applicationDropdown = screen.getByText('Select an option')
   fireEvent.click(applicationDropdown)

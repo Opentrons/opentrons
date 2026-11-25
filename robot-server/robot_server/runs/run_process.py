@@ -231,6 +231,10 @@ class DirectedRunProcess(AbstractRunCoordinator):
 
         self._run_id = run_id
 
+        # Get the CommandStoreProvider
+        command_store_provider = self._robot_server_resource.get_run_store_provider()
+        command_store_provider.set_run_id(self._run_id)
+
         if protocol is not None:
             load_fixed_trash = should_load_fixed_trash(protocol.source.config)
         else:
@@ -257,6 +261,7 @@ class DirectedRunProcess(AbstractRunCoordinator):
             notify_publishers=self._robot_server_resource.notify_publishers_callback,
             updates_callback=self._robot_server_resource.engine_updates_callback,
             proxy_of_callback_for_handling_door_events=proxy_of_callback_for_handling_door_events,
+            command_store_provider=self._robot_server_resource.get_run_store_provider(),
         )
 
         orchestrator = RunOrchestrator.build_orchestrator(
@@ -288,9 +293,14 @@ class DirectedRunProcess(AbstractRunCoordinator):
 
     async def create_simulating(self, protocol_resource: ProtocolResource) -> None:
         """Create a simulating runner for use in analysis."""
+        if self._robot_server_resource is None:
+            await self._connect_to_robot_server_resource()
+            assert self._robot_server_resource is not None
+
         self._run_orchestrator = await create_simulating_orchestrator(
             robot_type=protocol_resource.source.robot_type,
             protocol_config=protocol_resource.source.config,
+            analysis_store_provider=self._robot_server_resource.get_analysis_store_provider(),
         )
 
     @property

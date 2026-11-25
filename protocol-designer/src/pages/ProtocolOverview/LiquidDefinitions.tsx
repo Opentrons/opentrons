@@ -18,6 +18,7 @@ import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
 import { getLiquidClassDisplayName } from '../../liquid-defs/utils'
 
+import type { ReactNode } from 'react'
 import type {
   AllIngredGroupFields,
   IngredInputs,
@@ -56,7 +57,7 @@ interface LiquidDefinitionsProps {
 
 export function LiquidDefinitions({
   allIngredientGroupFields,
-}: LiquidDefinitionsProps): JSX.Element {
+}: LiquidDefinitionsProps): ReactNode {
   const { t } = useTranslation('protocol_overview')
 
   return (

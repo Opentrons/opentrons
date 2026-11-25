@@ -16,6 +16,7 @@ import {
 
 import { formatVolume } from './utils'
 
+import type { ReactNode } from 'react'
 import type { AdditionalEquipmentName } from '@opentrons/step-generation'
 import type {
   SubstepIdentifier,
@@ -36,7 +37,7 @@ interface SubstepProps {
   dispenseVolume?: number
 }
 
-function SubstepComponent(props: SubstepProps): JSX.Element {
+function SubstepComponent(props: SubstepProps): ReactNode {
   const {
     volume,
     stepId,

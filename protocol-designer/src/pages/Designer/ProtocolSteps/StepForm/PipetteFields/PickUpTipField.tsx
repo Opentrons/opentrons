@@ -4,10 +4,11 @@ import { useSelector } from 'react-redux'
 import { DropdownStepFormField } from '/protocol-designer/components/molecules'
 import { getAllTiprackOptions } from '/protocol-designer/ui/labware/selectors'
 
+import type { ReactNode } from 'react'
 import type { DropdownOption } from '@opentrons/components'
 import type { FieldProps } from '../types'
 
-export function PickUpTipField(props: FieldProps): JSX.Element {
+export function PickUpTipField(props: FieldProps): ReactNode {
   const { value: dropdownItem } = props
   const { t } = useTranslation('protocol_steps')
   const tiprackOptions = useSelector(getAllTiprackOptions)

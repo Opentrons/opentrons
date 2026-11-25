@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import { RobotCoordsForeignDiv, TYPOGRAPHY } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { ModuleOrientation } from '@opentrons/shared-data'
 
 interface Props {
@@ -24,7 +25,7 @@ const StyledRect = styled.rect`
   stroke-dasharray: 8 4;
 `
 
-export const SlotWarning = (props: Props): JSX.Element => {
+export const SlotWarning = (props: Props): ReactNode => {
   const { x, y, xDimension, yDimension, orientation, warningType } = props
   const rectXOffset = orientation === 'left' ? -OVERHANG : 0
   const textXOffset = orientation === 'left' ? -1 * OVERHANG : xDimension

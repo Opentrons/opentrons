@@ -14,7 +14,7 @@ export function registerUpdateBrightness(): (action: Action) => void {
         systemd
           .updateBrightness(action.payload.message)
           .catch(err =>
-            log.debug('Something wrong when updating the brightness', err)
+            log.error('Something wrong when updating the brightness', err)
           )
         break
     }

@@ -29,7 +29,7 @@ export function DeckInfoLabelTextTag({
   colOneDeckInfoLabels,
   colTwoText,
   colThreeTag,
-}: DeckInfoLabelTextTagProps): JSX.Element {
+}: DeckInfoLabelTextTagProps): ReactNode {
   return (
     <Flex display={DISPLAY_GRID} css={CONTAINER_STYLE}>
       <Flex css={LABEL_CONTAINER_STYLE}>

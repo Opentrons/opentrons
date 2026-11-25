@@ -13,6 +13,7 @@ import {
 import { EightEmanatingNozzles } from './EightEmanatingNozzles'
 import { EmanatingNozzle } from './EmanatingNozzle'
 
+import type { ReactNode } from 'react'
 import type { LabwareDefinition, PipetteName } from '@opentrons/shared-data'
 
 interface PipetteRenderProps {
@@ -21,7 +22,7 @@ interface PipetteRenderProps {
   usingMetalProbe?: boolean
 }
 
-export const PipetteRender = (props: PipetteRenderProps): JSX.Element => {
+export const PipetteRender = (props: PipetteRenderProps): ReactNode => {
   const { labwareDef, pipetteName, usingMetalProbe = false } = props
   const channels = getPipetteNameSpecs(pipetteName)?.channels
   const cx =

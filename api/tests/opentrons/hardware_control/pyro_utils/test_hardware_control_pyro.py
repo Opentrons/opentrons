@@ -25,10 +25,10 @@ from opentrons.drivers.asyncio.communication.serial_connection import (
     AsyncResponseSerialConnection,
 )
 from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
-from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.thermocycler.simulator import (
     SimulatingDriver as ThermocyclerSimulatingDriver,
 )
+from opentrons.drivers.usb.types import USBPort
 from opentrons.drivers.vacuum_module.simulator import (
     SimulatingDriver as VacuumModuleSimulatingDriver,
 )

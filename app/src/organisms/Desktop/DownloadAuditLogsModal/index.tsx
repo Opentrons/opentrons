@@ -23,6 +23,7 @@ import { useIsLogDeleted } from '/app/resources/audit/useIsLogDeleted'
 import { useToaster } from '../../ToasterOven'
 import styles from './downloadauditlogsmodal.module.css'
 
+import type { ReactNode } from 'react'
 import type { IconProps } from '@opentrons/components'
 
 export interface DownloadAuditLogsModalProps {
@@ -99,7 +100,7 @@ function DownloadAuditLogsModalContent({
   logPeriodId,
 }: {
   logPeriodId: string
-}): JSX.Element {
+}): ReactNode {
   const { t } = useTranslation('device_details')
   const modal = useModal()
   const { makeToast, eatToast } = useToaster()

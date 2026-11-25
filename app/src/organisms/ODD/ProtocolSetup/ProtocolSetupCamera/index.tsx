@@ -25,7 +25,7 @@ import {
 
 import styles from './setupcamera.module.css'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { SetupScreens } from '/app/organisms/ODD/ProtocolSetup'
 import type { State } from '/app/redux/types'
 import type { RobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
@@ -44,7 +44,7 @@ export interface ProtocolSetupCameraProps {
 
 export function ProtocolSetupCamera(
   props: ProtocolSetupCameraProps
-): JSX.Element {
+): ReactNode {
   const { runId, confirmCameraSettings, cameraConfirmed } = props
   const { t } = useTranslation('protocol_setup')
   const dispatch = useDispatch()
@@ -165,7 +165,7 @@ function SetupCameraHeader({
   onConfirmPreferences,
   cameraEnabled,
   isConfirmPending,
-}: SetupCameraHeaderProps): JSX.Element {
+}: SetupCameraHeaderProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
 
   return (

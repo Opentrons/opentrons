@@ -95,7 +95,7 @@ function SectionBody({
 
 function SectionBodyOrStandIn(
   props: SectionBodyProps & { standIn: boolean }
-): JSX.Element {
+): React.ReactNode {
   return props.standIn ? <StandInContent /> : <SectionBody {...props} />
 }
 

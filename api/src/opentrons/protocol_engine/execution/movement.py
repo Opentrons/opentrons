@@ -23,10 +23,149 @@ from .gantry_mover import GantryMover
 from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_engine.errors import LocationIsStagingSlotError
-from opentrons.types import MountType, Point, StagingSlotName
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.motion_planning.adjacent_slots_getters import (
+    CardinalSide,
+    get_cardinal_neighbor_side,
+    get_flex_slot_id,
+)
+from opentrons.protocol_engine.errors import (
+    InvalidLabwarePositionError,
+    LabwareNotOnDeckError,
+    LocationIsLidDockSlotError,
+    LocationIsStagingSlotError,
+    LocationNotAccessibleByPipetteError,
+)
+from opentrons.types import (
+    MountType,
+    NozzleConfigurationType,
+    Point,
+    StagingSlotName,
+)
 
 log = logging.getLogger(__name__)
+
+_OFF_DECK_ERRORS = (
+    LabwareNotOnDeckError,
+    InvalidLabwarePositionError,
+    LocationIsLidDockSlotError,
+)
+
+
+def _primary_nozzle_faces_collar(nozzle_map: NozzleMap, side: CardinalSide) -> bool:
+    """Return whether the primary nozzle is on the instrument edge facing the collar.
+
+    The pipette aligns that primary nozzle to the well, shifting the pipette head
+    to one side. In the case of the collar, certain nozzle configurations shift
+    the pipette head into the collar. So lets only allow nozzle configs where the
+    primary nozzle faces the collar, this way if head does have to shift, it shifts
+    the opposite direction of the collar.
+    """
+    primary = nozzle_map.starting_nozzle
+    primary_row = primary[0]
+    primary_column = primary[1:]
+    row_names = list(nozzle_map.full_instrument_rows)
+    column_names = list(nozzle_map.full_instrument_columns)
+    back_row, front_row = row_names[0], row_names[-1]
+    left_column, right_column = column_names[0], column_names[-1]
+    if side is CardinalSide.NORTH:
+        return primary_row == back_row
+    if side is CardinalSide.SOUTH:
+        return primary_row == front_row
+    if side is CardinalSide.WEST:
+        return primary_column == left_column
+    if side is CardinalSide.EAST:
+        # A row whose primary is column 1 keeps the full head's left-right
+        # position, so it clears an east collar on every row of the labware.
+        if (
+            nozzle_map.configuration == NozzleConfigurationType.ROW
+            and primary_column == left_column
+        ):
+            return True
+        return primary_column == right_column
+    return False
+
+
+def _suggested_configuration(nozzle_map: NozzleMap, side: CardinalSide) -> str:
+    """Return a nozzle configuration that faces the collar.
+
+    The collision error offers this configuration, or moving the collar.
+    """
+    row_names = list(nozzle_map.full_instrument_rows)
+    column_names = list(nozzle_map.full_instrument_columns)
+    back_row, front_row = row_names[0], row_names[-1]
+    left_column, right_column = column_names[0], column_names[-1]
+    if side is CardinalSide.NORTH:
+        nozzles = [f"{back_row}{left_column}", f"{back_row}{right_column}"]
+    elif side is CardinalSide.SOUTH:
+        nozzles = [f"{front_row}{left_column}", f"{front_row}{right_column}"]
+    elif side is CardinalSide.WEST:
+        nozzles = [f"{back_row}{left_column}", f"{front_row}{left_column}"]
+    elif left_column == right_column:
+        nozzles = [f"{back_row}{left_column}", f"{front_row}{left_column}"]
+    else:
+        return (
+            f"a configuration whose primary nozzle is {back_row}{right_column} "
+            f"or {front_row}{right_column}, or a row starting at "
+            f"{back_row}{left_column} or {front_row}{left_column}"
+        )
+    unique: List[str] = []
+    for nozzle in nozzles:
+        if nozzle not in unique:
+            unique.append(nozzle)
+    nozzle = f"{unique[0]}" if len(unique) == 1 else f"{unique[0]} or {unique[1]}"
+    return f"a configuration whose primary nozzle is {nozzle}"
+
+
+def raise_if_nozzle_configuration_hits_vacuum_collar(
+    pipette_id: str,
+    labware_id: str,
+    state_view: StateStore,
+) -> None:
+    """Reject an 8/96-channel move when a vacuum collar is on a cardinal side.
+
+    The primary nozzle has to be on the edge facing the collar. North is row A,
+    south is row H, west is column 1, and east is column 12. A FULL 8/96-channel
+    layout is allowed on every side, and a 8/96-channel row that starts at column
+    1 is allowed when the collar is east.
+    """
+    channels = state_view.pipettes.get_channels(pipette_id)
+    if channels not in (8, 96):
+        return
+    try:
+        destination = state_view.geometry.get_ancestor_slot_name(labware_id)
+    except _OFF_DECK_ERRORS:
+        return
+    nozzle_map = state_view.pipettes.get_nozzle_configuration(pipette_id)
+    # Skip checks for 8/96-ch in FULL mode, since the nozzles are always directly
+    # over the wells and the pipette head does not shift over.
+    if channels in (8, 96) and nozzle_map.configuration == NozzleConfigurationType.FULL:
+        return
+    for other in state_view.labware.get_all():
+        if other.id == labware_id:
+            continue
+
+        try:
+            collar_slot = state_view.geometry.get_ancestor_slot_name(other.id)
+        except _OFF_DECK_ERRORS:
+            continue
+        side = get_cardinal_neighbor_side(destination, collar_slot)
+        if side is None or not state_view.labware.get_has_quirk(
+            other.id, "vacuumModuleDock"
+        ):
+            continue
+        if _primary_nozzle_faces_collar(nozzle_map, side):
+            continue
+        destination_labware = state_view.labware.get(labware_id)
+        collar = state_view.labware.get(other.id)
+        suggestion = _suggested_configuration(nozzle_map, side)
+        raise LocationNotAccessibleByPipetteError(
+            f"Cannot move the {channels}-channel pipette to {destination_labware.loadName} "
+            f"on {get_flex_slot_id(destination)} with the {nozzle_map.valid_map_key} "
+            f"nozzle configuration while {collar.loadName} is {side} of it "
+            f"on {get_flex_slot_id(collar_slot)}. "
+            f"Use {suggestion}, or move the collar."
+        )
 
 
 class MovementHandler:
@@ -91,6 +230,11 @@ class MovementHandler:
         self._state_store.labware.raise_if_labware_has_labware_on_top(
             labware_id=labware_id
         )
+
+        # Block pipette access to labware that is physically contained inside
+        # another labware (e.g. a collection plate inside a vacuum collar).
+        self._state_store.labware.raise_if_labware_is_contained(labware_id=labware_id)
+
         await self._tc_movement_flagger.ensure_labware_in_open_thermocycler(
             labware_parent=self._state_store.labware.get_location(labware_id=labware_id)
         )
@@ -106,6 +250,12 @@ class MovementHandler:
             raise LocationIsStagingSlotError(
                 "Cannot move to well on labware in Staging Area Slot."
             )
+
+        raise_if_nozzle_configuration_hits_vacuum_collar(
+            pipette_id=pipette_id,
+            labware_id=labware_id,
+            state_view=self._state_store,
+        )
 
         dest_slot_int = ancestor.as_int()
 

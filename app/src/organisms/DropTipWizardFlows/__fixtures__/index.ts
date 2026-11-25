@@ -1,4 +1,4 @@
-import { mockPipetteInfo } from '/app/resources/instruments/__fixtures__'
+import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 
 import { CHOOSE_DROP_TIP_LOCATION, DT_ROUTES } from '../constants'
 
@@ -6,7 +6,7 @@ import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { DropTipWizardContainerProps } from '../types'
 
 const MOCK_ACTUAL_PIPETTE = {
-  ...mockPipetteInfo.pipetteSpecs,
+  ...fixtureP10Single,
   model: 'model',
   tipLength: {
     value: 20,

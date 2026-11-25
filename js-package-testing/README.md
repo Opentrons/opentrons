@@ -99,6 +99,11 @@ between JS and CSS.
 `react-i18next`. Wrap your app with `I18nextProvider` and load the
 `protocol_visualization` namespace.
 
+Shared component namespaces (`command_type_summary`, `deck_configuration`,
+`protocol_command_text`) come from the Node-safe subpath
+`@opentrons/components/localization` (do not import them from the package root
+in Node — that entry loads React/DOM).
+
 Minimal example (see [`src/i18n.ts`](src/i18n.ts) and
 [`src/main.tsx`](src/main.tsx)):
 
@@ -106,12 +111,16 @@ Minimal example (see [`src/i18n.ts`](src/i18n.ts) and
 import { I18nextProvider } from 'react-i18next'
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
+import { shared_en_resources } from '@opentrons/components/localization'
 import protocolVisualizationEn from './locale/en/protocol_visualization.json'
 
 void i18n.use(initReactI18next).init({
   lng: 'en',
   resources: {
-    en: { protocol_visualization: protocolVisualizationEn },
+    en: {
+      ...shared_en_resources,
+      protocol_visualization: protocolVisualizationEn,
+    },
   },
   interpolation: { escapeValue: false },
 })
@@ -123,7 +132,7 @@ root.render(
 )
 ```
 
-Copy English strings from
+Copy English strings for `protocol_visualization` from
 [`src/locale/en/protocol_visualization.json`](src/locale/en/protocol_visualization.json)
 (keep in sync with
 [`app/src/assets/localization/en/protocol_visualization.json`](../app/src/assets/localization/en/protocol_visualization.json)).

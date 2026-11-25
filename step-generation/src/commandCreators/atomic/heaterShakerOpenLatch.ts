@@ -1,17 +1,33 @@
 import * as errorCreators from '../../errorCreators'
-import { getIsTallLabwareEastWestOfHeaterShaker, uuid } from '../../utils'
+import {
+  getIsTallLabwareEastWestOfHeaterShaker,
+  resolveStringRuntimeValue,
+  uuid,
+} from '../../utils'
 
-import type { ModuleOnlyParams } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+import type { CommandCreator, ModuleStepGenArgs } from '../../types'
 
 const LEFT_SLOTS = ['1', '4', '7', '10']
-export const heaterShakerOpenLatch: CommandCreator<ModuleOnlyParams> = (
+export const heaterShakerOpenLatch: CommandCreator<ModuleStepGenArgs> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { pipetteEntities, labwareEntities, moduleEntities } = invariantContext
-  const heaterShakerSlot = prevRobotState.modules[args.moduleId].slot
+  const {
+    pipetteEntities,
+    labwareEntities,
+    moduleEntities,
+    runtimeParameters,
+  } = invariantContext
+  const moduleId = resolveStringRuntimeValue(args.moduleId, runtimeParameters)
+  if (moduleId == null) {
+    return {
+      errors: [
+        errorCreators.invalidRuntimeParameter({ parameterName: args.moduleId }),
+      ],
+    }
+  }
+  const heaterShakerSlot = prevRobotState.modules[moduleId].slot
   const firstPipetteId = Object.keys(pipetteEntities)[0]
   const firstPipetteSpec = pipetteEntities[firstPipetteId]?.spec
 
@@ -34,7 +50,7 @@ export const heaterShakerOpenLatch: CommandCreator<ModuleOnlyParams> = (
       errors: [errorCreators.tallLabwareEastWestOfHeaterShaker(leftOrRight)],
     }
   }
-  const pythonName = moduleEntities[args.moduleId].pythonName
+  const pythonName = moduleEntities[moduleId].pythonName
 
   return {
     commands: [
@@ -42,7 +58,7 @@ export const heaterShakerOpenLatch: CommandCreator<ModuleOnlyParams> = (
         commandType: 'heaterShaker/openLabwareLatch',
         key: uuid(),
         params: {
-          moduleId: args.moduleId,
+          moduleId,
         },
       },
     ],

@@ -28,6 +28,19 @@ const STACKER_SLOT_MAPPING: Record<string, string> = {
   D3: 'D4',
 }
 
+// A labware on the stacker shuttle is located on the stacker module without
+// the `inStackerHopper` kind. Its stack is built directly on the stacker's slot
+// (no module id), matching the stacks created by flexStacker/retrieve & moveLabware.
+// Including the module id would make it render as if it were in the hopper.
+const isStackerShuttleLocation = (
+  location: object,
+  moduleLocations: RobotState['modules']
+): boolean =>
+  'moduleId' in location &&
+  !('kind' in location && location.kind === 'inStackerHopper') &&
+  moduleLocations[location.moduleId as string]?.moduleState.type ===
+    FLEX_STACKER_MODULE_TYPE
+
 export type RunCommandTimelineFrame = RobotStateAndWarnings & {
   command: RunTimeCommand
 }
@@ -93,6 +106,9 @@ export function getResultingTimelineFrameFromRunCommands(
           } else if ('moduleId' in location) {
             const moduleSlot =
               moduleLocations[location.moduleId]?.slot ?? 'offDeck'
+            if (isStackerShuttleLocation(location, moduleLocations)) {
+              return [moduleSlot]
+            }
             return [location.moduleId, moduleSlot]
           } else if ('addressableAreaName' in location) {
             return [location.addressableAreaName]
@@ -119,7 +135,10 @@ export function getResultingTimelineFrameFromRunCommands(
             (acc: Record<string, { stack: string[] }>, id, index) => {
               const sequence = sequenceMap[id] ?? locationSequences[index]
               if (sequence != null) {
-                const stack = getStackForLabwareLocation(sequence)
+                const stack = getStackForLabwareLocation(
+                  sequence,
+                  moduleLocations
+                )
                 acc[id] = {
                   stack: stack[0] === id ? stack : [id, ...stack],
                 }
@@ -141,7 +160,10 @@ export function getResultingTimelineFrameFromRunCommands(
             stackLabwareId != null && stackLocationSequence != null
               ? [
                   stackLabwareId,
-                  ...getStackForLabwareLocation(stackLocationSequence),
+                  ...getStackForLabwareLocation(
+                    stackLocationSequence,
+                    moduleLocations
+                  ),
                 ]
               : null
           return {
@@ -162,7 +184,9 @@ export function getResultingTimelineFrameFromRunCommands(
               } else if ('moduleId' in location) {
                 const moduleId = location.moduleId
                 acc[id] = {
-                  stack: [id, moduleId, moduleLocations[moduleId].slot],
+                  stack: isStackerShuttleLocation(location, moduleLocations)
+                    ? [id, moduleLocations[moduleId].slot]
+                    : [id, moduleId, moduleLocations[moduleId].slot],
                 }
               } else {
                 acc[id] = { stack: [id, 'offDeck'] }
@@ -201,10 +225,13 @@ export function getResultingTimelineFrameFromRunCommands(
             )
             return acc
           }
-          stack.push(
-            command.params.location.moduleId,
-            moduleLocations[command.params.location.moduleId].slot
-          )
+          if (
+            isStackerShuttleLocation(command.params.location, moduleLocations)
+          ) {
+            stack.push(moduleLocations[moduleId].slot)
+          } else {
+            stack.push(moduleId, moduleLocations[moduleId].slot)
+          }
         } else if ('labwareId' in command.params.location) {
           const labwareId = command.params.location.labwareId
           if (acc[labwareId] == null) {

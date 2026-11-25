@@ -3,6 +3,12 @@ import { uuid } from '../../utils'
 import type { DropTipInPlaceParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
 
+// NOTE (ja 9/29/26): the python is emitted in here for OAIv2's purposes ONLY
+// in order to prevent OAIv2 from needing to emit compound commands
+// from the IR output to compiler
+// otherwise, the compound command dropTipInTrash is emitted for PD
+// with the python not being generated directly from dropTipInPlace via
+// curryWithoutPython(dropTipInPlace)
 export const dropTipInPlace: CommandCreator<DropTipInPlaceParams> = (
   args,
   invariantContext,
@@ -16,6 +22,17 @@ export const dropTipInPlace: CommandCreator<DropTipInPlaceParams> = (
     }
   }
 
+  const { pipetteEntities, trashBinEntities, wasteChuteEntities } =
+    invariantContext
+  const pipettePythonName = pipetteEntities[pipetteId].pythonName
+  const entityId = prevRobotState.pipettes[pipetteId]?.entityId ?? ''
+  const trashBin = trashBinEntities[entityId]
+  const wasteChute = wasteChuteEntities[entityId]
+  const dropTipArgs =
+    trashBin != null
+      ? `${trashBin.pythonName}, alternate_drop_location=True`
+      : (wasteChute?.pythonName ?? '')
+
   const commands = [
     {
       commandType: 'dropTipInPlace' as const,
@@ -27,5 +44,6 @@ export const dropTipInPlace: CommandCreator<DropTipInPlaceParams> = (
   ]
   return {
     commands,
+    python: `${pipettePythonName}.drop_tip(${dropTipArgs})`,
   }
 }

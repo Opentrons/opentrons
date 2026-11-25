@@ -25,9 +25,10 @@ import {
 } from './constants'
 import { RecoverySingleColumnContentWrapper } from './shared'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from './types'
 
-export function RecoveryError(props: RecoveryContentProps): JSX.Element {
+export function RecoveryError(props: RecoveryContentProps): ReactNode {
   const { recoveryMap } = props
   const { step } = recoveryMap
   const { ERROR_WHILE_RECOVERING } = RECOVERY_MAP
@@ -56,7 +57,7 @@ export function ErrorRecoveryFlowError({
   routeUpdateActions,
   recoveryCommands,
   errorKind,
-}: RecoveryContentProps): JSX.Element {
+}: RecoveryContentProps): ReactNode {
   const { OPTION_SELECTION } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
@@ -94,7 +95,7 @@ export function RecoveryDropTipFlowErrors({
   getRecoveryOptionCopy,
   errorKind,
   subMapUtils,
-}: RecoveryContentProps): JSX.Element {
+}: RecoveryContentProps): ReactNode {
   const { t } = useTranslation('error_recovery')
   const { step } = recoveryMap
   const { ERROR_WHILE_RECOVERING, OPTION_SELECTION, DROP_TIP_FLOWS } =

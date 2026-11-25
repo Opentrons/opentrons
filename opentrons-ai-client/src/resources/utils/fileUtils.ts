@@ -1,5 +1,5 @@
-// MIME types provide better security than file extensions
-// as they check the actual file content headers
+// `File.type` is reported by the OS, not sniffed from file content, and can be
+// empty (commonly for .py on Windows). Only empty MIME + .py uses that fallback.
 export const ALLOWED_MIME_TYPES = {
   pdf: ['application/pdf', 'pdf'],
   csv: ['text/csv', 'application/csv', 'application/vnd.ms-excel', 'csv'],
@@ -63,6 +63,12 @@ export const getFileType = (file: File): FileType | null => {
     return 'csv'
   }
   if (ALLOWED_MIME_TYPES.python.includes(mimeType)) {
+    return 'python'
+  }
+
+  // Only .py gets an extension fallback, and only when MIME is empty.
+  // The server also falls back for unrecognized MIME types; we stay stricter.
+  if (mimeType === '' && file.name.toLowerCase().endsWith('.py')) {
     return 'python'
   }
 

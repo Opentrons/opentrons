@@ -8,7 +8,6 @@ import { mockMagneticModule } from '@opentrons/api-client'
 import {
   useInstrumentsQuery,
   useModulesQuery,
-  usePipettesQuery,
 } from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -90,12 +89,6 @@ describe('InstrumentsAndModules', () => {
   it('renders a Module card when a robot is viewable', () => {
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [mockMagneticModule] },
-    } as any)
-    vi.mocked(usePipettesQuery).mockReturnValue({
-      data: {
-        left: null,
-        right: null,
-      },
     } as any)
     render(props)
     expect(vi.mocked(ModuleCard)).toHaveBeenCalled()

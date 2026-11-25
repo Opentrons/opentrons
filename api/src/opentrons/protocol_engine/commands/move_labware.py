@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, List, Optional, Type
+from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Type
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
@@ -26,9 +26,12 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 
 from ..errors import (
+    InvalidLabwarePositionError,
     LabwareIsNotAllowedInLocationError,
     LabwareMovementNotAllowedError,
+    LabwareNotOnDeckError,
     LabwareOffsetDoesNotExistError,
+    LocationIsLidDockSlotError,
     NotSupportedOnRobotType,
     VacuumModuleStillUnderVacuumError,
 )
@@ -41,6 +44,7 @@ from ..types import (
     AddressableAreaLocation,
     CurrentWell,
     DeckSlotLocation,
+    LabwareLocation,
     LabwareLocationSequence,
     LabwareMovementStrategy,
     LabwareOffsetVector,
@@ -57,8 +61,12 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
+from opentrons.motion_planning.adjacent_slots_getters import (
+    get_north_south_neighbor_slots,
+)
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.types import Point
+from opentrons.protocol_engine.types.labware import LoadedLabware
+from opentrons.types import DeckSlotName, Point, StagingSlotName
 
 if TYPE_CHECKING:
     from ..execution import EquipmentHandler, LabwareMovementHandler, RunControlHandler
@@ -74,6 +82,61 @@ def _remove_default(s: dict[str, Any]) -> None:
 
 # Extra buffer on top of minimum distance to move to the right
 _TRASH_CHUTE_DROP_BUFFER_MM = 8
+
+
+def _move_slot_label(location: LabwareLocation) -> str:
+    if isinstance(location, DeckSlotLocation):
+        return location.slotName.id
+    if isinstance(location, AddressableAreaLocation):
+        return location.addressableAreaName
+    return str(location)
+
+
+def _location_slot(
+    location: LabwareLocation, state_view: StateView
+) -> DeckSlotName | StagingSlotName | None:
+    try:
+        parent = state_view.geometry.get_parent_from_location(location)
+        return fixture_validation.get_slot_name_from_addressable_area(parent)
+    except (LabwareNotOnDeckError, ValueError, TypeError):
+        return None
+
+
+def _has_vacuum_neighbor(location: LabwareLocation, state_view: StateView) -> bool:
+    """Return True if a north/south neighbor holds a vacuum module."""
+    slot = _location_slot(location, state_view)
+    for neighbor in get_north_south_neighbor_slots(slot):
+        if not isinstance(neighbor, DeckSlotName):
+            continue
+        module = state_view.modules.get_by_slot(neighbor)
+        if module is not None and module.model == ModuleModel.VACUUM_MODULE_V1:
+            return True
+    return False
+
+
+def _gripper_move_grazes_collar_neighbor(
+    location: LabwareLocation, state_view: StateView
+) -> Tuple[LoadedLabware, str] | None:
+    """Return the collar and its slot when a north/south neighbor would graze this move."""
+    parent_slot = _location_slot(location, state_view)
+    if parent_slot is None:
+        return None
+    neighbors = get_north_south_neighbor_slots(parent_slot)
+
+    for labware in state_view.labware.get_all():
+        try:
+            slot = state_view.geometry.get_ancestor_slot_name(labware.id)
+        except (
+            LabwareNotOnDeckError,
+            InvalidLabwarePositionError,
+            LocationIsLidDockSlotError,
+        ):
+            continue
+        if slot in neighbors and state_view.labware.get_has_quirk(
+            labware.id, "vacuumModuleDock"
+        ):
+            return labware, slot.id
+    return None
 
 
 class MoveLabwareParams(BaseModel):
@@ -377,6 +440,10 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 self._state_view.labware.raise_if_labware_incompatible_with_plate_reader(
                     current_labware_definition
                 )
+            if module is not None and module.model == ModuleModel.VACUUM_MODULE_V1:
+                self._state_view.labware.raise_if_labware_incompatible_with_vacuum_module(
+                    current_labware_definition
+                )
 
         # Allow propagation of ModuleNotLoadedError.
         new_offset_id = self._equipment.find_applicable_labware_offset_id(
@@ -424,10 +491,8 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 raise LabwareMovementNotAllowedError(
                     f"Cannot move adapter '{current_labware_definition.parameters.loadName}' with gripper."
                 )
-            validated_current_loc = (
-                self._state_view.geometry.ensure_valid_gripper_location(
-                    current_labware.location
-                )
+            validated_cur_loc = self._state_view.geometry.ensure_valid_gripper_location(
+                current_labware.location
             )
 
             if module_location_error:
@@ -439,6 +504,22 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             validated_new_loc = self._state_view.geometry.ensure_valid_gripper_location(
                 available_new_location,
             )
+
+            for location, relation in (
+                (validated_cur_loc, "from"),
+                (validated_new_loc, "to"),
+            ):
+                neighbor = _gripper_move_grazes_collar_neighbor(
+                    location, self._state_view
+                )
+                if neighbor is not None:
+                    collar, slot = neighbor
+                    raise LabwareMovementNotAllowedError(
+                        f"Cannot move {current_labware.loadName} {relation}"
+                        f" {_move_slot_label(location)} with the gripper"
+                        f" while {collar.loadName} is on {slot}."
+                    )
+
             user_pick_up_offset = (
                 Point.from_xyz_attrs(params.pickUpOffset)
                 if params.pickUpOffset is not None
@@ -463,15 +544,21 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     immediate_destination_location_sequence
                 )
 
+            # Narrow the jaws when a vacuum module is north or south of the labware,
+            # including the staging column. B4's north is the dock on A4.
+            restrict_pick = _has_vacuum_neighbor(validated_cur_loc, self._state_view)
+            restrict_drop = _has_vacuum_neighbor(validated_new_loc, self._state_view)
             try:
                 # Skips gripper moves when using virtual gripper
                 await self._labware_movement.move_labware_with_gripper(
                     labware_id=params.labwareId,
-                    current_location=validated_current_loc,
+                    current_location=validated_cur_loc,
                     new_location=validated_new_loc,
                     user_pick_up_offset=user_pick_up_offset,
                     user_drop_offset=user_drop_offset,
                     post_drop_slide_offset=post_drop_slide_offset,
+                    restrict_pickup_approach=restrict_pick,
+                    restrict_drop_retract=restrict_drop,
                 )
             except (
                 FailedGripperPickupError,

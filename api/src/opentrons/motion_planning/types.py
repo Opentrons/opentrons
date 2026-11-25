@@ -43,3 +43,5 @@ class GripperMovementWaypointsWithJawStatus:
     jaw_open: bool
     dropping: bool
     """This flag should only be set to True if this waypoint involves dropping a piece of labware."""
+    speed: Optional[float] = None
+    """Optional mm/s override for the move to this waypoint. ``None`` uses the default."""

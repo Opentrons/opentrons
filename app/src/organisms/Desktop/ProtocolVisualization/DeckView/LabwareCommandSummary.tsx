@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { DeckLabelSet, useCommandTypeSummaries } from '@opentrons/components'
+import {
+  CenterLabwareInSlot,
+  DeckLabelSet,
+  useCommandTypeSummaries,
+} from '@opentrons/components'
+import { getLabwareViewBox } from '@opentrons/shared-data'
 
+import type { ReactNode } from 'react'
 import type {
   CoordinateTuple,
   LabwareDefinition2,
@@ -24,7 +30,7 @@ interface LabwareCommandSummaryProps {
 }
 export function LabwareCommandSummary(
   props: LabwareCommandSummaryProps
-): JSX.Element {
+): ReactNode {
   const { labwareDef, position, showModuleIcon, commandType } = props
   const labelContainerRef = useRef<HTMLDivElement>(null)
   const [labelContainerHeight, setLabelContainerHeight] = useState(0)
@@ -46,23 +52,29 @@ export function LabwareCommandSummary(
 
   const showDeckRiserAdjustments =
     labwareDef.parameters.loadName === 'opentrons_flex_deck_riser'
+  const { minX, minY, maxX, maxY } = getLabwareViewBox(labwareDef)
+  const x =
+    position[0] + minX - (showDeckRiserAdjustments ? DECK_RISER_ADJUSTED_X : 0)
 
   return (
-    <DeckLabelSet
-      ref={labelContainerRef}
-      deckLabels={deckLabels}
-      x={
-        position[0] -
-        labwareDef.cornerOffsetFromSlot.x -
-        (showDeckRiserAdjustments ? DECK_RISER_ADJUSTED_X : 0)
-      }
-      y={position[1] + labwareDef.cornerOffsetFromSlot.y - labelContainerHeight}
-      width={labwareDef.dimensions.xDimension}
-      height={
-        labwareDef.dimensions.yDimension -
-        (showDeckRiserAdjustments ? DECK_RISER_ADJUSTED_Z_DIMENSION : 0)
-      }
-      showModuleIcon={showModuleIcon}
-    />
+    <CenterLabwareInSlot definition={labwareDef}>
+      <DeckLabelSet
+        ref={labelContainerRef}
+        deckLabels={deckLabels}
+        x={x}
+        y={position[1] + minY - labelContainerHeight}
+        width={
+          showDeckRiserAdjustments
+            ? labwareDef.dimensions.xDimension
+            : maxX - minX
+        }
+        height={
+          showDeckRiserAdjustments
+            ? labwareDef.dimensions.yDimension - DECK_RISER_ADJUSTED_Z_DIMENSION
+            : maxY - minY
+        }
+        showModuleIcon={showModuleIcon}
+      />
+    </CenterLabwareInSlot>
   )
 }

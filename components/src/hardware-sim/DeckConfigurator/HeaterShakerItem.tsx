@@ -20,6 +20,7 @@ import {
   Y_ADJUSTMENT,
 } from './constants'
 
+import type { ReactNode } from 'react'
 import type {
   AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
@@ -42,7 +43,7 @@ interface HeaterShakerItemProps {
   selected?: boolean
 }
 
-export function HeaterShakerItem(props: HeaterShakerItemProps): JSX.Element {
+export function HeaterShakerItem(props: HeaterShakerItemProps): ReactNode {
   const { t } = useTranslation('deck_configuration')
 
   const {

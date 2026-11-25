@@ -56,6 +56,8 @@ stages:
       method: GET
     response:
       status_code: 200
+      strict:
+        - json:off
       json:
         meta:
           cursor: 0
@@ -88,7 +90,6 @@ stages:
                 commandType: home
                 key: !anystr
                 status: succeeded
-                params: {}
                 result: {}
                 notes: []
                 startedAt: !re_fullmatch "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+(Z|([+-]\\d{2}:\\d{2}))"

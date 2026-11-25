@@ -9,7 +9,7 @@ from opentrons.drivers.mag_deck import (
     MagDeckDriver,
     SimulatingDriver,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 from opentrons.hardware_control.modules.retry import retry_module_init
 
 log = logging.getLogger(__name__)

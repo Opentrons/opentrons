@@ -5,6 +5,7 @@ import { createSelector } from 'reselect'
 
 import { NONE_LIQUID_CLASS_NAME } from '@opentrons/shared-data'
 import {
+  getRunTimeParameters,
   PD_APPLICATION_VERSION,
   pythonCustomLabwareDict,
   pythonDefRun,
@@ -164,6 +165,7 @@ export const createFile = createSelector(
           internalAppBuildDate: _internalAppBuildDate,
         }),
         pythonRequirements(robotType),
+        getRunTimeParameters(invariantContext.runtimeParameters),
         pythonDefRun(
           invariantContext,
           robotState,

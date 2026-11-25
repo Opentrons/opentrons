@@ -1,0 +1,48 @@
+.container {
+  display: flex;
+  height: 24.625rem;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--spacing-24);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+.radio_set {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.need_help {
+  display: flex;
+}
+
+@media (height = 600px) and (width = 1024px) {
+  .container {
+    height: 29.5rem;
+    padding: var(--spacing-32);
+  }
+
+  .radio_set {
+    gap: var(--spacing-8);
+  }
+
+  .footer {
+    justify-content: flex-end;
+  }
+
+  .need_help {
+    display: none;
+  }
+}

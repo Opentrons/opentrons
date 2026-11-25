@@ -15,6 +15,7 @@ import {
 } from '@opentrons/components'
 
 import type { FlattenSimpleInterpolation } from 'styled-components'
+import type { ReactNode } from 'react'
 
 // A one-off designed button for default offsets.
 export function ManageDefaultOffsetBtn({
@@ -23,7 +24,7 @@ export function ManageDefaultOffsetBtn({
 }: {
   isMissingDefaultOffset: boolean
   onClick: () => void
-}): JSX.Element {
+}): ReactNode {
   const { t } = useTranslation('labware_position_check')
 
   return (

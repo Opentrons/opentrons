@@ -6,11 +6,10 @@ import {
 } from '../shared'
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '../types'
 
-export function StackerHopperEmptySkip(
-  props: RecoveryContentProps
-): JSX.Element {
+export function StackerHopperEmptySkip(props: RecoveryContentProps): ReactNode {
   const { recoveryMap } = props
   const { step, route } = recoveryMap
   const { STACKER_HOPPER_EMPTY_SKIP } = RECOVERY_MAP

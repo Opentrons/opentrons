@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 interface GenericLidProps {
   lidDimensions: {
     xDimension: number
@@ -5,7 +7,7 @@ interface GenericLidProps {
     zDimension: number
   } | null
 }
-export function GenericLid(props: GenericLidProps): JSX.Element {
+export function GenericLid(props: GenericLidProps): ReactNode {
   return (
     <svg
       id="GenericLid"

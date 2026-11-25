@@ -15,13 +15,14 @@ import { useUpdateClientLPC } from '/app/resources/client_data'
 
 import styles from './setupoffsetsheader.module.css'
 
+import type { ReactNode } from 'react'
 import type { ProtocolSetupOffsetsProps } from '/app/organisms/ODD/ProtocolSetup'
 
 export function SetupOffsetsHeader({
   runId,
   setSetupScreen,
   isConfirmed,
-}: ProtocolSetupOffsetsProps): JSX.Element {
+}: ProtocolSetupOffsetsProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
   const dispatch = useDispatch()
   const isNecessaryDefaultOffsetMissing = useSelector(

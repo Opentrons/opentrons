@@ -9,6 +9,8 @@ import { TertiaryButton } from '/app/atoms/buttons'
 import { CameraControls } from '/app/organisms/Desktop/Camera/CameraControls'
 import styles from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/setupcamera.module.css'
 
+import type { ReactNode } from 'react'
+
 export interface SetupRunCameraControlsProps {
   cameraConfirmed: boolean
   runId: string
@@ -17,7 +19,7 @@ export interface SetupRunCameraControlsProps {
 export function SetupRunCameraControls({
   cameraConfirmed,
   runId,
-}: SetupRunCameraControlsProps): JSX.Element {
+}: SetupRunCameraControlsProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const [showControls, setShowControls] = useState(false)
   const toggleControls = (): void => {

@@ -37,7 +37,7 @@ describe('ProtocolAnalysisFailure', () => {
   it('renders modal after clicking view details', () => {
     render()
     const viewDetailsButton = screen.getByRole('button', {
-      name: 'error details',
+      name: 'view error details',
     })
     fireEvent.click(viewDetailsButton)
     const closeButton = screen.getByRole('button', { name: 'close' })
@@ -46,7 +46,9 @@ describe('ProtocolAnalysisFailure', () => {
   })
   it('dispatches reanalyze action on click', () => {
     const store = render()[1]
-    const reanalyzeButton = screen.getByRole('button', { name: 'Reanalyze' })
+    const reanalyzeButton = screen.getByRole('button', {
+      name: 'Reanalyze protocol',
+    })
     fireEvent.click(reanalyzeButton)
     expect(store.dispatch).toHaveBeenCalledWith(
       analyzeProtocol('fakeProtocolKey')

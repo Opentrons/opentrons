@@ -14,7 +14,7 @@ from opentrons.drivers.barcode_scanner import (
     RTScanner,
     SmartScanner,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 
 
 async def _try_create_rt(port: str) -> Optional[AbstractBarcodeScannerDriver]:

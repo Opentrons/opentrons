@@ -63,7 +63,7 @@ const CAPTION_STYLE = css`
   }
 `
 
-export function SelectField(props: SelectFieldProps): JSX.Element {
+export function SelectField(props: SelectFieldProps): ReactNode {
   const {
     id,
     name,

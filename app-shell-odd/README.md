@@ -213,41 +213,14 @@ Random, persistent ID to use for anonymous analytics tracking if opted in.
 
 Whether or not the user has opted into anonymous analytics tracking.
 
-##### support.userId
+##### userInfo.userId
 
-- CLI argument: `--support.userId`
-- Environment variable: `OT_APP_SUPPORT__USER_ID`
-- JSON path: `support.userId`
+- CLI argument: `--userInfo.userId`
+- Environment variable: `OT_APP_USER_INFO__USER_ID`
+- JSON path: `userInfo.userId`
 - Default: Random UUID generated at first launch
 
-Random, persistent ID to use for support tracking. Different than `analytics.appId`.
-
-##### support.createdAt
-
-- CLI argument: `--support.createdAt`
-- Environment variable: `OT_APP_SUPPORT__CREATED_AT`
-- JSON path: `support.createdAt`
-- Default: Current Unix time at first launch
-
-Timestamp of first app launch.
-
-##### support.name
-
-- CLI argument: `--support.name`
-- Environment variable: `OT_APP_SUPPORT__NAME`
-- JSON path: `support.name`
-- Default: `"App User"`
-
-Full name of app user to populate "Name" in support conversations.
-
-##### support.email
-
-- CLI argument: `--support.email`
-- Environment variable: `OT_APP_SUPPORT__EMAIL`
-- JSON path: `support.email`
-- Default: `null`
-
-Email of app user to populate "Email" in support conversations.
+Random, persistent ID for this app install. Different than `analytics.appId`.
 
 ##### discovery.candidates
 

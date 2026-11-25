@@ -16,7 +16,7 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import { ACTIONS } from './constants'
 
-import type { ComponentProps, Dispatch } from 'react'
+import type { ComponentProps, Dispatch, ReactNode } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { SmallButton } from '/app/atoms/buttons'
 import type {
@@ -32,7 +32,7 @@ interface SelectTipRackProps {
   dispatch: Dispatch<QuickTransferWizardAction>
 }
 
-export function SelectTipRack(props: SelectTipRackProps): JSX.Element {
+export function SelectTipRack(props: SelectTipRackProps): ReactNode {
   const { onNext, onBack, exitButtonProps, state, dispatch } = props
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
 

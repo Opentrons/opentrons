@@ -24,7 +24,11 @@ import {
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 
-import { EMPTY } from '../constants'
+import {
+  EMPTY,
+  VACUUM_DOCK_ADDRESSABLE_AREA,
+  VACUUM_DOCK_LOCATION,
+} from '../constants'
 import { getPipetteCriticalPoint } from './getPipetteCriticalPoint'
 import { getFullStackFromLabwares, getSlotInLocationStack } from './misc'
 
@@ -51,6 +55,7 @@ import type {
   Point,
   RobotState,
   TipState,
+  UnsafePipetteMovementReason,
 } from '../types'
 
 const FLEX_TC_LID_COLLISION_ZONE = {
@@ -293,6 +298,169 @@ const getWillCollideWithThermocyclerLid = (
   }
 }
 
+const FLEX_DECK_SLOT = /^[ABCD][1-4]$/
+
+type VacuumCollarCollision = Extract<
+  UnsafePipetteMovementReason,
+  { type: 'vacuumCollarCollision' }
+>
+
+const deckSlotFromStack = (
+  stack: string[] | undefined,
+  modules: RobotState['modules']
+): string | null => {
+  if (stack == null) {
+    return null
+  }
+  for (let index = stack.length - 1; index >= 0; index--) {
+    const item = stack[index]
+    if (FLEX_DECK_SLOT.test(item)) {
+      return item
+    }
+    if (
+      item === VACUUM_DOCK_ADDRESSABLE_AREA ||
+      item === VACUUM_DOCK_LOCATION
+    ) {
+      return 'A4'
+    }
+    const moduleSlot = modules[item]?.slot
+    if (moduleSlot != null && FLEX_DECK_SLOT.test(moduleSlot)) {
+      return moduleSlot
+    }
+  }
+  return null
+}
+
+const collarSide = (destination: string, collar: string): string | null => {
+  const sameRow = destination[0] === collar[0]
+  const sameColumn = destination[1] === collar[1]
+  const rowGap = Math.abs(destination.charCodeAt(0) - collar.charCodeAt(0))
+  const columnGap = Math.abs(Number(destination[1]) - Number(collar[1]))
+  if (sameRow && columnGap === 1) {
+    return collar[1] > destination[1] ? 'east' : 'west'
+  }
+  if (sameColumn && rowGap === 1) {
+    return collar[0] > destination[0] ? 'south' : 'north'
+  }
+  return null
+}
+
+const primaryFacesCollar = (
+  primaryNozzle: string,
+  side: string,
+  channels: number
+): boolean => {
+  const row = primaryNozzle[0]
+  const column = primaryNozzle.slice(1)
+  // An 8-channel pipette has one column, so it faces both east and west.
+  const eastColumn = channels === 8 ? '1' : '12'
+  if (side === 'north') {
+    return row === 'A'
+  }
+  if (side === 'south') {
+    return row === 'H'
+  }
+  if (side === 'west') {
+    return column === '1'
+  }
+  return column === eastColumn
+}
+
+// A 96-channel row from column 1 keeps the full head's left-right position.
+const rowClearsEastCollar = (
+  nozzleConfiguration: NozzleConfigurationStyle,
+  primaryNozzle: string,
+  side: string,
+  channels: number
+): boolean =>
+  channels === 96 &&
+  nozzleConfiguration === ROW &&
+  side === 'east' &&
+  primaryNozzle.slice(1) === '1'
+
+const suggestedConfiguration = (side: string, channels: number): string => {
+  if (channels === 8) {
+    if (side === 'north') {
+      return 'a configuration whose primary nozzle is A1'
+    }
+    if (side === 'south') {
+      return 'a configuration whose primary nozzle is H1'
+    }
+    return 'a configuration whose primary nozzle is A1 or H1'
+  }
+  if (side === 'north') {
+    return 'a configuration whose primary nozzle is A1 or A12'
+  }
+  if (side === 'south') {
+    return 'a configuration whose primary nozzle is H1 or H12'
+  }
+  if (side === 'west') {
+    return 'a configuration whose primary nozzle is A1 or H1'
+  }
+  return 'a configuration whose primary nozzle is A12 or H12, or a row starting at A1 or H1'
+}
+
+const labwareDisplayName = (entity: LabwareEntity, id: string): string =>
+  entity.def.metadata.displayName ?? entity.def.parameters.loadName ?? id
+
+// A partial layout is allowed only when its primary nozzle is on the instrument
+// edge facing the collar. A full 8- or 96-channel layout stays on the labware.
+const getVacuumCollarCollision = (args: {
+  channels: number
+  nozzleConfiguration: NozzleConfigurationStyle
+  primaryNozzle: PrimaryNozzleConfigurationStyle
+  labwareId: string
+  labwareState: RobotState['labware']
+  labwareEntities: InvariantContext['labwareEntities']
+  modules: RobotState['modules']
+}): VacuumCollarCollision | null => {
+  const {
+    channels,
+    nozzleConfiguration,
+    primaryNozzle,
+    labwareId,
+    labwareState,
+    labwareEntities,
+    modules,
+  } = args
+  if ((channels === 8 || channels === 96) && nozzleConfiguration === ALL) {
+    return null
+  }
+  const destinationEntity = labwareEntities[labwareId]
+  const destination = deckSlotFromStack(labwareState[labwareId]?.stack, modules)
+  if (destinationEntity == null || destination == null) {
+    return null
+  }
+  for (const [id, entity] of Object.entries(labwareEntities)) {
+    const isCollar =
+      entity.def.parameters.quirks?.includes('vacuumModuleDock') === true
+    if (id === labwareId || !isCollar) {
+      continue
+    }
+    const collarSlot = deckSlotFromStack(labwareState[id]?.stack, modules)
+    const side = collarSlot == null ? null : collarSide(destination, collarSlot)
+    const primaryFaces =
+      side != null &&
+      (primaryFacesCollar(primaryNozzle, side, channels) ||
+        rowClearsEastCollar(nozzleConfiguration, primaryNozzle, side, channels))
+    if (collarSlot == null || side == null || primaryFaces) {
+      continue
+    }
+    return {
+      type: 'vacuumCollarCollision',
+      channels,
+      labwareName: labwareDisplayName(destinationEntity, labwareId),
+      slot: destination,
+      primaryNozzle,
+      collarName: labwareDisplayName(entity, id),
+      side,
+      collarSlot,
+      suggestion: suggestedConfiguration(side, channels),
+    }
+  }
+  return null
+}
+
 const getWellPosition = (
   labwareEntity: LabwareEntity,
   wellName: string,
@@ -366,6 +534,18 @@ export const getPipetteMovementSafetyStatus = (args: {
     channels === 1
   ) {
     return { isSafe: true }
+  }
+  const collarCollision = getVacuumCollarCollision({
+    channels,
+    nozzleConfiguration,
+    primaryNozzle,
+    labwareId,
+    labwareState,
+    labwareEntities,
+    modules: robotState.modules,
+  })
+  if (collarCollision != null) {
+    return { isSafe: false, reason: collarCollision }
   }
   // If tiprackId is explicitly provided, assume the pipette currently has a tip attached.
   // This is used in WellSelector.ts / getAllWellsSafetyStatus to force "tip present"

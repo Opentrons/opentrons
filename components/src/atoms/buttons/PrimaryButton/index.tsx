@@ -2,7 +2,7 @@ import { AltPrimaryButton } from './AltPrimaryButton'
 import { DefaultPrimaryButton } from './DefaultPrimaryButton'
 import { WarningPrimaryButton } from './WarningPrimaryButton'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type { StyleProps } from '../../../primitives/types'
 
 // todo(mm, 2026-07-29): We can probably consolidate the implementations of these
@@ -13,7 +13,7 @@ export type PrimaryButtonProps = ComponentProps<'button'> &
     variant?: 'default' | 'alt' | 'warning'
   }
 
-export function PrimaryButton(props: PrimaryButtonProps): JSX.Element {
+export function PrimaryButton(props: PrimaryButtonProps): ReactNode {
   if (props.variant === 'alt') {
     const { variant: _, ...rest } = props
     return <AltPrimaryButton {...rest} />

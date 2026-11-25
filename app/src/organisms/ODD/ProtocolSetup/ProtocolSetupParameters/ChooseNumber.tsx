@@ -13,8 +13,8 @@ import {
 
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-import { parseNumericalInput } from '/app/organisms/ODD/utils/parseNumericalInput'
 import { useToaster } from '/app/organisms/ToasterOven'
+import { parseNumericalInput } from '/app/resources/utils/parseNumericalInput'
 
 import type { NumberParameter } from '@opentrons/shared-data'
 
@@ -37,7 +37,7 @@ export function ChooseNumber({
   const [paramValue, setParamValue] = useState<string>(String(parameter.value))
 
   if (parameter.type !== 'int' && parameter.type !== 'float') {
-    console.log(`Incorrect parameter type: ${parameter.type as string}`)
+    console.error(`Incorrect parameter type: ${parameter.type as string}`)
     return null
   }
 

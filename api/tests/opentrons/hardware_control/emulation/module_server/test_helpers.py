@@ -3,7 +3,7 @@ from typing import List
 import pytest
 from mock import AsyncMock
 
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 from opentrons.hardware_control.emulation.module_server import (
     ModuleStatusClient,
     helpers,

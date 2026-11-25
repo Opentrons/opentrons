@@ -10,8 +10,13 @@ import {
   StyledText,
   Tag,
 } from '@opentrons/components'
-import { getLabwareViewBox } from '@opentrons/shared-data'
 import {
+  getLabwareViewBox,
+  getModuleDisplayName,
+  VACUUM_MODULE_TYPE,
+} from '@opentrons/shared-data'
+import {
+  getModuleLocationSlot,
   getSlotInLocationStack,
   wellFillFromWellContents,
 } from '@opentrons/step-generation'
@@ -80,6 +85,23 @@ export function LabwareSlotContainer(
     ([_, pipette]) => pipette.entityId === topLabwareOnSlotId
   )
   const slot = getSlotInLocationStack(labware[topLabwareOnSlotId].stack)
+  const vacuumModuleId = labware[topLabwareOnSlotId]?.stack.find(
+    item => moduleEntities[item]?.type === VACUUM_MODULE_TYPE
+  )
+  const displaySlot =
+    slot === 'offDeck' ? t('off_deck') : getModuleLocationSlot(slot)
+  const vacuumModuleDisplayName =
+    vacuumModuleId != null
+      ? getModuleDisplayName(moduleEntities[vacuumModuleId].model)
+      : null
+  const stackItems =
+    labware[topLabwareOnSlotId]?.stack.filter(
+      item => item !== topLabwareOnSlotId
+    ) ?? []
+  const moduleStackItems = stackItems.filter(
+    item => moduleEntities[item] != null
+  )
+  const showStackedIcon = stackItems.some(item => labware[item] != null)
 
   const { params: labwareLoadCommandParams } = labwareLoadCommand ?? {}
   const labwareNickname: string | null =
@@ -183,34 +205,25 @@ export function LabwareSlotContainer(
         <div className={styles.header}>
           <Tag text={t('labware')} type="default" shrinkToContent />
           <div className={styles.info_label_container}>
-            {labware[topLabwareOnSlotId]?.stack
-              .filter(item => item !== topLabwareOnSlotId)
-              .reverse()
-              .map((item, index) => {
-                if (moduleEntities[item] != null) {
-                  return (
-                    <RobotInfoLabel
-                      key={`${item}-${index}`}
-                      iconName={
-                        MODULE_ICON_NAME_BY_TYPE[moduleEntities[item].type]
-                      }
-                    />
-                  )
-                } else if (labware[item] != null) {
-                  return (
-                    <RobotInfoLabel
-                      key={`${item}-${index}`}
-                      iconName="stacked"
-                    />
-                  )
-                } else {
-                  return (
-                    <RobotInfoLabel key={`${item}-${index}`} deckLabel={slot} />
-                  )
-                }
-              })}
+            <RobotInfoLabel key="slotLabel" deckLabel={displaySlot} />
+            {moduleStackItems.map(item => (
+              <RobotInfoLabel
+                key={item}
+                iconName={MODULE_ICON_NAME_BY_TYPE[moduleEntities[item].type]}
+              />
+            ))}
+            {showStackedIcon ? (
+              <RobotInfoLabel key="stackedIcon" iconName="stacked" />
+            ) : null}
           </div>
         </div>
+        {vacuumModuleDisplayName != null ? (
+          <div className={styles.module_name}>
+            <StyledText desktopStyle="captionRegular">
+              {vacuumModuleDisplayName}
+            </StyledText>
+          </div>
+        ) : null}
         <div className={styles.subheader}>
           <StyledText desktopStyle="captionSemiBold">
             {labwareNickname ?? labwareDisplayName}

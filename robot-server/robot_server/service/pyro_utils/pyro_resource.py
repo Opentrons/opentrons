@@ -14,6 +14,9 @@ from opentrons.hardware_control.types import HardwareEvent, HardwareEventHandler
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
 )
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_engine.resources.file_provider import FileProvider
 from opentrons.protocol_engine.state.state import EngineEventNotification
 from opentrons.protocol_engine.types import DeckConfigurationType
@@ -77,6 +80,8 @@ class RobotServerPyroResource:
         self._file_provider: Optional[FileProvider] = None
         self._notify_publishers: Optional[Callable[[], Awaitable[None]]] = None
         self._hardware_state_store: Optional["HardwareStateStore"] = None
+        self._run_store_provider: Optional[CommandStoreProvider] = None
+        self._analysis_store_provider: Optional[CommandStoreProvider] = None
 
     ### Setters for procedural state gathering - Not to be used from remote process ###
     def set_run_orchestrator_store(
@@ -124,6 +129,18 @@ class RobotServerPyroResource:
     def set_hardware_state_store(self, hardware_store: "HardwareStateStore") -> None:
         """Set the HardwareStateStore of the RobotServerPyroResource, not serialized for remote processes."""
         self._hardware_state_store = hardware_store
+
+    def set_run_store_provider(self, run_store_provider: CommandStoreProvider) -> None:
+        """Set the CommandStoreProvider for the RunStore of the RobotServerPyroResource, not serialized for remote processes."""
+        if self._run_store_provider is None:
+            self._run_store_provider = run_store_provider
+
+    def set_analysis_store_provider(
+        self, analysis_store_provider: CommandStoreProvider
+    ) -> None:
+        """Set the CommandStoreProvider for the AnalysisStore of the RobotServerPyroResource, not serialized for remote processes."""
+        if self._analysis_store_provider is None:
+            self._analysis_store_provider = analysis_store_provider
 
     ### Interface methods for remote access ###
 
@@ -280,6 +297,34 @@ class RobotServerPyroResource:
         else:
             raise RuntimeError(
                 "Cannot provide a protocol engine listener from the RobotServerPyroResource without a RunOrchestratorStore."
+            )
+
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def get_run_store_provider(self) -> CommandStoreProvider:
+        """Provide a Pyro Proxy for the CommandStoreProvider of the RunStore.
+
+        The returned instance is meant to execute in the Robot Server's process.
+        """
+
+        if self._run_store_provider is not None:
+            return self._run_store_provider
+        else:
+            raise RuntimeError(
+                "Cannot return a CommandStoreProvider for RunStore from the RobotServerPyroResource without initializing."
+            )
+
+    @pyro_behavior(specialty_func=convert_result_to_proxy, apply_local=False)
+    def get_analysis_store_provider(self) -> CommandStoreProvider:
+        """Provide a Pyro Proxy for the CommandStoreProvider of the AnalysisStore.
+
+        The returned instance is meant to execute in the Robot Server's process.
+        """
+
+        if self._analysis_store_provider is not None:
+            return self._analysis_store_provider
+        else:
+            raise RuntimeError(
+                "Cannot return a CommandStoreProvider for AnalysisStore from the RobotServerPyroResource without initializing."
             )
 
 

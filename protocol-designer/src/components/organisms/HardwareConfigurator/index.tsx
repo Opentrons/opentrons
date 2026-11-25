@@ -7,6 +7,7 @@ import { getDeckConfiguration } from '/protocol-designer/step-forms/selectors'
 import { HardwareConfiguratorContainer } from './HardwareConfiguratorContainer'
 import { useMemoizedUpdatedDeckConfig } from './hooks/useMemoizedUpdatedDeckConfig'
 
+import type { ReactNode } from 'react'
 import type { UseFormSetValue } from 'react-hook-form'
 import type { CutoutConfigMap, DeckConfiguration } from '@opentrons/shared-data'
 import type { FormModules } from '/protocol-designer/step-forms'
@@ -25,7 +26,7 @@ interface HardwareConfiguratorProps {
 }
 export function HardwareConfigurator(
   props: HardwareConfiguratorProps
-): JSX.Element {
+): ReactNode {
   const { modules, setValue, hasGripper, fixtures, updateInitialDeckState } =
     props
   const dispatch = useDispatch()

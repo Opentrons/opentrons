@@ -41,6 +41,9 @@ _MOTOR_AXIS_TO_HARDWARE_MOUNT: Dict[MotorAxis, Mount] = {
     MotorAxis.LEFT_Z: Mount.LEFT,
     MotorAxis.RIGHT_Z: Mount.RIGHT,
     MotorAxis.EXTENSION_Z: Mount.EXTENSION,
+    MotorAxis.RIGHT_PLUNGER: Mount.RIGHT,
+    MotorAxis.LEFT_PLUNGER: Mount.LEFT,
+    MotorAxis.EXTENSION_JAW: Mount.EXTENSION,
 }
 
 _HARDWARE_MOUNT_MOTOR_AXIS_TO: Dict[Mount, MotorAxis] = {

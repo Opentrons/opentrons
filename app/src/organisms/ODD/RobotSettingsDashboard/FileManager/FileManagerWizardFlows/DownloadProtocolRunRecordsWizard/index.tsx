@@ -9,7 +9,7 @@ import { useNotifyAllRunsQuery } from '/app/resources/runs'
 
 import { DownloadDeleteRecordFlow } from '../shared/DownloadDeleteRecordFlow'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type { RunData } from '@opentrons/api-client'
 
 interface DownloadProtocolRunRecordsWizardProps {
@@ -18,7 +18,7 @@ interface DownloadProtocolRunRecordsWizardProps {
 
 export function DownloadProtocolRunRecordsWizard({
   onClose,
-}: DownloadProtocolRunRecordsWizardProps): JSX.Element {
+}: DownloadProtocolRunRecordsWizardProps): ReactNode {
   const { t } = useTranslation('device_details')
   const robotName = useSelector(getLocalRobot)?.name ?? ''
   const { data: runData } = useNotifyAllRunsQuery()

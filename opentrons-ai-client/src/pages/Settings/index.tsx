@@ -17,7 +17,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { FeatureFlag, Privacy } from '/ai-client/components/organisms/Settings'
+import { Privacy } from '/ai-client/components/organisms/Settings'
 import { featureFlagsAtom } from '/ai-client/resources/atoms'
 
 const SETTINGS_MAX_WIDTH = '56rem'
@@ -27,21 +27,11 @@ export function Settings(): JSX.Element {
   const navigate = useNavigate()
   const [featureFlags, setFeatureFlags] = useAtom(featureFlagsAtom)
 
-  const prereleaseModeEnabled = featureFlags.enablePrereleaseMode === true
-
   const handleToggleAnalytics = (): void => {
     const currentValue = featureFlags.enableAnalytics ?? true
     const newValue = !currentValue
     setFeatureFlags({
       enableAnalytics: newValue,
-    })
-  }
-
-  const handleTogglePDProtocolGeneration = (): void => {
-    const currentValue = featureFlags.enablePDProtocolGeneration ?? true
-    const newValue = !currentValue
-    setFeatureFlags({
-      enablePDProtocolGeneration: newValue,
     })
   }
 
@@ -98,14 +88,6 @@ export function Settings(): JSX.Element {
               enableAnalytics={featureFlags.enableAnalytics ?? true}
               onToggleAnalytics={handleToggleAnalytics}
             />
-            {prereleaseModeEnabled ? (
-              <FeatureFlag
-                enablePDProtocolGeneration={
-                  featureFlags.enablePDProtocolGeneration ?? true
-                }
-                onTogglePDProtocolGeneration={handleTogglePDProtocolGeneration}
-              />
-            ) : null}
           </Flex>
         </Flex>
       </Flex>

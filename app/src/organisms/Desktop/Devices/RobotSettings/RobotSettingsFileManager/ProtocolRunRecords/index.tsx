@@ -30,6 +30,7 @@ import fileManagerStyles from '../robotsettingsfilemanager.module.css'
 import protocolRunRecordsStyles from './protocolrunrecords.module.css'
 import { RunRecord } from './RunRecord'
 
+import type { ReactNode } from 'react'
 import type { IconProps } from '@opentrons/components'
 import type { DocumentedAction } from '@opentrons/react-api-client'
 
@@ -41,7 +42,7 @@ interface ProtocolRunRecordsProps {
 
 export function ProtocolRunRecords({
   robotName,
-}: ProtocolRunRecordsProps): JSX.Element {
+}: ProtocolRunRecordsProps): ReactNode {
   const { t } = useTranslation('device_details')
   const { makeToast, eatToast } = useToaster()
   const { data: runData } = useNotifyAllRunsQuery()

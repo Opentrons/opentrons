@@ -1,5 +1,6 @@
 import { LabwareRender } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 interface LabwareRenderOnDeckProps {
@@ -9,7 +10,7 @@ interface LabwareRenderOnDeckProps {
 }
 export function LabwareRenderOnDeck(
   props: LabwareRenderOnDeckProps
-): JSX.Element {
+): ReactNode {
   const { x, y, labwareDef } = props
   return (
     <g transform={`translate(${x}, ${y})`}>

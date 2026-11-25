@@ -6,7 +6,7 @@ import { Btn, Flex } from '../../primitives'
 import { FLEX_MAX_CONTENT } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 
-import type { MouseEvent } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 
 type LiquidIconSize = 'xSmall' | 'small' | 'medium'
 
@@ -17,7 +17,7 @@ export interface LiquidIconProps {
   hasError?: boolean
 }
 
-export function LiquidIcon(props: LiquidIconProps): JSX.Element {
+export function LiquidIcon(props: LiquidIconProps): ReactNode {
   const { color, size = 'small', onClick, hasError = false } = props
 
   const sizeStylesMap: Record<

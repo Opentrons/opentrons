@@ -24,7 +24,7 @@ import { getIsOnDevice } from '/app/redux/config'
 
 import { equipmentImages } from './equipmentImages'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
 
 interface WizardRequiredEquipmentListProps extends StyleProps {
@@ -41,7 +41,7 @@ const StyledEquipmentImage = styled.img<{ isEquipmentImage: boolean }>`
 
 export function WizardRequiredEquipmentList(
   props: WizardRequiredEquipmentListProps
-): JSX.Element {
+): ReactNode {
   const { t } = useTranslation('robot_calibration')
   const { equipmentList, footer } = props
   const isOnDevice = useSelector(getIsOnDevice)
@@ -128,7 +128,7 @@ interface RequiredEquipmentCardProps {
   bottomDivider?: boolean
 }
 
-function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
+function RequiredEquipmentCard(props: RequiredEquipmentCardProps): ReactNode {
   const { loadName, displayName, subtitle, bottomDivider = true } = props
 
   let imageSrc: string | null = null

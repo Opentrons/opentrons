@@ -29,6 +29,7 @@ import {
   getTiprackHasTips,
   OFF_DECK,
   PROTOCOL_CONTEXT_NAME,
+  resolveStringRuntimeValue,
   uuid,
 } from '../../utils'
 import * as warningCreators from '../../warningCreators'
@@ -37,6 +38,7 @@ import type {
   AddressableAreaName,
   CreateCommand,
   CutoutId,
+  LabwareLocation,
   MoveLabwareParams,
 } from '@opentrons/shared-data'
 import type {
@@ -44,25 +46,121 @@ import type {
   CommandCreatorError,
   CommandCreatorWarning,
   ModuleState,
+  MoveLabwareStepGenArgs,
 } from '../../types'
 
 export const TIPRACK_LID_LOADNAME = 'opentrons_flex_tiprack_lid'
 
 /** Move labware from one location to another, manually or via a gripper. */
-export const moveLabware: CommandCreator<MoveLabwareParams> = (
+export const moveLabware: CommandCreator<MoveLabwareStepGenArgs> = (
   args,
   invariantContext,
   prevRobotState
 ) => {
-  const { labwareId, strategy, newLocation } = args
-  const useGripper = strategy === 'usingGripper'
   const {
     gripperEntities,
     trashBinEntities,
     wasteChuteEntities,
     labwareEntities,
     moduleEntities,
+    runtimeParameters,
   } = invariantContext
+  const labwareId = resolveStringRuntimeValue(args.labwareId, runtimeParameters)
+  const strategy = resolveStringRuntimeValue(args.strategy, runtimeParameters)
+  const errors: CommandCreatorError[] = []
+  let newLocation: LabwareLocation | null = null
+  if (labwareId == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: args.labwareId })
+    )
+  }
+  if (strategy == null) {
+    errors.push(
+      errorCreators.invalidRuntimeParameter({ parameterName: args.strategy })
+    )
+  }
+  if (typeof args.newLocation === 'string') {
+    const resolvedLocation = resolveStringRuntimeValue(
+      args.newLocation,
+      runtimeParameters
+    )
+    if (resolvedLocation == null) {
+      errors.push(
+        errorCreators.invalidRuntimeParameter({
+          parameterName: args.newLocation,
+        })
+      )
+    } else {
+      newLocation = resolvedLocation as LabwareLocation
+    }
+  } else if ('labwareId' in args.newLocation) {
+    const destLabwareId = resolveStringRuntimeValue(
+      args.newLocation.labwareId,
+      runtimeParameters
+    )
+    if (destLabwareId == null) {
+      errors.push(
+        errorCreators.invalidRuntimeParameter({
+          parameterName: args.newLocation.labwareId,
+        })
+      )
+    } else {
+      newLocation = { labwareId: destLabwareId }
+    }
+  } else if ('moduleId' in args.newLocation) {
+    const moduleId = resolveStringRuntimeValue(
+      args.newLocation.moduleId,
+      runtimeParameters
+    )
+    if (moduleId == null) {
+      errors.push(
+        errorCreators.invalidRuntimeParameter({
+          parameterName: args.newLocation.moduleId,
+        })
+      )
+    } else {
+      newLocation = { moduleId }
+    }
+  } else if ('slotName' in args.newLocation) {
+    const slotName = resolveStringRuntimeValue(
+      args.newLocation.slotName,
+      runtimeParameters
+    )
+    if (slotName == null) {
+      errors.push(
+        errorCreators.invalidRuntimeParameter({
+          parameterName: args.newLocation.slotName,
+        })
+      )
+    } else {
+      newLocation = { slotName }
+    }
+  } else {
+    const addressableAreaName = resolveStringRuntimeValue(
+      args.newLocation.addressableAreaName,
+      runtimeParameters
+    )
+    if (addressableAreaName == null) {
+      errors.push(
+        errorCreators.invalidRuntimeParameter({
+          parameterName: args.newLocation.addressableAreaName,
+        })
+      )
+    } else {
+      newLocation = {
+        addressableAreaName: addressableAreaName as AddressableAreaName,
+      }
+    }
+  }
+  if (
+    errors.length > 0 ||
+    labwareId == null ||
+    strategy == null ||
+    newLocation == null
+  ) {
+    return { errors }
+  }
+  const useGripper = strategy === 'usingGripper'
   const hasGripperEntity = Object.keys(gripperEntities).length > 0
   const hasWasteChute = Object.values(wasteChuteEntities).length > 0
   const tiprackHasTip =
@@ -77,7 +175,6 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
     ({ hasTip }) => hasTip
   )
   const actionName = 'moveToLabware'
-  const errors: CommandCreatorError[] = []
   const warnings: CommandCreatorWarning[] = []
 
   const newLocationInWasteChute =
@@ -266,7 +363,7 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
 
   const params = {
     labwareId,
-    strategy,
+    strategy: strategy as MoveLabwareParams['strategy'],
     newLocation,
   }
   const commands: CreateCommand[] = [
@@ -311,7 +408,14 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
       parentSlotForSlotCompatibility =
         newLocationStack[newLocationStack.length - 1]
     } else {
-      location = formatPyStr(slotName)
+      const rawSlotName =
+        typeof args.newLocation === 'object' && 'slotName' in args.newLocation
+          ? args.newLocation.slotName
+          : slotName
+      location =
+        runtimeParameters[rawSlotName] != null
+          ? rawSlotName
+          : formatPyStr(slotName)
       parentSlotForSlotCompatibility = slotName
     }
   } else if ('addressableAreaName' in newLocation) {
@@ -355,7 +459,15 @@ export const moveLabware: CommandCreator<MoveLabwareParams> = (
         : null
 
     if (is4thColumnSlot) {
-      location = formatPyStr(newLocation.addressableAreaName)
+      const rawAreaName =
+        typeof args.newLocation === 'object' &&
+        'addressableAreaName' in args.newLocation
+          ? args.newLocation.addressableAreaName
+          : newLocation.addressableAreaName
+      location =
+        runtimeParameters[rawAreaName] != null
+          ? rawAreaName
+          : formatPyStr(newLocation.addressableAreaName)
     } else if (matchingTrashId != null && !isWasteChuteLocation) {
       location = trashBinEntities[matchingTrashId]?.pythonName ?? ''
     } else if (matchingTrashId == null && isWasteChuteLocation) {

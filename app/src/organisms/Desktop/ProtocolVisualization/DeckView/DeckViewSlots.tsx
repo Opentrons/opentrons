@@ -1,14 +1,14 @@
 import { COLORS } from '@opentrons/components'
 import {
+  FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   getPositionFromSlotId,
   isAddressableAreaStandardSlot,
 } from '@opentrons/shared-data'
 
 import { getSlotIsEmpty } from '../utils/getSlotIsEmpty'
-import { getStagingAreaAddressableAreas } from '../utils/getStagingAreaAddressableAreas'
 import { DeckViewOverlay } from './DeckViewOverlay'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {
   CutoutId,
   DeckDefinition,
@@ -29,7 +29,7 @@ interface DeckViewSlotsProps {
   slotIdsBlockedBySpanning: string[]
 }
 
-export function DeckViewSlots(props: DeckViewSlotsProps): JSX.Element {
+export function DeckViewSlots(props: DeckViewSlotsProps): ReactNode {
   const {
     deckDef,
     robotType,
@@ -46,11 +46,11 @@ export function DeckViewSlots(props: DeckViewSlotsProps): JSX.Element {
     <>
       {deckDef.locations.addressableAreas.reduce<JSX.Element[]>(
         (acc, addressableArea) => {
-          const stagingAreaAddressableAreas =
-            getStagingAreaAddressableAreas(stagingAreaCutoutIds)
           const addressableAreas =
             isAddressableAreaStandardSlot(addressableArea.id, deckDef) ||
-            stagingAreaAddressableAreas.includes(addressableArea.id)
+            FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS.includes(
+              addressableArea.id
+            )
           const slotPosition = getPositionFromSlotId(
             addressableArea.id,
             deckDef
@@ -75,6 +75,7 @@ export function DeckViewSlots(props: DeckViewSlotsProps): JSX.Element {
                 setHoveredSlot={setHoveredSlot}
                 hover={hoveredSlot}
                 selectedSlot={selectedSlot}
+                stagingAreaCutoutIds={stagingAreaCutoutIds}
               />,
             ]
           }

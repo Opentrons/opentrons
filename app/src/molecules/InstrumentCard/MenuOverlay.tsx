@@ -8,6 +8,7 @@ import {
   MenuItem,
   NO_WRAP,
   POSITION_ABSOLUTE,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { Divider } from '/app/atoms/structure'
@@ -28,7 +29,7 @@ interface MenuOverlayProps extends StyleProps {
 }
 
 // TODO(bh, 2022-10-31): consider making this a generic molecule if other overflow menus are refactored to use
-export function MenuOverlay(props: MenuOverlayProps): JSX.Element {
+export function MenuOverlay(props: MenuOverlayProps): ReactNode {
   const { hasDivider = false, menuOverlayItems, setShowMenuOverlay } = props
 
   return (
@@ -41,7 +42,7 @@ export function MenuOverlay(props: MenuOverlayProps): JSX.Element {
       top="2.25rem"
       right="0"
       whiteSpace={NO_WRAP}
-      zIndex={10}
+      zIndex={Z_INDEX.MENUS}
       onClick={(e: MouseEvent) => {
         e.preventDefault()
         e.stopPropagation()

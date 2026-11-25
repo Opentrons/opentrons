@@ -13,6 +13,7 @@ import {
 import { getLiquidDisplay } from './getLiquidDisplay'
 import { getLiquidIdsForStepSummary, getWellsForStepSummary } from './utils'
 
+import type { ReactNode } from 'react'
 import type {
   LabwareEntities,
   LiquidEntities,
@@ -28,7 +29,7 @@ interface MixSummaryProps {
   labwareEntities: LabwareEntities
 }
 
-export function MixSummary(props: MixSummaryProps): JSX.Element {
+export function MixSummary(props: MixSummaryProps): ReactNode {
   const {
     currentStep,
     labwareNicknamesById,

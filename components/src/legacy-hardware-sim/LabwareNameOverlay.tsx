@@ -2,6 +2,8 @@ import cx from 'classnames'
 
 import styles from './LabwareNameOverlay.module.css'
 
+import type { ReactNode } from 'react'
+
 export interface LabwareNameOverlayProps {
   title: string
   subtitle?: string | null
@@ -9,9 +11,7 @@ export interface LabwareNameOverlayProps {
 }
 
 /** @deprecated use LabwareDisplayName or custom RobotCoordsForeignDiv */
-export function LabwareNameOverlay(
-  props: LabwareNameOverlayProps
-): JSX.Element {
+export function LabwareNameOverlay(props: LabwareNameOverlayProps): ReactNode {
   const { title, subtitle, className } = props
 
   return (

@@ -23,9 +23,11 @@ import {
 import { getFeatureFlagData } from '/protocol-designer/feature-flags/selectors'
 import { selectors as tutorialSelectors } from '/protocol-designer/tutorial'
 
+import type { ReactNode } from 'react'
+
 const SETTINGS_MAX_WIDTH = '56rem'
 
-export function Settings(): JSX.Element {
+export function Settings(): ReactNode {
   const { t } = useTranslation('shared')
   const [showAnnouncementModal, setShowAnnouncementModal] =
     useState<boolean>(false)

@@ -11,6 +11,8 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 export interface Metadata {
   [key: string]: any
 }
@@ -25,7 +27,7 @@ export function MetadataDetails({
   description,
   metadata,
   protocolType,
-}: MetadataDetailsProps): JSX.Element {
+}: MetadataDetailsProps): ReactNode {
   if (protocolType === 'json') {
     return <LegacyStyledText forwardedAs="p">{description}</LegacyStyledText>
   } else {

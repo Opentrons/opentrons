@@ -14,6 +14,7 @@ import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { useCloseCurrentRun } from '/app/resources/runs'
 
+import type { ReactNode } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface AnalysisFailedModalProps {
@@ -27,7 +28,7 @@ export function AnalysisFailedModal({
   errors,
   protocolId,
   setShowAnalysisFailedModal,
-}: AnalysisFailedModalProps): JSX.Element {
+}: AnalysisFailedModalProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
   const navigate = useNavigate()
   const modalHeader: OddModalHeaderBaseProps = {

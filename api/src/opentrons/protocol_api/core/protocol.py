@@ -99,6 +99,7 @@ class AbstractProtocol(
         location: Union[
             DeckSlotName,
             StagingSlotName,
+            LabwareCoreType,
             ModuleCoreType,
             ModuleFixtureLocation,
             OffDeckType,

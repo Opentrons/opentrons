@@ -34,7 +34,7 @@ import { OddModal } from '/app/molecules/OddModal'
 import { getIsOnDevice } from '/app/redux/config'
 import { usePlacePlateReaderLid } from '/app/resources/modules'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { ModalProps } from '@opentrons/components'
 import type {
   ModalSize,
@@ -55,7 +55,7 @@ export function EstopPressedModal({
   closeModal,
   isWaitingForResumeOperation,
   setIsWaitingForResumeOperation,
-}: EstopPressedModalProps): JSX.Element {
+}: EstopPressedModalProps): ReactNode {
   const isOnDevice = useSelector(getIsOnDevice)
   return createPortal(
     isOnDevice ? (
@@ -84,7 +84,7 @@ function TouchscreenModal({
   closeModal,
   isWaitingForResumeOperation,
   setIsWaitingForResumeOperation,
-}: EstopPressedModalProps): JSX.Element {
+}: EstopPressedModalProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'branded'])
   const [isResuming, setIsResuming] = useState<boolean>(false)
   const documentationState = useDocumentationState()
@@ -173,7 +173,7 @@ function DesktopModal({
   closeModal,
   isWaitingForResumeOperation,
   setIsWaitingForResumeOperation,
-}: EstopPressedModalProps): JSX.Element {
+}: EstopPressedModalProps): ReactNode {
   const { t } = useTranslation('device_settings')
   const [isResuming, setIsResuming] = useState<boolean>(false)
   const documentationState = useDocumentationState()

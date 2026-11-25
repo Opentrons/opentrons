@@ -13,6 +13,7 @@ import { CheckUpdates } from './CheckUpdates'
 import { ErrorUpdateSoftware } from './ErrorUpdateSoftware'
 import { NoUpdateFound } from './NoUpdateFound'
 
+import type { ReactNode } from 'react'
 import type { ViewableRobot } from '/app/redux/discovery/types'
 import type { Dispatch } from '/app/redux/types'
 
@@ -33,7 +34,7 @@ interface UpdateRobotSoftwareProps {
 
 export function UpdateRobotSoftware(
   props: UpdateRobotSoftwareProps
-): JSX.Element {
+): ReactNode {
   const {
     localRobot,
     afterError,

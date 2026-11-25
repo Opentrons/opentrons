@@ -28,7 +28,7 @@ import { FileUpload } from '/app/molecules/FileUpload'
 import { UploadInput } from '/app/molecules/UploadInput'
 import { useRestartRobotMutation } from '/app/resources/devices/hooks/useRestartRobotMutation'
 
-import type { ChangeEvent, MouseEventHandler } from 'react'
+import type { ChangeEvent, MouseEventHandler, ReactNode } from 'react'
 import type { FieldError, Resolver } from 'react-hook-form'
 import type { RobotSettingsField } from '@opentrons/api-client'
 
@@ -50,7 +50,7 @@ export function FactoryModeSlideout({
   onCloseClick,
   robotName,
   sn,
-}: FactoryModeSlideoutProps): JSX.Element {
+}: FactoryModeSlideoutProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared', 'branded'])
 
   const { settings } = useRobotSettingsQuery().data ?? {}

@@ -32,6 +32,7 @@ import { WellDimensions } from './WellDimensions'
 import { WellProperties } from './WellProperties'
 import { WellSpacing } from './WellSpacing'
 
+import type { ReactNode } from 'react'
 import type { LabwareDefAndDate } from '/app/local-resources/labware'
 
 export interface LabwareDetailsProps {
@@ -39,7 +40,7 @@ export interface LabwareDetailsProps {
   labware: LabwareDefAndDate
 }
 
-export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
+export function LabwareDetails(props: LabwareDetailsProps): ReactNode {
   const { t } = useTranslation(['labware_landing', 'branded'])
   const { definition, modified, filename } = props.labware
   const { metadata, parameters, brand, wells, ordering } = definition

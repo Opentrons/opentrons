@@ -1,5 +1,6 @@
 """Simulating AbstractRunner factory."""
 
+from opentrons_shared_data.errors.exceptions import UnsupportedHardwareCommand
 from opentrons_shared_data.robot.types import RobotType
 
 from ..protocol_engine.types import (
@@ -8,7 +9,6 @@ from ..protocol_engine.types import (
 from .protocol_runner import LiveRunner, create_protocol_runner
 from .python_protocol_wrappers import SimulatingContextCreator
 from .run_orchestrator import RunOrchestrator
-from opentrons.hardware_control import API as OT2API
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
@@ -18,6 +18,9 @@ from opentrons.protocol_engine import (
     error_recovery_policy,
 )
 from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
+from opentrons.protocol_engine.resources.command_store_provider import (
+    CommandStoreProvider,
+)
 from opentrons.protocol_reader.protocol_source import ProtocolConfig
 from opentrons.protocols.api_support import deck_type
 from opentrons.protocols.api_support.deck_type import should_load_fixed_trash
@@ -48,7 +51,9 @@ class SimulatingRunOrchestrator(RunOrchestrator):
 
 
 async def create_simulating_orchestrator(
-    robot_type: RobotType, protocol_config: ProtocolConfig
+    robot_type: RobotType,
+    protocol_config: ProtocolConfig,
+    analysis_store_provider: CommandStoreProvider | None = None,
 ) -> SimulatingRunOrchestrator:
     """Create a RunOrchestrator wired to a simulating HardwareControlAPI.
 
@@ -96,6 +101,7 @@ async def create_simulating_orchestrator(
         ),
         error_recovery_policy=error_recovery_policy.never_recover,
         load_fixed_trash=should_load_fixed_trash(protocol_config),
+        command_store_provider=analysis_store_provider,
     )
 
     simulating_context_creator = SimulatingContextCreator(
@@ -139,9 +145,10 @@ async def _build_hardware_simulator_for_robot_type(
     robot_type: RobotType,
 ) -> HardwareControlAPI:
     if robot_type == "OT-2 Standard":
-        return await OT2API.build_hardware_simulator()
+        raise UnsupportedHardwareCommand(
+            message="Simulating orchestrators are not supported on OT-2."
+        )
     elif robot_type == "OT-3 Standard":
-        # Inline import because OT3API is not present to import on an OT-2 system.
         from opentrons.hardware_control.ot3api import OT3API
 
         return await OT3API.build_hardware_simulator()

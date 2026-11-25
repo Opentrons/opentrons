@@ -6,9 +6,10 @@ import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
 
 import { TwoColTextAndFailedStepNextStep } from './TwoColTextAndFailedStepNextStep'
 
+import type { ReactNode } from 'react'
 import type { RecoveryContentProps } from '/app/organisms/ErrorRecoveryFlows/types'
 
-export function RetryWithSameTips(props: RecoveryContentProps): JSX.Element {
+export function RetryWithSameTips(props: RecoveryContentProps): ReactNode {
   const { routeUpdateActions, recoveryCommands } = props
   const { retryFailedCommand, resumeRun } = recoveryCommands
   const { handleMotionRouting } = routeUpdateActions

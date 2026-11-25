@@ -19,6 +19,7 @@ import { useFeatureFlag } from '/app/redux/config'
 
 import { RobotSystemVersionModal } from './RobotSystemVersionModal'
 
+import type { ReactNode } from 'react'
 import type { RobotUpdateInfo } from '/app/redux/robot-update/types'
 import type { SetSettingOption } from './types'
 
@@ -40,7 +41,7 @@ export function RobotSystemVersion({
   isUpdateAvailable,
   robotUpdateInfo,
   setCurrentOption,
-}: RobotSystemVersionProps): JSX.Element {
+}: RobotSystemVersionProps): ReactNode {
   const { t, i18n } = useTranslation([
     'device_settings',
     'shared',

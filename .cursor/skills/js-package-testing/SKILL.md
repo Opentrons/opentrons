@@ -28,7 +28,9 @@ via `link:pack/...`, and runs a Vite demo plus Playwright + Applitools Eyes.
    - `@opentrons/protocol-visualization/styles`
    - `@opentrons/components/styles/global`
    - `@opentrons/components/styles`
-4. Wrap app in `I18nextProvider` with `protocol_visualization` namespace (see `src/i18n.ts`).
+4. Wrap app in `I18nextProvider`. Load `protocol_visualization` (local JSON) plus
+   shared component namespaces from `@opentrons/components/localization`
+   (Node-safe; do not import resources from the package root in Node).
 5. Vite: dedupe React, use `cssModulesSideEffect` plugin, `define: { 'process.env': {} }` if needed.
 
 Library runtime deps (`styled-components`, `redux`, etc.) are bundled; host app does not install them.

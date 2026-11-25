@@ -10,6 +10,7 @@ import { getActiveSlotForTiprackDetails } from '../utils/getActiveSlotForTiprack
 import { getIsPipetteActive } from '../utils/getIsPipetteActive'
 import styles from './stepdetailcontainer.module.css'
 
+import type { ReactNode } from 'react'
 import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 
@@ -29,7 +30,7 @@ export function StepDetailContainer({
   invariantContext,
   currentCommand,
   liquids,
-}: StepDetailContainerProps): JSX.Element {
+}: StepDetailContainerProps): ReactNode {
   const { labwareEntities, pipetteEntities, moduleEntities } = invariantContext
   const { labware, pipettes } = robotState
   const tiprackActiveSlot = getActiveSlotForTiprackDetails(

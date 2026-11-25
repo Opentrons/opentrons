@@ -80,12 +80,6 @@ setup:
 .PHONY: setup-py
 setup-py: setup
 
-.PHONY: setup-ot2
-setup-ot2:
-	@$(uv_sync_dev)
-	@$(UV) pip uninstall python-can
-	@$(UV) pip list
-
 .PHONY: lock
 lock:
 	$(UV) lock
@@ -141,15 +135,11 @@ _dev:
 	$(UV) run $(run_dev)
 
 .PHONY: dev
-dev: dev-ot2
+dev: dev-flex
 
 .PHONY: dev-flex
 dev-flex: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= dev-flex.env
 dev-flex: _dev
-
-.PHONY: dev-ot2
-dev-ot2: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= dev.env
-dev-ot2: _dev
 
 
 .PHONY: dev-with-emulator
@@ -168,11 +158,6 @@ dev-with-ot3-emulator:
 local-shell:
 	$(UV) shell
 
-.PHONY: push
-push: wheel
-	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/usr/lib/python3.10/site-packages/)
-	$(call push-systemd-unit,$(host),$(ssh_key),$(ssh_opts),./opentrons-robot-server.service)
-	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-robot-server)
 
 .PHONY: push-ot3
 push-ot3: wheel
@@ -191,28 +176,6 @@ install-key:
 restart:
 	curl -X POST http://$(host):31950/server/restart
 
-.PHONY: change-right
-change-right:
-	curl -X POST \
-		-H "Content-Type: application/json" \
-		-d '{"target": "mount", "mount": "right", "point": [65, 40, 30]}' \
-		http://$(host):31950/robot/move
-	curl -X POST \
-		-H "Content-Type: application/json" \
-		-d '{"axes": ["c"]}' \
-		http://$(host):31950/motors/disengage
-
-
-.PHONY: change-left
-change-left:
-	curl -X POST \
-		-H "Content-Type: application/json" \
-		-d '{"target": "mount", "mount": "left", "point": [325, 40, 30]}' \
-		http://$(host):31950/robot/move
-	curl -X POST \
-		-H "Content-Type: application/json" \
-		-d '{"axes": ["b"]}' \
-		http://$(host):31950/motors/disengage
 
 # User must currently specify host, e.g.: `make term host=169.254.202.176`
 .PHONY: term

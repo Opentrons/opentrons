@@ -18,9 +18,10 @@ import {
   toggleDevtools,
 } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
-export function EnableDevTools(): JSX.Element {
+export function EnableDevTools(): ReactNode {
   const { t } = useTranslation('app_settings')
   const devToolsOn = useSelector(getDevtoolsEnabled)
   const dispatch = useDispatch<Dispatch>()

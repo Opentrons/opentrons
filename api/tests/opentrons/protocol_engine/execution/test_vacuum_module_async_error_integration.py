@@ -10,7 +10,7 @@ from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.errors.exceptions import EnumeratedError
 from opentrons_shared_data.robot import load as load_robot
 
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.usb.types import USBPort
 from opentrons.drivers.vacuum_module.errors import (
     PressureNotReached,
     WasteContainerFull,

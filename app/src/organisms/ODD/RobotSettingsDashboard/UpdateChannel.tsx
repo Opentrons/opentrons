@@ -23,7 +23,7 @@ import {
 } from '/app/redux/config'
 import { useHandleAndLog } from '/app/resources/access-control/useHandleAndLog'
 
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
 interface LabelProps {
@@ -49,7 +49,7 @@ interface UpdateChannelProps {
 
 export function UpdateChannel({
   handleBackPress,
-}: UpdateChannelProps): JSX.Element {
+}: UpdateChannelProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'app_settings'])
   const dispatch = useDispatch<Dispatch>()
 

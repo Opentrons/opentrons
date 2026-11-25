@@ -14,12 +14,14 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
+
 interface RobotMotionLoaderProps {
   header?: string
   body?: string
 }
 
-export function RobotMotionLoader(props: RobotMotionLoaderProps): JSX.Element {
+export function RobotMotionLoader(props: RobotMotionLoaderProps): ReactNode {
   const { header, body } = props
   return (
     <Flex

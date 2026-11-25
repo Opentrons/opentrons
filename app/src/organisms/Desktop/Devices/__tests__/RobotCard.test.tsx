@@ -16,11 +16,6 @@ import {
   ROBOT_MODEL_OT3,
 } from '/app/redux/discovery/constants'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
-import { useAttachedPipettes } from '/app/resources/instruments'
-import {
-  mockLeftProtoPipette,
-  mockRightProtoPipette,
-} from '/app/resources/instruments/__fixtures__'
 import { useAttachedModules } from '/app/resources/modules'
 
 import {
@@ -96,10 +91,6 @@ describe('RobotCard', () => {
     vi.mocked(useAttachedModules).mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
-    vi.mocked(useAttachedPipettes).mockReturnValue({
-      left: mockLeftProtoPipette,
-      right: mockRightProtoPipette,
-    })
     vi.mocked(UpdateRobotBanner).mockReturnValue(
       <div>Mock UpdateRobotBanner</div>
     )

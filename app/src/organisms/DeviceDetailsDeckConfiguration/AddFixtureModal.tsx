@@ -34,6 +34,7 @@ import {
 import { useSendIdentifyModule } from '../ModuleWizardFlows/hooks'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type { AttachedModule } from '@opentrons/api-client'
 import type { ModalProps } from '@opentrons/components'
 import type {
@@ -74,7 +75,7 @@ export function AddFixtureModal({
   deckDef,
   existingCutoutFixtureId,
   updateDeckConfiguration,
-}: AddFixtureModalProps): JSX.Element {
+}: AddFixtureModalProps): ReactNode {
   const { t } = useTranslation([
     'device_details',
     'shared',

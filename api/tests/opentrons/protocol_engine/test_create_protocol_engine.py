@@ -9,7 +9,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.ot3api import OT3API as HardwareAPI
 from opentrons.hardware_control.types import DoorState
 from opentrons.protocol_engine import (
     Config as EngineConfig,

@@ -30,6 +30,7 @@ import {
 } from '/app/redux/protocol-runs'
 import { formatTimestamp } from '/app/transformations/runs'
 
+import type { ReactNode } from 'react'
 import type { IconProps } from '@opentrons/components'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
@@ -41,7 +42,7 @@ export interface OffsetsConflictModalProps {
 export function LabwareOffsetsConflictModal({
   runId,
   isOnDevice,
-}: OffsetsConflictModalProps): JSX.Element {
+}: OffsetsConflictModalProps): ReactNode {
   const dispatch = useDispatch()
   const tsInfo = useSelector(selectConflictTimestampInfo(runId))
   const tsFormatted = formatTimestamp(tsInfo.timestamp ?? '')
@@ -88,7 +89,7 @@ function OffsetsConflictODD({
   lastFreshRunTs,
   onDatabaseOffsets,
   onRunRecordOffsets,
-}: OffsetsConflictContentProps): JSX.Element {
+}: OffsetsConflictContentProps): ReactNode {
   const { t } = useTranslation(['protocol_setup', 'branded'])
 
   const header: OddModalHeaderBaseProps = {
@@ -134,7 +135,7 @@ function OffsetsConflictDesktop({
   lastFreshRunTs,
   onDatabaseOffsets,
   onRunRecordOffsets,
-}: OffsetsConflictContentProps): JSX.Element {
+}: OffsetsConflictContentProps): ReactNode {
   const { t } = useTranslation(['protocol_setup', 'branded'])
 
   const buildIcon = (): IconProps => {

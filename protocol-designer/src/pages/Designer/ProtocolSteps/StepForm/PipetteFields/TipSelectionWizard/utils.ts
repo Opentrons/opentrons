@@ -233,6 +233,49 @@ export function getIsTiprackSelectable(args: {
   )
 }
 
+export const getFirstSelectableTiprackId = (args: {
+  allLabware: Record<string, LabwareOnDeck>
+  formTiprackUri: string
+  pipetteSpecs: PipetteV2Specs
+  nozzles: NozzleConfigurationStyle
+  labwareEntities: LabwareEntities
+  labwareRobotState: LabwareRobotState
+}): string | null => {
+  const {
+    allLabware,
+    formTiprackUri,
+    pipetteSpecs,
+    nozzles,
+    labwareEntities,
+    labwareRobotState,
+  } = args
+
+  for (const labware of Object.values(allLabware)) {
+    const { stack } = labware
+    if (
+      getSlotInLocationStack(stack) === 'offDeck' ||
+      stack.includes('fixedTrash')
+    ) {
+      continue
+    }
+
+    if (
+      getIsTiprackSelectable({
+        labware,
+        formTiprackUri,
+        pipetteSpecs,
+        nozzles,
+        labwareEntities,
+        labwareRobotState,
+      })
+    ) {
+      return labware.id
+    }
+  }
+
+  return null
+}
+
 interface GetIsTiprackSelectableAndValidArgs {
   labware: LabwareOnDeck
   formTiprackUri: string

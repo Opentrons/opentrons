@@ -10,6 +10,7 @@ import {
   WRAP,
 } from '@opentrons/components'
 
+import type { ReactNode } from 'react'
 import type { IconName } from '@opentrons/components'
 
 interface TagInfo {
@@ -22,7 +23,7 @@ interface StyledTransProps {
   values?: object
 }
 
-export function StyledTrans(props: StyledTransProps): JSX.Element {
+export function StyledTrans(props: StyledTransProps): ReactNode {
   const { i18nKey, tagInfos, values } = props
   const { t } = useTranslation(['protocol_steps', 'application'])
 

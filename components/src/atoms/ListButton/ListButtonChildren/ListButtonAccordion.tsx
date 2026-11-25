@@ -22,7 +22,7 @@ interface ListButtonAccordionProps {
 **/
 export function ListButtonAccordion(
   props: ListButtonAccordionProps
-): JSX.Element {
+): ReactNode {
   const {
     headline,
     children,

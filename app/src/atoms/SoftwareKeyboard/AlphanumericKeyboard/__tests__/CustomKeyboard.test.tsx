@@ -9,9 +9,10 @@ import { renderWithProviders } from '/app/__testing-utils__'
 
 import { AlphanumericKeyboard } from '..'
 
+import type { ReactNode } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
 
-function TestKeyboard(): JSX.Element {
+function TestKeyboard(): ReactNode {
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
   const inputElementRef = useRef<HTMLInputElement>(null)
 

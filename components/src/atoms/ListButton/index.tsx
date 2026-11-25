@@ -84,7 +84,7 @@ const ODD_LIST_BUTTON_PROPS_BY_TYPE: Record<
   TODO(ja, 8/12/24): shuld be used in ODD as well and need to add
   odd stylings
 **/
-export function ListButton(props: ListButtonProps): JSX.Element {
+export function ListButton(props: ListButtonProps): ReactNode {
   const {
     type,
     children,

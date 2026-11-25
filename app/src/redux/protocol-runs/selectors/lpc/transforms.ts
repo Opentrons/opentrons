@@ -254,11 +254,16 @@ export function getWorkingOffsetsByUri(
 }
 
 // "Missing" means the existing offset is not present (the offsets are persisted on the server).
+// Hardcoded offsets are not missing.
 export function getAreAnyLocationSpecificOffsetsMissing(
   lsDetails: LocationSpecificOffsetDetails[] | undefined
 ): boolean {
   return (
-    lsDetails?.some(detail => detail.existingOffset?.vector == null) ?? false
+    lsDetails?.some(
+      detail =>
+        detail.existingOffset?.vector == null &&
+        detail.locationDetails.hardCodedOffsetId == null
+    ) ?? false
   )
 }
 

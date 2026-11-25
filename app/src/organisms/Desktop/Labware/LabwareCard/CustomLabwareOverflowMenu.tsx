@@ -24,6 +24,7 @@ import {
   TYPOGRAPHY,
   useConditionalConfirm,
   useOnClickOutside,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -37,7 +38,7 @@ import {
   openCustomLabwareDirectory,
 } from '/app/redux/custom-labware'
 
-import type { MouseEventHandler } from 'react'
+import type { MouseEventHandler, ReactNode } from 'react'
 import type { Dispatch } from '/app/redux/types'
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create/'
@@ -49,7 +50,7 @@ interface CustomLabwareOverflowMenuProps {
 
 export function CustomLabwareOverflowMenu(
   props: CustomLabwareOverflowMenuProps
-): JSX.Element {
+): ReactNode {
   const { filename, onDelete } = props
   const { t } = useTranslation(['labware_landing', 'shared'])
   const dispatch = useDispatch<Dispatch>()
@@ -113,7 +114,7 @@ export function CustomLabwareOverflowMenu(
       {showOverflowMenu && (
         <Flex
           ref={overflowMenuRef}
-          zIndex={10}
+          zIndex={Z_INDEX.MODALS}
           borderRadius="4px 4px 0px 0px"
           boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}

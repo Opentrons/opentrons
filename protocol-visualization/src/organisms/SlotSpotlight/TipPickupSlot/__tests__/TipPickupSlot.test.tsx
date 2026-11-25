@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react'
-import { beforeEach, describe, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fixtureTiprack300ul } from '@opentrons/shared-data'
 import { CLEAN, DIRTY, EMPTY } from '@opentrons/step-generation'
@@ -96,8 +96,19 @@ describe('TipPickupSlot', () => {
   it('should render TipPickupSlot', () => {
     render(props)
     screen.getByText('mockNickname')
+    screen.getByText('Mock 300µL Tiprack')
     screen.getByText('mock LabwareRender')
     screen.getByTestId('robot-workspace')
+  })
+
+  it('should render display name without nickname when nickName is absent', () => {
+    props.tiprackEntity = {
+      ...createMockTiprackEntity(),
+      nickName: null,
+    }
+    render(props)
+    screen.getByText('Mock 300µL Tiprack')
+    expect(screen.queryByText('mockNickname')).not.toBeInTheDocument()
   })
 
   it('should display tips remaining count when tips are present', () => {

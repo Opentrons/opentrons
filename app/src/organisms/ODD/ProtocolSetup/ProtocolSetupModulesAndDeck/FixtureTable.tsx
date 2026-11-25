@@ -34,6 +34,7 @@ import {
 } from '/app/resources/deck_configuration/utils'
 
 import type { TFunction } from 'i18next'
+import type { ReactNode } from 'react'
 import type {
   CutoutConfigAndCompatibility,
   CutoutFixtureId,
@@ -107,7 +108,7 @@ function FixtureTableItem({
   deckDef,
   robotName,
   partialRequiredCutoutFixtureId,
-}: FixtureTableItemProps): JSX.Element {
+}: FixtureTableItemProps): ReactNode {
   const { t, i18n } = useTranslation(['protocol_setup', 'deck_configuration'])
 
   const [showLocationConflictModal, setShowLocationConflictModal] =

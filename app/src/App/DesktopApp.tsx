@@ -21,7 +21,6 @@ import {
 import { IncompatibleModuleTakeover } from '/app/organisms/IncompatibleModule'
 import { ToasterOven } from '/app/organisms/ToasterOven'
 import { AppSettings } from '/app/pages/Desktop/AppSettings'
-import { CalibrationDashboard } from '/app/pages/Desktop/Devices/CalibrationDashboard'
 import { DeviceDetails } from '/app/pages/Desktop/Devices/DeviceDetails'
 import { DevicesLanding } from '/app/pages/Desktop/Devices/DevicesLanding'
 import { ProtocolRunDetails } from '/app/pages/Desktop/Devices/ProtocolRunDetails'
@@ -48,9 +47,10 @@ import { Navbar } from './Navbar'
 import { ModalPortalRoot } from './portal'
 import { ReactQueryDevtools } from './tools'
 
+import type { ReactNode } from 'react'
 import type { RouteProps } from './types'
 
-export const DesktopApp = (): JSX.Element => {
+export const DesktopApp = (): ReactNode => {
   useSoftwareUpdatePoll()
   useRefreshAccessTokenOnActivity()
   useTrackRobotRestarts()
@@ -90,11 +90,6 @@ export const DesktopApp = (): JSX.Element => {
       Component: DeviceDetails,
       name: 'Device',
       path: '/devices/:robotName/:deviceDetailsTab?',
-    },
-    {
-      Component: CalibrationDashboard,
-      name: 'Calibration Dashboard',
-      path: '/devices/:robotName/robot-settings/calibration/dashboard',
     },
     {
       Component: RobotSettings,

@@ -1,7 +1,7 @@
 import { InProgressModal } from '../InProgressModal/InProgressModal'
 import { SimpleWizardBodyContainer } from './SimpleWizardBodyContainer'
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import type { StyleProps } from '@opentrons/components'
 
 export type SimpleWizardInProgressBodyProps = ComponentProps<
@@ -15,7 +15,7 @@ export function SimpleWizardInProgressBody({
   body,
   children,
   ...styleProps
-}: SimpleWizardInProgressBodyProps): JSX.Element {
+}: SimpleWizardInProgressBodyProps): ReactNode {
   return (
     <SimpleWizardBodyContainer {...styleProps}>
       <InProgressModal

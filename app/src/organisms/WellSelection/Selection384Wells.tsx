@@ -40,7 +40,7 @@ export function Selection384Wells({
   deselectWells,
   labwareRender,
   selectWells,
-}: Selection384WellsProps): JSX.Element {
+}: Selection384WellsProps): ReactNode {
   const [selectBy, setSelectBy] = useState<'columns' | 'wells'>('columns')
 
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
@@ -186,7 +186,7 @@ function SelectBy({
   selectBy,
   setSelectBy,
   setLastSelectedIndex,
-}: SelectByProps): JSX.Element {
+}: SelectByProps): ReactNode {
   const { t, i18n } = useTranslation('quick_transfer')
 
   return (
@@ -249,7 +249,7 @@ function StartingWell({
     SetStateAction<Record<StartingWellOption, boolean>>
   >
   wells: string[]
-}): JSX.Element {
+}): ReactNode {
   const { t, i18n } = useTranslation('quick_transfer')
 
   const checkboxWellOptions: StartingWellOption[] =
@@ -314,7 +314,7 @@ interface ButtonControlsProps {
   plusDisabled: boolean
 }
 
-function ButtonControls(props: ButtonControlsProps): JSX.Element {
+function ButtonControls(props: ButtonControlsProps): ReactNode {
   const { channels, handleMinus, handlePlus, minusDisabled, plusDisabled } =
     props
   const { t, i18n } = useTranslation('quick_transfer')

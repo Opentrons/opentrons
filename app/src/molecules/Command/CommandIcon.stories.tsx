@@ -1,6 +1,7 @@
 import { CommandIcon as CommandIconComponent } from './CommandIcon'
 
 import type { Meta, StoryObj } from '@storybook/react'
+import type { ReactNode } from 'react'
 import type { ICON_BY_COMMAND_TYPE } from './CommandIcon'
 
 type CHECKED_COMMANDS = 'moveLabware' | 'comment' | keyof ICON_BY_COMMAND_TYPE
@@ -89,7 +90,7 @@ interface StorybookArgs {
   size: string
 }
 
-function Wrapper(props: StorybookArgs): JSX.Element {
+function Wrapper(props: StorybookArgs): ReactNode {
   return (
     <CommandIconComponent
       command={COMMANDS[props.commandType]}

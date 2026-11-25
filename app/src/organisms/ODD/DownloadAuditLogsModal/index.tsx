@@ -8,7 +8,9 @@ import { OddInfoScreen } from '/app/molecules/ODDInfoScreen'
 import { OddModal } from '/app/molecules/OddModal'
 import { useIsLogDeleted } from '/app/resources/audit/useIsLogDeleted'
 
-export function DownloadAuditLogsModal(): JSX.Element {
+import type { ReactNode } from 'react'
+
+export function DownloadAuditLogsModal(): ReactNode {
   const { t } = useTranslation('branded')
 
   return (
@@ -25,7 +27,7 @@ export function DownloadAuditLogsModal(): JSX.Element {
 }
 
 const DownloadAuditLogsModalImpl = NiceModal.create(
-  ({ logPeriodId }: { logPeriodId: string }): JSX.Element => {
+  ({ logPeriodId }: { logPeriodId: string }): ReactNode => {
     const modal = useModal()
     const { isLoading, isDeleted, isError } = useIsLogDeleted(logPeriodId)
 

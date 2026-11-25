@@ -11,40 +11,31 @@ import {
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '/app/i18n'
-import { useIsFlex } from '/app/redux-resources/robots'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { PIPETTE_MOUNTS } from '/app/resources/instruments/constants'
 import { isGripperInCommands } from '/app/resources/protocols/utils'
-import {
-  useMostRecentCompletedAnalysis,
-  useRunPipetteInfoByMount,
-} from '/app/resources/runs'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 
 import { PipetteRecalibrationWarning } from '../PipetteCard/PipetteRecalibrationWarning'
 import { SetupFlexPipetteCalibrationItem } from './SetupFlexPipetteCalibrationItem'
 import { SetupGripperCalibrationItem } from './SetupGripperCalibrationItem'
-import { SetupPipetteCalibrationItem } from './SetupPipetteCalibrationItem'
 
+import type { ReactNode } from 'react'
 import type { GripperData } from '@opentrons/api-client'
 
 const EQUIPMENT_POLL_MS = 5000
 
 interface SetupInstrumentCalibrationProps {
-  robotName: string
   runId: string
 }
 
 export function SetupInstrumentCalibration({
-  robotName,
   runId,
-}: SetupInstrumentCalibrationProps): JSX.Element {
+}: SetupInstrumentCalibrationProps): ReactNode {
   const { t } = useTranslation('protocol_setup')
-  const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
-  const isFlex = useIsFlex(robotName)
 
   const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
-    enabled: isFlex,
     refetchInterval: EQUIPMENT_POLL_MS,
   })
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -67,30 +58,14 @@ export function SetupInstrumentCalibration({
         {i18n.format(t('required_instrument_calibrations'), 'titleCase')}
       </LegacyStyledText>
       {PIPETTE_MOUNTS.map((mount, index) => {
-        const pipetteInfo = runPipetteInfoByMount[mount]
-        if (pipetteInfo != null && !isFlex) {
-          return (
-            <SetupPipetteCalibrationItem
-              key={index}
-              pipetteInfo={pipetteInfo}
-              mount={mount}
-              robotName={robotName}
-              runId={runId}
-              instrumentsRefetch={refetch}
-            />
-          )
-        } else if (isFlex) {
-          return (
-            <SetupFlexPipetteCalibrationItem
-              key={index}
-              mount={mount}
-              runId={runId}
-              instrumentsRefetch={refetch}
-            />
-          )
-        } else {
-          return null
-        }
+        return (
+          <SetupFlexPipetteCalibrationItem
+            key={index}
+            mount={mount}
+            runId={runId}
+            instrumentsRefetch={refetch}
+          />
+        )
       })}
       {usesGripper ? (
         <SetupGripperCalibrationItem

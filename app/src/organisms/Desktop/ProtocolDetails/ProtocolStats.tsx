@@ -16,6 +16,7 @@ import {
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
+import type { ReactNode } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 
 interface ProtocolStatsProps {
@@ -175,7 +176,7 @@ interface StatRowProps {
   datum: string | number
 }
 
-export const StatRow = (props: StatRowProps): JSX.Element => {
+export const StatRow = (props: StatRowProps): ReactNode => {
   const { displayName, description, datum } = props
   return (
     <Flex flexDirection={DIRECTION_ROW}>

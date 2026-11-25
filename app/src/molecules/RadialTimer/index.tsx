@@ -4,6 +4,8 @@ import { StyledText } from '@opentrons/components'
 
 import styles from './radial_timer.module.css'
 
+import type { ReactNode } from 'react'
+
 interface RadialTimerProps {
   from: number
   until: number
@@ -17,7 +19,7 @@ function getTimerValue(until: number): number {
   return Math.max(0, Math.ceil(r / 1000))
 }
 
-export function RadialTimer({ from, until }: RadialTimerProps): JSX.Element {
+export function RadialTimer({ from, until }: RadialTimerProps): ReactNode {
   const [value, setValue] = useState(() => getTimerValue(until))
 
   useEffect(() => {

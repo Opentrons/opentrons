@@ -15,9 +15,10 @@ import { getTopmostLabwareOnModuleFromStack } from '../utils/getTopmostLabwareOn
 import { DeckViewOverlay } from './DeckViewOverlay'
 import { DeckViewStacker } from './DeckViewStacker'
 
-import type { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { ThermocyclerVizProps } from '@opentrons/components'
 import type {
+  CutoutId,
   DeckDefinition,
   Liquid,
   RobotType,
@@ -40,9 +41,10 @@ interface DeckViewModulesProps {
   hoveredSlot: string | null
   selectedSlot: string | null
   selectedRunTimeCommand?: RunTimeCommand
+  stagingAreaCutoutIds: CutoutId[]
 }
 
-export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
+export function DeckViewModules(props: DeckViewModulesProps): ReactNode {
   const {
     robotState,
     invariantContext,
@@ -55,6 +57,7 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
     selectedSlot,
     labwareEntitiesExtended,
     selectedRunTimeCommand,
+    stagingAreaCutoutIds,
   } = props
   const { moduleEntities } = invariantContext
   const { modules, labware, pipettes } = robotState
@@ -146,6 +149,7 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
                   labwareEntitiesExtended={labwareEntitiesExtended}
                   selectedRunTimeCommand={selectedRunTimeCommand}
                   renderLabware={!isThermocyclerLidClosed}
+                  stagingAreaCutoutIds={stagingAreaCutoutIds}
                 />
               ) : null}
               <DeckViewOverlay
@@ -170,6 +174,7 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
                 setHoveredSlot={setHoveredSlot}
                 hover={hoveredSlot}
                 selectedSlot={selectedSlot}
+                stagingAreaCutoutIds={stagingAreaCutoutIds}
               />
             </Module>
           </Fragment>

@@ -12,6 +12,7 @@ import {
   Snackbar,
   SPACING,
   Toast,
+  Z_INDEX,
 } from '@opentrons/components'
 
 import { getIsOnDevice } from '/app/redux/config'
@@ -30,14 +31,12 @@ interface ToasterOvenProps {
   children: ReactNode
 }
 
-const DEFAULT_TOAST_CONTAINER_Z_INDEX = 1000
-
 /**
  * A toaster oven that renders up to 5 toasts in an app-level display container
  * @param children passes through and renders children
  * @returns
  */
-export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
+export function ToasterOven({ children }: ToasterOvenProps): ReactNode {
   const [toasts, setToasts] = useState<ToastProps[]>([])
   const [snackbar, setSnackbar] = useState<SnackbarProps | null>(null)
 
@@ -61,7 +60,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
           return {
             ...toast,
             exitNow: true,
-            zIndex: 1,
+            zIndex: Z_INDEX.BASE,
             position: POSITION_FIXED,
           }
         })
@@ -70,7 +69,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
             id,
             message,
             type,
-            zIndex: 2,
+            zIndex: Z_INDEX.DETAILS,
             position: POSITION_FIXED,
             // Allow callers to override stacking
             ...options,
@@ -85,11 +84,9 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
   )
 
   const toastContainerZIndex = Math.max(
-    DEFAULT_TOAST_CONTAINER_Z_INDEX,
-    ...toasts.map(toast =>
-      typeof toast.zIndex === 'number'
-        ? toast.zIndex
-        : DEFAULT_TOAST_CONTAINER_Z_INDEX
+    Z_INDEX.TOASTS,
+    ...toasts.map((toast: ToastProps): number =>
+      typeof toast.zIndex === 'number' ? toast.zIndex : Z_INDEX.TOASTS
     )
   )
 
@@ -157,7 +154,7 @@ export function ToasterOven({ children }: ToasterOvenProps): JSX.Element {
           width="100%"
           position="absolute"
           bottom={SPACING.spacing40}
-          zIndex={1000}
+          zIndex={Z_INDEX.TOASTS}
           onClick={() => {
             eatSnackbar()
           }}

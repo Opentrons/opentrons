@@ -19,6 +19,7 @@ import { ACCESS_CONTROL_DISABLED_DOCUMENTATION_STATE } from '/app/local-resource
 import { OddModal } from '/app/molecules/OddModal'
 import { updateConfigValue } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data'
 import type { Dispatch } from '/app/redux/types'
 
@@ -28,7 +29,7 @@ interface WelcomeModalProps {
 
 export function WelcomeModal({
   setShowWelcomeModal,
-}: WelcomeModalProps): JSX.Element {
+}: WelcomeModalProps): ReactNode {
   const { t } = useTranslation(['device_details', 'shared'])
   const dispatch = useDispatch<Dispatch>()
 

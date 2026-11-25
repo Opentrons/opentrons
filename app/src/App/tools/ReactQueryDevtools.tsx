@@ -2,6 +2,8 @@ import { lazy, Suspense } from 'react'
 
 import { useFeatureFlag } from '/app/redux/config'
 
+import type { ReactNode } from 'react'
+
 // Lazily load to enable devtools when env.process.DEV is false (ex, when dev code is pushed to a physical ODD)
 const ReactQueryTools = lazy(() =>
   import('react-query/devtools/development').then(d => ({
@@ -9,7 +11,7 @@ const ReactQueryTools = lazy(() =>
   }))
 )
 
-export function ReactQueryDevtools(): JSX.Element {
+export function ReactQueryDevtools(): ReactNode {
   const enableRQTools = useFeatureFlag('reactQueryDevtools')
 
   return (

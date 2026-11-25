@@ -38,7 +38,7 @@
 }
 
 .api_name_link {
-  font-size: var(--font-size-p);
+  font-size: var(--font-size-13);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-20);
   white-space: normal;
@@ -48,7 +48,7 @@
   display: inline;
   min-width: 0;
   color: var(--black-90);
-  font-size: var(--font-size-p);
+  font-size: var(--font-size-13);
   overflow-wrap: anywhere;
   white-space: normal;
 }

@@ -18,6 +18,7 @@ import {
 
 import { useResponsiveBreakpoints } from '../../resources/hooks'
 
+import type { ReactNode } from 'react'
 import type { DropdownMenuProps, TagProps } from '@opentrons/components'
 
 interface PDListItemCustomizeProps {
@@ -38,7 +39,7 @@ export function PDListItemCustomize({
   label,
   dropdown,
   tag,
-}: PDListItemCustomizeProps): JSX.Element {
+}: PDListItemCustomizeProps): ReactNode {
   const responsiveType = useResponsiveBreakpoints()
   const isLargeScreen = responsiveType === 'xl' || responsiveType === 'lg'
   const flexSize = responsiveType === 'xl' ? '0 0 1.5' : '0 0 1'

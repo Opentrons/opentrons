@@ -15,6 +15,7 @@ import { SmallButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { useIsOEMMode } from '/app/resources/robot-settings'
 
+import type { ReactNode } from 'react'
 import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 interface RobotSystemVersionModalProps {
@@ -27,7 +28,7 @@ export function RobotSystemVersionModal({
   version,
   releaseNotes,
   setShowModal,
-}: RobotSystemVersionModalProps): JSX.Element {
+}: RobotSystemVersionModalProps): ReactNode {
   const { t } = useTranslation(['device_settings', 'shared'])
   const navigate = useNavigate()
   const isOEMMode = useIsOEMMode()

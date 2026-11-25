@@ -13,7 +13,7 @@ import { DeckLabelSet } from '../../organisms'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import styles from './basedeck.module.css'
 
-import type { SVGProps } from 'react'
+import type { ReactNode, SVGProps } from 'react'
 import type {
   DeckDefinition,
   ModuleType,
@@ -91,7 +91,7 @@ interface WasteChuteProps {
 /**
  * a deck map foreign object representing the physical location of the waste chute connected to the deck
  */
-export function WasteChute(props: WasteChuteProps): JSX.Element {
+export function WasteChute(props: WasteChuteProps): ReactNode {
   const {
     wasteIconColor,
     backgroundColor,

@@ -44,7 +44,7 @@ export {
   LARGE_STEP_SIZE_MM,
 }
 
-export function JogControls(props: JogControlsProps): JSX.Element {
+export function JogControls(props: JogControlsProps): ReactNode {
   const {
     jog,
     directionControlButtonColor,

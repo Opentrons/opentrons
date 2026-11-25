@@ -24,6 +24,7 @@ import {
   SUCCESSFULLY_DETACHED,
 } from './constants'
 
+import type { ReactNode } from 'react'
 import type { GripperWizardStepProps, SuccessStep } from './types'
 
 const HEADER_STYLE = css`
@@ -39,7 +40,7 @@ export const Success = (
   props: Pick<GripperWizardStepProps, 'proceed'> &
     Pick<GripperWizardStepProps, 'isRobotMoving'> &
     SuccessStep
-): JSX.Element => {
+): ReactNode => {
   const { proceed, successfulAction, isRobotMoving } = props
   const { t, i18n } = useTranslation([
     'gripper_wizard_flows',

@@ -3,7 +3,7 @@ import asyncio
 import pytest
 from mock import PropertyMock
 
-from opentrons.drivers.rpi_drivers.types import PortGroup, USBPort
+from opentrons.drivers.usb.types import PortGroup, USBPort
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import (
     HeaterShaker,

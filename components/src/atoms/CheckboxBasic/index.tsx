@@ -4,7 +4,7 @@ import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import styles from './checkboxbasic.module.css'
 
-import type { ChangeEventHandler } from 'react'
+import type { ChangeEventHandler, ReactNode } from 'react'
 
 export interface CheckboxBasicProps {
   /** false = unchecked, true = checked, 'indeterminate' = partial-select dash */
@@ -21,7 +21,7 @@ export interface CheckboxBasicProps {
   backgroundColor?: string
 }
 
-export function CheckboxBasic(props: CheckboxBasicProps): JSX.Element {
+export function CheckboxBasic(props: CheckboxBasicProps): ReactNode {
   const {
     checked,
     onChange,

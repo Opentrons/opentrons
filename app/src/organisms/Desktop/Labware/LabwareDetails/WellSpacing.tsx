@@ -6,6 +6,7 @@ import { getSpacingDiagram } from '@opentrons/components'
 import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
 import { LabeledValue } from './StyledComponents/LabeledValue'
 
+import type { ReactNode } from 'react'
 import type { LabwareWellGroupProperties } from '/app/local-resources/labware'
 
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
@@ -18,7 +19,7 @@ export interface WellSpacingProps {
   className?: string
 }
 
-export function WellSpacing(props: WellSpacingProps): JSX.Element {
+export function WellSpacing(props: WellSpacingProps): ReactNode {
   const { t } = useTranslation('labware_details')
   const { labelSuffix, wellProperties, category, isMultiRow } = props
 

@@ -13,7 +13,7 @@ export interface TooltipProps extends StyleProps {
   key?: string
 }
 
-export function Tooltip(props: TooltipProps): JSX.Element {
+export function Tooltip(props: TooltipProps): ReactNode {
   const {
     children,
     tooltipProps,
