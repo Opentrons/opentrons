@@ -94,6 +94,14 @@ export function LabwareSlotContainer(
     vacuumModuleId != null
       ? getModuleDisplayName(moduleEntities[vacuumModuleId].model)
       : null
+  const stackItems =
+    labware[topLabwareOnSlotId]?.stack.filter(
+      item => item !== topLabwareOnSlotId
+    ) ?? []
+  const moduleStackItems = stackItems.filter(
+    item => moduleEntities[item] != null
+  )
+  const showStackedIcon = stackItems.some(item => labware[item] != null)
 
   const { params: labwareLoadCommandParams } = labwareLoadCommand ?? {}
   const labwareNickname: string | null =
@@ -203,25 +211,16 @@ export function LabwareSlotContainer(
         <div className={styles.header}>
           <Tag text={t('labware')} type="default" shrinkToContent />
           <div className={styles.info_label_container}>
-            {labware[topLabwareOnSlotId]?.stack
-              .filter(item => item !== topLabwareOnSlotId)
-              .reverse()
-              .map(item => {
-                if (moduleEntities[item] != null) {
-                  return (
-                    <RobotInfoLabel
-                      key={item}
-                      iconName={
-                        MODULE_ICON_NAME_BY_TYPE[moduleEntities[item].type]
-                      }
-                    />
-                  )
-                } else if (labware[item] != null) {
-                  return <RobotInfoLabel key={item} iconName="stacked" />
-                } else {
-                  return <RobotInfoLabel key={item} deckLabel={displaySlot} />
-                }
-              })}
+            <RobotInfoLabel key="slotLabel" deckLabel={displaySlot} />
+            {moduleStackItems.map(item => (
+              <RobotInfoLabel
+                key={item}
+                iconName={MODULE_ICON_NAME_BY_TYPE[moduleEntities[item].type]}
+              />
+            ))}
+            {showStackedIcon ? (
+              <RobotInfoLabel key="stackedIcon" iconName="stacked" />
+            ) : null}
           </div>
         </div>
         {vacuumModuleDisplayName != null ? (
