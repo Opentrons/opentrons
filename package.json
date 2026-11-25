@@ -110,7 +110,7 @@
     "rehype-urls": "^1.0.0",
     "semver": "^7.3.8",
     "shx": "^0.3.4",
-    "simple-git": "^3.32.3",
+    "simple-git": "^4.0.1",
     "storybook": "10.6.2",
     "storybook-addon-pseudo-states": "9.1.5",
     "stylelint": "18.0.0",
