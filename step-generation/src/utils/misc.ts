@@ -1618,9 +1618,13 @@ export const getIsRetractSafeForAirGap = (args: {
 }
 
 export const getStackForLabwareLocation = (
-  locationSequence: LabwareLocationSequence
-): string[] =>
-  locationSequence.reduce<string[]>((acc, item) => {
+  locationSequence: LabwareLocationSequence,
+  modules: RobotState['modules'] = {}
+): string[] => {
+  // labware on a stacker shuttle is stacked directly on the stacker's slot (no
+  // module id and no hopper marker), which is how retrieve/moveLabware build it
+  let isOnShuttle = false
+  return locationSequence.reduce<string[]>((acc, item) => {
     const { kind } = item
     if (kind === 'onCutoutFixture') {
       return acc
@@ -1628,14 +1632,32 @@ export const getStackForLabwareLocation = (
     if (kind === 'onLabware') {
       return [...acc, item.labwareId]
     }
-    if (kind === 'onModule' || kind === 'inStackerHopper') {
+    if (kind === 'onModule') {
+      const stackerModule = modules[item.moduleId]
+      if (stackerModule?.moduleState.type === FLEX_STACKER_MODULE_TYPE) {
+        isOnShuttle = true
+        return [...acc, stackerModule.slot]
+      }
+      return [...acc, item.moduleId]
+    }
+    if (kind === 'inStackerHopper') {
       return [...acc, item.moduleId]
     }
     if (kind === 'onAddressableArea') {
+      // the shuttle's addressable area is already represented by the stacker slot
+      if (
+        isOnShuttle &&
+        FLEX_STACKER_ADDRESSABLE_AREAS.includes(
+          item.addressableAreaName as AddressableAreaName
+        )
+      ) {
+        return acc
+      }
       return [...acc, item.addressableAreaName]
     }
     return [...acc, item.logicalLocationName]
   }, [])
+}
 
 const FOURTH_COLUMN_TO_CUTOUT_MAP = {
   A4: 'cutoutA3',
