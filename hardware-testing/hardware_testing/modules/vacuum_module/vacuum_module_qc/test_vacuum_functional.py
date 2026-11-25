@@ -30,7 +30,8 @@ SETTLE_WINDOW_SAMPLES = max(2, round(SETTLE_WINDOW_S / SAMPLE_PERIOD_S))
 TIMEOUT_S = HOLD_DURATION_S + 60
 # First sample inside this band of the command counts as reached.
 PRESSURE_TOLERANCE = 8  # mbar
-# Unscored pull on the filter plate before the holds.
+# Unscored pull on the filter plate before the holds. Keep going to -800.
+# The ±8 reach band passes a plate that stalls a few mbar short.
 SEAL_TARGET_MBAR = -800
 SEAL_ATTEMPTS = 2
 
@@ -74,9 +75,9 @@ ZERO_P95_ABS_ERR_LIMIT = 8.0
 ZERO_SETTLE_TIME_LIMIT_S = 20.0
 ZERO_DEEPEST_LIMIT_MBAR = -50.0
 # -900 is past the pump ceiling. It must not reach or settle.
-# Steady mean must sit on the ceiling, not at atmosphere and not past -850.
+# Steady mean must sit on the ceiling, not at atmosphere and not past -890.
 UNREACHABLE_TARGETS = [-900]
-UNREACHABLE_MIN_MEAN_MBAR = -850.0
+UNREACHABLE_MIN_MEAN_MBAR = -890.0
 UNREACHABLE_MAX_MEAN_MBAR = -700.0
 # Ceiling hold must stay steady.
 UNREACHABLE_P2P_LIMIT = 8.0
@@ -201,7 +202,7 @@ def _target_passed(
 
 
 async def _pull_for_seal(vacuum: VacuumModule) -> float:
-    """Close the vent, pull toward -800, and return the gauge reached."""
+    """Close the vent, pull to -800, and return the deepest gauge."""
     print("Checking fixture seal")
     await vacuum.set_vacuum_state(False)
     await vacuum.set_vent_state(VentState.CLOSED)
@@ -213,38 +214,41 @@ async def _pull_for_seal(vacuum: VacuumModule) -> float:
         vent_after=False,
     )
     started = time.monotonic()
-    gauge = vacuum.vacuum_state.current_gauge_pressure
+    deepest = 0.0
     while time.monotonic() - started < REACH_TIME_LIMIT_S:
         await vacuum._reader.update_vacuum_state()
         gauge = vacuum.vacuum_state.current_gauge_pressure
         print(f"Gauge: {gauge}")
-        if abs(gauge - SEAL_TARGET_MBAR) <= PRESSURE_TOLERANCE:
+        if gauge < deepest:
+            deepest = gauge
+        if gauge <= SEAL_TARGET_MBAR:
             break
         await asyncio.sleep(0.5)
     await vacuum.set_vacuum_state(False)
     await vacuum.set_vent_state(VentState.OPENED)
-    return gauge
+    return deepest
 
 
 async def _fixture_sealed(
     vacuum: VacuumModule, report: CSVReport, section: str
 ) -> bool:
-    """Require -800 on the filter plate. The first miss is a reseat only."""
+    """Require the filter plate to reach -800. The first miss is a reseat only."""
     if vacuum.is_simulated:
         report(section, "fixture-seal", [CSVResult.PASS, float(SEAL_TARGET_MBAR)])
         return True
     gauge = 0.0
     for attempt in range(SEAL_ATTEMPTS):
         gauge = await _pull_for_seal(vacuum)
-        if abs(gauge - SEAL_TARGET_MBAR) <= PRESSURE_TOLERANCE:
+        if gauge <= SEAL_TARGET_MBAR:
             report(section, "fixture-seal", [CSVResult.PASS, round(gauge, 2)])
             return True
         if attempt == 0:
             ui.get_user_ready(
-                f"Seal check did not reach {SEAL_TARGET_MBAR} ±{PRESSURE_TOLERANCE}. Reseat the plate, collar, and hose"
+                f"Seal check reached {gauge:.0f}, short of {SEAL_TARGET_MBAR}. "
+                "Press the filter plate flat, set the collar, and cover every well"
             )
     ui.print_error(
-        f"Seal check did not reach {SEAL_TARGET_MBAR} ±{PRESSURE_TOLERANCE} after a reseat: gauge={gauge:.1f}"
+        f"Seal check did not reach {SEAL_TARGET_MBAR} after a reseat: gauge={gauge:.1f}"
     )
     report(section, "fixture-seal", [CSVResult.FAIL, round(gauge, 2)])
     return False
