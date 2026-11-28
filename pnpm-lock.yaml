@@ -437,8 +437,8 @@ importers:
         specifier: 4.18.1
         version: 4.18.1
       mixpanel-browser:
-        specifier: 2.60.0
-        version: 2.60.0
+        specifier: 2.66.0
+        version: 2.66.0
       netmask:
         specifier: 2.0.2
         version: 2.0.2
@@ -3632,6 +3632,9 @@ packages:
 
   '@rrweb/types@2.2.2':
     resolution: {integrity: sha512-b9BNYEBcQF9dGQ5JJOoqBEFM7HlLmOdKgCfS2qkQj3gevF1wyuJIGPDGpaAYpl0H24fFOHGw6IdbYH6qrZNk1w==}
+
+  '@rrweb/utils@2.2.2':
+    resolution: {integrity: sha512-C078kPGG4iJ6uuSPELy/RkXZ6Ge3rUsSrX0KYzbtSjoCwMErrqF0RMbWjxpUROI0Hx7ewKeiDTp+Og9AYzYzjg==}
 
   '@rtsao/scc@1.1.0':
     resolution: {integrity: sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==}
@@ -7214,9 +7217,6 @@ packages:
     resolution: {integrity: sha512-7yAQpD2UMJzLi1Dqv7qFYnPbaPx7ZfFK6PiIxQ4PfkGPyNyl2Ugx+a/umUonmKqjhM4DnfbMvdX6otXq83soQQ==}
     engines: {node: ^12.20 || >= 14.13}
 
-  fflate@0.4.9:
-    resolution: {integrity: sha512-zdxgIEddhfsyCaWpJ2SdXEP8ZMrKJ6+5jl4OupODcywU0IhRk6gdXuVGcPICyfx2H97hVK7xmJtRLPjkxAX8Vw==}
-
   figures@1.7.0:
     resolution: {integrity: sha512-UxKlfCRuCBxSXU4C6t9scbDyWZ4VlaFFdojKtzJuSkuOBQ5CNFum+zZXFwHjo+CxBC1t6zlYPgHIgFjL8ggoEQ==}
     engines: {node: '>=0.10.0'}
@@ -9033,8 +9033,8 @@ packages:
   mixpanel-browser@2.29.1:
     resolution: {integrity: sha512-RSBqVBznOkKBz3MkCXRrkTEEXqoNNYAbASpjaCxvhpT5pykWhjh7JY54fAmOvtG9XNL3GHYA6XiB7Yos4ngNYQ==}
 
-  mixpanel-browser@2.60.0:
-    resolution: {integrity: sha512-oys+/EnmFEyJqQkmNqb6wI7qTyVQUfxibvzct5HxI8QvQw/hMXqt2UENem1MqCBDTakAaJvgXNeajG4UulIPqA==}
+  mixpanel-browser@2.66.0:
+    resolution: {integrity: sha512-n02abeEhQCNHnpQlYTYx8EzcZGpNXvmw8ozgbFiTbthMRY65aPXuRat5hCiZXllZ+UY31awszFx/LpryPwie0A==}
 
   mkdirp@0.5.6:
     resolution: {integrity: sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw==}
@@ -10629,8 +10629,8 @@ packages:
   rrweb-snapshot@2.2.2:
     resolution: {integrity: sha512-/0w4Xzd/Tw5a80dmEmv8/YkFitJYoMOnbtmt0jCAEdZ1w0nDSw5hvf59E/oDLy+z+x+vCcT0ibI+IYWeuCHegQ==}
 
-  rrweb@2.0.0-alpha.13:
-    resolution: {integrity: sha512-a8GXOCnzWHNaVZPa7hsrLZtNZ3CGjiL+YrkpLo0TfmxGLhjNZbWY2r7pE06p+FcjFNlgUVTmFrSJbK3kO7yxvw==}
+  rrweb@2.0.0-alpha.18:
+    resolution: {integrity: sha512-1mjZcB+LVoGSx1+i9E2ZdAP90fS3MghYVix2wvGlZvrgRuLCbTCCOZMztFCkKpgp7/EeCdYM4nIHJkKX5J1Nmg==}
 
   run-applescript@7.1.0:
     resolution: {integrity: sha512-DPe5pVFaAsinSaV6QjQ6gdiedWDcRCbUuiQfQa2wmWV7+xC9bGulGI8+TdRmoFkAPaBXk8CrAbnlY2ISniJ47Q==}
@@ -15421,6 +15421,8 @@ snapshots:
 
   '@rrweb/types@2.2.2': {}
 
+  '@rrweb/utils@2.2.2': {}
+
   '@rtsao/scc@1.1.0': {}
 
   '@sentry-internal/browser-utils@10.29.0':
@@ -20157,8 +20159,6 @@ snapshots:
       node-domexception: 1.0.0
       web-streams-polyfill: 3.3.3
 
-  fflate@0.4.9: {}
-
   figures@1.7.0:
     dependencies:
       escape-string-regexp: 1.0.5
@@ -22330,9 +22330,9 @@ snapshots:
 
   mixpanel-browser@2.29.1: {}
 
-  mixpanel-browser@2.60.0:
+  mixpanel-browser@2.66.0:
     dependencies:
-      rrweb: 2.0.0-alpha.13
+      rrweb: 2.0.0-alpha.18
 
   mkdirp@0.5.6:
     dependencies:
@@ -24435,13 +24435,13 @@ snapshots:
     dependencies:
       postcss: 8.5.33
 
-  rrweb@2.0.0-alpha.13:
+  rrweb@2.0.0-alpha.18:
     dependencies:
       '@rrweb/types': 2.2.2
+      '@rrweb/utils': 2.2.2
       '@types/css-font-loading-module': 0.0.7
       '@xstate/fsm': 1.6.5
       base64-arraybuffer: 1.0.2
-      fflate: 0.4.9
       mitt: 3.0.1
       rrdom: 2.2.2
       rrweb-snapshot: 2.2.2
