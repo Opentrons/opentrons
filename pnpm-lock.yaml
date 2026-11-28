@@ -1171,6 +1171,9 @@ importers:
       '@types/lodash':
         specifier: 'catalog:'
         version: 4.17.24
+      '@types/react':
+        specifier: 18.2.51
+        version: 18.2.51
       '@types/redux-actions':
         specifier: 2.6.1
         version: 2.6.1
@@ -1242,7 +1245,7 @@ importers:
         version: 18.2.0
       react-dnd:
         specifier: 16.0.1
-        version: 16.0.1(@types/hoist-non-react-statics@3.3.7(@types/react@19.2.17))(@types/node@26.1.1)(@types/react@19.2.17)(react@18.2.0)
+        version: 16.0.1(@types/hoist-non-react-statics@3.3.7(@types/react@18.2.51))(@types/node@26.1.1)(@types/react@18.2.51)(react@18.2.0)
       react-dnd-html5-backend:
         specifier: 16.0.1
         version: 16.0.1
@@ -1263,7 +1266,7 @@ importers:
         version: 1.0.0(react@18.2.0)
       react-redux:
         specifier: 8.1.2
-        version: 8.1.2(@types/react-dom@18.2.18)(@types/react@19.2.17)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(redux@5.0.1)
+        version: 8.1.2(@types/react-dom@18.2.18)(@types/react@18.2.51)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(redux@5.0.1)
       react-router-dom:
         specifier: 'catalog:'
         version: 6.24.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -23862,7 +23865,7 @@ snapshots:
     dependencies:
       dnd-core: 16.0.1
 
-  react-dnd@16.0.1(@types/hoist-non-react-statics@3.3.7(@types/react@19.2.17))(@types/node@26.1.1)(@types/react@19.2.17)(react@18.2.0):
+  react-dnd@16.0.1(@types/hoist-non-react-statics@3.3.7(@types/react@18.2.51))(@types/node@26.1.1)(@types/react@18.2.51)(react@18.2.0):
     dependencies:
       '@react-dnd/invariant': 4.0.2
       '@react-dnd/shallowequal': 4.0.2
@@ -23871,9 +23874,9 @@ snapshots:
       hoist-non-react-statics: 3.3.2
       react: 18.2.0
     optionalDependencies:
-      '@types/hoist-non-react-statics': 3.3.7(@types/react@19.2.17)
+      '@types/hoist-non-react-statics': 3.3.7(@types/react@18.2.51)
       '@types/node': 26.1.1
-      '@types/react': 19.2.17
+      '@types/react': 18.2.51
 
   react-docgen-typescript@1.22.0(typescript@5.3.3):
     dependencies:
@@ -23996,6 +23999,21 @@ snapshots:
       react: 18.2.0
     optionalDependencies:
       react-dom: 18.2.0(react@18.2.0)
+
+  react-redux@8.1.2(@types/react-dom@18.2.18)(@types/react@18.2.51)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(redux@5.0.1):
+    dependencies:
+      '@babel/runtime': 7.28.4
+      '@types/hoist-non-react-statics': 3.3.7(@types/react@18.2.51)
+      '@types/use-sync-external-store': 0.0.3
+      hoist-non-react-statics: 3.3.2
+      react: 18.2.0
+      react-is: 18.3.1
+      use-sync-external-store: 1.6.0(react@18.2.0)
+    optionalDependencies:
+      '@types/react': 18.2.51
+      '@types/react-dom': 18.2.18
+      react-dom: 18.2.0(react@18.2.0)
+      redux: 5.0.1
 
   react-redux@8.1.2(@types/react-dom@18.2.18)(@types/react@19.2.17)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(redux@5.0.1):
     dependencies:
